@@ -1,16 +1,19 @@
 <template>
 	<view>
 		<text class="title">{{title}}</text>
-		    <!-- #ifdef REGION-CN -->
-		    <view class="cn-version">
-		      <text>欢迎使用智达IoT（国内版）</text>
-		    </view>
+		<view>
+		    <!-- #ifdef VERSION_CN -->
+		    <view><text>这是版本 国内 的独立页面</text></view>
 		    <!-- #endif -->
-			<!-- #ifdef REGION-EN -->
-			<view class="cn-version">
-			  <text>欢迎使用智达IoT（国际版）</text>
-			</view>
+		    
+		    <!-- #ifdef VERSION_INT -->
+		    <view><text>这是版本 国际 的独立页面</text></view>
+		    <!-- #endif -->
+			
+			<!-- #ifdef MP-WEIXIN -->
+			<view>只在微信小程序中显示</view>
 			<!-- #endif -->
+		  </view>
 	</view>
 </template>
 

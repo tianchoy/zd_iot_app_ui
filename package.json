@@ -1,0 +1,26 @@
+{
+  "uni-app": {
+    "scripts": {
+      "h5-version-a": {
+        "title": "国内版",
+        "BROWSER": "edge",
+        "env": {
+          "UNI_PLATFORM": "h5"
+        },
+        "define": {
+          "VERSION_CN": true
+        }
+      },
+      "h5-version-b": {
+        "title": "国际版",
+        "BROWSER": "edge",
+        "env": {
+          "UNI_PLATFORM": "h5"
+        },
+        "define": {
+          "VERSION_INT": true
+        }
+      }
+    }
+  }
+}
