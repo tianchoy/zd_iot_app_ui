@@ -1,0 +1,8 @@
+@import "../../uvue.wxss";
+:host{display:flex;flex-direction:column}
+
+page .title {
+		font-size: 18px;
+		color: #8f8f94;
+		text-align: center;
+}

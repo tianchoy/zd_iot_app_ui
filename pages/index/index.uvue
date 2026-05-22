@@ -1,0 +1,27 @@
+<template>
+	<view>
+		<text class="title">{{title}}</text>
+		    <!-- #ifdef REGION-CN -->
+		    <view class="cn-version">
+		      <text>欢迎使用智达IoT（国内版）</text>
+		    </view>
+		    <!-- #endif -->
+			<!-- #ifdef REGION-EN -->
+			<view class="cn-version">
+			  <text>欢迎使用智达IoT（国际版）</text>
+			</view>
+			<!-- #endif -->
+	</view>
+</template>
+
+<script setup lang="uts">
+	const title = ref('Hello')
+</script>
+
+<style>
+	.title {
+		font-size: 18px;
+		color: #8f8f94;
+		text-align: center;
+	}
+</style>
