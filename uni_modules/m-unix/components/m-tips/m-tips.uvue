@@ -1,0 +1,148 @@
+<template>
+	<view v-if="position == 'top'" class="m-tips-class m-toptips"
+		:style="tipBarStyle"
+		:class="[show ? 'm-top-show' : '']">{{ msg }}</view>
+	<view v-else class="m-tips-class m-toast"
+		:class="[position == 'center' ? 'm-centertips' : 'm-bottomtips', show ? 'm-toast-show' : '']">
+		<view class="m-tips-content" :style="tipBarStyle">
+			{{ msg }}</view>
+	</view>
+</template>
+
+<script lang="uts">
+	import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+	interface ToastRef {
+	  showTips: (options: { msg: string; duration?: number }) => void; // 属性名必须是 msg
+	}
+	export default {
+		name: 'mTips',
+		props: {
+			//top bottom center
+			position: {
+				type: String,
+				default: 'top'
+			},
+			backgroundColor: {
+				type: String,
+				default: 'rgba(0, 0, 0, 0.7)'
+			},
+			color: {
+				type: String,
+				default: '#fff'
+			},
+			size: {
+				type: [Number, String],
+				default: 30
+			}
+		},
+		computed: {
+			tipBarStyle(): UTSJSONObject {
+				return {
+					backgroundColor: this.backgroundColor,
+					color: this.color,
+					'font-size': toCssLength(this.size as number | string)
+				}
+			}
+		},
+		data() {
+			return {
+				timer: null as number | null,
+				show: false,
+				msg: '无法连接到服务器~'
+			};
+		},
+		methods: {
+			showTips: function (options : { duration : number, msg : string }) {
+				const { duration = 2000 } = options;
+				clearTimeout(this.timer);
+				this.show = true;
+				// this.duration = duration < 2000 ? 2000 : duration;
+				this.msg = options.msg;
+				this.timer = setTimeout(() => {
+					this.show = false;
+					clearTimeout(this.timer);
+					this.timer = null;
+				}, duration);
+			}
+		},
+		expose: ['showTips']
+	};
+</script>
+
+<style scoped lang="scss">
+	/*顶部消息提醒 start*/
+	.m-tips-class {}
+
+	.m-toptips {
+		width: 100%;
+		padding: 18rpx 30rpx;
+		box-sizing: border-box;
+		position: fixed;
+		z-index: 9999;
+		left: 0;
+		top: 0;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		word-break: break-all;
+		opacity: 0;
+		transform: translateZ(0) translateY(-100%);
+		transition: all 0.3s ease-in-out;
+	}
+
+	.m-top-show {
+		transform: translateZ(0) translateY(0);
+		opacity: 1;
+	}
+
+	/*顶部消息提醒 end*/
+
+	/*toast消息提醒 start*/
+
+	/*注意问题：
+ 1、fixed 元素宽度无法自适应，所以增加了子元素
+ 2、fixed 和 display冲突导致动画效果消失，暂时使用visibility替代
+*/
+	.m-toast {
+		width: 80%;
+		box-sizing: border-box;
+		color: #fff;
+		font-size: 28rpx;
+		position: fixed;
+		visibility: hidden;
+		opacity: 0;
+		left: 50%;
+		transition: all 0.3s ease-in-out;
+		z-index: 9999;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.m-toast-show {
+		visibility: visible;
+		opacity: 1;
+	}
+
+	.m-tips-content {
+		word-wrap: break-word;
+		word-break: break-all;
+		border-radius: 8rpx;
+		padding: 18rpx 30rpx;
+	}
+
+	.m-bottomtips {
+		bottom: 120rpx;
+		-webkit-transform: translateX(-50%);
+		transform: translateX(-50%);
+	}
+
+	.m-centertips {
+		top: 50%;
+		-webkit-transform: translate(-50%, -50%);
+		transform: translate(-50%, -50%);
+	}
+</style>

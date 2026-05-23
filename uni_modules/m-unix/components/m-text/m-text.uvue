@@ -1,0 +1,268 @@
+<template>
+	<view
+		class="m-text"
+		:class="{ 'm-text--block': block, 'm-text--hl': highlight && !disable }"
+		:style="wrapStyle"
+		@tap="onTap"
+	>
+		<slot></slot>
+		<text
+			class="m-text__main"
+			:style="mainStyle"
+			:selectable="selectable"
+			:user-select="userSelect"
+			:decode="decode"
+		>{{ displayText }}</text>
+		<slot name="right"></slot>
+	</view>
+</template>
+
+<script lang="uts">
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mText',
+	emits: ['click'],
+	props: {
+		type: {
+			type: String,
+			default: 'black'
+		},
+		text: {
+			type: [Number, String],
+			default: ''
+		},
+		size: {
+			type: [Number, String],
+			default: 32
+		},
+		unit: {
+			type: String,
+			default: 'rpx'
+		},
+		color: {
+			type: String,
+			default: ''
+		},
+		fontWeight: {
+			type: [Number, String],
+			default: 400
+		},
+		align: {
+			type: String,
+			default: 'left'
+		},
+		decoration: {
+			type: String,
+			default: 'none'
+		},
+		lineHeight: {
+			type: Boolean,
+			default: false
+		},
+		padding: {
+			type: String,
+			default: '0'
+		},
+		block: {
+			type: Boolean,
+			default: false
+		},
+		textType: {
+			type: String,
+			default: 'text'
+		},
+		format: {
+			type: Boolean,
+			default: false
+		},
+		call: {
+			type: Boolean,
+			default: false
+		},
+		selectable: {
+			type: Boolean,
+			default: false
+		},
+		userSelect: {
+			type: Boolean,
+			default: false
+		},
+		decode: {
+			type: Boolean,
+			default: false
+		},
+		highlight: {
+			type: Boolean,
+			default: false
+		},
+		unShrink: {
+			type: Boolean,
+			default: false
+		},
+		disable: {
+			type: Boolean,
+			default: false
+		}
+	},
+	computed: {
+		displayText(): string {
+			const t = this.text
+			const s = t == null ? '' : '' + t
+			if (this.textType === 'mobile' && this.format) {
+				return this.formatMobile(s)
+			}
+			if (this.textType === 'amount' && this.format) {
+				return this.formatAmount(s)
+			}
+			return s
+		},
+		typeColor(): string {
+			const ty = this.type as string
+			if (ty === 'primary') {
+				return '#5677fc'
+			}
+			if (ty === 'success') {
+				return '#07c160'
+			}
+			if (ty === 'danger') {
+				return '#eb0909'
+			}
+			if (ty === 'warning') {
+				return '#ff7900'
+			}
+			if (ty === 'gray') {
+				return '#888888'
+			}
+			if (ty === 'white') {
+				return '#ffffff'
+			}
+			return '#333333'
+		},
+		fontSizeCss(): string {
+			const u = this.unit as string
+			const n = this.size as number | string
+			if (typeof n === 'number') {
+				return n + u
+			}
+			const str = n as string
+			if (str.indexOf('rpx') > 0 || str.indexOf('px') > 0) {
+				return str
+			}
+			return toCssLength(n)
+		},
+		wrapStyle(): UTSJSONObject {
+			const st: UTSJSONObject = {
+				padding: this.padding as string,
+				flexDirection: 'row',
+				alignItems: 'center'
+			}
+			if (this.block) {
+				st['width'] = '100%'
+			}
+			if (this.unShrink) {
+				st['flexShrink'] = '0'
+			}
+			return st
+		},
+		mainStyle(): UTSJSONObject {
+			const c = (this.color as string).trim()
+			const col = c.length > 0 ? c : this.typeColor
+			const st: UTSJSONObject = {
+				color: col,
+				'font-size': this.fontSizeCss,
+				'font-weight': this.fontWeight,
+				'text-align': this.align as string
+			}
+			const dec = this.decoration as string
+			if (dec === 'underline') {
+				st['textDecorationLine'] = 'underline'
+			} else if (dec === 'line-through') {
+				st['textDecorationLine'] = 'line-through'
+			}
+			if (this.lineHeight) {
+				st['lineHeight'] = '1.35'
+			}
+			return st
+		}
+	},
+	methods: {
+		formatMobile(s: string): string {
+			const d = this.filterDigits(s)
+			if (d.length <= 3) {
+				return d
+			}
+			if (d.length <= 7) {
+				return d.substring(0, 3) + ' ' + d.substring(3)
+			}
+			return d.substring(0, 3) + ' ' + d.substring(3, 7) + ' ' + d.substring(7, 11)
+		},
+		filterDigits(s: string): string {
+			let out = ''
+			for (let i = 0; i < s.length; i++) {
+				const c = s.charAt(i)
+				if (c >= '0' && c <= '9') {
+					out += c
+				}
+			}
+			return out
+		},
+		formatAmount(s: string): string {
+			const parts = s.split('.')
+			const intp = parts[0]
+			let dec = ''
+			if (parts.length > 1) {
+				dec = parts[1]
+			}
+			let out = ''
+			let cnt = 0
+			for (let i = intp.length - 1; i >= 0; i--) {
+				out = intp.charAt(i) + out
+				cnt++
+				if (cnt === 3 && i > 0) {
+					out = ',' + out
+					cnt = 0
+				}
+			}
+			if (dec.length > 0) {
+				out += '.' + dec.substring(0, 2)
+			}
+			return out
+		},
+		onTap() {
+			if (this.disable) {
+				return
+			}
+			if (this.call && this.textType === 'mobile') {
+				const d = this.filterDigits('' + this.text)
+				if (d.length >= 7) {
+					uni.makePhoneCall({ phoneNumber: d })
+				}
+				return
+			}
+			this.$emit('click', { text: this.displayText } as UTSJSONObject)
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-text {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	box-sizing: border-box;
+}
+
+.m-text--block {
+	width: 100%;
+}
+
+.m-text__main {
+	flex-shrink: 1;
+}
+
+.m-text--hl:active {
+	opacity: 0.75;
+}
+</style>

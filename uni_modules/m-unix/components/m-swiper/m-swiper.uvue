@@ -1,0 +1,568 @@
+<template>
+	<view class="m-swiper" :style="wrapStyle">
+		<view v-if="normalizedList.length === 0" class="m-swiper__empty" :style="{ height: heightCss }"></view>
+		<swiper
+			v-else
+			class="m-swiper__core"
+			:style="coreStyle"
+			:current="internalCurrent"
+			:autoplay="autoplay && !loading && normalizedList.length > 1"
+			:interval="intervalNum"
+			:duration="durationNum"
+			:circular="effectiveCircular"
+			:vertical="vertical"
+			:previous-margin="prevMarginPx"
+			:next-margin="nextMarginPx"
+			@change="onSwiperChange"
+		>
+			<swiper-item v-for="(row, idx) in normalizedList" :key="slideKey(idx, row)" class="m-swiper__item">
+				<view class="m-swiper__slide" :style="slideRadiusStyle" @tap="onSlideTap(idx, row)">
+					<view class="m-swiper__img-wrap" :style="slideInnerPadStyle">
+						<image
+							v-if="row.src.length > 0"
+							class="m-swiper__img"
+							:src="row.src"
+							:mode="imgMode"
+							:style="slideImageClipStyle"
+						></image>
+					</view>
+					<view v-if="showTitle && row.title.length > 0" class="m-swiper__title-wrap">
+						<text class="m-swiper__title">{{ row.title }}</text>
+					</view>
+				</view>
+			</swiper-item>
+		</swiper>
+
+		<view v-if="indicator && normalizedList.length > 1" class="m-swiper__indicator" :style="indicatorBoxStyle">
+			<view v-if="indicatorMode === 'line'" class="m-swiper__lines">
+				<view
+					v-for="(_, i) in normalizedList"
+					:key="'l' + i"
+					class="m-swiper__line-seg"
+					:class="{ 'm-swiper__line-seg--active': i === internalCurrent }"
+					:style="lineSegStyle(i)"
+				></view>
+			</view>
+			<view v-else class="m-swiper__dots">
+				<view
+					v-for="(_, i) in normalizedList"
+					:key="'d' + i"
+					class="m-swiper__dot"
+					:class="{ 'm-swiper__dot--active': i === internalCurrent }"
+					:style="dotStyle(i)"
+				></view>
+			</view>
+		</view>
+
+		<view v-if="loading" class="m-swiper__mask">
+			<m-loading text="加载中" size="40rpx" color="#ffffff"></m-loading>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+/** 图片轮播：Banner、广告位等；基于原生 swiper，风格与 m-* 一致。 */
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+type SlideRow = {
+	src: string
+	title: string
+	raw: any | null
+}
+
+export default {
+	name: 'mSwiper',
+	emits: ['change', 'click', 'update:current'],
+	props: {
+		list: {
+			type: Array,
+			default(): any[] {
+				return []
+			}
+		},
+		imageKey: {
+			type: String,
+			default: 'url'
+		},
+		titleKey: {
+			type: String,
+			default: 'title'
+		},
+		showTitle: {
+			type: Boolean,
+			default: false
+		},
+		indicator: {
+			type: Boolean,
+			default: false
+		},
+		indicatorMode: {
+			type: String,
+			default: 'dot'
+		},
+		indicatorActiveColor: {
+			type: String,
+			default: '#ffffff'
+		},
+		indicatorInactiveColor: {
+			type: String,
+			default: 'rgba(255,255,255,0.45)'
+		},
+		indicatorStyle: {
+			type: String,
+			default: ''
+		},
+		autoplay: {
+			type: Boolean,
+			default: true
+		},
+		current: {
+			type: [Number, String],
+			default: 0
+		},
+		interval: {
+			type: [Number, String],
+			default: 3000
+		},
+		duration: {
+			type: [Number, String],
+			default: 300
+		},
+		circular: {
+			type: Boolean,
+			default: true
+		},
+		vertical: {
+			type: Boolean,
+			default: false
+		},
+		previousMargin: {
+			type: [Number, String],
+			default: 0
+		},
+		nextMargin: {
+			type: [Number, String],
+			default: 0
+		},
+		height: {
+			type: [Number, String],
+			default: 320
+		},
+		/** 容器背景；空字符串不写 background，由父级透出。可设 #fff、transparent 等 */
+		bgColor: {
+			type: String,
+			default: ''
+		},
+		radius: {
+			type: [Number, String],
+			default: 16
+		},
+		imgMode: {
+			type: String,
+			default: 'aspectFill'
+		},
+		loading: {
+			type: Boolean,
+			default: false
+		},
+		/** 单页内图片左右留白（数字默认 rpx），与露边搭配可避免贴边 */
+		slidePadding: {
+			type: [Number, String],
+			default: 0
+		}
+	},
+	data() {
+		return {
+			internalCurrent: 0 as number
+		}
+	},
+	computed: {
+		heightCss(): string {
+			return toCssLength(this.height as number | string)
+		},
+		hasPeekMargin(): boolean {
+			return this.prevMarginPx !== '0px' || this.nextMarginPx !== '0px'
+		},
+		prevMarginPx(): string {
+			return this.marginToPxString(this.previousMargin as number | string)
+		},
+		nextMarginPx(): string {
+			return this.marginToPxString(this.nextMargin as number | string)
+		},
+		/** 衔接滑动：露边时各端要求列表项足够多（通常 ≥3），否则关闭 circular 避免空白或无法滑动 */
+		effectiveCircular(): boolean {
+			const n = this.normalizedList.length
+			if (n <= 1) {
+				return false
+			}
+			if (!(this.circular as boolean)) {
+				return false
+			}
+			if (this.hasPeekMargin && n < 3) {
+				return false
+			}
+			return true
+		},
+		coreStyle(): UTSJSONObject {
+			return {
+				height: this.heightCss,
+				width: '100%'
+			} as UTSJSONObject
+		},
+		slideRadiusStyle(): UTSJSONObject {
+			const r = toCssLength(this.radius as number | string)
+			return {
+				borderRadius: r,
+				overflow: 'hidden'
+			}
+		},
+		slideInnerPadStyle(): UTSJSONObject {
+			const p = toCssLength(this.slidePadding as number | string)
+			return {
+				paddingLeft: p,
+				paddingRight: p,
+				flex: '1',
+				minHeight: '0',
+				width: '100%',
+				boxSizing: 'border-box'
+			}
+		},
+		slideImageClipStyle(): UTSJSONObject {
+			const pad = this.slidePadding as number | string
+			let n = 0
+			if (typeof pad === 'number') {
+				n = pad
+			} else {
+				const t = (pad as string).trim()
+				if (t !== '' && t !== '0') {
+					const f = parseFloat(t)
+					n = isNaN(f) ? 0 : f
+				}
+			}
+			if (n <= 0) {
+				return {} as UTSJSONObject
+			}
+			const r = toCssLength(this.radius as number | string)
+			return {
+				borderRadius: r,
+				overflow: 'hidden'
+			}
+		},
+		intervalNum(): number {
+			const v = this.interval as number | string
+			if (typeof v === 'number') {
+				return v
+			}
+			const n = parseInt(v as string)
+			return isNaN(n) ? 3000 : n
+		},
+		durationNum(): number {
+			const v = this.duration as number | string
+			if (typeof v === 'number') {
+				return v
+			}
+			const n = parseInt(v as string)
+			return isNaN(n) ? 300 : n
+		},
+		wrapStyle(): UTSJSONObject {
+			const r = toCssLength(this.radius as number | string)
+			const style = {
+				position: 'relative',
+				overflow: 'hidden',
+				borderRadius: r
+			} as UTSJSONObject
+			const bg = this.bgColor as string
+			if (bg != null && bg.trim().length > 0) {
+				style['backgroundColor'] = bg.trim()
+			}
+			return style
+		},
+		indicatorBoxStyle(): string {
+			let s =
+				'position:absolute;left:0;right:0;bottom:24rpx;display:flex;flex-direction:row;justify-content:center;align-items:center;pointer-events:none;'
+			const extra = this.indicatorStyle as string
+			if (extra != null && extra.trim().length > 0) {
+				const t = extra.trim()
+				s += t
+				if (!t.endsWith(';')) {
+					s += ';'
+				}
+			}
+			return s
+		},
+		normalizedList(): SlideRow[] {
+			const raw = this.list as any[]
+			const ik = this.imageKey as string
+			const tk = this.titleKey as string
+			const out = [] as SlideRow[]
+			for (let i = 0; i < raw.length; i++) {
+				const it = raw[i]
+				let src = ''
+				let title = ''
+				let rawRef: any | null = null
+				if (typeof it === 'string') {
+					src = it
+				} else if (it != null) {
+					rawRef = it
+					const o = it as UTSJSONObject
+					const a = o[ik]
+					if (a != null && '' + a !== '') {
+						src = '' + a
+					} else {
+						const u = o['url']
+						const s = o['src']
+						const im = o['image']
+						if (u != null && '' + u !== '') {
+							src = '' + u
+						} else if (s != null && '' + s !== '') {
+							src = '' + s
+						} else if (im != null && '' + im !== '') {
+							src = '' + im
+						}
+					}
+					const t = o[tk]
+					if (t != null) {
+						title = '' + t
+					}
+				}
+				out.push({ src: src, title: title, raw: rawRef })
+			}
+			return out
+		}
+	},
+	watch: {
+		current: {
+			handler(n: number | string) {
+				let v = 0
+				if (typeof n === 'number') {
+					v = n
+				} else {
+					const p = parseInt(n as string)
+					v = isNaN(p) ? 0 : p
+				}
+				const max = this.normalizedList.length - 1
+				if (max < 0) {
+					v = 0
+				} else if (v > max) {
+					v = max
+				}
+				if (v < 0) {
+					v = 0
+				}
+				if (v !== this.internalCurrent) {
+					this.internalCurrent = v
+				}
+			},
+			immediate: true
+		},
+		list() {
+			this.clampCurrent()
+		}
+	},
+	methods: {
+		marginToPxString(v: number | string): string {
+			if (typeof v === 'number') {
+				if (v <= 0) {
+					return '0px'
+				}
+				return this.rpxNumberToPx(v)
+			}
+			const t = (v as string).trim()
+			if (t === '' || t === '0') {
+				return '0px'
+			}
+			if (t.endsWith('px')) {
+				const n = parseFloat(t)
+				if (isNaN(n) || n <= 0) {
+					return '0px'
+				}
+				return Math.round(n) + 'px'
+			}
+			let num = parseFloat(t)
+			if (t.indexOf('rpx') >= 0) {
+				num = parseFloat(t.replace('rpx', ''))
+			}
+			if (isNaN(num) || num <= 0) {
+				return '0px'
+			}
+			return this.rpxNumberToPx(num)
+		},
+		rpxNumberToPx(n: number): string {
+			let px = 0 as number
+			try {
+				const u = uni.rpx2px(n)
+				if (u != null && typeof u === 'number' && !isNaN(u) && u > 0) {
+					px = u
+				}
+			} catch (e) {
+				px = 0
+			}
+			if (px <= 0) {
+				px = Math.round(n * 0.52)
+			}
+			if (px <= 0) {
+				px = 1
+			}
+			return Math.round(px) + 'px'
+		},
+		clampCurrent() {
+			const max = this.normalizedList.length - 1
+			if (this.internalCurrent > max) {
+				this.internalCurrent = max < 0 ? 0 : max
+			}
+		},
+		slideKey(idx: number, row: SlideRow): string {
+			return 'm-swiper-slide-' + idx
+		},
+		lineSegStyle(i: number): UTSJSONObject {
+			const active = i === this.internalCurrent
+			return {
+				backgroundColor: active ? this.indicatorActiveColor : this.indicatorInactiveColor
+			}
+		},
+		dotStyle(i: number): UTSJSONObject {
+			const active = i === this.internalCurrent
+			return {
+				backgroundColor: active ? this.indicatorActiveColor : this.indicatorInactiveColor
+			}
+		},
+		onSwiperChange(e: any) {
+			const detail = e != null ? e['detail'] : null
+			let idx = 0
+			if (detail != null) {
+				const c = detail['current']
+				if (typeof c === 'number') {
+					idx = c
+				}
+			}
+			this.internalCurrent = idx
+			this.$emit('update:current', idx)
+			const row = idx >= 0 && idx < this.normalizedList.length ? this.normalizedList[idx] : null
+			const item = row != null ? row.raw : null
+			const payload = {
+				index: idx,
+				item: item != null ? item : (row != null ? row.src : '')
+			} as UTSJSONObject
+			this.$emit('change', payload)
+		},
+		onSlideTap(idx: number, row: SlideRow) {
+			const item = row.raw != null ? row.raw : row.src
+			this.$emit('click', { index: idx, item: item } as UTSJSONObject)
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-swiper {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-swiper__empty {
+	width: 100%;
+}
+
+.m-swiper__core {
+	width: 100%;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+.m-swiper__item {
+	height: 100%;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+}
+
+.m-swiper__slide {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+}
+
+.m-swiper__img-wrap {
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	align-self: stretch;
+}
+
+.m-swiper__img {
+	width: 100%;
+	height: 100%;
+	display: block;
+	flex: 1;
+}
+
+.m-swiper__title-wrap {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: 20rpx 24rpx 48rpx;
+	background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.m-swiper__title {
+	font-size: 28rpx;
+	color: #ffffff;
+	line-height: 1.4;
+}
+
+.m-swiper__lines {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.m-swiper__line-seg {
+	width: 20rpx;
+	height: 6rpx;
+	border-radius: 3rpx;
+	margin: 0 6rpx;
+	transition-property: width;
+	transition-duration: 0.25s;
+}
+
+.m-swiper__line-seg--active {
+	width: 40rpx;
+}
+
+.m-swiper__dots {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.m-swiper__dot {
+	width: 12rpx;
+	height: 12rpx;
+	border-radius: 50%;
+	margin: 0 8rpx;
+}
+
+.m-swiper__mask {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.35);
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	z-index: 2;
+}
+</style>

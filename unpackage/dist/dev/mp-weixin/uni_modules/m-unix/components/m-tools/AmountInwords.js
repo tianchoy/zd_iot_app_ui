@@ -1,0 +1,126 @@
+"use strict";
+const CN_NUMS = ["零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"];
+const CN_INT_RADICE = ["", "拾", "佰", "仟"];
+const CN_INT_UNITS = ["", "万", "亿", "兆"];
+function trimZero(s) {
+  let out = s;
+  while (out.length > 1 && out.indexOf("零") === 0) {
+    out = out.substring(1);
+  }
+  return out;
+}
+function sectionToCn(n) {
+  if (n === 0) {
+    return "";
+  }
+  let s = "";
+  let zero = false;
+  let rest = n;
+  for (let i = 3; i >= 0; i--) {
+    const p = Math.pow(10, i);
+    const d = Math.floor(rest / p);
+    rest = rest % p;
+    if (d !== 0) {
+      if (zero) {
+        s += "零";
+      }
+      if (!(i === 1 && d === 1)) {
+        s += CN_NUMS[d];
+      }
+      s += CN_INT_RADICE[i];
+      zero = false;
+    } else if (s.length > 0 && rest > 0) {
+      zero = true;
+    }
+  }
+  return s;
+}
+function amountToChineseInWords(raw) {
+  let str = "";
+  if (typeof raw === "number") {
+    str = "" + raw;
+  } else {
+    str = raw.trim();
+  }
+  if (str.length === 0) {
+    return "零元整";
+  }
+  if (str === ".") {
+    return "零元整";
+  }
+  let neg = false;
+  if (str.indexOf("-") === 0) {
+    neg = true;
+    str = str.substring(1);
+  }
+  const dot = str.indexOf(".");
+  let intPart = str;
+  let decPart = "";
+  if (dot >= 0) {
+    intPart = str.substring(0, dot);
+    decPart = str.substring(dot + 1);
+  }
+  if (intPart.length === 0) {
+    intPart = "0";
+  }
+  let intNum = parseInt(intPart);
+  if (isNaN(intNum)) {
+    intNum = 0;
+  }
+  let dec2 = "00";
+  if (decPart.length > 0) {
+    const d0 = decPart.length > 0 ? decPart.charAt(0) : "0";
+    const d1 = decPart.length > 1 ? decPart.charAt(1) : "0";
+    dec2 = d0 + d1;
+  }
+  const jiao = parseInt(dec2.charAt(0), 10);
+  const fen = parseInt(dec2.charAt(1), 10);
+  const ji = isNaN(jiao) ? 0 : jiao;
+  const fe = isNaN(fen) ? 0 : fen;
+  if (intNum === 0 && ji === 0 && fe === 0) {
+    return (neg ? "负" : "") + "零元整";
+  }
+  let intStr = "";
+  let num = intNum;
+  if (num === 0) {
+    intStr = "";
+  } else {
+    let unit = 0;
+    let parts = "";
+    while (num > 0 && unit < 4) {
+      const sec = num % 1e4;
+      num = Math.floor(num / 1e4);
+      if (sec !== 0) {
+        const secCn = sectionToCn(sec);
+        parts = secCn + CN_INT_UNITS[unit] + parts;
+      } else if (parts.length > 0 && num > 0) {
+        parts = "零" + parts;
+      }
+      unit++;
+    }
+    intStr = trimZero(parts);
+  }
+  let out = neg ? "负" : "";
+  if (intStr.length > 0) {
+    out += intStr + "元";
+  } else if (ji !== 0 || fe !== 0) {
+    out += "零元";
+  }
+  if (ji === 0 && fe === 0) {
+    if (intStr.length > 0) {
+      out += "整";
+    }
+    return out.length > 0 ? out : "零元整";
+  }
+  if (ji !== 0) {
+    out += CN_NUMS[ji] + "角";
+  } else if (intStr.length > 0 && fe !== 0) {
+    out += "零";
+  }
+  if (fe !== 0) {
+    out += CN_NUMS[fe] + "分";
+  }
+  return out;
+}
+exports.amountToChineseInWords = amountToChineseInWords;
+//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/m-unix/components/m-tools/AmountInwords.js.map

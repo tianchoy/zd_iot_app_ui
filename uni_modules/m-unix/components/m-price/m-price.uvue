@@ -1,0 +1,168 @@
+<template>
+	<view class="m-price" :class="priceSizeClass">
+		<text
+			v-if="symbol !== ''"
+			class="m-price__symbol"
+			:style="lineStyle"
+		>{{ symbol }}</text>
+		<template v-if="useDecimalSmall && hasDecimal">
+			<text class="m-price__int" :style="lineStyle">{{ intPart }}</text>
+			<text class="m-price__decimal" :style="lineStyle">.{{ decPart }}</text>
+		</template>
+		<text v-else class="m-price__whole" :style="lineStyle">{{ displayWhole }}</text>
+	</view>
+</template>
+
+<script lang="uts">
+export default {
+	name: 'mPrice',
+	props: {
+		// 价格（与 value 二选一，value 优先）
+		price: {
+			type: [Number, String],
+			default: '0.00'
+		},
+		value: {
+			type: [Number, String],
+			default: ''
+		},
+		symbol: {
+			type: String,
+			default: '¥'
+		},
+		// 为 false 时小数与整数同字号（整段一个 text）
+		small: {
+			type: Boolean,
+			default: true
+		},
+		// 整体字号档位：small / normal / large
+		size: {
+			type: String,
+			default: 'normal'
+		},
+		color: {
+			type: String,
+			default: '#303133'
+		},
+		lineThrough: {
+			type: Boolean,
+			default: false
+		}
+	},
+	computed: {
+		priceStr(): string {
+			const v = this.value
+			if (v !== '' && v != null) {
+				return '' + v
+			}
+			return '' + this.price
+		},
+		useDecimalSmall(): boolean {
+			return this.small !== false
+		},
+		hasDecimal(): boolean {
+			return this.priceStr.indexOf('.') >= 0 && this.decPart.length > 0
+		},
+		intPart(): string {
+			const s = this.priceStr
+			const i = s.indexOf('.')
+			return i >= 0 ? s.substring(0, i) : s
+		},
+		decPart(): string {
+			const s = this.priceStr
+			const i = s.indexOf('.')
+			return i >= 0 ? s.substring(i + 1) : ''
+		},
+		displayWhole(): string {
+			return this.priceStr
+		},
+		priceSizeClass(): string {
+			const s = this.size
+			if (s === 'small') {
+				return 'm-price--sm'
+			}
+			if (s === 'large') {
+				return 'm-price--lg'
+			}
+			return 'm-price--md'
+		},
+		lineStyle(): UTSJSONObject {
+			const st: UTSJSONObject = { color: this.color }
+			if (this.lineThrough) {
+				st.textDecoration = 'line-through'
+			}
+			return st
+		}
+	}
+};
+</script>
+
+<style scoped lang="scss">
+.m-price {
+	display: inline-flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: baseline;
+}
+
+.m-price__symbol {
+	font-weight: 500;
+	line-height: 1;
+	margin-right: 4rpx;
+}
+
+.m-price__int {
+	font-weight: 600;
+	line-height: 1;
+}
+
+.m-price__decimal {
+	font-weight: 500;
+	line-height: 1;
+}
+
+.m-price__whole {
+	font-weight: 600;
+	line-height: 1;
+}
+
+/* 档位：符号 / 整数 / 小数（小数略小于整数，基线对齐） */
+.m-price--sm {
+	.m-price__symbol {
+		font-size: 22rpx;
+	}
+	.m-price__int,
+	.m-price__whole {
+		font-size: 32rpx;
+	}
+	.m-price__decimal {
+		font-size: 22rpx;
+	}
+}
+
+.m-price--md {
+	.m-price__symbol {
+		font-size: 26rpx;
+	}
+	.m-price__int,
+	.m-price__whole {
+		font-size: 40rpx;
+	}
+	.m-price__decimal {
+		font-size: 26rpx;
+	}
+}
+
+.m-price--lg {
+	.m-price__symbol {
+		font-size: 30rpx;
+	}
+	.m-price__int,
+	.m-price__whole {
+		font-size: 48rpx;
+	}
+	.m-price__decimal {
+		font-size: 30rpx;
+	}
+}
+</style>

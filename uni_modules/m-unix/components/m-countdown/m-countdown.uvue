@@ -1,0 +1,536 @@
+<template>
+	<view class="m-countdown" :class="rootClass" @tap="onTap">
+		<view v-if="showCellsLayout" class="m-countdown__cells">
+			<view v-for="(part, idx) in cellParts" :key="'cp-' + idx" class="m-countdown__cellItem">
+				<view v-if="part.kind === 'box'" class="m-countdown__cell">
+					<text class="m-countdown__cellText">{{ part.text }}</text>
+				</view>
+				<text v-else class="m-countdown__sep">{{ part.text }}</text>
+			</view>
+		</view>
+		<text v-else class="m-countdown__text" :class="textClass">{{ displayStr }}</text>
+	</view>
+</template>
+
+<script lang="uts">
+type CellPart = {
+	kind: 'box' | 'sep'
+	text: string
+}
+
+export default {
+	name: 'mCountdown',
+	emits: ['change', 'finish', 'tap'],
+	props: {
+		time: {
+			type: Number,
+			default: 60
+		},
+		seconds: {
+			type: Number,
+			default: 0
+		},
+		/**
+		 * 占位符：YYYY MM DD HH mm ss（MM 为大写表示月，mm 为小写表示分）
+		 * 示例：HH:mm:ss、DD天HH时mm分ss秒、YYYY-MM-DD HH:mm:ss
+		 */
+		format: {
+			type: String,
+			default: 'HH:mm:ss'
+		},
+		autoStart: {
+			type: Boolean,
+			default: true
+		},
+		// 空 / text / button / cells（分格小方格，与 button 互斥）
+		type: {
+			type: String,
+			default: ''
+		},
+		suffix: {
+			type: String,
+			default: ''
+		},
+		endText: {
+			type: String,
+			default: ''
+		},
+		startText: {
+			type: String,
+			default: ''
+		},
+		restartOnTap: {
+			type: Boolean,
+			default: true
+		},
+		primary: {
+			type: Boolean,
+			default: false
+		},
+		/**
+		 * 为 true 时按「年(365天)/月(30天)/日/时/分/秒」拆分剩余秒数，用于 YYYY-MM-DD HH:mm:ss 等长周期展示
+		 * 为 false 时 DD 表示总天数（不足一天进 HH:mm:ss）
+		 */
+		calendar: {
+			type: Boolean,
+			default: false
+		}
+	},
+	data() {
+		return {
+			remaining: 0,
+			timer: null as number | null,
+			hasStarted: false
+		}
+	},
+	computed: {
+		duration(): number {
+			const sec = this.seconds as number
+			if (sec > 0) {
+				return sec
+			}
+			return this.time as number
+		},
+		isSmsStyle(): boolean {
+			const suf = this.suffix as string
+			const end = this.endText as string
+			return suf.length > 0 || end.length > 0
+		},
+		isButtonType(): boolean {
+			return (this.type as string) === 'button'
+		},
+		isCellsType(): boolean {
+			return (this.type as string) === 'cells'
+		},
+		showCellsLayout(): boolean {
+			return this.isCellsType && !this.isSmsStyle
+		},
+		isCounting(): boolean {
+			return this.remaining > 0
+		},
+		rootClass(): string[] {
+			const list: string[] = []
+			if (this.isButtonType && !this.isCellsType) {
+				list.push('m-countdown--button')
+			}
+			if (this.isCellsType) {
+				list.push('m-countdown--cells')
+			}
+			if (this.isCounting) {
+				list.push('m-countdown--counting')
+			}
+			if (this.canTapRestart) {
+				list.push('m-countdown--clickable')
+			}
+			if (this.primary === true) {
+				list.push('m-countdown--primary')
+			}
+			return list
+		},
+		textClass(): string[] {
+			const list: string[] = []
+			if (this.isButtonType && this.isCounting && !this.isCellsType) {
+				list.push('m-countdown__text--muted')
+			}
+			if (this.canTapRestart) {
+				list.push('m-countdown__text--action')
+			}
+			return list
+		},
+		canTapRestart(): boolean {
+			if (!this.isSmsStyle) {
+				return false
+			}
+			if (this.restartOnTap !== true) {
+				return false
+			}
+			if (this.remaining > 0) {
+				return false
+			}
+			return (this.endText as string).length > 0
+		},
+		clockDisplay(): string {
+			const fmt = this.format as string
+			if (this.calendar === true) {
+				const lb = this.longBreakdown(this.remaining)
+				return this.applyFormatString(
+					fmt,
+					lb.y,
+					lb.M,
+					lb.d,
+					lb.h,
+					lb.m,
+					lb.s,
+					true
+				)
+			}
+			const sh = this.parseFormatShort(this.remaining)
+			return this.applyFormatString(fmt, 0, 0, sh.day, sh.hour, sh.minute, sh.second, false)
+		},
+		cellParts(): CellPart[] {
+			if (!this.showCellsLayout) {
+				return []
+			}
+			const fmt = this.format as string
+			let br: { y: number; M: number; d: number; h: number; mi: number; s: number }
+			if (this.calendar === true) {
+				const lb = this.longBreakdown(this.remaining)
+				br = { y: lb.y, M: lb.M, d: lb.d, h: lb.h, mi: lb.m, s: lb.s }
+			} else {
+				const sh = this.parseFormatShort(this.remaining)
+				br = { y: 0, M: 0, d: sh.day, h: sh.hour, mi: sh.minute, s: sh.second }
+			}
+			return this.scanFormatToCells(fmt, br)
+		},
+		displayStr(): string {
+			if (this.autoStart !== true && !this.hasStarted) {
+				const st = this.startText as string
+				if (st.length > 0) {
+					return st
+				}
+			}
+			if (this.isSmsStyle) {
+				if (this.remaining <= 0) {
+					const end = this.endText as string
+					if (end.length > 0) {
+						return end
+					}
+					return this.clockDisplay
+				}
+				const suf = this.suffix as string
+				if (suf.length > 0) {
+					return String(this.remaining) + suf
+				}
+				return this.clockDisplay
+			}
+			return this.clockDisplay
+		}
+	},
+	created() {
+		this.remaining = this.duration
+	},
+	mounted() {
+		if (this.autoStart) {
+			this.hasStarted = true
+			this.start()
+		}
+	},
+	beforeUnmount() {
+		this.stop()
+	},
+	methods: {
+		padZero(num: number): string {
+			return num < 10 ? '0' + num : String(num)
+		},
+		pad4(num: number): string {
+			if (num < 10) {
+				return '000' + num
+			}
+			if (num < 100) {
+				return '00' + num
+			}
+			if (num < 1000) {
+				return '0' + num
+			}
+			return String(num)
+		},
+		padDD(d: number): string {
+			if (d >= 100) {
+				return String(d)
+			}
+			return this.padZero(d)
+		},
+		/** 总秒数拆成：天(0~)、时(0~23)、分、秒（duration 模式） */
+		parseFormatShort(seconds: number) {
+			let sec = seconds
+			const day = Math.floor(sec / (60 * 60 * 24))
+			sec = sec % (60 * 60 * 24)
+			const hour = Math.floor(sec / (60 * 60))
+			sec = sec % (60 * 60)
+			const minute = Math.floor(sec / 60)
+			sec = sec % 60
+			return {
+				day,
+				hour,
+				minute,
+				second: sec
+			}
+		},
+		/** 年=365天、月=30天、日、时、分、秒（calendar 模式，近似） */
+		longBreakdown(seconds: number) {
+			let s = seconds
+			const y = Math.floor(s / (365 * 24 * 3600))
+			s = s % (365 * 24 * 3600)
+			const M = Math.floor(s / (30 * 24 * 3600))
+			s = s % (30 * 24 * 3600)
+			const d = Math.floor(s / (24 * 3600))
+			s = s % (24 * 3600)
+			const h = Math.floor(s / 3600)
+			s = s % 3600
+			const m = Math.floor(s / 60)
+			const sec = s % 60
+			return { y, M, d, h, m, s: sec }
+		},
+		applyFormatString(
+			fmt: string,
+			y: number,
+			M: number,
+			d: number,
+			h: number,
+			mi: number,
+			s: number,
+			isLong: boolean
+		): string {
+			let r = fmt
+			if (isLong) {
+				r = r.replace('YYYY', this.pad4(y))
+				r = r.replace('MM', this.padZero(M))
+				r = r.replace('DD', this.padZero(d))
+			} else {
+				r = r.replace('YYYY', this.pad4(0))
+				r = r.replace('MM', this.padZero(0))
+				r = r.replace('DD', this.padDD(d))
+			}
+			r = r.replace('HH', this.padZero(h))
+			r = r.replace('mm', this.padZero(mi))
+			r = r.replace('ss', this.padZero(s))
+			return r
+		},
+		scanFormatToCells(
+			fmt: string,
+			br: { y: number; M: number; d: number; h: number; mi: number; s: number }
+		): CellPart[] {
+			const out: CellPart[] = []
+			let i = 0
+			const len = fmt.length
+			while (i < len) {
+				if (i + 4 <= len && fmt.substring(i, i + 4) === 'YYYY') {
+					out.push({ kind: 'box', text: this.pad4(br.y) })
+					i += 4
+					continue
+				}
+				if (i + 2 <= len) {
+					const two = fmt.substring(i, i + 2)
+					if (two === 'MM') {
+						out.push({ kind: 'box', text: this.padZero(br.M) })
+						i += 2
+						continue
+					}
+					if (two === 'DD') {
+						out.push({ kind: 'box', text: this.padDD(br.d) })
+						i += 2
+						continue
+					}
+					if (two === 'HH') {
+						out.push({ kind: 'box', text: this.padZero(br.h) })
+						i += 2
+						continue
+					}
+					if (two === 'mm') {
+						out.push({ kind: 'box', text: this.padZero(br.mi) })
+						i += 2
+						continue
+					}
+					if (two === 'ss') {
+						out.push({ kind: 'box', text: this.padZero(br.s) })
+						i += 2
+						continue
+					}
+				}
+				const ch = fmt.charAt(i)
+				out.push({ kind: 'sep', text: ch })
+				i++
+			}
+			return out
+		},
+		getBreakdownForEmit(seconds: number): UTSJSONObject {
+			if (this.calendar === true) {
+				const lb = this.longBreakdown(seconds)
+				return {
+					year: lb.y,
+					month: lb.M,
+					day: lb.d,
+					hour: lb.h,
+					minute: lb.m,
+					second: lb.s
+				} as UTSJSONObject
+			}
+			const sh = this.parseFormatShort(seconds)
+			return {
+				day: sh.day,
+				hour: sh.hour,
+				minute: sh.minute,
+				second: sh.second
+			} as UTSJSONObject
+		},
+		tick() {
+			this.remaining--
+			this.$emit('change', this.getBreakdownForEmit(this.remaining))
+			if (this.remaining <= 0) {
+				this.stop()
+				this.$emit('finish')
+			}
+		},
+		start() {
+			this.stop()
+			this.hasStarted = true
+			if (this.remaining <= 0) {
+				this.$emit('finish')
+				return
+			}
+			this.timer = setInterval(() => {
+				this.tick()
+			}, 1000) as unknown as number
+		},
+		pause() {
+			this.stop()
+		},
+		reset() {
+			this.remaining = this.duration
+			this.start()
+		},
+		stop() {
+			if (this.timer != null) {
+				clearInterval(this.timer)
+				this.timer = null
+			}
+		},
+		onTap() {
+			this.$emit('tap')
+			if (this.canTapRestart) {
+				this.remaining = this.duration
+				this.start()
+			}
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-countdown {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+
+	.m-countdown__text {
+		font-size: 28rpx;
+		color: #303133;
+		line-height: 1.4;
+	}
+
+	&.m-countdown--button {
+		padding: 16rpx 28rpx;
+		border-radius: 8rpx;
+		background-color: #f5f7fa;
+		border-width: 1px;
+		border-style: solid;
+		border-color: #dcdfe6;
+		min-width: 200rpx;
+	}
+
+	&.m-countdown--button.m-countdown--counting {
+		background-color: #f5f7fa;
+	}
+
+	&.m-countdown--cells {
+		flex-wrap: wrap;
+		align-self: stretch;
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+	}
+
+	.m-countdown__cells {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.m-countdown__cellItem {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.m-countdown__cell {
+		min-width: 40rpx;
+		padding: 10rpx 14rpx;
+		border-radius: 8rpx;
+		border-width: 1px;
+		border-style: solid;
+		border-color: #dcdfe6;
+		background-color: #f5f7fa;
+		box-sizing: border-box;
+	}
+
+	.m-countdown__cellText {
+		font-size: 26rpx;
+		font-weight: 600;
+		color: #303133;
+		line-height: 1.2;
+	}
+
+	.m-countdown__sep {
+		font-size: 24rpx;
+		color: #909399;
+		line-height: 1.2;
+		padding: 0 4rpx;
+	}
+
+	&.m-countdown--clickable {
+		opacity: 1;
+	}
+
+	.m-countdown__text--muted {
+		color: #909399;
+	}
+
+	.m-countdown__text--action {
+		color: #5677fc;
+	}
+
+	&.m-countdown--primary {
+		.m-countdown__text {
+			color: #ff0844;
+		}
+
+		&.m-countdown--button {
+			background-color: #fff5f7;
+			border-color: #ff0844;
+		}
+
+		&.m-countdown--button.m-countdown--counting {
+			background-color: #fff5f7;
+			border-color: #ffc6d4;
+		}
+
+		.m-countdown__text--muted {
+			color: #c0c4cc;
+		}
+
+		.m-countdown__text--action {
+			color: #ff0844;
+		}
+
+		.m-countdown__cell {
+			background-color: #fff5f7;
+			border-color: #ff0844;
+		}
+
+		.m-countdown__cellText {
+			color: #ff0844;
+		}
+
+		.m-countdown__sep {
+			color: #ff0844;
+		}
+	}
+}
+</style>

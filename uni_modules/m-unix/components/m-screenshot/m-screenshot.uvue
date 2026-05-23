@@ -1,0 +1,94 @@
+<template>
+	<view class="m-screenshot">
+		<view class="m-screenshot__content" :id="'screenshot-' + componentId">
+			<slot></slot>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+export default {
+	name: 'mScreenshot',
+	props: {
+		// 图片质量 0-1
+		quality: {
+			type: [Number],
+			default: 0.8
+		},
+		// 延迟截图毫秒
+		delay: {
+			type: [Number],
+			default: 200
+		}
+	},
+	data() {
+		return {
+			componentId: ''
+		}
+	},
+	created() {
+		this.componentId = 'screenshot-' + Math.random().toString(36).substr(2, 9)
+	},
+	methods: {
+		capture(): Promise<string> {
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					// #ifdef MP-WEIXIN
+					const query = uni.createSelectorQuery().in(this)
+					query.select('#' + this.componentId).fields({
+						node: true,
+						size: true
+					}).exec(res => {
+						const node = res[0].node
+						if (!node) {
+							reject(new Error('获取节点失败'))
+							return
+						}
+						const width = res[0].width
+						const height = res[0].height
+						const canvas = wx.createCanvas()
+						canvas.width = width * uni.getSystemInfoSync().pixelRatio
+						canvas.height = height * uni.getSystemInfoSync().pixelRatio
+						const ctx = canvas.getContext('2d')
+						// 白色背景
+						ctx.fillStyle = '#ffffff'
+						ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+						node.draw(ctx, () => {
+							canvas.toTempFilePath({
+								width: width,
+								height: height,
+								quality: this.quality,
+								success: (res) => {
+									resolve({
+										tempFilePath: res.tempFilePath
+									})
+								},
+								fail: (err) => {
+									reject(err)
+								}
+							})
+						})
+					})
+					// #endif
+					// #ifndef MP-WEIXIN
+					// 其他平台可以根据需要实现
+					reject(new Error('not supported'))
+					// #endif
+				}, this.delay)
+			})
+		}
+	}
+};
+</script>
+
+<style scoped lang="scss">
+.m-screenshot {
+	width: 100%;
+	box-sizing: border-box;
+
+	.m-screenshot__content {
+		width: 100%;
+	}
+}
+</style>

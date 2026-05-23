@@ -14,11 +14,25 @@
 			<view>只在微信小程序中显示</view>
 			<!-- #endif -->
 		  </view>
+		  <m-icon name="print" size="40rpx"></m-icon>
+		  <m-button type="primary" @click="show = true">确定</m-button>
+		  <m-popup
+		  			:show="show"
+		  			position="bottom"
+		  			round
+		  			closeable
+		  			@close="show = false"
+		  		>
+		  			<view>
+		  				<text>弹出内容</text>
+		  			</view>
+		  		</m-popup>
 	</view>
 </template>
 
 <script setup lang="uts">
 	const title = ref('Hello')
+	const show = ref(false)
 </script>
 
 <style>

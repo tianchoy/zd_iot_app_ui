@@ -1,0 +1,85 @@
+// cache-util.uts
+const CACHE_PREFIX = "app_cache_"
+
+type CacheMeta = {
+  /** 数据过期时间戳（毫秒） */
+  expire?: number
+  /** 数据存储时间戳 */
+  timestamp: number
+  /** 实际缓存数据 */
+  data: unknown
+}
+
+class CacheUtil {
+  /**
+   * 设置缓存
+   * @param key 缓存键
+   * @param data 缓存数据
+   * @param expire 有效期（单位：秒）
+   */
+  static set<T>(key: string, data: T, expire?: number): boolean {
+    try {
+      const cacheKey = CACHE_PREFIX + key
+      const meta: CacheMeta = {
+        data,
+        timestamp: Date.now(),
+        expire: expire ? Date.now() + expire * 1000 : undefined
+      }
+      
+      uni.setStorageSync(cacheKey, JSON.stringify(meta))
+      return true
+    } catch (e) {
+      console.error(`[CacheUtil] 设置缓存失败 ${key}`, e)
+      return false
+    }
+  }
+
+  /**
+   * 获取缓存
+   * @param key 缓存键
+   * @param validator 数据校验函数（可选）
+   */
+  static get<T>(key: string, validator?: (data: unknown) => data is T): T | null {
+    const cacheKey = CACHE_PREFIX + key
+    try {
+      const cached = uni.getStorageSync(cacheKey)
+      if (!cached) return null
+
+      const meta = JSON.parse(cached) as CacheMeta
+      
+      // 检查过期
+      if (meta.expire && Date.now() > meta.expire) {
+        this.remove(key)
+        return null
+      }
+
+      // 执行自定义校验
+      if (validator && !validator(meta.data)) {
+        console.warn(`[CacheUtil] 数据校验未通过 ${key}`)
+        return null
+      }
+
+      return meta.data as T
+    } catch (e) {
+      console.error(`[CacheUtil] 获取缓存失败 ${key}`, e)
+      return null
+    }
+  }
+
+  /** 移除缓存 */
+  static remove(key: string): void {
+    uni.removeStorageSync(CACHE_PREFIX + key)
+  }
+
+  /** 清空所有带前缀的缓存 */
+  static clear(): void {
+    const keys = uni.getStorageInfoSync().keys
+    keys.forEach(key => {
+      if (key.startsWith(CACHE_PREFIX)) {
+        uni.removeStorageSync(key)
+      }
+    })
+  }
+}
+
+export default CacheUtil

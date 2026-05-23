@@ -1,0 +1,339 @@
+<template>
+	<view class="m-banner-arc" :class="rootClassObj" :style="rootStyle">
+		<!-- 上沿内凹 -->
+		<view v-if="showTopEdge" class="m-banner-arc__edge m-banner-arc__edge--top">
+			<view class="m-banner-arc__arc m-banner-arc__arc--top m-banner-arc__arc--in" :style="arcStyleTopIn"></view>
+		</view>
+		<!-- 下沿内凹 -->
+		<view v-if="showBottomEdge" class="m-banner-arc__edge m-banner-arc__edge--bottom">
+			<view class="m-banner-arc__arc m-banner-arc__arc--bottom m-banner-arc__arc--in" :style="arcStyleBottomIn"></view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mBannerArc',
+	props: {
+		/**
+		 * 数字/rpx 为固定高度；传 `auto` 时为 height:auto + min-height（按弧高估算），无插槽。
+		 */
+		height: {
+			type: [Number, String],
+			default: 400
+		},
+		/**
+		 * 单弧形态（仅内凹）：
+		 * - top-concave / topConcave：上沿凹
+		 * - bottom-concave / bottomConcave：下沿凹（默认）
+		 * 历史写法 top-convex / bottom-convex 仍解析为同边 bottom/top，按凹绘制。
+		 * 非空时优先于 arc-edge。
+		 */
+		arcVariant: {
+			type: String,
+			default: ''
+		},
+		/**
+		 * 弧形在「上沿」或「下沿」（arc-variant 为空时生效）。
+		 */
+		arcEdge: {
+			type: String,
+			default: 'bottom'
+		},
+		/**
+		 * 双内弧：上下同时凹；可分别配 top/bottom 的 percent、高度、颜色。
+		 * 为 true 时忽略 arc-variant 单弧解析。
+		 */
+		dualArc: {
+			type: Boolean,
+			default: false
+		},
+		percent: {
+			type: [Number, String],
+			default: 180
+		},
+		topPercent: {
+			type: [Number, String],
+			default: ''
+		},
+		bottomPercent: {
+			type: [Number, String],
+			default: ''
+		},
+		background: {
+			type: String,
+			default: 'linear-gradient(180deg, #5473ff 0%, #6da8ff 100%)'
+		},
+		arcColor: {
+			type: String,
+			default: '#ffffff'
+		},
+		topArcColor: {
+			type: String,
+			default: ''
+		},
+		bottomArcColor: {
+			type: String,
+			default: ''
+		},
+		arcHeight: {
+			type: [Number, String],
+			default: 100
+		},
+		topArcHeight: {
+			type: [Number, String],
+			default: ''
+		},
+		bottomArcHeight: {
+			type: [Number, String],
+			default: ''
+		},
+		customStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: () => ({})
+		}
+	},
+	computed: {
+		isDual(): boolean {
+			return this.dualArc as boolean
+		},
+		singleResolved(): UTSJSONObject {
+			return this.computeSingleResolved()
+		},
+		singleIsTop(): boolean {
+			if (this.isDual) {
+				return false
+			}
+			const r = this.singleResolved as UTSJSONObject
+			return (r['edge'] as string) === 'top'
+		},
+		singleIsBottom(): boolean {
+			if (this.isDual) {
+				return false
+			}
+			const r = this.singleResolved as UTSJSONObject
+			return (r['edge'] as string) === 'bottom'
+		},
+		heightIsAuto(): boolean {
+			const h = this.height as number | string
+			if (typeof h === 'string') {
+				return (h as string).trim().toLowerCase() === 'auto'
+			}
+			return false
+		},
+		intrinsicMinHeight(): number {
+			if (this.isDual) {
+				const t = this.topArcHeightNum / 2
+				const b = this.bottomArcHeightNum / 2
+				return Math.floor(t + b + 120)
+			}
+			if (this.singleIsTop) {
+				return Math.floor(this.topArcHeightNum + 96)
+			}
+			return Math.floor(this.arcHeightPxNum + 96)
+		},
+		arcHeightPxNum(): number {
+			return this.parseArcHeight(this.arcHeight)
+		},
+		topArcHeightNum(): number {
+			const raw = this.topArcHeight as string
+			if (raw != null && raw !== '') {
+				return this.parseArcHeight(this.topArcHeight)
+			}
+			return this.arcHeightPxNum
+		},
+		bottomArcHeightNum(): number {
+			const raw = this.bottomArcHeight as string
+			if (raw != null && raw !== '') {
+				return this.parseArcHeight(this.bottomArcHeight)
+			}
+			return this.arcHeightPxNum
+		},
+		pctNum(): number {
+			return this.parsePercent(this.percent, 180)
+		},
+		topPctNum(): number {
+			const tp = this.topPercent as string
+			if (tp != null && tp !== '') {
+				return this.parsePercent(this.topPercent, this.pctNum)
+			}
+			return this.pctNum
+		},
+		bottomPctNum(): number {
+			const bp = this.bottomPercent as string
+			if (bp != null && bp !== '') {
+				return this.parsePercent(this.bottomPercent, this.pctNum)
+			}
+			return this.pctNum
+		},
+		rootClassObj(): UTSJSONObject {
+			const o = {} as UTSJSONObject
+			if (this.isDual) {
+				o['m-banner-arc--variant-dual'] = true
+			} else {
+				if (this.singleIsTop) {
+					o['m-banner-arc--variant-top-concave'] = true
+				} else if (this.singleIsBottom) {
+					o['m-banner-arc--variant-bottom-concave'] = true
+				}
+			}
+			return o
+		},
+		showTopEdge(): boolean {
+			if (this.isDual) {
+				return true
+			}
+			return this.singleIsTop
+		},
+		showBottomEdge(): boolean {
+			if (this.isDual) {
+				return true
+			}
+			return this.singleIsBottom
+		},
+		rootStyle(): UTSJSONObject {
+			const st = {} as UTSJSONObject
+			if (this.heightIsAuto) {
+				st['height'] = 'auto'
+				st['minHeight'] = toCssLength(this.intrinsicMinHeight)
+			} else {
+				st['height'] = toCssLength(this.height as number | string)
+			}
+			st['width'] = '100%'
+			st['position'] = 'relative'
+			st['boxSizing'] = 'border-box'
+			st['background'] = this.background as string
+			st['overflow'] = 'hidden'
+			if (this.customStyle != null) {
+				Object.assign(st, this.customStyle)
+			}
+			return st
+		},
+		arcStyleTopIn(): UTSJSONObject {
+			return this.buildArcStyleIn(true, this.topPctNum, this.topArcHeightNum, this.colorTopBite())
+		},
+		arcStyleBottomIn(): UTSJSONObject {
+			return this.buildArcStyleIn(false, this.bottomPctNum, this.bottomArcHeightNum, this.colorBottomBite())
+		}
+	},
+	methods: {
+		computeSingleResolved(): UTSJSONObject {
+			const legacy = {} as UTSJSONObject
+			legacy['edge'] = (this.arcEdge as string) === 'top' ? 'top' : 'bottom'
+
+			const raw = (this.arcVariant as string).trim()
+			if (raw === '') {
+				return legacy
+			}
+			if (raw === 'bottom-concave' || raw === 'bottomConcave' || raw === 'bottom-convex' || raw === 'bottomConvex') {
+				legacy['edge'] = 'bottom'
+				return legacy
+			}
+			if (raw === 'top-concave' || raw === 'topConcave' || raw === 'top-convex' || raw === 'topConvex') {
+				legacy['edge'] = 'top'
+				return legacy
+			}
+			return legacy
+		},
+		colorTopBite(): string {
+			const c = this.topArcColor as string
+			if (c != null && c !== '') {
+				return c
+			}
+			return this.arcColor as string
+		},
+		colorBottomBite(): string {
+			const c = this.bottomArcColor as string
+			if (c != null && c !== '') {
+				return c
+			}
+			return this.arcColor as string
+		},
+		parseArcHeight(h: number | string): number {
+			if (typeof h === 'number') {
+				return h > 0 ? h : 100
+			}
+			const s = (h as string).trim()
+			if (s.length >= 3 && s.substring(s.length - 3) === 'rpx') {
+				const v = parseFloat(s.substring(0, s.length - 3))
+				return !isNaN(v) && v > 0 ? v : 100
+			}
+			const v2 = parseFloat(s)
+			return !isNaN(v2) && v2 > 0 ? v2 : 100
+		},
+		parsePercent(p: number | string, fallback: number): number {
+			let n = fallback
+			if (typeof p === 'number') {
+				n = p
+			} else {
+				const x = parseFloat(p as string)
+				if (!isNaN(x)) {
+					n = x
+				}
+			}
+			if (n < 120) {
+				n = 120
+			}
+			return n
+		},
+		halfOffset(ah: number): string {
+			const half = ah / 2
+			return '-' + half.toString() + 'rpx'
+		},
+		toLen(ah: number): string {
+			return toCssLength(ah as number)
+		},
+		buildArcStyleIn(isTop: boolean, pct: number, ah: number, color: string): UTSJSONObject {
+			const off = this.halfOffset(ah)
+			const st = {
+				position: 'absolute',
+				left: '50%',
+				width: pct + '%',
+				height: this.toLen(ah),
+				backgroundColor: color,
+				borderRadius: '50%',
+				transform: 'translate3d(-50%, 0, 0)',
+				zIndex: '2',
+				pointerEvents: 'none'
+			} as UTSJSONObject
+			if (isTop) {
+				st['top'] = off
+				st['bottom'] = 'auto'
+			} else {
+				st['bottom'] = off
+				st['top'] = 'auto'
+			}
+			return st
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-banner-arc {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-banner-arc__edge {
+	position: absolute;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 0;
+	overflow: visible;
+	pointer-events: none;
+	z-index: 2;
+}
+
+.m-banner-arc__edge--top {
+	top: 0;
+}
+
+.m-banner-arc__edge--bottom {
+	bottom: 0;
+}
+</style>

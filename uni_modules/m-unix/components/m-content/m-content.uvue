@@ -1,0 +1,96 @@
+<template>
+	<view class="m-wing__blank" :class="[radius?'m-wingblank__hidden':'',getPadding?'':`m-wingblank__${size}`]"
+		:style="getStyles" @tap="handleClick">
+		<slot></slot>
+	</view>
+</template>
+
+<script lang="uts">
+	import { PropType } from 'vue';
+	import { toCssLength, parseCssNumber } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+	export default {
+		name: 'mContent',
+		emits: ['click'],
+		props: {
+			//边距大小
+			size: {
+				type: String as unknown as PropType<'small' | 'default' | 'large'>, // 双重断言
+				default: 'default',
+				validator: (value : string) => ['small', 'default', 'large'].includes(value) // 可选校验
+			},
+			//自定义
+			gap: {
+				type: [Number, String] as unknown as PropType<number | string>,
+				default: 0
+			},
+			//背景
+			background: {
+				type: String as unknown as PropType<string>,
+				default: 'transparent'
+			},
+			//圆角
+			radius: {
+				type: [Number, String] as unknown as PropType<number | string>,
+				default: 0
+			},
+			//上边距
+			marginTop: {
+				type: [Number, String] as unknown as PropType<number | string>,
+				default: 20
+			},
+			//下边距
+			marginBottom: {
+				type: [Number, String] as unknown as PropType<number | string>,
+				default: 20
+			}
+		},
+		computed: {
+			getPadding() {
+				const padding = parseCssNumber(this.gap as number | string)
+				if (padding > 0) {
+					return `padding:0 ${padding}rpx;`
+				}
+				return ''
+			},
+			getStyles() {
+				const br = toCssLength(this.radius as number | string)
+				const mt = toCssLength(this.marginTop as number | string)
+				const mb = toCssLength(this.marginBottom as number | string)
+				let styles = `background:${this.background};border-radius:${br};margin-top:${mt};margin-bottom:${mb};`
+				styles += this.getPadding
+				return styles
+			}
+		},
+		methods: {
+			handleClick() {
+				this.$emit('click')
+			}
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.m-wing__blank {
+		/* #ifndef APP-NVUE */
+		width: 100%;
+		box-sizing: border-box;
+		/* #endif */
+	}
+
+	.m-wingblank__hidden {
+		overflow: hidden;
+	}
+
+	.m-wingblank__small {
+		padding: 0 10rpx;
+	}
+
+	.m-wingblank__default {
+		padding: 0 20rpx;
+	}
+
+	.m-wingblank__large {
+		padding: 0 30rpx;
+	}
+</style>

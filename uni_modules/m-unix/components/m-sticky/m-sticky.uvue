@@ -1,0 +1,305 @@
+<template>
+	<view class="m-sticky" :id="resolvedAnchorId">
+		<view
+			class="m-sticky__ph"
+			:style="{ height: isFixed ? headerHeightPx + 'px' : 'auto', minHeight: minHeightStyle }"
+		>
+			<view
+				class="m-sticky__header"
+				:class="{ 'm-sticky__header--fixed': isFixed }"
+				:style="headerFixedStyle"
+			>
+				<slot name="header"></slot>
+			</view>
+		</view>
+		<view v-if="container" class="m-sticky__container">
+			<slot name="content"></slot>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+/**
+ * 吸顶容器：scrollTop / stickyTop / scrollTick 等见组件 props
+ * - scrollTop：页面 onPageScroll 或 scroll-view 的滚动距离，用于触发重算
+ * - scrollTick：部分端 scrollTop 无效时，在 @scroll 内递增以强制测量（uni-app x 推荐）
+ * - 吸顶判定：页面滚动时用占位块相对窗口的 top；放在 scroll-view 内时请传 scrollViewportId（对应 scroll-view 的 id），用「组件根相对滚动视口顶边」判定。注意：组件根 id 在页面级 selector 中无法命中自定义组件内部节点，须用 .in(this) 查询 .m-sticky。
+ */
+export default {
+	name: 'mSticky',
+	emits: ['sticky', 'change'],
+	props: {
+		/** 页面 onPageScroll(e) 的 e.scrollTop，或 scroll-view @scroll 的 detail.scrollTop */
+		scrollTop: {
+			type: Number,
+			default: 0
+		},
+		/**
+		 * 吸顶后与可视区顶部的间距（px）。String 时按十进制解析整数。
+		 * H5 且 isNativeHeader 为 true 时会再叠加约 44px（原生导航内容区常见偏移）。
+		 */
+		stickyTop: {
+			type: [Number, String],
+			default: 0
+		},
+		/** 占位最小高度，如 80rpx；空则 auto */
+		stickyHeight: {
+			type: String,
+			default: ''
+		},
+		/** 是否展示 content 插槽（与头部同一块吸顶区域） */
+		container: {
+			type: Boolean,
+			default: false
+		},
+		/** 吸顶态头部背景；transparent 时在非 fixed 不强制铺色 */
+		backgroundColor: {
+			type: String,
+			default: 'transparent'
+		},
+		/** 列表索引，随 sticky / change 回传 */
+		index: {
+			type: [Number, String],
+			default: 0
+		},
+		/** 异步内容增高等场景下递增，触发重新测量 */
+		recalc: {
+			type: Number,
+			default: 0
+		},
+		/**
+		 * 是否按「带原生导航栏的页面」处理：true 时仅在 H5 对 stickyTop 叠加约 44px。
+		 * 组件放在 scroll-view 内滚动时建议 false，避免重复偏移。
+		 */
+		isNativeHeader: {
+			type: Boolean,
+			default: true
+		},
+		/**
+		 * 放在 scroll-view 内时，部分端 scrollTop 不变；父级可在每次 @scroll 时 scrollTick++。
+		 */
+		scrollTick: {
+			type: Number,
+			default: 0
+		},
+		/**
+		 * scroll-view 节点的 id（不要带 #）。传入后吸顶用「本组件根节点 top − 视口 top」与 stickyTop 比较；
+		 * 不传则仍按占位块相对窗口 top 判定（适合页面级 onPageScroll）。
+		 */
+		scrollViewportId: {
+			type: String,
+			default: ''
+		},
+		/** 可选：根节点 id，多实例吸顶时建议分别指定；留空则内部生成唯一 id */
+		stickyAnchorId: {
+			type: String,
+			default: ''
+		}
+	},
+	data() {
+		return {
+			isFixed: false as boolean,
+			headerHeightPx: 0 as number,
+			stickyTopPx: 0 as number,
+			lastTop: 0 as number,
+			internalAnchorId: '' as string
+		}
+	},
+	computed: {
+		resolvedAnchorId(): string {
+			const p = (this.stickyAnchorId as string).trim()
+			if (p.length > 0) {
+				return p
+			}
+			const i = this.internalAnchorId as string
+			return i.length > 0 ? i : 'm-sticky'
+		},
+		minHeightStyle(): string {
+			const h = this.stickyHeight as string
+			if (h == null || h === '') {
+				return 'auto'
+			}
+			return h
+		},
+		headerFixedStyle(): UTSJSONObject {
+			const bg = (this.backgroundColor as string).trim()
+			const style = {} as UTSJSONObject
+			if (this.isFixed) {
+				style['top'] = this.stickyTopPx + 'px'
+				const low = bg.toLowerCase()
+				if (bg.length === 0 || low === 'transparent') {
+					style['backgroundColor'] = '#ffffff'
+				} else {
+					style['backgroundColor'] = bg
+				}
+			}
+			return style
+		}
+	},
+	watch: {
+		scrollTop() {
+			this.scheduleUpdate()
+		},
+		stickyTop() {
+			this.resolveStickyTop()
+			this.scheduleUpdate()
+		},
+		isNativeHeader() {
+			this.resolveStickyTop()
+			this.scheduleUpdate()
+		},
+		recalc() {
+			this.measureHeader()
+			this.scheduleUpdate()
+		},
+		scrollTick() {
+			this.scheduleUpdate()
+		},
+		scrollViewportId() {
+			this.scheduleUpdate()
+		}
+	},
+	created() {
+		this.internalAnchorId =
+			'm-sticky-' + Date.now().toString() + '-' + Math.floor(Math.random() * 1e6).toString()
+	},
+	mounted() {
+		this.resolveStickyTop()
+		this.$nextTick(() => {
+			this.measureHeader()
+			this.scheduleUpdate()
+		})
+	},
+	methods: {
+		resolveStickyTop() {
+			const v = this.stickyTop
+			let base = 0 as number
+			if (typeof v === 'number') {
+				base = v
+			} else {
+				const s = v as string
+				if (s != null && s.length > 0) {
+					const n = parseInt(s)
+					base = isNaN(n) ? 0 : n
+				}
+			}
+			let nativeExtra = 0 as number
+			if (this.isNativeHeader) {
+				// #ifdef H5
+				nativeExtra = 44
+				// #endif
+			}
+			this.stickyTopPx = base + nativeExtra
+		},
+		scheduleUpdate() {
+			this.$nextTick(() => {
+				this.updateSticky()
+			})
+		},
+		measureHeader() {
+			const that = this
+			const q = uni.createSelectorQuery().in(this)
+			q.select('.m-sticky__header').boundingClientRect(function (rect) {
+				if (rect == null) {
+					return
+				}
+				const h = rect.height as number
+				if (h > 0) {
+					that.headerHeightPx = h
+				}
+			})
+			q.exec()
+		},
+		emitStickyIfNeeded(nextFixed: boolean) {
+			if (nextFixed != this.isFixed) {
+				this.isFixed = nextFixed
+				const idx = this.index
+				const n = typeof idx === 'number' ? (idx as number) : parseInt(idx as string)
+				this.$emit('sticky', {
+					isFixed: nextFixed,
+					index: isNaN(n) ? 0 : n
+				} as UTSJSONObject)
+			}
+		},
+		emitChange(topVal: number) {
+			const idx2 = this.index
+			const n2 = typeof idx2 === 'number' ? (idx2 as number) : parseInt(idx2 as string)
+			this.$emit('change', {
+				top: topVal,
+				index: isNaN(n2) ? 0 : n2
+			} as UTSJSONObject)
+			this.lastTop = topVal
+		},
+		/** scroll-view 内：组件根相对滚动视口可见区域顶边的距离（px） */
+		updateSticky() {
+			const that = this
+			const vid = (this.scrollViewportId as string).trim()
+			if (vid.length > 0) {
+				const qPage = uni.createSelectorQuery()
+				qPage.select('#' + vid).boundingClientRect(function (vrect: any) {
+					if (vrect == null) {
+						return
+					}
+					const qSelf = uni.createSelectorQuery().in(that)
+					qSelf.select('.m-sticky').boundingClientRect(function (srect: any) {
+						if (srect == null) {
+							return
+						}
+						const relTop = (srect.top as number) - (vrect.top as number)
+						const threshold = that.stickyTopPx
+						const nextFixed = relTop <= threshold
+						that.emitStickyIfNeeded(nextFixed)
+						that.emitChange(relTop)
+					})
+					qSelf.exec()
+				})
+				qPage.exec()
+				return
+			}
+			const q = uni.createSelectorQuery().in(this)
+			q.select('.m-sticky__ph').boundingClientRect(function (rect) {
+				if (rect == null) {
+					return
+				}
+				const top = rect.top as number
+				const threshold = that.stickyTopPx
+				const nextFixed = top <= threshold
+				that.emitStickyIfNeeded(nextFixed)
+				that.emitChange(top)
+			})
+			q.exec()
+		}
+	}
+}
+</script>
+
+<style lang="scss">
+.m-sticky {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.m-sticky__ph {
+	position: relative;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-sticky__header {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-sticky__header--fixed {
+	position: fixed;
+	left: 0;
+	right: 0;
+	z-index: 920;
+}
+
+.m-sticky__container {
+	width: 100%;
+	box-sizing: border-box;
+}
+</style>

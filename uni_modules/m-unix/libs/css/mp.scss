@@ -1,0 +1,16 @@
+/* 小程序平台特有样式 - ucss 兼容版本 */
+/* 注意：ucss 不支持 CSS 变量 */
+
+/* 图标字体：小程序端 uni.loadFontFace 无法用 /static 作为合法下载地址，改用包内 @font-face（基础库 2.10+）；单 ttf 兼容性最好 */
+@font-face {
+	font-family: "iconfont";
+	src: url("/static/iconfont/iconfont.ttf") format("truetype");
+	font-weight: normal;
+	font-style: normal;
+}
+
+page {
+	background-color: #f5f7fa;
+	font-size: 28rpx;
+	line-height: 1.5;
+}

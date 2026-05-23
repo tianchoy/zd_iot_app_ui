@@ -4,6 +4,18 @@
 	// #endif
 
 	onLaunch(() => {
+		// #ifndef MP
+		  uni.loadFontFace({
+		    family: 'iconfont',
+		    source: 'url("/static/iconfont/iconfont.ttf")',
+		    success: () => {
+		      console.log('图标字体加载成功')
+		    },
+		    fail: (err) => {
+		      console.log('图标字体加载失败', err)
+		    }
+		  })
+		  // #endif
 		console.log('App Launch')
 	})
 
@@ -39,8 +51,9 @@
 	// #endif
 </script>
 
-<style>
+<style lang="scss">
 	/*每个页面公共css */
+	@import '@/uni_modules/m-unix/index.scss';
 	.uni-row {
 		flex-direction: row;
 	}

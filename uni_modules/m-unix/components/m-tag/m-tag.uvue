@@ -1,0 +1,276 @@
+<template>
+	<view
+		class="m-tag"
+		:class="[
+			`m-tag--${type}`,
+			`m-tag--${size}`,
+			{ 'm-tag--plain': plain },
+			{ 'm-tag--round': round },
+			{ 'm-tag--mark': mark },
+			{ 'm-tag--disabled': disabled }
+		]"
+		:style="mergedCustomStyle"
+		@tap="handleClick"
+	>
+		<slot></slot>
+		<text v-if="text" class="m-tag__text">{{ text }}</text>
+		<m-icon
+			v-if="closable"
+			class="m-tag__close"
+			name="close"
+			:size="closeIconSize"
+			:color="closeIconColor"
+			@tap.stop="handleClose"
+		></m-icon>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+
+export default {
+	name: 'mTag',
+	emits: ['click', 'close'],
+	props: {
+		// 类型 primary/ success/ warning/ danger/ info/ default
+		type: {
+			type: String,
+			default: 'default'
+		},
+		// 尺寸 large / medium / small / mini
+		size: {
+			type: String,
+			default: 'medium'
+		},
+		// 文字
+		text: {
+			type: String,
+			default: ''
+		},
+		// 镂空样式
+		plain: {
+			type: Boolean,
+			default: false
+		},
+		// 是否圆角
+		round: {
+			type: Boolean,
+			default: false
+		},
+		// 是否标记样式
+		mark: {
+			type: Boolean,
+			default: false
+		},
+		// 是否可关闭
+		closable: {
+			type: Boolean,
+			default: false
+		},
+		// 是否禁用
+		disabled: {
+			type: Boolean,
+			default: false
+		},
+		// 自定义颜色
+		color: {
+			type: String,
+			default: ''
+		},
+		// 自定义背景色
+		bgColor: {
+			type: String,
+			default: ''
+		},
+		// 自定义样式（勿与合并结果同名 computed，否则冲突）
+		customStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: () => ({})
+		}
+	},
+	computed: {
+		mergedCustomStyle(): UTSJSONObject {
+			const style: UTSJSONObject = {}
+			if (this.color !== '') {
+				style.color = this.color
+			}
+			if (this.bgColor !== '') {
+				style.backgroundColor = this.bgColor
+			}
+			Object.assign(style, this.customStyle)
+			return style
+		},
+		closeIconSize(): string {
+			if (this.size === 'mini') {
+				return '24rpx'
+			}
+			if (this.size === 'small') {
+				return '28rpx'
+			}
+			if (this.size === 'large') {
+				return '36rpx'
+			}
+			return '32rpx'
+		},
+		// 关闭图标与标签字色一致（避免父 view 的 color 未作用到 m-icon 内 text）
+		closeIconColor(): string {
+			if (this.color !== '') {
+				return this.color
+			}
+			if (this.plain) {
+				if (this.type === 'primary') {
+					return '#409eff'
+				}
+				if (this.type === 'success') {
+					return '#67c23a'
+				}
+				if (this.type === 'warning') {
+					return '#e6a23c'
+				}
+				if (this.type === 'danger') {
+					return '#f56c6c'
+				}
+				if (this.type === 'info') {
+					return '#909399'
+				}
+				return '#606266'
+			}
+			if (this.type === 'default') {
+				return '#606266'
+			}
+			return '#ffffff'
+		}
+	},
+	methods: {
+		handleClick(e: any) {
+			if (!this.disabled) {
+				this.$emit('click', e)
+			}
+		},
+		handleClose(e: any) {
+			if (!this.disabled) {
+				this.$emit('close', e)
+			}
+		}
+	}
+};
+</script>
+
+<style scoped lang="scss">
+.m-tag {
+	display: inline-flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	padding: 8rpx 16rpx;
+	line-height: 1;
+	border-radius: 6rpx;
+
+	// 尺寸（须与 props 默认 medium 一致）
+	&.m-tag--large {
+		font-size: 32rpx;
+		padding: 16rpx 24rpx;
+	}
+	&.m-tag--medium {
+		font-size: 28rpx;
+		padding: 12rpx 20rpx;
+	}
+	&.m-tag--small {
+		font-size: 24rpx;
+		padding: 6rpx 14rpx;
+	}
+	&.m-tag--mini {
+		font-size: 20rpx;
+		padding: 4rpx 10rpx;
+	}
+
+	// 类型
+	&.m-tag--primary {
+		background-color: #409eff;
+		color: #ffffff;
+		border: 1rpx solid #409eff;
+	}
+	&.m-tag--success {
+		background-color: #67c23a;
+		color: #ffffff;
+		border: 1rpx solid #67c23a;
+	}
+	&.m-tag--warning {
+		background-color: #e6a23c;
+		color: #ffffff;
+		border: 1rpx solid #e6a23c;
+	}
+	&.m-tag--danger {
+		background-color: #f56c6c;
+		color: #ffffff;
+		border: 1rpx solid #f56c6c;
+	}
+	&.m-tag--info {
+		background-color: #909399;
+		color: #ffffff;
+		border: 1rpx solid #909399;
+	}
+	&.m-tag--default {
+		background-color: #f5f7fa;
+		color: #606266;
+		border: 1rpx solid #dcdfe6;
+	}
+
+	// 镂空
+	&.m-tag--plain {
+		background-color: transparent !important;
+	}
+	&.m-tag--plain.m-tag--primary {
+		color: #409eff;
+		border-color: #409eff;
+	}
+	&.m-tag--plain.m-tag--success {
+		color: #67c23a;
+		border-color: #67c23a;
+	}
+	&.m-tag--plain.m-tag--warning {
+		color: #e6a23c;
+		border-color: #e6a23c;
+	}
+	&.m-tag--plain.m-tag--danger {
+		color: #f56c6c;
+		border-color: #f56c6c;
+	}
+	&.m-tag--plain.m-tag--info {
+		color: #909399;
+		border-color: #909399;
+	}
+	&.m-tag--plain.m-tag--default {
+		color: #606266;
+		border-color: #dcdfe6;
+	}
+
+	// 圆角
+	&.m-tag--round {
+		border-radius: 100rpx;
+	}
+
+	// 标记样式
+	&.m-tag--mark {
+		border: none;
+	}
+
+	// 禁用
+	&.m-tag--disabled {
+		opacity: 0.5;
+	}
+
+	.m-tag__text {
+		line-height: inherit;
+		font-size: inherit;
+		color: inherit;
+	}
+
+	.m-tag__close {
+		margin-left: 8rpx;
+		flex-shrink: 0;
+		opacity: 0.85;
+	}
+}
+</style>

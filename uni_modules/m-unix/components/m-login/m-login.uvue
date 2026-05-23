@@ -1,0 +1,314 @@
+<template>
+	<m-bottom-popup :zIndex="1002" :maskZIndex="1001" :show="popupShow" @close="hiddenPopup">
+		<m-content gap="32" margin-top="24">
+			<view class="login-body">
+				<text class="login-title">登录 {{ configInfo.name }}</text>
+				<view class="login-agreement-row">
+					<view class="login-agreement-cb">
+						<m-checkbox
+							:checked="isAgree"
+							:size="40"
+							:scale="0.9"
+							color="#ff0844"
+							border-color="#cccccc"
+							@update:checked="onAgreeUpdate"
+						/>
+					</view>
+					<view class="login-agreement-text">
+						<text class="login-agreement-desc">
+							登录即表示您已阅读并同意
+						</text>
+						<view class="login-agreement-links">
+							<text
+								v-if="configInfo.agreementId.length > 0"
+								class="login-link"
+								@tap.stop="openAgreement"
+							>《用户协议》</text>
+							<text v-else class="login-link login-link--muted">《用户协议》</text>
+							<text class="login-agreement-desc">与</text>
+							<text
+								v-if="configInfo.privacyId.length > 0"
+								class="login-link"
+								@tap.stop="openPrivacy"
+							>《隐私政策》</text>
+							<text v-else class="login-link login-link--muted">《隐私政策》</text>
+						</view>
+					</view>
+				</view>
+				<view class="login-actions">
+					<!-- #ifdef MP-WEIXIN -->
+					<m-button
+						v-if="isAgree"
+						type="danger"
+						shadow
+						bold
+						shape="circle"
+						open-type="getPhoneNumber"
+						@getphonenumber="getPhone"
+					>同意并登录</m-button>
+					<m-button
+						v-else
+						type="danger"
+						shadow
+						bold
+						shape="circle"
+						@tap="onLoginTap"
+					>同意并登录</m-button>
+					<!-- #endif -->
+					<!-- #ifndef MP-WEIXIN -->
+					<m-button
+						v-if="isAgree"
+						type="danger"
+						shadow
+						bold
+						shape="circle"
+						@tap="onLoginAfterAgree"
+					>同意并登录</m-button>
+					<m-button
+						v-else
+						type="danger"
+						shadow
+						bold
+						shape="circle"
+						@tap="onLoginTap"
+					>同意并登录</m-button>
+					<!-- #endif -->
+				</view>
+			</view>
+		</m-content>
+	</m-bottom-popup>
+	<m-dialog
+		:show="showAgreementDialog"
+		:buttons="agreementDialogButtons"
+		title="提示"
+		@click="onAgreementDialogClick"
+		@update:show="onAgreementDialogShowUpdate"
+	>
+		<template v-slot:content>
+			请先阅读并勾选同意《用户协议》与《隐私政策》后再登录。
+		</template>
+	</m-dialog>
+</template>
+
+<script lang="uts">
+	import { getHostProjectConfig } from '@/uni_modules/m-unix/components/m-tools/ProjectConfig.uts'
+	import { StoreMemberVo } from '@/uni_modules/m-unix/components/m-tools/utype/type.uts'
+
+	export default {
+
+		name: 'mLogin',
+		emits: ['update:popupShow'],
+		props: {
+			popupShow: {
+				type: Boolean,
+				default: false
+			},
+			bo: {
+				type: Object,
+				default: () : object => ({})
+			},
+			full: {
+				type: Boolean,
+				default: false
+			},
+		},
+		data() {
+			return {
+				configInfo: { name: '', agreementId: '', privacyId: '' },
+				isAgree: false as boolean,
+				weixinInfo: {
+					encryptedData: '',
+					code: '',
+					iv: '',
+					mId: ''
+				},
+				showAgreementDialog: false,
+				agreementDialogButtons: [{
+					text: '取消'
+				}, {
+					text: '同意并勾选',
+					color: '#586c94'
+				}] as Array<{ text: string; color?: string }>
+			}
+		},
+		created() {
+			const than = this
+			const cfg = getHostProjectConfig()
+			const ci = cfg.configInfo
+			const aid = ci.userAgreementArticleId
+			const pid = ci.privacyPolicyArticleId
+			than.configInfo = {
+				name: ci.name,
+				agreementId: aid != null && aid.length > 0 ? aid : '',
+				privacyId: pid != null && pid.length > 0 ? pid : ''
+			}
+			than.$m.httpGet(cfg.api.login.tokenLogin, {}).then((res : StoreMemberVo) => {
+				this.$m.login(res)
+				than.hiddenPopup()
+			}).catch((_e : any) => {
+				this.$m.logout()
+				// #ifdef MP-WEIXIN
+				uni.login({
+					provider: 'weixin',
+					success: function (loginRes) {
+						than.$m.httpGet(cfg.api.login.codeGetOpenIdLogin, {
+							code: loginRes.code
+						}).then((rese : StoreMemberVo) => {
+							than.$m.login(rese)
+							than.hiddenPopup()
+						}).catch(() => {
+							than.$m.logout()
+							setTimeout(() => {}, 3000)
+						})
+					}
+				})
+				// #endif
+				// #ifndef MP-WEIXIN
+				const pages = getCurrentPages()
+				if (pages.length < 1) {
+					return
+				}
+				const currentPage = pages[pages.length - 1]
+				const pagePath = currentPage.route as string
+				const loginTarget = cfg.loginPagePath
+				let loginPathNorm = loginTarget
+				if (loginPathNorm.length > 0 && loginPathNorm.charAt(0) == '/') {
+					loginPathNorm = loginPathNorm.substring(1)
+				}
+				const onLoginPage =
+					pagePath != null &&
+					(pagePath === loginPathNorm || pagePath.indexOf('login/login') >= 0)
+				if (!onLoginPage && pagePath != null && pagePath.indexOf('tab/index') < 0) {
+					than.$m.href(loginTarget)
+				}
+				// #endif
+			})
+		},
+		methods: {
+			showPopup() {
+				this.$emit('update:popupShow', true)
+			},
+			hiddenPopup() {
+				this.$emit('update:popupShow', false)
+			},
+			openAgreement() {
+				const id = this.configInfo.agreementId
+				if (id.length < 1) {
+					return
+				}
+				this.$m.href('/son_me/article-details/article-details?id=' + id)
+			},
+			openPrivacy() {
+				const id = this.configInfo.privacyId
+				if (id.length < 1) {
+					return
+				}
+				this.$m.href('/son_me/article-details/article-details?id=' + id)
+			},
+			onLoginTap() {
+				if (!this.isAgree) {
+					this.showAgreementDialog = true
+				}
+			},
+			onAgreeUpdate(next : boolean) {
+				this.isAgree = next
+			},
+			onAgreementDialogShowUpdate(next : boolean) {
+				this.showAgreementDialog = next
+			},
+			onAgreementDialogClick(e : { index : number }) {
+				if (e.index === 1) {
+					this.isAgree = true
+				}
+			},
+			onLoginAfterAgree() {
+				this.$m.toast('非微信端请对接业务登录接口')
+			},
+			getPhone(e : { iv : string, encryptedData : string }) {
+				const than = this
+				if (!than.isAgree) {
+					than.showAgreementDialog = true
+					return
+				}
+				const cfg = getHostProjectConfig()
+				uni.login({
+					provider: 'weixin',
+					success: function (loginRes) {
+						than.weixinInfo.code = loginRes.code
+						than.weixinInfo.iv = e.iv
+						than.weixinInfo.encryptedData = e.encryptedData
+						let mid = uni.getStorageSync('mId')
+						than.weixinInfo.mId = (mid == null || mid == '') ? 0 : mid
+						than.$m.httpGet(cfg.api.login.codeGetPhoneRegisterOrLogin, than.weixinInfo).then((data : StoreMemberVo) => {
+							than.$m.login(data)
+							than.hiddenPopup()
+							than.$m.toast('登录成功!')
+						}).catch((error : string) => {
+							than.$m.toast(error)
+						})
+					}
+				})
+			},
+		},
+	}
+</script>
+
+<style lang="scss" scoped>
+	.login-body {
+		padding: 0 8rpx 24rpx;
+	}
+
+	.login-title {
+		font-size: 32rpx;
+		font-weight: 600;
+		color: #333333;
+		text-align: center;
+		margin-bottom: 32rpx;
+	}
+
+	.login-agreement-row {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		margin-bottom: 40rpx;
+	}
+
+	.login-agreement-cb {
+		flex-shrink: 0;
+		padding-top: 4rpx;
+	}
+
+	.login-agreement-text {
+		flex: 1;
+		margin-left: 16rpx;
+	}
+
+	.login-agreement-desc {
+		font-size: 26rpx;
+		color: #666666;
+		line-height: 1.65;
+	}
+
+	.login-agreement-links {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+		margin-top: 8rpx;
+	}
+
+	.login-link {
+		font-size: 26rpx;
+		line-height: 1.65;
+		color: #5677fc;
+		margin-right: 4rpx;
+	}
+
+	.login-link--muted {
+		color: #bbbbbb;
+	}
+
+	.login-actions {
+		width: 100%;
+	}
+</style>

@@ -1,0 +1,255 @@
+<template>
+	<view class="m-search" :style="outerBarStyle">
+		<view
+			class="m-search__content"
+			:class="[{ 'm-search__content--border': border }, { 'm-search__content--disabled': disabled }]"
+			:style="innerBoxStyle"
+		>
+			<view class="m-search__left">
+				<m-icon name="search" color="#c0c4cc" :size="iconSizeStr"></m-icon>
+			</view>
+			<input
+				class="m-search__input"
+				v-model="value"
+				:disabled="disabled"
+				:placeholder="placeholder"
+				:placeholder-color="placeholderColor"
+				@input="handleInput"
+				@confirm="handleConfirm"
+				@focus="handleFocus"
+				@blur="handleBlur"
+			>
+			<view v-if="clearabled && value !== '' && !disabled" class="m-search__clear" @tap="handleClear">
+				<m-icon name="close" color="#c0c4cc" :size="iconSizeStr"></m-icon>
+			</view>
+		</view>
+		<view v-if="showAction" class="m-search__action" @tap="handleSearch">
+			<text class="m-search__action-text">{{ actionText }}</text>
+		</view>
+		<view v-if="cancelabled" class="m-search__cancel" @tap="handleCancel">
+			<text class="m-search__cancel-text">取消</text>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mSearch',
+	emits: ['update:modelValue', 'input', 'confirm', 'search', 'clear', 'cancel', 'focus', 'blur'],
+	props: {
+		modelValue: {
+			type: String,
+			default: ''
+		},
+		placeholder: {
+			type: String,
+			default: '请搜索'
+		},
+		placeholderColor: {
+			type: String,
+			default: '#c0c4cc'
+		},
+		/** square 使用 radius；round 为胶囊形（高圆角） */
+		shape: {
+			type: String,
+			default: 'square'
+		},
+		radius: {
+			type: [Number, String],
+			default: 8
+		},
+		height: {
+			type: [Number, String],
+			default: 64
+		},
+		iconSize: {
+			type: [Number, String],
+			default: 32
+		},
+		/** 整条搜索栏外层背景 */
+		bgColor: {
+			type: String,
+			default: '#f5f5f5'
+		},
+		/** 与 bgColor 相同含义，兼容演示页 backgroundColor */
+		backgroundColor: {
+			type: String,
+			default: ''
+		},
+		/** 输入框白底区域背景 */
+		innerBgColor: {
+			type: String,
+			default: '#ffffff'
+		},
+		border: {
+			type: Boolean,
+			default: false
+		},
+		clearabled: {
+			type: Boolean,
+			default: true
+		},
+		cancelabled: {
+			type: Boolean,
+			default: false
+		},
+		/** 右侧「搜索」按钮（与 cancel 不同） */
+		showAction: {
+			type: Boolean,
+			default: false
+		},
+		actionText: {
+			type: String,
+			default: '搜索'
+		},
+		disabled: {
+			type: Boolean,
+			default: false
+		}
+	},
+	data() {
+		return {
+			value: ''
+		}
+	},
+	computed: {
+		iconSizeStr(): string {
+			return toCssLength(this.iconSize as number | string)
+		},
+		outerBg(): string {
+			if (this.backgroundColor !== '') {
+				return this.backgroundColor
+			}
+			return this.bgColor
+		},
+		outerBarStyle(): UTSJSONObject {
+			return { backgroundColor: this.outerBg }
+		},
+		contentRadiusCss(): string {
+			if (this.shape === 'round') {
+				return '999rpx'
+			}
+			return toCssLength(this.radius as number | string)
+		},
+		innerBoxStyle(): UTSJSONObject {
+			return {
+				borderRadius: this.contentRadiusCss,
+				height: toCssLength(this.height as number | string),
+				backgroundColor: this.innerBgColor
+			}
+		}
+	},
+	watch: {
+		modelValue(val: string) {
+			this.value = val
+		}
+	},
+	created() {
+		this.value = this.modelValue
+	},
+	methods: {
+		syncModel() {
+			this.$emit('update:modelValue', this.value)
+			this.$emit('input', this.value)
+		},
+		handleInput(_e: any) {
+			this.syncModel()
+		},
+		handleConfirm(_e: any) {
+			this.$emit('confirm', this.value)
+			this.$emit('search', this.value)
+		},
+		handleSearch() {
+			if (!this.disabled) {
+				this.$emit('search', this.value)
+			}
+		},
+		handleClear() {
+			this.value = ''
+			this.syncModel()
+			this.$emit('clear', '')
+		},
+		handleCancel() {
+			this.$emit('cancel')
+		},
+		handleFocus(e: any) {
+			this.$emit('focus', e)
+		},
+		handleBlur(e: any) {
+			this.$emit('blur', e)
+		}
+	}
+};
+</script>
+
+<style scoped lang="scss">
+.m-search {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 10rpx 20rpx;
+
+	.m-search__content {
+		flex: 1;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		box-sizing: border-box;
+		padding-left: 20rpx;
+		padding-right: 20rpx;
+		min-width: 0;
+
+		&.m-search__content--border {
+			border: 1rpx solid #e4e7ed;
+		}
+
+		&.m-search__content--disabled {
+			opacity: 0.55;
+		}
+
+		.m-search__left {
+			flex-shrink: 0;
+		}
+
+		.m-search__input {
+			flex: 1;
+			font-size: 28rpx;
+			color: #606266;
+			line-height: 1;
+			background-color: transparent;
+			padding: 0;
+			margin-left: 10rpx;
+			min-width: 0;
+		}
+
+		.m-search__clear {
+			flex-shrink: 0;
+			padding-left: 10rpx;
+		}
+	}
+
+	.m-search__action {
+		flex-shrink: 0;
+		padding-left: 20rpx;
+	}
+
+	.m-search__action-text {
+		font-size: 28rpx;
+		color: #409eff;
+		font-weight: 500;
+	}
+
+	.m-search__cancel {
+		flex-shrink: 0;
+		padding-left: 20rpx;
+	}
+
+	.m-search__cancel-text {
+		font-size: 28rpx;
+		color: #606266;
+	}
+}
+</style>

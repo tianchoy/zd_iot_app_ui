@@ -1,0 +1,261 @@
+<template>
+	<view v-if="show" class="m-bubble-popup" :style="rootStyle">
+		<view v-if="mask" class="m-bubble-popup__mask" :style="maskBgOnly" @tap="onMaskTap"></view>
+		<view class="m-bubble-popup__box" :style="boxStyle">
+			<view class="m-bubble-popup__tri" :style="triStyle"></view>
+			<view class="m-bubble-popup__inner" :style="innerStyle">
+				<slot></slot>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+import { parseCssNumber } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mBubblePopup',
+	emits: ['close', 'update:show'],
+	props: {
+		show: {
+			type: Boolean,
+			default: false
+		},
+		mask: {
+			type: Boolean,
+			default: true
+		},
+		maskBgColor: {
+			type: String,
+			default: 'rgba(0, 0, 0, 0.4)'
+		},
+		width: {
+			type: String,
+			default: '300rpx'
+		},
+		radius: {
+			type: String,
+			default: '8rpx'
+		},
+		left: {
+			type: String,
+			default: 'auto'
+		},
+		right: {
+			type: String,
+			default: 'auto'
+		},
+		top: {
+			type: String,
+			default: 'auto'
+		},
+		bottom: {
+			type: String,
+			default: 'auto'
+		},
+		translateX: {
+			type: String,
+			default: '0'
+		},
+		translateY: {
+			type: String,
+			default: '0'
+		},
+		backgroundColor: {
+			type: String,
+			default: '#4c4c4c'
+		},
+		color: {
+			type: String,
+			default: '#ffffff'
+		},
+		borderWidth: {
+			type: String,
+			default: '12rpx'
+		},
+		direction: {
+			type: String,
+			default: 'top'
+		},
+		triangleLeft: {
+			type: String,
+			default: 'auto'
+		},
+		triangleRight: {
+			type: String,
+			default: 'auto'
+		},
+		triangleTop: {
+			type: String,
+			default: 'auto'
+		},
+		triangleBottom: {
+			type: String,
+			default: 'auto'
+		},
+		position: {
+			type: String,
+			default: 'fixed'
+		},
+		zIndex: {
+			type: [Number, String],
+			default: 10080
+		}
+	},
+	computed: {
+		zIndexNum(): number {
+			const z = this.zIndex as number | string
+			if (typeof z === 'number') {
+				return z
+			}
+			return parseCssNumber(z as string)
+		},
+		rootStyle(): UTSJSONObject {
+			const zi = this.zIndexNum
+			const st = {
+				position: this.position as string,
+				left: '0',
+				top: '0',
+				right: '0',
+				bottom: '0',
+				'z-index': zi.toString()
+			} as UTSJSONObject
+			if (this.customStyle != null) {
+				Object.assign(st, this.customStyle)
+			}
+			return st
+		},
+		/** 蒙层仅用背景色；定位与层级在 scss，与 m-alert 一致，避免 fixed 蒙层盖住 absolute 气泡 */
+		maskBgOnly(): UTSJSONObject {
+			return {
+				backgroundColor: this.maskBgColor as string
+			} as UTSJSONObject
+		},
+		boxStyle(): UTSJSONObject {
+			const pos: UTSJSONObject = {
+				position: 'absolute',
+				width: this.width,
+				borderRadius: this.radius,
+				backgroundColor: this.backgroundColor,
+				transform: `translate3d(${this.translateX}, ${this.translateY}, 0)`,
+				overflow: 'visible'
+			} as UTSJSONObject
+			this.applyEdge(pos, 'left', this.left as string)
+			this.applyEdge(pos, 'right', this.right as string)
+			this.applyEdge(pos, 'top', this.top as string)
+			this.applyEdge(pos, 'bottom', this.bottom as string)
+			return pos
+		},
+		innerStyle(): UTSJSONObject {
+			return {
+				color: this.color as string,
+				position: 'relative',
+				zIndex: '2'
+			} as UTSJSONObject
+		},
+		triStyle(): UTSJSONObject {
+			const d = this.direction as string
+			const bw = this.borderWidth
+			const c = this.backgroundColor
+			const st: UTSJSONObject = {
+				position: 'absolute',
+				width: '0',
+				height: '0',
+				left: this.triangleLeft,
+				right: this.triangleRight,
+				top: this.triangleTop,
+				bottom: this.triangleBottom,
+				zIndex: '1'
+			} as UTSJSONObject
+			if (d === 'bottom') {
+				st['borderLeftWidth'] = bw
+				st['borderRightWidth'] = bw
+				st['borderTopWidth'] = bw
+				st['borderLeftStyle'] = 'solid'
+				st['borderRightStyle'] = 'solid'
+				st['borderTopStyle'] = 'solid'
+				st['borderLeftColor'] = 'transparent'
+				st['borderRightColor'] = 'transparent'
+				st['borderTopColor'] = c
+			} else if (d === 'top') {
+				st['borderLeftWidth'] = bw
+				st['borderRightWidth'] = bw
+				st['borderBottomWidth'] = bw
+				st['borderLeftStyle'] = 'solid'
+				st['borderRightStyle'] = 'solid'
+				st['borderBottomStyle'] = 'solid'
+				st['borderLeftColor'] = 'transparent'
+				st['borderRightColor'] = 'transparent'
+				st['borderBottomColor'] = c
+			} else if (d === 'left') {
+				st['borderTopWidth'] = bw
+				st['borderBottomWidth'] = bw
+				st['borderRightWidth'] = bw
+				st['borderTopStyle'] = 'solid'
+				st['borderBottomStyle'] = 'solid'
+				st['borderRightStyle'] = 'solid'
+				st['borderTopColor'] = 'transparent'
+				st['borderBottomColor'] = 'transparent'
+				st['borderRightColor'] = c
+			} else {
+				st['borderTopWidth'] = bw
+				st['borderBottomWidth'] = bw
+				st['borderLeftWidth'] = bw
+				st['borderTopStyle'] = 'solid'
+				st['borderBottomStyle'] = 'solid'
+				st['borderLeftStyle'] = 'solid'
+				st['borderTopColor'] = 'transparent'
+				st['borderBottomColor'] = 'transparent'
+				st['borderLeftColor'] = c
+			}
+			return st
+		}
+	},
+	methods: {
+		applyEdge(st: UTSJSONObject, key: string, val: string) {
+			const v = val.trim()
+			if (v.length === 0 || v === 'auto') {
+				return
+			}
+			st[key] = val
+		},
+		onMaskTap() {
+			this.$emit('close')
+			this.$emit('update:show', false)
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-bubble-popup {
+	box-sizing: border-box;
+}
+
+/* 相对根节点铺满，勿用 fixed，否则与气泡同为视口 fixed 时部分端层级异常 */
+.m-bubble-popup__mask {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+	box-sizing: border-box;
+}
+
+.m-bubble-popup__box {
+	position: absolute;
+	z-index: 2;
+	box-sizing: border-box;
+}
+
+.m-bubble-popup__inner {
+	padding: 16rpx 20rpx;
+	box-sizing: border-box;
+}
+
+.m-bubble-popup__tri {
+	box-sizing: border-box;
+}
+</style>

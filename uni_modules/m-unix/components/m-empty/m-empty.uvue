@@ -1,0 +1,121 @@
+<template>
+	<view class="m-empty" :style="{ paddingTop: paddingTopCss }">
+		<image v-if="image !== ''" class="m-empty__image" :src="image" mode="aspectFit"></image>
+		<view v-if="showIconBlock" class="m-empty__icon">
+			<slot name="icon">
+				<m-icon :name="resolvedIconName" size="96rpx" color="#c0c4cc"></m-icon>
+			</slot>
+		</view>
+		<view class="m-empty__text">
+			<text class="m-empty__description">{{ displayText }}</text>
+		</view>
+		<view v-if="hasBottomSlot" class="m-empty__bottom">
+			<slot name="footer"></slot>
+			<slot></slot>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+import { getMUiConfig } from '@/uni_modules/m-unix/config.uts'
+
+export default {
+	name: 'mEmpty',
+	props: {
+		// 图片地址
+		image: {
+			type: String,
+			default: ''
+		},
+		// 提示文字
+		description: {
+			type: String,
+			default: '暂无数据'
+		},
+		// 与 description 相同含义，非空时优先于 description（便于简写）
+		text: {
+			type: String,
+			default: ''
+		},
+		/** m-icon 的 name；不传 image 且未指定 icon 时使用 mUi.emptyDefaultIcon（默认 file-common-filling） */
+		icon: {
+			type: String,
+			default: ''
+		},
+		// 图片距离顶部的距离
+		paddingTop: {
+			type: [Number, String],
+			default: 200
+		}
+	},
+	computed: {
+		paddingTopCss(): string {
+			return toCssLength(this.paddingTop as number | string)
+		},
+		displayText(): string {
+			const t = (this.text as string).trim()
+			if (t.length > 0) {
+				return t
+			}
+			return this.description as string
+		},
+		/** 未传 icon 时使用 config.uts 的 emptyDefaultIcon（图标字体，不依赖静态 PNG） */
+		resolvedIconName(): string {
+			const ic = (this.icon as string).trim()
+			if (ic.length > 0) {
+				return ic
+			}
+			return getMUiConfig().emptyDefaultIcon
+		},
+		showIconBlock(): boolean {
+			return (this.image as string).trim().length === 0
+		},
+		hasBottomSlot(): boolean {
+			return this.$slots['footer'] != null || this.$slots.default != null
+		}
+	}
+};
+</script>
+
+<style scoped lang="scss">
+.m-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	box-sizing: border-box;
+
+	.m-empty__image {
+		width: 320rpx;
+		height: 240rpx;
+	}
+
+	.m-empty__icon {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.m-empty__text {
+		margin-top: 16rpx;
+	}
+
+	.m-empty__description {
+		font-size: 28rpx;
+		color: #c0c4cc;
+		line-height: 1.5;
+	}
+
+	.m-empty__bottom {
+		margin-top: 30rpx;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		box-sizing: border-box;
+	}
+}
+</style>

@@ -1,0 +1,50 @@
+<template>
+	<view class="m-sticky-bottom" :style="{ zIndex: zIndex }">
+		<view class="m-sticky-bottom__content" :class="{'m-sticky-bottom__content--safearea': safeAreaInsetBottom}" :style="{ backgroundColor: bgColor }">
+			<slot></slot>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+export default {
+	name: 'mStickyBottom',
+	props: {
+		// 层级
+		zIndex: {
+			type: [Number, String],
+			default: 998
+		},
+		// 是否开启底部安全区域适配
+		safeAreaInsetBottom: {
+			type: Boolean,
+			default: true
+		},
+		// 背景颜色
+		bgColor: {
+			type: String,
+			default: '#ffffff'
+		}
+	}
+};
+</script>
+
+<style scoped lang="scss">
+.m-sticky-bottom {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	box-sizing: border-box;
+	background-color: transparent;
+
+	.m-sticky-bottom__content {
+		box-sizing: border-box;
+		padding: 20rpx 30rpx;
+
+		&.m-sticky-bottom__content--safearea {
+			padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+		}
+	}
+}
+</style>

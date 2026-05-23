@@ -1,0 +1,456 @@
+<template>
+	<view class="m-cascade-selection" :style="{ backgroundColor: backgroundColor }">
+		<view v-if="headerLine" class="m-cascade-selection__header" :style="{ backgroundColor: headerBgColor }">
+			<scroll-view scroll-x class="m-cascade-selection__tabs" :style="{ height: tabsHeight }">
+				<view class="m-cascade-selection__tabs-inner">
+					<view
+						v-for="(lab, li) in tabLabels"
+						:key="li"
+						class="m-cascade-selection__tab"
+						@tap="onTabTap(li)"
+					>
+						<text
+							class="m-cascade-selection__tab-t"
+							:style="tabTextStyle(li)"
+						>{{ lab }}</text>
+						<view v-if="showLine && li === activeTabIndex" class="m-cascade-selection__tab-line" :style="{ backgroundColor: lineColor }"></view>
+					</view>
+				</view>
+			</scroll-view>
+		</view>
+		<scroll-view scroll-y class="m-cascade-selection__list" :style="{ height: height }">
+			<view :style="{ paddingTop: firstItemTop }"></view>
+			<view
+				v-for="(row, ri) in currentRows"
+				:key="ri"
+				class="m-cascade-selection__row"
+				:style="{ padding: padding }"
+				@tap="onPick(row, ri)"
+			>
+				<image
+					v-if="rowSrc(row) !== ''"
+					class="m-cascade-selection__img"
+					:src="rowSrc(row)"
+					mode="aspectFill"
+				></image>
+				<view class="m-cascade-selection__mid">
+					<text class="m-cascade-selection__text" :style="rowTextStyle(ri)">{{ rowText(row) }}</text>
+					<text v-if="rowSub(row) !== ''" class="m-cascade-selection__sub" :style="{ color: subTextColor, 'font-size': subTextSize + 'rpx' }">{{ rowSub(row) }}</text>
+				</view>
+				<m-icon
+					v-if="ri === highlightIndex"
+					class="m-cascade-selection__check"
+					name="check-item"
+					:size="checkMarkSize + 'rpx'"
+					:color="checkMarkColor"
+				></m-icon>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script lang="uts">
+type RowItem = UTSJSONObject
+
+export default {
+	name: 'mCascadeSelection',
+	emits: ['change', 'complete'],
+	props: {
+		itemList: {
+			type: Array,
+			default(): any[] {
+				return []
+			}
+		},
+		textField: {
+			type: String,
+			default: 'text'
+		},
+		subTextField: {
+			type: String,
+			default: 'subText'
+		},
+		valueField: {
+			type: String,
+			default: 'value'
+		},
+		srcField: {
+			type: String,
+			default: 'src'
+		},
+		childrenField: {
+			type: String,
+			default: 'children'
+		},
+		headerLine: {
+			type: Boolean,
+			default: true
+		},
+		headerBgColor: {
+			type: String,
+			default: '#FFFFFF'
+		},
+		tabsHeight: {
+			type: String,
+			default: '88rpx'
+		},
+		text: {
+			type: String,
+			default: '请选择'
+		},
+		size: {
+			type: Number,
+			default: 28
+		},
+		color: {
+			type: String,
+			default: '#555555'
+		},
+		activeColor: {
+			type: String,
+			default: '#5677fc'
+		},
+		bold: {
+			type: Boolean,
+			default: true
+		},
+		showLine: {
+			type: Boolean,
+			default: true
+		},
+		lineColor: {
+			type: String,
+			default: '#5677fc'
+		},
+		checkMarkSize: {
+			type: Number,
+			default: 15
+		},
+		checkMarkColor: {
+			type: String,
+			default: '#5677fc'
+		},
+		textColor: {
+			type: String,
+			default: '#333333'
+		},
+		textActiveColor: {
+			type: String,
+			default: '#333333'
+		},
+		textBold: {
+			type: Boolean,
+			default: true
+		},
+		textSize: {
+			type: Number,
+			default: 28
+		},
+		subTextColor: {
+			type: String,
+			default: '#999999'
+		},
+		subTextSize: {
+			type: Number,
+			default: 24
+		},
+		padding: {
+			type: String,
+			default: '20rpx 30rpx'
+		},
+		firstItemTop: {
+			type: String,
+			default: '20rpx'
+		},
+		height: {
+			type: String,
+			default: '300px'
+		},
+		backgroundColor: {
+			type: String,
+			default: '#FFFFFF'
+		},
+		request: {
+			type: Boolean,
+			default: false
+		},
+		receiveData: {
+			type: Array,
+			default(): any[] {
+				return []
+			}
+		},
+		reset: {
+			type: [Number, String],
+			default: 0
+		}
+	},
+	data() {
+		return {
+			path: [] as RowItem[],
+			indices: [] as number[]
+		}
+	},
+	computed: {
+		tabLabels(): string[] {
+			const labels = [] as string[]
+			const hint = this.text as string
+			for (let i = 0; i < this.path.length; i++) {
+				labels.push(this.rowText(this.path[i]))
+			}
+			labels.push(hint)
+			return labels
+		},
+		activeTabIndex(): number {
+			return this.path.length
+		},
+		currentRows(): RowItem[] {
+			if (this.path.length === 0) {
+				return this.rootList()
+			}
+			const last = this.path[this.path.length - 1]
+			return this.rowChildren(last)
+		},
+		// 当前列为列表浏览态，不在此高亮上一列已选项（与多列 swiper 交互不同）
+		highlightIndex(): number {
+			return -1
+		}
+	},
+	watch: {
+		reset() {
+			this.path = []
+			this.indices = []
+		}
+	},
+	methods: {
+		tf(): string {
+			return this.textField as string
+		},
+		rootList(): RowItem[] {
+			const arr = this.itemList as any[]
+			const out = [] as RowItem[]
+			for (let i = 0; i < arr.length; i++) {
+				out.push(arr[i] as RowItem)
+			}
+			return out
+		},
+		rowText(row: RowItem): string {
+			const v = row[this.tf()]
+			if (v != null) {
+				return '' + v
+			}
+			return ''
+		},
+		rowSub(row: RowItem): string {
+			const k = this.subTextField as string
+			const v = row[k]
+			if (v != null) {
+				return '' + v
+			}
+			return ''
+		},
+		rowVal(row: RowItem): any {
+			const k = this.valueField as string
+			return row[k]
+		},
+		rowSrc(row: RowItem): string {
+			const k = this.srcField as string
+			const v = row[k]
+			if (v != null) {
+				return v as string
+			}
+			return ''
+		},
+		rowChildren(row: RowItem): RowItem[] {
+			const k = this.childrenField as string
+			const ch = row[k]
+			if (ch == null) {
+				return []
+			}
+			const arr = ch as any[]
+			const out = [] as RowItem[]
+			for (let i = 0; i < arr.length; i++) {
+				out.push(arr[i] as RowItem)
+			}
+			return out
+		},
+		tabTextStyle(li: number): UTSJSONObject {
+			const active = li === this.activeTabIndex
+			const st: UTSJSONObject = {
+				'font-size': (this.size as number) + 'rpx',
+				color: active ? (this.activeColor as string) : (this.color as string)
+			}
+			if (active && this.bold) {
+				st['font-weight'] = 'bold'
+			}
+			return st
+		},
+		rowTextStyle(ri: number): UTSJSONObject {
+			const active = ri === this.highlightIndex
+			const st: UTSJSONObject = {
+				'font-size': (this.textSize as number) + 'rpx',
+				color: active ? (this.textActiveColor as string) : (this.textColor as string)
+			}
+			if (active && this.textBold) {
+				st['font-weight'] = 'bold'
+			}
+			return st
+		},
+		onTabTap(li: number) {
+			if (li < this.path.length) {
+				const nextPath = [] as RowItem[]
+				for (let i = 0; i < li; i++) {
+					nextPath.push(this.path[i])
+				}
+				this.path = nextPath
+				const nextIdx = [] as number[]
+				for (let j = 0; j < li; j++) {
+					nextIdx.push(this.indices[j])
+				}
+				this.indices = nextIdx
+			}
+		},
+		onPick(row: RowItem, ri: number) {
+			const layer = this.path.length
+			const ch = this.rowChildren(row)
+			this.$emit('change', {
+				layer: layer,
+				subIndex: ri,
+				text: this.rowText(row),
+				subText: this.rowSub(row),
+				value: this.rowVal(row),
+				src: this.rowSrc(row)
+			} as UTSJSONObject)
+			// request + receiveData 需业务侧合并进 itemList 后再选下级，此处仅支持整树 itemList
+			if (this.request as boolean) {
+				if (ch.length === 0) {
+					this.pushPath(row, ri)
+					this.emitComplete()
+				}
+				return
+			}
+			if (ch.length > 0) {
+				this.pushPath(row, ri)
+			} else {
+				this.pushPath(row, ri)
+				this.emitComplete()
+			}
+		},
+		pushPath(row: RowItem, ri: number) {
+			const np = [] as RowItem[]
+			for (let i = 0; i < this.path.length; i++) {
+				np.push(this.path[i])
+			}
+			np.push(row)
+			this.path = np
+			const ni = [] as number[]
+			for (let j = 0; j < this.indices.length; j++) {
+				ni.push(this.indices[j])
+			}
+			ni.push(ri)
+			this.indices = ni
+		},
+		emitComplete() {
+			let textJoin = ''
+			for (let i = 0; i < this.path.length; i++) {
+				textJoin += this.rowText(this.path[i])
+			}
+			const last = this.path[this.path.length - 1]
+			this.$emit('complete', {
+				text: textJoin,
+				value: this.rowVal(last),
+				subText: this.rowSub(last),
+				src: this.rowSrc(last),
+				result: this.path
+			} as UTSJSONObject)
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-cascade-selection {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-cascade-selection__header {
+	border-bottom-width: 1rpx;
+	border-bottom-style: solid;
+	border-bottom-color: #eeeeee;
+}
+
+.m-cascade-selection__tabs {
+	width: 100%;
+	white-space: nowrap;
+}
+
+.m-cascade-selection__tabs-inner {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 0 16rpx;
+	height: 100%;
+}
+
+.m-cascade-selection__tab {
+	padding: 16rpx 20rpx;
+	position: relative;
+	flex-shrink: 0;
+}
+
+.m-cascade-selection__tab-t {
+	font-size: 28rpx;
+}
+
+.m-cascade-selection__tab-line {
+	position: absolute;
+	left: 20rpx;
+	right: 20rpx;
+	bottom: 0;
+	height: 4rpx;
+	border-radius: 2rpx;
+}
+
+.m-cascade-selection__list {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-cascade-selection__row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	border-bottom-width: 1rpx;
+	border-bottom-style: solid;
+	border-bottom-color: #f5f5f5;
+}
+
+.m-cascade-selection__img {
+	width: 40rpx;
+	height: 40rpx;
+	border-radius: 50%;
+	margin-right: 16rpx;
+	flex-shrink: 0;
+}
+
+.m-cascade-selection__mid {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.m-cascade-selection__text {
+	font-size: 28rpx;
+}
+
+.m-cascade-selection__sub {
+	margin-top: 6rpx;
+	font-size: 24rpx;
+}
+
+.m-cascade-selection__check {
+	flex-shrink: 0;
+	margin-left: 12rpx;
+}
+</style>

@@ -1,0 +1,436 @@
+<template>
+	<view class="m-input" :style="rootMarginStyle">
+		<view
+			class="m-input__row"
+			:class="{ 'm-input__row--disabled': disabled }"
+			:style="rowStyle"
+		>
+			<view v-if="label !== '' || required" class="m-input__label-wrap" :style="labelWrapStyle">
+				<text v-if="required" class="m-input__required" :style="{ color: requiredColor }">*</text>
+				<text v-if="label !== ''" class="m-input__label" :style="labelTextStyle">{{ label }}</text>
+			</view>
+			<view class="m-input__left">
+				<slot name="left"></slot>
+			</view>
+			<input
+				class="m-input__field"
+				:class="{ 'm-input__field--right': textRight, 'm-input__field--boxed': inputBorder }"
+				:style="fieldMergedStyle"
+				v-model="innerValue"
+				:type="inputType"
+				:password="password"
+				:name="name"
+				:disabled="disabled"
+				:placeholder="placeholder"
+				:placeholder-style="placeholderStyleResolved"
+				:placeholder-color="placeholderColor"
+				:maxlength="maxlengthResolved"
+				:confirm-type="confirmType"
+				:cursor-spacing="cursorSpacing"
+				@input="onInput"
+				@focus="onFocus"
+				@blur="onBlur"
+				@confirm="onConfirm"
+			/>
+			<view class="m-input__right">
+				<slot name="right"></slot>
+			</view>
+			<view
+				v-if="clearable && innerValue !== '' && !disabled"
+				class="m-input__clear"
+				@tap.stop="onClear"
+			>
+				<m-icon name="close" :color="clearColor" :size="clearSizeStr"></m-icon>
+			</view>
+		</view>
+		<text v-if="error !== ''" class="m-input__error">{{ error }}</text>
+	</view>
+</template>
+
+<script lang="uts">
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mInput',
+	emits: ['update:modelValue', 'input', 'focus', 'blur', 'confirm', 'clear'],
+	props: {
+		modelValue: {
+			type: String,
+			default: ''
+		},
+		/** 左侧标题，空则不占标题列 */
+		label: {
+			type: String,
+			default: ''
+		},
+		required: {
+			type: Boolean,
+			default: false
+		},
+		requiredColor: {
+			type: String,
+			default: '#EB0909'
+		},
+		labelSize: {
+			type: [Number, String],
+			default: 32
+		},
+		labelColor: {
+			type: String,
+			default: '#333333'
+		},
+		/** 标题最小宽度，单位 rpx */
+		labelWidth: {
+			type: [Number, String],
+			default: 140
+		},
+		placeholder: {
+			type: String,
+			default: ''
+		},
+		placeholderStyle: {
+			type: String,
+			default: ''
+		},
+		placeholderColor: {
+			type: String,
+			default: '#c0c4cc'
+		},
+		name: {
+			type: String,
+			default: ''
+		},
+		type: {
+			type: String,
+			default: 'text'
+		},
+		password: {
+			type: Boolean,
+			default: false
+		},
+		disabled: {
+			type: Boolean,
+			default: false
+		},
+		/** 最大长度；-1 表示不限制（内部用大值透传） */
+		maxlength: {
+			type: [Number, String],
+			default: 140
+		},
+		clearable: {
+			type: Boolean,
+			default: false
+		},
+		clearSize: {
+			type: [Number, String],
+			default: 30
+		},
+		clearColor: {
+			type: String,
+			default: '#bfbfbf'
+		},
+		confirmType: {
+			type: String,
+			default: 'done'
+		},
+		cursorSpacing: {
+			type: Number,
+			default: 0
+		},
+		/** 输入框字号，rpx */
+		size: {
+			type: [Number, String],
+			default: 32
+		},
+		color: {
+			type: String,
+			default: '#333333'
+		},
+		textRight: {
+			type: Boolean,
+			default: false
+		},
+		/** 失去焦点时去除首尾空格 */
+		trim: {
+			type: Boolean,
+			default: true
+		},
+		borderTop: {
+			type: Boolean,
+			default: false
+		},
+		borderBottom: {
+			type: Boolean,
+			default: true
+		},
+		borderColor: {
+			type: String,
+			default: 'rgba(0, 0, 0, 0.08)'
+		},
+		/** 整行背景 */
+		backgroundColor: {
+			type: String,
+			default: '#FFFFFF'
+		},
+		/** 行内水平内边距，如 26rpx 30rpx */
+		padding: {
+			type: String,
+			default: '26rpx 30rpx'
+		},
+		/** 圆角，rpx；0 表示方角 */
+		radius: {
+			type: [Number, String],
+			default: 0
+		},
+		/** 是否描边包裹输入区域（细边框） */
+		inputBorder: {
+			type: Boolean,
+			default: false
+		},
+		/** 底部校验文案 */
+		error: {
+			type: String,
+			default: ''
+		},
+		/** 与上一条字段的间距，rpx */
+		marginTop: {
+			type: [Number, String],
+			default: 0
+		}
+	},
+	data() {
+		return {
+			innerValue: ''
+		}
+	},
+	computed: {
+		inputType(): string {
+			return this.type
+		},
+		maxlengthResolved(): number {
+			const m = this.maxlength
+			if (typeof m === 'number') {
+				if (m < 0) {
+					return 99999
+				}
+				return m
+			}
+			const s = (m as string).trim()
+			if (s === '-1') {
+				return 99999
+			}
+			const n = parseInt(s)
+			if (isNaN(n)) {
+				return 140
+			}
+			if (n < 0) {
+				return 99999
+			}
+			return n
+		},
+		placeholderStyleResolved(): string {
+			if (this.placeholderStyle !== '') {
+				return this.placeholderStyle
+			}
+			return 'font-size:' + toCssLength(this.size as number | string) + ';color:' + this.placeholderColor
+		},
+		clearSizeStr(): string {
+			return toCssLength(this.clearSize as number | string)
+		},
+		labelWrapStyle(): UTSJSONObject {
+			return { minWidth: toCssLength(this.labelWidth as number | string) }
+		},
+		labelTextStyle(): UTSJSONObject {
+			return {
+				'font-size': toCssLength(this.labelSize as number | string),
+				color: this.labelColor
+			}
+		},
+		fieldMergedStyle(): UTSJSONObject {
+			const st: UTSJSONObject = {
+				'font-size': toCssLength(this.size as number | string),
+				color: this.color
+			}
+			if (this.inputBorder) {
+				st['borderWidth'] = '1rpx'
+				st['borderStyle'] = 'solid'
+				st['borderColor'] = this.borderColor
+				st['borderRadius'] = '8rpx'
+				st['paddingLeft'] = '16rpx'
+				st['paddingRight'] = '16rpx'
+			}
+			return st
+		},
+		rowStyle(): UTSJSONObject {
+			const st: UTSJSONObject = {
+				backgroundColor: this.backgroundColor,
+				padding: this.padding
+			}
+			const r = this.radius as number | string
+			let rn = 0
+			if (typeof r === 'number') {
+				rn = r
+			} else {
+				const rs = (r as string).replace('rpx', '').trim()
+				const p = parseInt(rs)
+				if (!isNaN(p)) {
+					rn = p
+				}
+			}
+			if (rn > 0) {
+				st['borderRadius'] = toCssLength(r)
+			}
+			if (this.borderTop) {
+				st['borderTopWidth'] = '1rpx'
+				st['borderTopStyle'] = 'solid'
+				st['borderTopColor'] = this.borderColor
+			}
+			if (this.borderBottom) {
+				st['borderBottomWidth'] = '1rpx'
+				st['borderBottomStyle'] = 'solid'
+				st['borderBottomColor'] = this.borderColor
+			}
+			return st
+		},
+		rootMarginStyle(): UTSJSONObject {
+			const mt = this.marginTop as number | string
+			let n = 0
+			if (typeof mt === 'number') {
+				n = mt
+			} else {
+				const p = parseInt((mt as string).replace('rpx', '').trim())
+				if (!isNaN(p)) {
+					n = p
+				}
+			}
+			if (n > 0) {
+				return { marginTop: toCssLength(mt) }
+			}
+			return {}
+		}
+	},
+	watch: {
+		modelValue(val: string) {
+			this.innerValue = val
+		}
+	},
+	created() {
+		this.innerValue = this.modelValue
+	},
+	methods: {
+		emitValue(next: string) {
+			this.$emit('update:modelValue', next)
+			this.$emit('input', next)
+		},
+		onInput(_e: any) {
+			this.emitValue(this.innerValue)
+		},
+		onFocus(e: any) {
+			this.$emit('focus', e)
+		},
+		onBlur(e: any) {
+			let v = this.innerValue
+			if (this.trim) {
+				v = v.trim()
+				if (v !== this.innerValue) {
+					this.innerValue = v
+					this.emitValue(v)
+				}
+			}
+			this.$emit('blur', e)
+		},
+		onConfirm(_e: any) {
+			this.$emit('confirm', this.innerValue)
+		},
+		onClear() {
+			this.innerValue = ''
+			this.emitValue('')
+			this.$emit('clear', '')
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-input {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-input__row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	box-sizing: border-box;
+	min-height: 88rpx;
+	width: 100%;
+}
+
+.m-input__row--disabled {
+	opacity: 0.55;
+}
+
+.m-input__label-wrap {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-right: 16rpx;
+}
+
+.m-input__required {
+	font-size: 32rpx;
+	margin-right: 4rpx;
+}
+
+.m-input__label {
+	flex-shrink: 0;
+}
+
+.m-input__left {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.m-input__field {
+	flex: 1;
+	min-width: 0;
+	height: 48rpx;
+	line-height: 48rpx;
+	background-color: transparent;
+	border-width: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.m-input__field--right {
+	text-align: right;
+}
+
+.m-input__field--boxed {
+	box-sizing: border-box;
+}
+
+.m-input__right {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-left: 8rpx;
+}
+
+.m-input__clear {
+	flex-shrink: 0;
+	padding-left: 12rpx;
+}
+
+.m-input__error {
+	display: flex;
+	font-size: 24rpx;
+	color: #EB0909;
+	padding: 8rpx 30rpx 0 30rpx;
+	line-height: 1.4;
+}
+</style>

@@ -1,0 +1,112 @@
+<template>
+	<view class="m-collapse" :style="{ backgroundColor: bgColor }">
+		<view
+			class="m-collapse__hd"
+			:style="{ backgroundColor: hdBgColor }"
+			@tap="onHeadTap"
+		>
+			<view class="m-collapse__hd-main">
+				<slot name="title"></slot>
+			</view>
+			<m-icon
+				v-if="arrow"
+				class="m-collapse__arrow-icon"
+				:name="open ? 'arrow-up' : 'arrow-down'"
+				size="28rpx"
+				:color="arrowColor"
+			></m-icon>
+		</view>
+		<view v-if="open" class="m-collapse__bd" :style="{ backgroundColor: bdBgColor, height: height }">
+			<slot name="content"></slot>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+export default {
+	name: 'mCollapse',
+	emits: ['click'],
+	props: {
+		bgColor: {
+			type: String,
+			default: 'transparent'
+		},
+		hdBgColor: {
+			type: String,
+			default: '#ffffff'
+		},
+		bdBgColor: {
+			type: String,
+			default: 'transparent'
+		},
+		height: {
+			type: String,
+			default: 'auto'
+		},
+		index: {
+			type: Number,
+			default: 0
+		},
+		current: {
+			type: Number,
+			default: -1
+		},
+		disabled: {
+			type: Boolean,
+			default: false
+		},
+		arrow: {
+			type: Boolean,
+			default: true
+		},
+		arrowColor: {
+			type: String,
+			default: '#333333'
+		}
+	},
+	computed: {
+		open(): boolean {
+			return (this.current as number) === (this.index as number)
+		}
+	},
+	methods: {
+		onHeadTap() {
+			if (this.disabled) {
+				return
+			}
+			this.$emit('click', { index: this.index as number })
+		}
+	}
+}
+</script>
+
+<style lang="scss">
+.m-collapse {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-collapse__hd {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 0 24rpx;
+	min-height: 88rpx;
+	box-sizing: border-box;
+}
+
+.m-collapse__hd-main {
+	flex: 1;
+}
+
+.m-collapse__arrow-icon {
+	margin-left: 16rpx;
+	flex-shrink: 0;
+}
+
+.m-collapse__bd {
+	width: 100%;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+</style>

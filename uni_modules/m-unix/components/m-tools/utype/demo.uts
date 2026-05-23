@@ -1,0 +1,58 @@
+// 声明接口响应
+// export declare type R<T = any> = {
+// 	code: number;
+// 	msg: string;
+// 	data: T;
+// 	state: boolean;
+// }
+/**
+ * 一个属性
+ */
+export const bo = "BO"
+export const vo = "VO"
+
+/**
+ * 一个类型
+ */
+export type InfoType{
+	id : string;
+	name : string;
+	sex ?: number;
+	state : boolean;
+}
+
+/**
+ * 一个类
+ * 
+ * 示例：
+ * import { Member,init } from "@/utype/common"
+ * 			const m = new Member(1)
+			console.log(m.getId());
+			console.log(init) 
+ */
+export class Member {
+	//私有属性
+	private id : number = 0;
+	//私有属性
+	private memberList : Map<number, string> = new Map<number, string>();
+
+
+	//构造函数(只能有一个)
+	// const m=new Member(1)
+	// console.log(m.id);
+	constructor(id : number) {
+		this.id = id;
+	}
+
+	/**
+	 * 方法
+	 */
+	public addMember(id : number) : void {
+		this.id = id;
+		this.memberList.set(this.id, "")
+	}
+
+	public getId() : number {
+		return this.id;
+	}
+}

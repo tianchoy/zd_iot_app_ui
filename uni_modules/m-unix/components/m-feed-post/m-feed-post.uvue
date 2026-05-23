@@ -1,0 +1,612 @@
+<template>
+	<view class="m-feed-post" :style="rootMergedStyle">
+		<view class="m-feed-post__head">
+			<view class="m-feed-post__head-main" @tap="onAvatarTap">
+				<image class="m-feed-post__avatar" :src="avatar" mode="aspectFill"></image>
+				<view class="m-feed-post__titles">
+					<text class="m-feed-post__nickname">{{ nickname }}</text>
+					<text class="m-feed-post__time">{{ timeLabel }}</text>
+				</view>
+			</view>
+		</view>
+
+		<view v-if="content !== ''" class="m-feed-post__text-wrap" @tap="onContentTap">
+			<text class="m-feed-post__text" selectable>{{ content }}</text>
+		</view>
+
+		<view v-if="showVideo" class="m-feed-post__video-box">
+			<video class="m-feed-post__video" :src="videoSrc" controls object-fit="contain"></video>
+		</view>
+
+		<view v-else-if="imageCount > 0" class="m-feed-post__media" :class="gridClass">
+			<view
+				v-for="idx in displayImageIndexes"
+				:key="'mfp-img-' + postKey + '-' + idx"
+				class="m-feed-post__cell"
+				@tap.stop="onImageTap(idx)"
+			>
+				<image class="m-feed-post__img" :src="imageUrls[idx]" mode="aspectFill"></image>
+				<view v-if="idx === lastDisplayIndex && overflowCount > 0" class="m-feed-post__more-mask">
+					<text class="m-feed-post__more-text">+{{ overflowCount }}</text>
+				</view>
+			</view>
+		</view>
+
+		<view v-if="showToolbar" class="m-feed-post__toolbar">
+			<view class="m-feed-post__action" @tap.stop="onLikeTap">
+				<m-icon name="fabulous" size="36rpx" :color="liked ? activeColor : '#666666'"></m-icon>
+				<text class="m-feed-post__action-text" :style="likedTextStyle">{{ formatCount(likeCount) }}</text>
+			</view>
+			<view class="m-feed-post__action" @tap.stop="onCommentTap">
+				<m-icon name="message" size="36rpx" color="#666666"></m-icon>
+				<text class="m-feed-post__action-text">{{ formatCount(commentCount) }}</text>
+			</view>
+			<view class="m-feed-post__action" @tap.stop="onCollectTap">
+				<m-icon name="star" size="36rpx" :color="collected ? activeColor : '#666666'"></m-icon>
+				<text class="m-feed-post__action-text" :style="collectedTextStyle">收藏</text>
+			</view>
+		</view>
+
+		<view v-if="showSocialExtra" class="m-feed-post__social">
+			<view v-if="likerNames.length > 0" class="m-feed-post__likers">
+				<m-icon name="fabulous" size="28rpx" :color="activeColor"></m-icon>
+				<text class="m-feed-post__liker-names">{{ likerLine }}</text>
+			</view>
+			<view
+				v-for="c in safeComments"
+				:key="'cmt-' + postKey + '-' + c.id"
+				class="m-feed-post__cmt"
+				@tap.stop="onCommentRowTap(c)"
+			>
+				<view class="m-feed-post__cmt-row">
+					<text class="m-feed-post__cmt-author">{{ c.author }}</text>
+					<text v-if="c.replyTo !== ''" class="m-feed-post__cmt-plain"> 回复 </text>
+					<text v-if="c.replyTo !== ''" class="m-feed-post__cmt-author">{{ c.replyTo }}</text>
+					<text class="m-feed-post__cmt-plain">：</text>
+					<text class="m-feed-post__cmt-body">{{ c.text }}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+
+type FeedCommentItem = {
+	id: string
+	author: string
+	replyTo: string
+	text: string
+}
+
+export default {
+	name: 'mFeedPost',
+	emits: [
+		'avatar-tap',
+		'content-tap',
+		'image-tap',
+		'like',
+		'comment',
+		'collect',
+		'comment-reply',
+		'update:liked',
+		'update:collected',
+		'update:likeCount',
+		'update:likerNames',
+	],
+	props: {
+		postKey: {
+			type: String,
+			default: '0',
+		},
+		avatar: {
+			type: String,
+			default: '',
+		},
+		nickname: {
+			type: String,
+			default: '',
+		},
+		timeLabel: {
+			type: String,
+			default: '',
+		},
+		content: {
+			type: String,
+			default: '',
+		},
+		imageUrls: {
+			type: Array as PropType<string[]>,
+			default: (): string[] => [],
+		},
+		videoSrc: {
+			type: String,
+			default: '',
+		},
+		maxPreviewImages: {
+			type: Number,
+			default: 9,
+		},
+		liked: {
+			type: Boolean,
+			default: false,
+		},
+		likeCount: {
+			type: Number,
+			default: 0,
+		},
+		commentCount: {
+			type: Number,
+			default: 0,
+		},
+		collected: {
+			type: Boolean,
+			default: false,
+		},
+		showToolbar: {
+			type: Boolean,
+			default: true,
+		},
+		activeColor: {
+			type: String,
+			default: '#ff0844',
+		},
+		customStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: (): UTSJSONObject => ({} as UTSJSONObject),
+		},
+		likerNames: {
+			type: Array as PropType<string[]>,
+			default: (): string[] => [],
+		},
+		comments: {
+			type: Array as PropType<FeedCommentItem[]>,
+			default: (): FeedCommentItem[] => [],
+		},
+	},
+	computed: {
+		showSocialExtra(): boolean {
+			const ln = this.likerNames != null ? this.likerNames.length : 0
+			const cn = this.comments != null ? this.comments.length : 0
+			return ln > 0 || cn > 0
+		},
+		likerLine(): string {
+			if (this.likerNames == null || this.likerNames.length === 0) {
+				return ''
+			}
+			return this.likerNames.join('、')
+		},
+		safeComments(): FeedCommentItem[] {
+			const out: FeedCommentItem[] = []
+			if (this.comments == null) {
+				return out
+			}
+			for (let i = 0; i < this.comments.length; i++) {
+				const x = this.comments[i]
+				if (x != null) {
+					out.push(x)
+				}
+			}
+			return out
+		},
+		showVideo(): boolean {
+			return this.videoSrc != null && this.videoSrc !== ''
+		},
+		imageCount(): number {
+			if (this.imageUrls == null) {
+				return 0
+			}
+			return this.imageUrls.length
+		},
+		maxImages(): number {
+			const cap = this.maxPreviewImages
+			if (cap <= 0) {
+				return 0
+			}
+			const n = this.imageCount
+			if (n <= cap) {
+				return n
+			}
+			return cap
+		},
+		overflowCount(): number {
+			const n = this.imageCount
+			const cap = this.maxPreviewImages
+			if (n <= cap) {
+				return 0
+			}
+			return n - cap
+		},
+		displayImageIndexes(): number[] {
+			const out: number[] = []
+			const m = this.maxImages
+			for (let i = 0; i < m; i++) {
+				out.push(i)
+			}
+			return out
+		},
+		lastDisplayIndex(): number {
+			const m = this.maxImages
+			if (m <= 0) {
+				return -1
+			}
+			return m - 1
+		},
+		gridClass(): string {
+			const n = this.maxImages
+			if (n <= 0) {
+				return ''
+			}
+			if (n === 1) {
+				return 'm-feed-post__media--one'
+			}
+			if (n === 2) {
+				return 'm-feed-post__media--two'
+			}
+			if (n === 4) {
+				return 'm-feed-post__media--four'
+			}
+			return 'm-feed-post__media--grid'
+		},
+		rootMergedStyle(): UTSJSONObject {
+			const st: UTSJSONObject = {} as UTSJSONObject
+			if (this.customStyle != null) {
+				Object.assign(st, this.customStyle)
+			}
+			return st
+		},
+		likedTextStyle(): string {
+			if (this.liked) {
+				return 'color:' + this.activeColor
+			}
+			return ''
+		},
+		collectedTextStyle(): string {
+			if (this.collected) {
+				return 'color:' + this.activeColor
+			}
+			return ''
+		},
+	},
+	methods: {
+		formatCount(n: number): string {
+			if (n == null || n < 0) {
+				return '0'
+			}
+			if (n < 10000) {
+				return '' + n
+			}
+			const w = n / 10000.0
+			return w.toFixed(1) + '万'
+		},
+		onAvatarTap() {
+			this.$emit('avatar-tap')
+		},
+		onContentTap() {
+			this.$emit('content-tap')
+		},
+		onImageTap(idx: number) {
+			this.$emit('image-tap', this.postKey, idx)
+		},
+		toggleSelfInLikerNames(names: string[] | null, add: boolean): string[] {
+			const base: string[] = []
+			if (names != null) {
+				for (let i = 0; i < names.length; i++) {
+					base.push(names[i])
+				}
+			}
+			if (add) {
+				let has = false
+				for (let j = 0; j < base.length; j++) {
+					if (base[j] === '我') {
+						has = true
+						break
+					}
+				}
+				if (!has) {
+					base.push('我')
+				}
+				return base
+			}
+			const out: string[] = []
+			for (let k = 0; k < base.length; k++) {
+				if (base[k] !== '我') {
+					out.push(base[k])
+				}
+			}
+			return out
+		},
+		onLikeTap() {
+			const nextLiked = !this.liked
+			let nextCount = this.likeCount
+			if (nextLiked) {
+				nextCount = nextCount + 1
+			} else {
+				nextCount = nextCount - 1
+				if (nextCount < 0) {
+					nextCount = 0
+				}
+			}
+			const nextNames = this.toggleSelfInLikerNames(this.likerNames, nextLiked)
+			this.$emit('update:liked', nextLiked)
+			this.$emit('update:likeCount', nextCount)
+			this.$emit('update:likerNames', nextNames)
+			this.$emit('like')
+		},
+		onCommentTap() {
+			this.$emit('comment')
+		},
+		onCollectTap() {
+			this.$emit('update:collected', !this.collected)
+			this.$emit('collect')
+		},
+		onCommentRowTap(c: FeedCommentItem) {
+			if (c == null) {
+				return
+			}
+			this.$emit('comment-reply', this.postKey, c.id, c.author)
+		},
+	},
+}
+</script>
+
+<style lang="scss" scoped>
+.m-feed-post {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	margin-bottom: 20rpx;
+}
+
+.m-feed-post__head {
+	margin-bottom: 16rpx;
+}
+
+.m-feed-post__head-main {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.m-feed-post__avatar {
+	width: 80rpx;
+	height: 80rpx;
+	border-radius: 40rpx;
+	margin-right: 20rpx;
+	flex-shrink: 0;
+	background-color: #f0f0f0;
+}
+
+.m-feed-post__titles {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-width: 0;
+}
+
+.m-feed-post__nickname {
+	font-size: 30rpx;
+	font-weight: 600;
+	color: #333333;
+	margin-bottom: 6rpx;
+}
+
+.m-feed-post__time {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.m-feed-post__text-wrap {
+	margin-bottom: 16rpx;
+}
+
+.m-feed-post__text {
+	font-size: 28rpx;
+	color: #333333;
+	line-height: 1.55;
+}
+
+.m-feed-post__video-box {
+	width: 100%;
+	border-radius: 12rpx;
+	overflow: hidden;
+	margin-bottom: 8rpx;
+	background-color: #000000;
+}
+
+.m-feed-post__video {
+	width: 100%;
+	height: 360rpx;
+}
+
+.m-feed-post__media {
+	width: 100%;
+	margin-bottom: 8rpx;
+}
+
+.m-feed-post__media--one .m-feed-post__cell {
+	width: 100%;
+	padding-bottom: 56%;
+	position: relative;
+	height: 0;
+	overflow: hidden;
+	border-radius: 12rpx;
+}
+
+.m-feed-post__media--one .m-feed-post__img {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.m-feed-post__media--two {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	margin-left: -8rpx;
+	margin-right: -8rpx;
+}
+
+.m-feed-post__media--two .m-feed-post__cell {
+	width: 50%;
+	padding: 8rpx;
+	box-sizing: border-box;
+	height: 220rpx;
+	position: relative;
+	border-radius: 12rpx;
+	overflow: hidden;
+}
+
+.m-feed-post__media--two .m-feed-post__img {
+	width: 100%;
+	height: 100%;
+}
+
+.m-feed-post__media--four {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	margin-left: -8rpx;
+	margin-right: -8rpx;
+}
+
+.m-feed-post__media--four .m-feed-post__cell {
+	width: 50%;
+	padding: 8rpx;
+	box-sizing: border-box;
+	height: 200rpx;
+	position: relative;
+	border-radius: 12rpx;
+	overflow: hidden;
+}
+
+.m-feed-post__media--four .m-feed-post__img {
+	width: 100%;
+	height: 100%;
+}
+
+.m-feed-post__media--grid {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	margin-left: -8rpx;
+	margin-right: -8rpx;
+}
+
+.m-feed-post__media--grid .m-feed-post__cell {
+	width: 33.33%;
+	padding: 8rpx;
+	box-sizing: border-box;
+	height: 200rpx;
+	position: relative;
+	border-radius: 12rpx;
+	overflow: hidden;
+}
+
+.m-feed-post__media--grid .m-feed-post__img {
+	width: 100%;
+	height: 100%;
+}
+
+.m-feed-post__more-mask {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.45);
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.m-feed-post__more-text {
+	font-size: 40rpx;
+	font-weight: 600;
+	color: #ffffff;
+}
+
+.m-feed-post__toolbar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	padding-top: 20rpx;
+	margin-top: 8rpx;
+	border-top-width: 1rpx;
+	border-top-style: solid;
+	border-top-color: #f0f0f0;
+}
+
+.m-feed-post__action {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-right: 48rpx;
+}
+
+.m-feed-post__action-text {
+	font-size: 26rpx;
+	color: #666666;
+	margin-left: 8rpx;
+}
+
+.m-feed-post__social {
+	background-color: #f7f7f7;
+	border-radius: 8rpx;
+	padding: 12rpx 16rpx;
+	margin-top: 16rpx;
+}
+
+.m-feed-post__likers {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	margin-bottom: 8rpx;
+}
+
+.m-feed-post__liker-names {
+	font-size: 26rpx;
+	color: #576b95;
+	line-height: 1.45;
+	margin-left: 8rpx;
+	flex: 1;
+}
+
+.m-feed-post__cmt {
+	padding-top: 6rpx;
+	padding-bottom: 6rpx;
+	border-top-width: 1rpx;
+	border-top-style: solid;
+	border-top-color: #e5e5e5;
+}
+
+.m-feed-post__cmt-row {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: flex-start;
+}
+
+.m-feed-post__cmt-author {
+	font-size: 26rpx;
+	color: #576b95;
+	line-height: 1.45;
+}
+
+.m-feed-post__cmt-plain {
+	font-size: 26rpx;
+	color: #333333;
+	line-height: 1.45;
+}
+
+.m-feed-post__cmt-body {
+	font-size: 26rpx;
+	color: #333333;
+	line-height: 1.45;
+}
+</style>

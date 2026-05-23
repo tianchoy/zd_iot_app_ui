@@ -1,0 +1,112 @@
+<template>
+	<view v-if="visible" class="m-skeleton" :style="{ backgroundColor: backgroundColor }">
+		<view
+			v-for="(el, idx) in elements"
+			:key="idx"
+			class="m-skeleton__block"
+			:class="{ 'm-skeleton__block--active': active }"
+			:style="blockStyle(el)"
+		></view>
+	</view>
+</template>
+
+<script lang="uts">
+type SkEl = UTSJSONObject
+
+export default {
+	name: 'mSkeleton',
+	props: {
+		selector: {
+			type: String,
+			default: 'm-skeleton'
+		},
+		backgroundColor: {
+			type: String,
+			default: '#ffffff'
+		},
+		skeletonBgColor: {
+			type: String,
+			default: '#e9e9e9'
+		},
+		borderRadius: {
+			type: String,
+			default: '16rpx'
+		},
+		preloadData: {
+			type: Array,
+			default(): any[] {
+				return []
+			}
+		},
+		isLoading: {
+			type: Boolean,
+			default: false
+		},
+		active: {
+			type: Boolean,
+			default: true
+		},
+		/** 为 false 时不渲染（由父级 v-if 控制亦可） */
+		show: {
+			type: Boolean,
+			default: true
+		}
+	},
+	computed: {
+		visible(): boolean {
+			return this.show as boolean
+		},
+		elements(): SkEl[] {
+			const pd = this.preloadData as SkEl[]
+			if (pd != null && pd.length > 0) {
+				return pd
+			}
+			return this.defaultBlocks()
+		}
+	},
+	methods: {
+		defaultBlocks(): SkEl[] {
+			const list = [] as SkEl[]
+			list.push({ left: 24, top: 24, width: 300, height: 28, skeletonType: 'fillet' } as SkEl)
+			list.push({ left: 24, top: 72, width: 200, height: 24, skeletonType: 'fillet' } as SkEl)
+			list.push({ left: 24, top: 120, width: 700, height: 200, skeletonType: 'rect' } as SkEl)
+			return list
+		},
+		blockStyle(el: SkEl): UTSJSONObject {
+			const st = {} as UTSJSONObject
+			const t = el['skeletonType']
+			const typ = t == null ? 'rect' : '' + t
+			st['position'] = 'absolute'
+			st['left'] = (el['left'] as number) + 'rpx'
+			st['top'] = (el['top'] as number) + 'rpx'
+			st['width'] = (el['width'] as number) + 'rpx'
+			st['height'] = (el['height'] as number) + 'rpx'
+			st['backgroundColor'] = this.skeletonBgColor as string
+			if (typ === 'circular') {
+				st['borderRadius'] = '50%'
+			} else if (typ === 'fillet') {
+				st['borderRadius'] = this.borderRadius as string
+			} else {
+				st['borderRadius'] = '0'
+			}
+			return st
+		}
+	}
+}
+</script>
+
+<style lang="scss">
+.m-skeleton {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 50;
+	box-sizing: border-box;
+}
+
+.m-skeleton__block--active {
+	opacity: 0.85;
+}
+</style>

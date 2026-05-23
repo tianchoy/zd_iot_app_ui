@@ -1,0 +1,306 @@
+<template>
+	<view
+		class="m-countdown-verify"
+		:class="{ 'm-countdown-verify--hover': hover }"
+		:style="rootStyle"
+		@tap.stop="onTap"
+	>
+		<text class="m-countdown-verify__txt" :style="textStyle">{{ displayText }}</text>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mCountdownVerify',
+	emits: ['send', 'countdown', 'end'],
+	props: {
+		/** 未发送、未倒计时时的文案 */
+		text: {
+			type: String,
+			default: '获取验证码'
+		},
+		/** 已点击发送、等待服务端成功回调（successTick 递增）期间 */
+		sendText: {
+			type: String,
+			default: '请稍候...'
+		},
+		/** 倒计时中文案接在「剩余秒数」之后，如 s后重新获取 → 显示 59s后重新获取 */
+		countdownSuffix: {
+			type: String,
+			default: 's后重新获取'
+		},
+		seconds: {
+			type: Number,
+			default: 60
+		},
+		/**
+		 * 发送成功后由父级递增（如 ++），大于历史值且大于 0 时开始倒计时。
+		 * 与 resetTick 配合可多次重发。
+		 */
+		successTick: {
+			type: Number,
+			default: 0
+		},
+		/**
+		 * 由父级递增以重置为可点击状态（清除倒计时与等待）。
+		 */
+		resetTick: {
+			type: Number,
+			default: 0
+		},
+		/** 为 true 时挂载后立即进入倒计时（无需先点发送） */
+		start: {
+			type: Boolean,
+			default: false
+		},
+		disabled: {
+			type: Boolean,
+			default: false
+		},
+		width: {
+			type: String,
+			default: '182rpx'
+		},
+		height: {
+			type: String,
+			default: '56rpx'
+		},
+		padding: {
+			type: String,
+			default: '0'
+		},
+		margin: {
+			type: String,
+			default: '0'
+		},
+		radius: {
+			type: [Number, String],
+			default: 6
+		},
+		size: {
+			type: [Number, String],
+			default: 24
+		},
+		color: {
+			type: String,
+			default: '#5677fc'
+		},
+		background: {
+			type: String,
+			default: 'transparent'
+		},
+		borderWidth: {
+			type: String,
+			default: '1rpx'
+		},
+		borderColor: {
+			type: String,
+			default: '#5677fc'
+		},
+		/** 倒计时过程中是否降低不透明度 */
+		countdownOpacity: {
+			type: Boolean,
+			default: true
+		},
+		/** 是否使用点击态样式类（各端 hover-class 能力不同，仅作弱提示） */
+		hover: {
+			type: Boolean,
+			default: true
+		},
+		/** 发出 send 后若 successTick 一直未递增，超时（ms）后结束等待，允许再次点击 */
+		sendTimeoutMs: {
+			type: Number,
+			default: 30000
+		},
+		params: {
+			type: [Number, String],
+			default: 0
+		},
+		customStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: () => ({})
+		}
+	},
+	data() {
+		return {
+			remaining: 0,
+			timer: null as number | null,
+			sendTimeoutTimer: null as number | null,
+			waitingSuccess: false,
+			ackSuccessTick: 0,
+			ackResetTick: 0
+		}
+	},
+	computed: {
+		isCounting(): boolean {
+			return this.remaining > 0
+		},
+		mergedDisabled(): boolean {
+			if (this.disabled === true) {
+				return true
+			}
+			if (this.isCounting) {
+				return true
+			}
+			if (this.waitingSuccess === true) {
+				return true
+			}
+			return false
+		},
+		displayText(): string {
+			if (this.isCounting) {
+				return String(this.remaining) + this.countdownSuffix
+			}
+			if (this.waitingSuccess) {
+				return this.sendText
+			}
+			return this.text
+		},
+		rootStyle(): UTSJSONObject {
+			const st: UTSJSONObject = {
+				width: this.width,
+				height: this.height,
+				padding: this.padding,
+				margin: this.margin,
+				borderRadius: toCssLength(this.radius as number | string),
+				backgroundColor: this.background,
+				borderWidth: this.borderWidth,
+				borderStyle: 'solid',
+				borderColor: this.borderColor,
+				boxSizing: 'border-box',
+				display: 'flex',
+				flexDirection: 'row',
+				alignItems: 'center',
+				justifyContent: 'center'
+			}
+			if (this.disabled === true) {
+				st['opacity'] = 0.45
+			} else if (this.countdownOpacity === true && this.isCounting) {
+				st['opacity'] = 0.55
+			} else if (this.waitingSuccess === true) {
+				st['opacity'] = 0.75
+			}
+			if (this.customStyle != null) {
+				Object.assign(st, this.customStyle)
+			}
+			return st
+		},
+		textStyle(): UTSJSONObject {
+			return {
+				'font-size': toCssLength(this.size as number | string),
+				color: this.color
+			}
+		}
+	},
+	watch: {
+		successTick(n: number) {
+			if (n > this.ackSuccessTick) {
+				this.ackSuccessTick = n
+				if (n > 0) {
+					this.clearSendTimeout()
+					this.waitingSuccess = false
+					this.startCountdown()
+				}
+			}
+		},
+		resetTick(n: number) {
+			if (n > this.ackResetTick) {
+				this.ackResetTick = n
+				this.fullReset()
+			}
+		}
+	},
+	mounted() {
+		this.ackSuccessTick = this.successTick as number
+		this.ackResetTick = this.resetTick as number
+		if (this.start === true) {
+			this.startCountdown()
+		}
+	},
+	beforeUnmount() {
+		this.clearTimer()
+		this.clearSendTimeout()
+	},
+	methods: {
+		clearTimer() {
+			if (this.timer != null) {
+				clearInterval(this.timer)
+				this.timer = null
+			}
+		},
+		clearSendTimeout() {
+			if (this.sendTimeoutTimer != null) {
+				clearTimeout(this.sendTimeoutTimer)
+				this.sendTimeoutTimer = null
+			}
+		},
+		fullReset() {
+			this.clearTimer()
+			this.clearSendTimeout()
+			this.remaining = 0
+			this.waitingSuccess = false
+		},
+		startCountdown() {
+			this.clearTimer()
+			let sec = this.seconds as number
+			if (sec <= 0) {
+				sec = 60
+			}
+			this.remaining = sec
+			this.tickEmit()
+			this.timer = setInterval(() => {
+				this.remaining--
+				if (this.remaining <= 0) {
+					this.clearTimer()
+					this.remaining = 0
+					this.$emit('end', { params: this.params } as UTSJSONObject)
+				} else {
+					this.tickEmit()
+				}
+			}, 1000) as unknown as number
+		},
+		tickEmit() {
+			this.$emit('countdown', { seconds: this.remaining, params: this.params } as UTSJSONObject)
+		},
+		onTap() {
+			if (this.mergedDisabled === true) {
+				return
+			}
+			this.$emit('send', { params: this.params } as UTSJSONObject)
+			this.waitingSuccess = true
+			const ms = this.sendTimeoutMs as number
+			if (ms > 0) {
+				this.clearSendTimeout()
+				this.sendTimeoutTimer = setTimeout(() => {
+					this.sendTimeoutTimer = null
+					if (this.waitingSuccess === true) {
+						this.waitingSuccess = false
+					}
+				}, ms) as unknown as number
+			}
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-countdown-verify {
+	flex-shrink: 0;
+}
+
+.m-countdown-verify--hover:active {
+	opacity: 0.75;
+}
+
+.m-countdown-verify__txt {
+	line-height: 1.2;
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 100%;
+}
+</style>

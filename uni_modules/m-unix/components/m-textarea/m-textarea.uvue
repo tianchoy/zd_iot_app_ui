@@ -1,0 +1,527 @@
+<template>
+	<view class="m-textarea" :style="rootMarginStyle">
+		<view
+			class="m-textarea__row"
+			:class="{
+				'm-textarea__row--disabled': disabled,
+				'm-textarea__row--flex-start': flexStart
+			}"
+			:style="rowStyle"
+		>
+			<view v-if="label !== '' || required" class="m-textarea__label-wrap" :style="labelWrapStyle">
+				<text v-if="required" class="m-textarea__required" :style="requiredStarStyle">*</text>
+				<text v-if="label !== ''" class="m-textarea__label" :style="labelTextStyle">{{ label }}</text>
+			</view>
+			<view class="m-textarea__col">
+				<view class="m-textarea__field-row">
+					<view class="m-textarea__left">
+						<slot name="left"></slot>
+					</view>
+					<textarea
+						class="m-textarea__field"
+						:class="{ 'm-textarea__field--right': textRight, 'm-textarea__field--boxed': textareaBorder }"
+						:style="fieldMergedStyle"
+						v-model="innerValue"
+						:disabled="disabled"
+						:placeholder="placeholder"
+						:placeholder-style="placeholderStyleResolved"
+						:maxlength="maxlengthResolved"
+						:auto-height="autoHeight"
+						:fixed="fixed"
+						:focus="focus"
+						:cursor-spacing="cursorSpacing"
+						:show-confirm-bar="showConfirmBar"
+						:adjust-position="adjustPosition"
+						:hold-keyboard="holdKeyboard"
+						:confirm-type="confirmType"
+						@input="onInput"
+						@focus="onFocus"
+						@blur="onBlur"
+						@confirm="onConfirm"
+						@linechange="onLinechange"
+					/>
+					<view class="m-textarea__right">
+						<slot name="right"></slot>
+					</view>
+				</view>
+				<view v-if="isCounter" class="m-textarea__counter">
+					<text class="m-textarea__counter-text" :style="counterTextStyle">{{ counterDisplay }}</text>
+				</view>
+			</view>
+		</view>
+		<text v-if="error !== ''" class="m-textarea__error">{{ error }}</text>
+	</view>
+</template>
+
+<script lang="uts">
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mTextarea',
+	emits: ['update:modelValue', 'input', 'focus', 'blur', 'confirm', 'linechange'],
+	props: {
+		modelValue: {
+			type: String,
+			default: ''
+		},
+		label: {
+			type: String,
+			default: ''
+		},
+		required: {
+			type: Boolean,
+			default: false
+		},
+		requiredColor: {
+			type: String,
+			default: '#EB0909'
+		},
+		/** flexStart 为 true 时，星号相对标题下移，便于与多行首行对齐 */
+		requiredTop: {
+			type: [Number, String],
+			default: 32
+		},
+		labelSize: {
+			type: [Number, String],
+			default: 32
+		},
+		labelColor: {
+			type: String,
+			default: '#333333'
+		},
+		labelWidth: {
+			type: [Number, String],
+			default: 140
+		},
+		placeholder: {
+			type: String,
+			default: ''
+		},
+		placeholderStyle: {
+			type: String,
+			default: ''
+		},
+		placeholderColor: {
+			type: String,
+			default: '#c0c4cc'
+		},
+		disabled: {
+			type: Boolean,
+			default: false
+		},
+		maxlength: {
+			type: [Number, String],
+			default: 500
+		},
+		/** 为 true 时高度随内容增高，此时不设置固定 height */
+		autoHeight: {
+			type: Boolean,
+			default: false
+		},
+		fixed: {
+			type: Boolean,
+			default: false
+		},
+		focus: {
+			type: Boolean,
+			default: false
+		},
+		cursorSpacing: {
+			type: Number,
+			default: 0
+		},
+		showConfirmBar: {
+			type: Boolean,
+			default: true
+		},
+		adjustPosition: {
+			type: Boolean,
+			default: true
+		},
+		holdKeyboard: {
+			type: Boolean,
+			default: false
+		},
+		confirmType: {
+			type: String,
+			default: 'done'
+		},
+		/** 固定高度（autoHeight 为 false 时生效），如 200rpx */
+		height: {
+			type: String,
+			default: '200rpx'
+		},
+		/** 最小高度 */
+		minHeight: {
+			type: String,
+			default: '200rpx'
+		},
+		/** 标题与输入区顶端对齐，适合多行 */
+		flexStart: {
+			type: Boolean,
+			default: false
+		},
+		size: {
+			type: [Number, String],
+			default: 32
+		},
+		color: {
+			type: String,
+			default: '#333333'
+		},
+		textRight: {
+			type: Boolean,
+			default: false
+		},
+		trim: {
+			type: Boolean,
+			default: true
+		},
+		borderTop: {
+			type: Boolean,
+			default: false
+		},
+		borderBottom: {
+			type: Boolean,
+			default: true
+		},
+		borderColor: {
+			type: String,
+			default: 'rgba(0, 0, 0, 0.08)'
+		},
+		backgroundColor: {
+			type: String,
+			default: '#FFFFFF'
+		},
+		padding: {
+			type: String,
+			default: '26rpx 30rpx'
+		},
+		radius: {
+			type: [Number, String],
+			default: 0
+		},
+		textareaBorder: {
+			type: Boolean,
+			default: false
+		},
+		/** 边框模式下的圆角，rpx */
+		textareaRadius: {
+			type: [Number, String],
+			default: 8
+		},
+		error: {
+			type: String,
+			default: ''
+		},
+		marginTop: {
+			type: [Number, String],
+			default: 0
+		},
+		isCounter: {
+			type: Boolean,
+			default: false
+		},
+		counterColor: {
+			type: String,
+			default: '#999999'
+		},
+		counterSize: {
+			type: [Number, String],
+			default: 28
+		}
+	},
+	data() {
+		return {
+			innerValue: ''
+		}
+	},
+	computed: {
+		maxlengthResolved(): number {
+			const m = this.maxlength
+			if (typeof m === 'number') {
+				if (m < 0) {
+					return 99999
+				}
+				return m
+			}
+			const s = (m as string).trim()
+			if (s === '-1') {
+				return 99999
+			}
+			const n = parseInt(s)
+			if (isNaN(n)) {
+				return 500
+			}
+			if (n < 0) {
+				return 99999
+			}
+			return n
+		},
+		isUnlimitedMax(): boolean {
+			const m = this.maxlength
+			if (typeof m === 'number') {
+				return m < 0
+			}
+			return (m as string).trim() === '-1'
+		},
+		placeholderStyleResolved(): string {
+			if (this.placeholderStyle !== '') {
+				return this.placeholderStyle
+			}
+			return 'font-size:' + toCssLength(this.size as number | string) + ';color:' + this.placeholderColor
+		},
+		labelWrapStyle(): UTSJSONObject {
+			return { minWidth: toCssLength(this.labelWidth as number | string) }
+		},
+		requiredStarStyle(): UTSJSONObject {
+			const st: UTSJSONObject = { color: this.requiredColor }
+			if (this.flexStart && this.required) {
+				st['marginTop'] = toCssLength(this.requiredTop as number | string)
+			}
+			return st
+		},
+		labelTextStyle(): UTSJSONObject {
+			return {
+				'font-size': toCssLength(this.labelSize as number | string),
+				color: this.labelColor
+			}
+		},
+		fieldMergedStyle(): UTSJSONObject {
+			const st: UTSJSONObject = {
+				'font-size': toCssLength(this.size as number | string),
+				color: this.color,
+				width: '100%',
+				minHeight: this.minHeight
+			}
+			if (!this.autoHeight) {
+				st['height'] = this.height
+			}
+			if (this.textareaBorder) {
+				st['borderWidth'] = '1rpx'
+				st['borderStyle'] = 'solid'
+				st['borderColor'] = this.borderColor
+				st['borderRadius'] = toCssLength(this.textareaRadius as number | string)
+				st['paddingLeft'] = '16rpx'
+				st['paddingRight'] = '16rpx'
+				st['paddingTop'] = '16rpx'
+				st['paddingBottom'] = '16rpx'
+				st['boxSizing'] = 'border-box'
+			}
+			return st
+		},
+		rowStyle(): UTSJSONObject {
+			const st: UTSJSONObject = {
+				backgroundColor: this.backgroundColor,
+				padding: this.padding
+			}
+			const r = this.radius as number | string
+			let rn = 0
+			if (typeof r === 'number') {
+				rn = r
+			} else {
+				const rs = (r as string).replace('rpx', '').trim()
+				const p = parseInt(rs)
+				if (!isNaN(p)) {
+					rn = p
+				}
+			}
+			if (rn > 0) {
+				st['borderRadius'] = toCssLength(r)
+			}
+			if (this.borderTop) {
+				st['borderTopWidth'] = '1rpx'
+				st['borderTopStyle'] = 'solid'
+				st['borderTopColor'] = this.borderColor
+			}
+			if (this.borderBottom) {
+				st['borderBottomWidth'] = '1rpx'
+				st['borderBottomStyle'] = 'solid'
+				st['borderBottomColor'] = this.borderColor
+			}
+			return st
+		},
+		rootMarginStyle(): UTSJSONObject {
+			const mt = this.marginTop as number | string
+			let n = 0
+			if (typeof mt === 'number') {
+				n = mt
+			} else {
+				const p = parseInt((mt as string).replace('rpx', '').trim())
+				if (!isNaN(p)) {
+					n = p
+				}
+			}
+			if (n > 0) {
+				return { marginTop: toCssLength(mt) }
+			}
+			return {}
+		},
+		counterTextStyle(): UTSJSONObject {
+			return {
+				'font-size': toCssLength(this.counterSize as number | string),
+				color: this.counterColor
+			}
+		},
+		counterDisplay(): string {
+			const len = this.innerValue.length
+			if (this.isUnlimitedMax) {
+				return len + ''
+			}
+			return len + ' / ' + this.maxlengthResolved
+		}
+	},
+	watch: {
+		modelValue(val: string) {
+			this.innerValue = val
+		}
+	},
+	created() {
+		this.innerValue = this.modelValue
+	},
+	methods: {
+		emitValue(next: string) {
+			this.$emit('update:modelValue', next)
+			this.$emit('input', next)
+		},
+		onInput(_e: any) {
+			this.emitValue(this.innerValue)
+		},
+		onFocus(e: any) {
+			this.$emit('focus', e)
+		},
+		onBlur(e: any) {
+			let v = this.innerValue
+			if (this.trim) {
+				v = v.trim()
+				if (v !== this.innerValue) {
+					this.innerValue = v
+					this.emitValue(v)
+				}
+			}
+			this.$emit('blur', e)
+		},
+		onConfirm(_e: any) {
+			this.$emit('confirm', this.innerValue)
+		},
+		onLinechange(e: any) {
+			this.$emit('linechange', e)
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-textarea {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-textarea__row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	box-sizing: border-box;
+	width: 100%;
+}
+
+.m-textarea__row--flex-start {
+	align-items: flex-start;
+}
+
+.m-textarea__row--disabled {
+	opacity: 0.55;
+}
+
+.m-textarea__label-wrap {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-right: 16rpx;
+}
+
+.m-textarea__row--flex-start .m-textarea__label-wrap {
+	align-items: flex-start;
+}
+
+.m-textarea__required {
+	font-size: 32rpx;
+	margin-right: 4rpx;
+	flex-shrink: 0;
+}
+
+.m-textarea__label {
+	flex-shrink: 0;
+}
+
+.m-textarea__col {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
+.m-textarea__field-row {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	width: 100%;
+}
+
+.m-textarea__left {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	padding-top: 4rpx;
+}
+
+.m-textarea__field {
+	flex: 1;
+	min-width: 0;
+	line-height: 1.5;
+	background-color: transparent;
+	border-width: 0;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+.m-textarea__field--right {
+	text-align: right;
+}
+
+.m-textarea__field--boxed {
+	box-sizing: border-box;
+}
+
+.m-textarea__right {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	margin-left: 8rpx;
+	padding-top: 4rpx;
+}
+
+.m-textarea__counter {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	padding-top: 8rpx;
+}
+
+.m-textarea__counter-text {
+	line-height: 1.4;
+}
+
+.m-textarea__error {
+	display: flex;
+	font-size: 24rpx;
+	color: #EB0909;
+	padding: 8rpx 30rpx 0 30rpx;
+	line-height: 1.4;
+}
+</style>

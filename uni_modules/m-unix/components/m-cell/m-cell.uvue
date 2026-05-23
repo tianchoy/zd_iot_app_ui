@@ -1,0 +1,236 @@
+<template>
+	<view
+		class="m-cell"
+		:class="{ 'm-cell--center': center, 'm-cell--border': border }"
+		:style="cellWrapStyle"
+		@click="handleClick"
+	>
+		<view class="m-cell__left">
+			<slot name="icon">
+				<view v-if="icon" class="m-cell__icon">
+					<m-icon :name="icon" size="40rpx"></m-icon>
+				</view>
+			</slot>
+			<view class="m-cell__content">
+				<view class="m-cell__title" :class="{'m-cell__title--disabled': disabled}">
+					<slot></slot>
+					<text v-if="actualTitle" class="m-cell__title-text">{{ actualTitle }}</text>
+					<text v-if="actualLabel" class="m-cell__label">{{ actualLabel }}</text>
+				</view>
+				<view v-if="brief" class="m-cell__brief">{{ brief }}</view>
+			</view>
+		</view>
+		<view class="m-cell__right">
+			<slot name="right"></slot>
+			<text v-if="value" class="m-cell__value" :class="{'m-cell__value--disabled': disabled}">{{ value }}</text>
+			<view v-if="isLink" class="m-cell__arrow">
+				<m-icon name="arrow-right" size="28rpx" color="#c0c4cc"></m-icon>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+
+export default {
+	name: 'mCell',
+	emits: ['click'],
+	props: {
+		// 左侧主标题
+		title: {
+			type: String,
+			default: ''
+		},
+		// 无 title 时作主标题；与 title 同时存在时作标题下方说明（与 brief 并存时优先展示 brief）
+		label: {
+			type: String,
+			default: ''
+		},
+		// 右侧内容
+		value: {
+			type: String,
+			default: ''
+		},
+		// 标题下方的提示说明
+		brief: {
+			type: String,
+			default: ''
+		},
+		// 是否禁止点击
+		disabled: {
+			type: Boolean,
+			default: false
+		},
+		// 是否展示下边框
+		border: {
+			type: Boolean,
+			default: true
+		},
+		// 是否垂直居中对齐
+		center: {
+			type: Boolean,
+			default: false
+		},
+		// 是否链接类型（显示箭头）
+		isLink: {
+			type: Boolean,
+			default: false
+		},
+		// 链接跳转类型
+		linkType: {
+			type: String,
+			default: 'navigateTo'
+		},
+		// 跳转地址
+		url: {
+			type: String,
+			default: ''
+		},
+		// 左侧图标
+		icon: {
+			type: String,
+			default: ''
+		},
+		// 自定义样式
+		customStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: () => ({})
+		}
+	},
+	computed: {
+		cellWrapStyle(): UTSJSONObject {
+			const st = {} as UTSJSONObject
+			if (this.customStyle != null) {
+				Object.assign(st, this.customStyle)
+			}
+			return st
+		},
+		actualTitle(): string {
+			if (this.title !== '') {
+				return this.title
+			}
+			return this.label
+		},
+		actualLabel(): string {
+			if (this.brief !== '') {
+				return this.brief
+			}
+			if (this.title !== '' && this.label !== '') {
+				return this.label
+			}
+			return ''
+		}
+	},
+	methods: {
+		handleClick(event: any) {
+			if (!this.disabled) {
+				this.$emit('click', event)
+				if (this.url && this.isLink) {
+					if (this.linkType === 'navigateTo') {
+						uni.navigateTo({ url: this.url })
+					} else if (this.linkType === 'redirectTo') {
+						uni.redirectTo({ url: this.url })
+					} else if (this.linkType === 'switchTab') {
+						uni.switchTab({ url: this.url })
+					}
+				}
+			}
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-cell {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	box-sizing: border-box;
+	padding: 24rpx 30rpx;
+	background-color: #ffffff;
+	min-height: 90rpx;
+
+	.m-cell__left {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		flex: 1;
+		min-width: 0;
+
+		.m-cell__icon {
+			margin-right: 16rpx;
+		}
+
+		.m-cell__content {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			flex: 1;
+			min-width: 0;
+
+			.m-cell__title {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+
+				.m-cell__title-text {
+					font-size: 30rpx;
+					line-height: 1.5;
+					color: #303133;
+				}
+
+				&.m-cell__title--disabled {
+					.m-cell__title-text {
+						color: #c0c4cc;
+					}
+				}
+			}
+
+			.m-cell__label {
+				font-size: 24rpx;
+				color: #909399;
+				margin-top: 4rpx;
+				line-height: 1.5;
+			}
+
+			.m-cell__brief {
+				font-size: 24rpx;
+				color: #606266;
+				margin-top: 8rpx;
+				line-height: 1.5;
+			}
+		}
+	}
+
+	.m-cell__right {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		flex-shrink: 0;
+
+		.m-cell__value {
+			font-size: 28rpx;
+			color: #606266;
+			text-align: right;
+
+			&.m-cell__value--disabled {
+				color: #c0c4cc;
+			}
+		}
+
+		.m-cell__arrow {
+			margin-left: 10rpx;
+		}
+	}
+
+	&.m-cell--center {
+		align-items: center;
+	}
+
+	&.m-cell--border {
+		border-bottom: 1rpx solid #e4e7ed;
+	}
+}
+</style>

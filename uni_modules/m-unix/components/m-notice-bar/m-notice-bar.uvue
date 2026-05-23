@@ -1,0 +1,393 @@
+<template>
+	<view
+		class="m-notice-bar"
+		:class="{ 'm-notice-bar--fixed': isFixed, 'm-notice-bar--wrapable': wrapable && !single && !scrollable }"
+		:style="rootStyle"
+		@tap="onBarTap"
+	>
+		<view v-if="showLeftCol" class="m-notice-bar__left" @tap.stop="onLeftTap">
+			<slot name="icon">
+				<m-icon
+					v-if="showIcon"
+					:name="iconNameStr"
+					:color="resolvedIconColor"
+					:size="iconSizeCss"
+				></m-icon>
+			</slot>
+		</view>
+		<view class="m-notice-bar__body">
+			<view v-if="scrollable" class="m-notice-bar__marquee">
+				<view class="m-notice-bar__track" :style="marqueeTrackStyle">
+					<slot>
+						<text class="m-notice-bar__dup">{{ displayText }}</text>
+						<text class="m-notice-bar__dup">{{ displayText }}</text>
+					</slot>
+				</view>
+			</view>
+			<view
+				v-else
+				class="m-notice-bar__content"
+				:class="{
+					'm-notice-bar__content--single': single,
+					'm-notice-bar__content--wrap': wrapable && !single
+				}"
+				:style="contentTextStyle"
+			>
+				<slot>
+					<text class="m-notice-bar__text">{{ displayText }}</text>
+				</slot>
+			</view>
+		</view>
+		<view v-if="showRightCol" class="m-notice-bar__right" @tap.stop="onRightTap">
+			<slot name="right">
+				<view v-if="showRight" class="m-notice-bar__more">
+					<text>更多</text>
+					<m-icon name="arrow-right" color="#c0c4cc" size="26rpx"></m-icon>
+				</view>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mNoticeBar',
+	emits: ['click', 'leftClick', 'rightClick'],
+	props: {
+		text: {
+			type: String,
+			default: ''
+		},
+		content: {
+			type: String,
+			default: ''
+		},
+		/** 是否在左侧显示内置图标（仍可用 #icon 插槽完全自定义） */
+		showIcon: {
+			type: Boolean,
+			default: false
+		},
+		/** 内置图标名称，对应 m-icon 的 name（默认 notification-filling） */
+		icon: {
+			type: String,
+			default: 'notification-filling'
+		},
+		/** 图标颜色；空则与正文字色 color/textColor 一致 */
+		iconColor: {
+			type: String,
+			default: ''
+		},
+		/** 图标尺寸，空则与 size 一致 */
+		iconSize: {
+			type: [Number, String],
+			default: ''
+		},
+		showRight: {
+			type: Boolean,
+			default: false
+		},
+		scrollable: {
+			type: Boolean,
+			default: true
+		},
+		wrapable: {
+			type: Boolean,
+			default: false
+		},
+		single: {
+			type: Boolean,
+			default: false
+		},
+		/** 与 backgroundColor 二选一，优先于 backgroundColor */
+		bgColor: {
+			type: String,
+			default: ''
+		},
+		backgroundColor: {
+			type: String,
+			default: '#fff8d5'
+		},
+		/** 与 color 二选一，优先于 color */
+		textColor: {
+			type: String,
+			default: ''
+		},
+		/** 正文字体颜色 */
+		color: {
+			type: String,
+			default: '#ff7900'
+		},
+		height: {
+			type: [Number, String],
+			default: 72
+		},
+		size: {
+			type: [Number, String],
+			default: 28
+		},
+		bold: {
+			type: Boolean,
+			default: false
+		},
+		padding: {
+			type: Array,
+			default(): any[] {
+				return []
+			}
+		},
+		isLeft: {
+			type: Boolean,
+			default: false
+		},
+		isRight: {
+			type: Boolean,
+			default: false
+		},
+		isFixed: {
+			type: Boolean,
+			default: false
+		},
+		top: {
+			type: String,
+			default: '0px'
+		},
+		params: {
+			type: [Number, String],
+			default: 0
+		},
+		duration: {
+			type: Number,
+			default: 18
+		},
+		customStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: () => ({})
+		}
+	},
+	computed: {
+		displayText(): string {
+			const c = this.content as string
+			if (c != null && c.length > 0) {
+				return c
+			}
+			return this.text as string
+		},
+		resolvedBg(): string {
+			const b = this.bgColor as string
+			if (b != null && b.length > 0) {
+				return b
+			}
+			return this.backgroundColor as string
+		},
+		resolvedColor(): string {
+			const t = this.textColor as string
+			if (t != null && t.length > 0) {
+				return t
+			}
+			return this.color as string
+		},
+		iconNameStr(): string {
+			const n = this.icon as string
+			if (n != null && n.length > 0) {
+				return n
+			}
+			return 'notification-filling'
+		},
+		resolvedIconColor(): string {
+			const ic = this.iconColor as string
+			if (ic != null && ic.length > 0) {
+				return ic
+			}
+			return this.resolvedColor
+		},
+		iconSizeCss(): string {
+			const raw = this.iconSize as number | string
+			if (raw == null) {
+				return toCssLength(this.size as number | string)
+			}
+			if (typeof raw === 'string' && raw.length === 0) {
+				return toCssLength(this.size as number | string)
+			}
+			if (typeof raw === 'number' && raw <= 0) {
+				return toCssLength(this.size as number | string)
+			}
+			return toCssLength(raw as number | string)
+		},
+		showLeftCol(): boolean {
+			if (this.isLeft as boolean) {
+				return true
+			}
+			return this.showIcon as boolean
+		},
+		showRightCol(): boolean {
+			if (this.isRight as boolean) {
+				return true
+			}
+			return this.showRight as boolean
+		},
+		paddingCss(): string {
+			const arr = this.padding as any[]
+			if (arr == null || arr.length === 0) {
+				return ''
+			}
+			const parts = [] as string[]
+			for (let i = 0; i < arr.length; i++) {
+				parts.push(toCssLength(arr[i] as number | string))
+			}
+			if (parts.length === 1) {
+				return parts[0]
+			}
+			if (parts.length === 2) {
+				return parts[0] + ' ' + parts[1]
+			}
+			if (parts.length === 3) {
+				return parts[0] + ' ' + parts[1] + ' ' + parts[2]
+			}
+			return parts[0] + ' ' + parts[1] + ' ' + parts[2] + ' ' + parts[3]
+		},
+		rootStyle(): UTSJSONObject {
+			const h = toCssLength(this.height as number | string)
+			const style = {
+				backgroundColor: this.resolvedBg,
+				minHeight: h
+			} as UTSJSONObject
+			if (this.isFixed as boolean) {
+				style['position'] = 'fixed'
+				style['left'] = '0'
+				style['right'] = '0'
+				style['top'] = this.top as string
+				style['zIndex'] = '900'
+			}
+			const pad = this.paddingCss
+			if (pad.length > 0) {
+				style['padding'] = pad
+			}
+			if (this.customStyle != null) {
+				Object.assign(style, this.customStyle)
+			}
+			return style
+		},
+		contentTextStyle(): UTSJSONObject {
+			const fs = toCssLength(this.size as number | string)
+			const bold = this.bold as boolean
+			return {
+				color: this.resolvedColor,
+				'font-size': fs,
+				'font-weight': bold ? 'bold' : 'normal'
+			}
+		},
+		marqueeTrackStyle(): UTSJSONObject {
+			const dur = this.duration as number
+			const fs = toCssLength(this.size as number | string)
+			const bold = this.bold as boolean
+			return {
+				animationDuration: dur + 's',
+				color: this.resolvedColor,
+				'font-size': fs,
+				'font-weight': bold ? 'bold' : 'normal'
+			}
+		}
+	},
+	methods: {
+		onBarTap() {
+			this.$emit('click', { params: this.params } as UTSJSONObject)
+		},
+		onLeftTap() {
+			this.$emit('leftClick', { params: this.params } as UTSJSONObject)
+		},
+		onRightTap() {
+			this.$emit('rightClick', { params: this.params } as UTSJSONObject)
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-notice-bar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 18rpx 24rpx;
+	border-radius: 8rpx;
+}
+
+.m-notice-bar__left {
+	margin-right: 8rpx;
+	flex-shrink: 0;
+}
+
+.m-notice-bar__body {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+}
+
+.m-notice-bar__marquee {
+	overflow: hidden;
+	width: 100%;
+}
+
+.m-notice-bar__track {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	width: max-content;
+	animation: m-notice-marquee linear infinite;
+}
+
+.m-notice-bar__dup {
+	white-space: nowrap;
+	padding-right: 48rpx;
+	line-height: 1.6;
+}
+
+.m-notice-bar__content {
+	line-height: 1.6;
+	overflow: hidden;
+}
+
+.m-notice-bar__text {
+	line-height: inherit;
+}
+
+.m-notice-bar__content--single {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.m-notice-bar__content--wrap {
+	white-space: normal;
+}
+
+.m-notice-bar__right {
+	margin-left: 16rpx;
+	flex-shrink: 0;
+
+	.m-notice-bar__more {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		font-size: 26rpx;
+		color: #c0c4cc;
+	}
+}
+
+.m-notice-bar--wrapable {
+	.m-notice-bar__content {
+		white-space: normal;
+	}
+}
+
+@keyframes m-notice-marquee {
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
+}
+</style>

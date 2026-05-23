@@ -1,0 +1,37 @@
+<template>
+	<view class="m-gap" :style="gapStyle"></view>
+</template>
+
+<script lang="uts">
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mGap',
+	props: {
+		// 高度，单位rpx
+		height: {
+			type: [Number, String],
+			default: 20
+		},
+		// 背景颜色
+		background: {
+			type: String,
+			default: 'transparent'
+		}
+	},
+	computed: {
+		gapStyle() {
+			return {
+				height: toCssLength(this.height as number | string),
+				backgroundColor: this.background
+			}
+		}
+	}
+};
+</script>
+
+<style scoped lang="scss">
+.m-gap {
+	width: 100%;
+}
+</style>

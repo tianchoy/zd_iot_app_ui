@@ -1,0 +1,77 @@
+<template>
+	<view class="m-form" :style="rootStyle">
+		<view v-if="title !== ''" class="m-form__title">
+			<text class="m-form__title-text">{{ title }}</text>
+		</view>
+		<slot></slot>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mForm',
+	emits: [],
+	props: {
+		/** 表单顶部标题，空则不显示 */
+		title: {
+			type: String,
+			default: ''
+		},
+		backgroundColor: {
+			type: String,
+			default: '#FFFFFF'
+		},
+		/** 圆角，rpx */
+		radius: {
+			type: [Number, String],
+			default: 16
+		},
+		/** 外层与屏幕边缘留白，rpx */
+		marginX: {
+			type: [Number, String],
+			default: 24
+		},
+		/** 内边距，如 0 或 10rpx 0 */
+		padding: {
+			type: String,
+			default: '0'
+		}
+	},
+	computed: {
+		rootStyle(): UTSJSONObject {
+			const st = {
+				backgroundColor: this.backgroundColor,
+				borderRadius: toCssLength(this.radius as number | string),
+				marginLeft: toCssLength(this.marginX as number | string),
+				marginRight: toCssLength(this.marginX as number | string),
+				padding: this.padding,
+				overflow: 'hidden'
+			} as UTSJSONObject
+			if (this.customStyle != null) {
+				Object.assign(st, this.customStyle)
+			}
+			return st
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-form {
+	width: auto;
+	box-sizing: border-box;
+}
+
+.m-form__title {
+	padding: 24rpx 30rpx 12rpx 30rpx;
+}
+
+.m-form__title-text {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #333333;
+}
+</style>

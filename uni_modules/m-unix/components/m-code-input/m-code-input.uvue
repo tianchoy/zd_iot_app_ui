@@ -1,0 +1,463 @@
+<template>
+	<view class="m-code-input" :style="rootStyle" @tap="onTapWrap">
+		<view class="m-code-input__row">
+			<input
+				class="m-code-input__hidden"
+				:value="innerValue"
+				:type="inputType"
+				:password="password"
+				:disabled="disabled"
+				:focus="focused"
+				:maxlength="lengthNum"
+				@input="onNativeInput"
+				@focus="onNativeFocus"
+				@blur="onNativeBlur"
+				@confirm="onNativeConfirm"
+			/>
+			<view
+				v-for="idx in lengthNum"
+				:key="idx"
+				class="m-code-input__cell"
+				:style="cellStyle(idx - 1)"
+			>
+				<view
+					v-if="password && charAt(idx - 1) !== ''"
+					class="m-code-input__pwd-dot"
+					:style="pwdDotStyle"
+				></view>
+				<text v-else class="m-code-input__t" :style="textStyle">{{ charAt(idx - 1) }}</text>
+				<view
+					v-if="cursor && focused && !disabled && caretIndex === idx - 1"
+					class="m-code-input__caret"
+					:style="{ backgroundColor: cursorColor, height: caretHeightCss }"
+				></view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+import { toCssLength, parseCssNumber } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mCodeInput',
+	emits: ['update:modelValue', 'input', 'complete', 'focus', 'blur', 'confirm'],
+	props: {
+		modelValue: {
+			type: String,
+			default: ''
+		},
+		value: {
+			type: String,
+			default: ''
+		},
+		gap: {
+			type: [Number, String],
+			default: 80
+		},
+		marginTop: {
+			type: [Number, String],
+			default: 0
+		},
+		marginBottom: {
+			type: [Number, String],
+			default: 0
+		},
+		type: {
+			type: String,
+			default: 'text'
+		},
+		password: {
+			type: Boolean,
+			default: false
+		},
+		disabled: {
+			type: Boolean,
+			default: false
+		},
+		isFocus: {
+			type: Boolean,
+			default: false
+		},
+		cursor: {
+			type: Boolean,
+			default: true
+		},
+		cursorColor: {
+			type: String,
+			default: '#5677fc'
+		},
+		cursorHeight: {
+			type: [Number, String],
+			default: 60
+		},
+		length: {
+			type: Number,
+			default: 4
+		},
+		width: {
+			type: [Number, String],
+			default: 108
+		},
+		height: {
+			type: [Number, String],
+			default: 108
+		},
+		background: {
+			type: String,
+			default: 'transparent'
+		},
+		borderType: {
+			type: [Number, String],
+			default: 1
+		},
+		borderColor: {
+			type: String,
+			default: '#eaeef1'
+		},
+		activeColor: {
+			type: String,
+			default: '#5677fc'
+		},
+		borderWidth: {
+			type: [Number, String],
+			default: 2
+		},
+		radius: {
+			type: [Number, String],
+			default: 0
+		},
+		size: {
+			type: [Number, String],
+			default: 48
+		},
+		color: {
+			type: String,
+			default: '#333333'
+		},
+		fontWeight: {
+			type: [Number, String],
+			default: 600
+		},
+		/**
+		 * 统一格子边长（rpx）。大于 0 时覆盖 width/height，并按比例设置字号、光标高度、密码圆点。
+		 * 与分别传 width、height、size 二选一即可。
+		 */
+		boxSize: {
+			type: Number,
+			default: 0
+		},
+		/** 格子之间的水平间距（rpx） */
+		cellGap: {
+			type: [Number, String],
+			default: 16
+		},
+		customStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: () => ({})
+		}
+	},
+	data() {
+		return {
+			innerValue: '',
+			focused: false
+		}
+	},
+	computed: {
+		lengthNum(): number {
+			const n = this.length as number
+			if (n < 1) {
+				return 1
+			}
+			if (n > 12) {
+				return 12
+			}
+			return n
+		},
+		inputType(): string {
+			const t = this.type as string
+			if (t === 'number' || t === 'digit') {
+				return 'number'
+			}
+			if (t === 'password') {
+				return 'password'
+			}
+			return 'text'
+		},
+		rootStyle(): UTSJSONObject {
+			const st = {
+				paddingLeft: toCssLength(this.gap as number | string),
+				paddingRight: toCssLength(this.gap as number | string),
+				marginTop: toCssLength(this.marginTop as number | string),
+				marginBottom: toCssLength(this.marginBottom as number | string)
+			} as UTSJSONObject
+			if (this.customStyle != null) {
+				Object.assign(st, this.customStyle)
+			}
+			return st
+		},
+		textStyle(): UTSJSONObject {
+			let fs = this.size as number | string
+			const bs = this.boxSize as number
+			if (bs > 0) {
+				const n = Math.floor(bs * 0.445)
+				fs = n < 20 ? 20 : n
+			}
+			return {
+				'font-size': toCssLength(fs as number | string),
+				color: this.color as string,
+				'font-weight': this.fontWeight
+			}
+		},
+		pwdDotStyle(): UTSJSONObject {
+			let d = 18
+			const bs = this.boxSize as number
+			if (bs > 0) {
+				const n = Math.floor(bs * 0.17)
+				d = n < 10 ? 10 : n
+			}
+			return {
+				backgroundColor: this.color as string,
+				width: d + 'rpx',
+				height: d + 'rpx',
+				borderRadius: '50%'
+			}
+		},
+		/** 光标条高度（与 boxSize 联动） */
+		caretHeightCss(): string {
+			const bs = this.boxSize as number
+			if (bs > 0) {
+				return toCssLength(Math.floor(bs * 0.56))
+			}
+			return toCssLength(this.cursorHeight as number | string)
+		},
+		borderW(): string {
+			return toCssLength(this.borderWidth as number | string)
+		},
+		cellW(): string {
+			const bs = this.boxSize as number
+			if (bs > 0) {
+				return toCssLength(bs)
+			}
+			return toCssLength(this.width as number | string)
+		},
+		cellH(): string {
+			const bs = this.boxSize as number
+			if (bs > 0) {
+				return toCssLength(bs)
+			}
+			return toCssLength(this.height as number | string)
+		},
+		radiusCss(): string {
+			return toCssLength(this.radius as number | string)
+		},
+		borderMode(): number {
+			const v = this.borderType as number | string
+			if (typeof v === 'number') {
+				return v
+			}
+			const n = parseCssNumber(v as string)
+			if (n === 2 || n === 3) {
+				return n
+			}
+			return 1
+		},
+		caretIndex(): number {
+			const len = this.innerValue.length
+			if (len >= this.lengthNum) {
+				return this.lengthNum - 1
+			}
+			return len
+		}
+	},
+	watch: {
+		value: {
+			immediate: true,
+			handler() {
+				this.applyExternal()
+			}
+		},
+		modelValue: {
+			immediate: true,
+			handler() {
+				this.applyExternal()
+			}
+		},
+		isFocus(n: boolean) {
+			if (n === true && !this.disabled) {
+				this.focused = true
+			}
+		}
+	},
+	mounted() {
+		if (this.isFocus as boolean) {
+			this.focused = true
+		}
+	},
+	methods: {
+		applyExternal() {
+			const v = this.value as string
+			if (v != null && v !== '') {
+				this.syncFromProp(v)
+				return
+			}
+			const m = this.modelValue as string
+			this.syncFromProp(m == null ? '' : m)
+		},
+		syncFromProp(s: string) {
+			const raw = s == null ? '' : s
+			let next = '' + raw
+			if (next.length > this.lengthNum) {
+				next = next.substring(0, this.lengthNum)
+			}
+			if (this.type === 'number' || this.type === 'digit') {
+				next = this.filterDigits(next)
+			}
+			this.innerValue = next
+		},
+		filterDigits(s: string): string {
+			let out = ''
+			for (let i = 0; i < s.length; i++) {
+				const c = s.charAt(i)
+				if (c >= '0' && c <= '9') {
+					out += c
+				}
+			}
+			return out
+		},
+		charAt(i: number): string {
+			const s = this.innerValue
+			if (i < 0 || i >= s.length) {
+				return ''
+			}
+			return s.charAt(i)
+		},
+		cellStyle(i: number): UTSJSONObject {
+			const st: UTSJSONObject = {
+				width: this.cellW,
+				height: this.cellH,
+				backgroundColor: this.background as string,
+				borderRadius: this.radiusCss
+			}
+			const last = i >= this.lengthNum - 1
+			if (last) {
+				st['marginRight'] = '0'
+			} else {
+				st['marginRight'] = toCssLength(this.cellGap as number | string)
+			}
+			const active = i === this.caretIndex && this.focused && !this.disabled
+			const bc = active ? (this.activeColor as string) : (this.borderColor as string)
+			const bw = this.borderW
+			const m = this.borderMode
+			if (m === 3) {
+				st['borderWidth'] = '0'
+			} else if (m === 2) {
+				st['borderBottomWidth'] = bw
+				st['borderBottomStyle'] = 'solid'
+				st['borderBottomColor'] = bc
+			} else {
+				st['borderWidth'] = bw
+				st['borderStyle'] = 'solid'
+				st['borderColor'] = bc
+			}
+			return st
+		},
+		onTapWrap() {
+			if (this.disabled) {
+				return
+			}
+			this.focused = true
+		},
+		onNativeInput(e: UTSJSONObject) {
+			const d = e['detail'] as UTSJSONObject
+			if (d == null) {
+				return
+			}
+			const v = d['value']
+			let s = v == null ? '' : '' + v
+			if (this.type === 'number' || this.type === 'digit') {
+				s = this.filterDigits(s)
+			}
+			if (s.length > this.lengthNum) {
+				s = s.substring(0, this.lengthNum)
+			}
+			this.innerValue = s
+			this.$emit('update:modelValue', s)
+			this.$emit('input', { value: s } as UTSJSONObject)
+			if (s.length === this.lengthNum) {
+				this.$emit('complete', { value: s } as UTSJSONObject)
+			}
+		},
+		onNativeFocus() {
+			this.focused = true
+			this.$emit('focus')
+		},
+		onNativeBlur() {
+			this.focused = false
+			this.$emit('blur', { value: this.innerValue } as UTSJSONObject)
+		},
+		onNativeConfirm() {
+			this.$emit('confirm', { value: this.innerValue } as UTSJSONObject)
+		},
+		clear() {
+			this.innerValue = ''
+			this.$emit('update:modelValue', '')
+			this.$emit('input', { value: '' } as UTSJSONObject)
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-code-input {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-code-input__row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: nowrap;
+	position: relative;
+}
+
+.m-code-input__hidden {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0.01;
+	z-index: 2;
+	font-size: 1px;
+	color: transparent;
+}
+
+.m-code-input__cell {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	position: relative;
+}
+
+.m-code-input__t {
+	line-height: 1;
+}
+
+.m-code-input__pwd-dot {
+	flex-shrink: 0;
+	box-sizing: border-box;
+}
+
+.m-code-input__caret {
+	position: absolute;
+	width: 4rpx;
+	bottom: 20%;
+	border-radius: 2rpx;
+}
+</style>

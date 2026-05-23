@@ -1,0 +1,193 @@
+<template>
+	<view class="m-richtext-root" :style="rootOuterStyle">
+		<!-- 固定高度 + 纵向滚动（长文、表格等） -->
+		<scroll-view
+			v-if="hasContent && useScrollBox"
+			class="m-richtext__scroll"
+			:style="scrollBoxStyle"
+			scroll-y
+		>
+			<rich-text
+				class="m-richtext"
+				:nodes="content"
+				:selectable="selectable"
+			></rich-text>
+		</scroll-view>
+		<!-- 仅限制最大高度，超出用 overflow（部分端表现优于无界高度） -->
+		<view
+			v-else-if="hasContent && useMaxHeightClip"
+			class="m-richtext__clip"
+			:style="clipBoxStyle"
+		>
+			<rich-text
+				class="m-richtext"
+				:nodes="content"
+				:selectable="selectable"
+			></rich-text>
+		</view>
+		<!-- 默认：高度随内容 -->
+		<rich-text
+			v-else-if="hasContent"
+			class="m-richtext"
+			:nodes="content"
+			:selectable="selectable"
+		></rich-text>
+		<text v-else-if="showPlaceholder" class="m-richtext__placeholder">{{ placeholder }}</text>
+	</view>
+</template>
+
+<script lang="uts">
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+/**
+ * 在 rich-text 能力之上的薄封装（各端仍受 rich-text 标签子集限制）。
+ * - 尺寸：width；height 固定区域并内部滚动；maxHeight 限制最大高度并溢出滚动（CSS，端差异见文档）
+ * - Markdown 请在外部先转为 HTML 再传入
+ */
+export default {
+	name: 'mRichtext',
+	props: {
+		content: {
+			type: String,
+			default: ''
+		},
+		/** 容器宽度，默认 100%；数字默认 rpx */
+		width: {
+			type: [Number, String],
+			default: '100%'
+		},
+		/**
+		 * 固定高度；设置后内容在区域内纵向滚动（适合长文、大表格等）。
+		 * 数字默认按 rpx，或传 400rpx / 200px 等。
+		 */
+		height: {
+			type: [Number, String],
+			default: ''
+		},
+		/**
+		 * 最大高度（与 height 二选一优先 height）；超出部分在容器内滚动（依赖 overflow-y:auto，与 scroll-view 行为不同）。
+		 */
+		maxHeight: {
+			type: [Number, String],
+			default: ''
+		},
+		/** 是否允许长按选择文本（以各端 rich-text 支持为准） */
+		selectable: {
+			type: Boolean,
+			default: false
+		},
+		/** content 为空时显示的占位文案；不传则空白 */
+		placeholder: {
+			type: String,
+			default: ''
+		}
+	},
+	computed: {
+		hasContent(): boolean {
+			const c = this.content as string
+			if (c == null) {
+				return false
+			}
+			return c.length > 0
+		},
+		showPlaceholder(): boolean {
+			if (this.hasContent) {
+				return false
+			}
+			const p = this.placeholder as string
+			return p != null && p.length > 0
+		},
+		heightStr(): string {
+			const h = this.height as number | string
+			if (h == null) {
+				return ''
+			}
+			if (typeof h === 'number') {
+				return h > 0 ? toCssLength(h) : ''
+			}
+			const s = (h as string).trim()
+			if (s.length === 0 || s === '0') {
+				return ''
+			}
+			return toCssLength(h as number | string)
+		},
+		maxHeightStr(): string {
+			const h = this.maxHeight as number | string
+			if (h == null) {
+				return ''
+			}
+			if (typeof h === 'number') {
+				return h > 0 ? toCssLength(h) : ''
+			}
+			const s = (h as string).trim()
+			if (s.length === 0 || s === '0') {
+				return ''
+			}
+			return toCssLength(h as number | string)
+		},
+		useScrollBox(): boolean {
+			return this.heightStr.length > 0
+		},
+		useMaxHeightClip(): boolean {
+			if (this.useScrollBox) {
+				return false
+			}
+			return this.maxHeightStr.length > 0
+		},
+		rootOuterStyle(): UTSJSONObject {
+			const w = this.width as number | string
+			let ws = '100%'
+			if (typeof w === 'number') {
+				ws = w > 0 ? toCssLength(w) : '100%'
+			} else if (w != null && (w as string).length > 0) {
+				ws = toCssLength(w as number | string)
+			}
+			return {
+				width: ws
+			} as UTSJSONObject
+		},
+		scrollBoxStyle(): UTSJSONObject {
+			return {
+				height: this.heightStr,
+				width: '100%'
+			} as UTSJSONObject
+		},
+		clipBoxStyle(): UTSJSONObject {
+			return {
+				maxHeight: this.maxHeightStr,
+				width: '100%',
+				overflowY: 'scroll'
+			} as UTSJSONObject
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-richtext-root {
+	box-sizing: border-box;
+}
+
+.m-richtext__scroll {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-richtext__clip {
+	width: 100%;
+	box-sizing: border-box;
+	-webkit-overflow-scrolling: touch;
+}
+
+.m-richtext {
+	width: 100%;
+	word-break: break-word;
+	overflow-wrap: break-word;
+}
+
+.m-richtext__placeholder {
+	font-size: 28rpx;
+	color: #c0c4cc;
+	line-height: 1.5;
+}
+</style>

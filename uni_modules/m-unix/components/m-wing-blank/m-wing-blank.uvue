@@ -1,0 +1,116 @@
+<template>
+	<view class="m-wing-blank" :style="boxStyle" @tap="onTap">
+		<slot></slot>
+	</view>
+</template>
+
+<script lang="uts">
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+/**
+ * 留白：内容区与容器边缘的间距。
+ * - 左右：size / gap → paddingLeft/Right
+ * - 上下：paddingTop / paddingBottom（内留白）；marginTop / marginBottom（外间距，与兄弟元素）
+ */
+export default {
+	name: 'mWingBlank',
+	emits: ['click'],
+	props: {
+		size: {
+			type: String,
+			default: 'default'
+		},
+		gap: {
+			type: [Number, String],
+			default: 0
+		},
+		background: {
+			type: String,
+			default: 'transparent'
+		},
+		radius: {
+			type: [Number, String],
+			default: 0
+		},
+		/** 上内边距（留白），与 gap 独立 */
+		paddingTop: {
+			type: [Number, String],
+			default: 0
+		},
+		/** 下内边距（留白） */
+		paddingBottom: {
+			type: [Number, String],
+			default: 0
+		},
+		marginTop: {
+			type: [Number, String],
+			default: 0
+		},
+		marginBottom: {
+			type: [Number, String],
+			default: 0
+		}
+	},
+	computed: {
+		verticalPaddingStyle(): UTSJSONObject {
+			return {
+				paddingTop: toCssLength(this.paddingTop as number | string),
+				paddingBottom: toCssLength(this.paddingBottom as number | string)
+			}
+		},
+		boxStyle(): UTSJSONObject {
+			let g = 0 as number
+			const gv = this.gap as number | string
+			const vpad = this.verticalPaddingStyle
+			if (typeof gv === 'number' && gv > 0) {
+				g = gv
+			} else if (typeof gv === 'string' && gv !== '' && gv !== '0') {
+				const pad = toCssLength(gv)
+				const st = {
+					paddingLeft: pad,
+					paddingRight: pad,
+					backgroundColor: this.background,
+					borderRadius: toCssLength(this.radius as number | string),
+					marginTop: toCssLength(this.marginTop as number | string),
+					marginBottom: toCssLength(this.marginBottom as number | string)
+				} as UTSJSONObject
+				st['paddingTop'] = vpad['paddingTop']
+				st['paddingBottom'] = vpad['paddingBottom']
+				return st
+			} else {
+				const sz = this.size as string
+				if (sz === 'small') {
+					g = 10
+				} else if (sz === 'large') {
+					g = 30
+				} else {
+					g = 20
+				}
+			}
+			const st2 = {
+				paddingLeft: g + 'rpx',
+				paddingRight: g + 'rpx',
+				backgroundColor: this.background,
+				borderRadius: toCssLength(this.radius as number | string),
+				marginTop: toCssLength(this.marginTop as number | string),
+				marginBottom: toCssLength(this.marginBottom as number | string)
+			} as UTSJSONObject
+			st2['paddingTop'] = vpad['paddingTop']
+			st2['paddingBottom'] = vpad['paddingBottom']
+			return st2
+		}
+	},
+	methods: {
+		onTap() {
+			this.$emit('click')
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-wing-blank {
+	width: 100%;
+	box-sizing: border-box;
+}
+</style>

@@ -1,0 +1,28 @@
+// 引入公共基础样式
+@import "./libs/css/common.scss";
+@import "./libs/css/m.scss";
+@import "./libs/css/animate.scss";
+
+// 图标字体样式（H5/App：App.uvue 中 uni.loadFontFace；小程序：libs/css/mp.scss 中 @font-face）
+.iconfont {
+	font-family: "iconfont" !important;
+	font-size: 32rpx;
+	font-style: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+// H5特有样式
+/* #ifdef H5 */
+@import "./libs/css/h5.scss";
+/* #endif */
+
+// 小程序特有样式
+/* #ifdef MP */
+@import "./libs/css/mp.scss";
+/* #endif */
+
+// APP NVue 特有样式
+/* #ifdef APP-NVUE */
+@import "./libs/css/nvue.scss";
+/* #endif */

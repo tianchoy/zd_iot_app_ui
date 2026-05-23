@@ -1,0 +1,169 @@
+<template>
+	<view class="m-section" :style="rootStyle" @tap="onRootTap">
+		<view class="m-section__head">
+			<view v-if="isLine" class="m-section__line" :style="lineStyle"></view>
+			<slot name="left"></slot>
+			<view class="m-section__titles">
+				<text class="m-section__title" :style="titleStyleComputed">{{ title }}</text>
+				<slot name="descr"></slot>
+				<text v-if="descr !== ''" class="m-section__descr" :style="descrStyleComputed">{{ descr }}</text>
+			</view>
+			<slot></slot>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mSection',
+	emits: ['click'],
+	props: {
+		title: {
+			type: String,
+			default: ''
+		},
+		size: {
+			type: [Number, String],
+			default: 32
+		},
+		color: {
+			type: String,
+			default: '#333333'
+		},
+		fontWeight: {
+			type: [Number, String],
+			default: 400
+		},
+		descr: {
+			type: String,
+			default: ''
+		},
+		descrSize: {
+			type: [Number, String],
+			default: 24
+		},
+		descrColor: {
+			type: String,
+			default: '#7a7a7a'
+		},
+		descrTop: {
+			type: [Number, String],
+			default: 16
+		},
+		isLine: {
+			type: Boolean,
+			default: false
+		},
+		lineWidth: {
+			type: [Number, String],
+			default: 8
+		},
+		lineColor: {
+			type: String,
+			default: '#5677fc'
+		},
+		lineRight: {
+			type: [Number, String],
+			default: 16
+		},
+		lineGap: {
+			type: [Number, String],
+			default: 4
+		},
+		background: {
+			type: String,
+			default: 'transparent'
+		},
+		padding: {
+			type: String,
+			default: '20rpx 30rpx'
+		},
+		margin: {
+			type: String,
+			default: '0'
+		},
+		customStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: () => ({})
+		}
+	},
+	computed: {
+		rootStyle(): UTSJSONObject {
+			const st = {
+				backgroundColor: this.background,
+				padding: this.padding,
+				margin: this.margin
+			} as UTSJSONObject
+			if (this.customStyle != null) {
+				Object.assign(st, this.customStyle)
+			}
+			return st
+		},
+		titleStyleComputed(): UTSJSONObject {
+			return {
+				'font-size': toCssLength(this.size as number | string),
+				color: this.color,
+				'font-weight': this.fontWeight
+			}
+		},
+		descrStyleComputed(): UTSJSONObject {
+			return {
+				'font-size': toCssLength(this.descrSize as number | string),
+				color: this.descrColor,
+				marginTop: toCssLength(this.descrTop as number | string)
+			}
+		},
+		lineStyle(): UTSJSONObject {
+			return {
+				width: toCssLength(this.lineWidth as number | string),
+				backgroundColor: this.lineColor,
+				marginRight: toCssLength(this.lineRight as number | string),
+				marginTop: toCssLength(this.lineGap as number | string),
+				marginBottom: toCssLength(this.lineGap as number | string)
+			}
+		}
+	},
+	methods: {
+		onRootTap() {
+			this.$emit('click', { title: this.title } as UTSJSONObject)
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-section {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-section__head {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+}
+
+.m-section__line {
+	border-radius: 4rpx;
+	flex-shrink: 0;
+	align-self: stretch;
+	min-height: 28rpx;
+}
+
+.m-section__titles {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.m-section__title {
+	line-height: 1.4;
+}
+
+.m-section__descr {
+	line-height: 1.4;
+}
+</style>

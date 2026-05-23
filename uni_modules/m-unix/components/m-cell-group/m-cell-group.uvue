@@ -1,0 +1,58 @@
+<template>
+	<view class="m-cell-group">
+		<view v-if="title" class="m-cell-group__title">{{ title }}</view>
+		<view class="m-cell-group__content">
+			<slot></slot>
+		</view>
+		<view v-if="footer" class="m-cell-group__footer">{{ footer }}</view>
+	</view>
+</template>
+
+<script lang="uts">
+export default {
+	name: 'mCellGroup',
+	props: {
+		// 分组标题
+		title: {
+			type: String,
+			default: ''
+		},
+		// 分组底部说明
+		footer: {
+			type: String,
+			default: ''
+		},
+		// 是否显示外边框
+		border: {
+			type: Boolean,
+			default: true
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-cell-group {
+	margin: 0;
+
+	.m-cell-group__title {
+		padding: 20rpx 30rpx;
+		font-size: 28rpx;
+		color: #969799;
+		line-height: 1.4;
+	}
+
+	.m-cell-group__content {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		overflow: hidden;
+	}
+
+	.m-cell-group__footer {
+		padding: 20rpx 30rpx;
+		font-size: 24rpx;
+		color: #969799;
+		line-height: 1.4;
+	}
+}
+</style>

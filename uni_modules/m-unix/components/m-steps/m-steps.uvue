@@ -1,0 +1,302 @@
+<template>
+	<view class="m-steps" :style="{ backgroundColor: backgroundColor }">
+		<!-- 横向：扁平 [列][线段][列]…，避免旧结构里 seg 与 col 同 flex:1 挤扁文案 -->
+		<view v-if="direction === 'row'" class="m-steps__row">
+			<template v-for="(cell, ri) in rowCells" :key="'rs-' + ri">
+				<view v-if="cell.kind === 'seg'" class="m-steps__seg" :style="segStyle(cell.segIdx as number)"></view>
+				<view v-else class="m-steps__col m-steps__col--row" @tap="onItemTap(cell.idx as number)">
+					<view class="m-steps__icon-row">
+						<text v-if="typeNum === 2" class="m-steps__num" :style="numStyle(cell.idx as number)">{{ (cell.idx as number) + 1 }}</text>
+						<view v-else class="m-steps__dot" :style="dotStyle(cell.idx as number)"></view>
+					</view>
+					<text class="m-steps__title" :style="titleStyle(cell.idx as number)">{{ itemTitle(items[cell.idx as number] as StepItem) }}</text>
+					<text v-if="itemDesc(items[cell.idx as number] as StepItem) !== ''" class="m-steps__desc" :style="descStyle">{{
+						itemDesc(items[cell.idx as number] as StepItem)
+					}}</text>
+				</view>
+			</template>
+		</view>
+		<!-- 纵向 -->
+		<view v-else class="m-steps__column">
+			<view
+				v-for="(item, idx) in items"
+				:key="idx"
+				class="m-steps__col-v"
+				:style="{ marginBottom: spacing }"
+				@tap="onItemTap(idx)"
+			>
+				<view class="m-steps__v-left">
+					<view class="m-steps__v-line" v-if="idx > 0" :style="vLineStyle(idx - 1)"></view>
+					<text v-if="typeNum === 2" class="m-steps__num" :style="numStyle(idx)">{{ idx + 1 }}</text>
+					<view v-else class="m-steps__dot" :style="dotStyle(idx)"></view>
+					<view class="m-steps__v-line-b" v-if="idx < itemCount - 1" :style="vLineStyle(idx)"></view>
+				</view>
+				<view class="m-steps__v-right">
+					<text class="m-steps__title" :style="titleStyle(idx)">{{ itemTitle(item) }}</text>
+					<text v-if="itemDesc(item) !== ''" class="m-steps__desc" :style="descStyle">{{ itemDesc(item) }}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+type StepItem = UTSJSONObject
+
+type RowCell = {
+	kind: string
+	segIdx?: number
+	idx?: number
+}
+
+export default {
+	name: 'mSteps',
+	emits: ['click'],
+	props: {
+		type: {
+			type: Number,
+			default: 1
+		},
+		spacing: {
+			type: String,
+			default: '160rpx'
+		},
+		direction: {
+			type: String,
+			default: 'row'
+		},
+		activeColor: {
+			type: String,
+			default: '#5677fc'
+		},
+		deactiveColor: {
+			type: String,
+			default: '#999999'
+		},
+		titleSize: {
+			type: Number,
+			default: 28
+		},
+		bold: {
+			type: Boolean,
+			default: false
+		},
+		descSize: {
+			type: Number,
+			default: 24
+		},
+		activeSteps: {
+			type: Number,
+			default: -1
+		},
+		lineStyleProp: {
+			type: String,
+			default: 'solid'
+		},
+		items: {
+			type: Array,
+			default(): any[] {
+				return []
+			}
+		},
+		titleField: {
+			type: String,
+			default: 'title'
+		},
+		descrField: {
+			type: String,
+			default: 'desc'
+		},
+		backgroundColor: {
+			type: String,
+			default: '#ffffff'
+		}
+	},
+	computed: {
+		typeNum(): number {
+			return this.type as number
+		},
+		itemCount(): number {
+			return (this.items as any[]).length
+		},
+		descStyle(): UTSJSONObject {
+			return {
+				'font-size': (this.descSize as number) + 'rpx',
+				color: '#999999'
+			} as UTSJSONObject
+		},
+		rowCells(): RowCell[] {
+			const items = this.items as any[]
+			const out = [] as RowCell[]
+			const len = items.length
+			for (let i = 0; i < len; i++) {
+				if (i > 0) {
+					out.push({ kind: 'seg', segIdx: i - 1 } as RowCell)
+				}
+				out.push({ kind: 'col', idx: i } as RowCell)
+			}
+			return out
+		}
+	},
+	methods: {
+		itemTitle(item: StepItem): string {
+			const k = this.titleField as string
+			const v = item[k]
+			return v == null ? '' : '' + v
+		},
+		itemDesc(item: StepItem): string {
+			const k = this.descrField as string
+			const v = item[k]
+			return v == null ? '' : '' + v
+		},
+		segStyle(segIdx: number): UTSJSONObject {
+			const active = (this.activeSteps as number) > segIdx
+			return {
+				flex: '1 1 0%',
+				minWidth: '32rpx',
+				height: '4rpx',
+				backgroundColor: active ? (this.activeColor as string) : (this.deactiveColor as string),
+				alignSelf: 'center'
+			} as UTSJSONObject
+		},
+		vLineStyle(segIdx: number): UTSJSONObject {
+			const active = (this.activeSteps as number) > segIdx
+			return {
+				width: '4rpx',
+				flex: '1',
+				backgroundColor: active ? this.activeColor as string : this.deactiveColor as string
+			} as UTSJSONObject
+		},
+		dotStyle(idx: number): UTSJSONObject {
+			const on = idx <= (this.activeSteps as number)
+			return {
+				backgroundColor: on ? this.activeColor as string : this.deactiveColor as string,
+				width: '20rpx',
+				height: '20rpx',
+				borderRadius: '50%'
+			} as UTSJSONObject
+		},
+		numStyle(idx: number): UTSJSONObject {
+			const on = idx <= (this.activeSteps as number)
+			return {
+				color: on ? '#ffffff' : this.deactiveColor as string,
+				backgroundColor: on ? this.activeColor as string : '#f0f0f0',
+				'font-size': '24rpx',
+				width: '44rpx',
+				height: '44rpx',
+				borderRadius: '50%',
+				textAlign: 'center',
+				lineHeight: '44rpx'
+			} as UTSJSONObject
+		},
+		titleStyle(idx: number): UTSJSONObject {
+			const st = {} as UTSJSONObject
+			st['font-size'] = (this.titleSize as number) + 'rpx'
+			st['color'] = idx <= (this.activeSteps as number) ? this.activeColor as string : '#333333'
+			if (this.bold) {
+				st['font-weight'] = 'bold'
+			}
+			return st
+		},
+		onItemTap(idx: number) {
+			this.$emit('click', { index: idx })
+		}
+	}
+}
+</script>
+
+<style lang="scss">
+.m-steps {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 24rpx 12rpx;
+}
+
+.m-steps__row {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-steps__seg {
+	display: flex;
+	flex-direction: row;
+	box-sizing: border-box;
+}
+
+.m-steps__col--row {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex: 1 1 0%;
+	min-width: 0;
+	width: 0;
+	box-sizing: border-box;
+}
+
+.m-steps__icon-row {
+	height: 48rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.m-steps__title {
+	margin-top: 8rpx;
+	text-align: center;
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+.m-steps__desc {
+	margin-top: 6rpx;
+	text-align: center;
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+.m-steps__column {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.m-steps__col-v {
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+}
+
+.m-steps__v-left {
+	width: 48rpx;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.m-steps__v-line {
+	min-height: 16rpx;
+}
+
+.m-steps__v-line-b {
+	min-height: 16rpx;
+	flex: 1;
+}
+
+.m-steps__v-right {
+	flex: 1;
+	min-width: 0;
+	padding-left: 16rpx;
+	padding-bottom: 24rpx;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+}
+</style>

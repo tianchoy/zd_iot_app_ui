@@ -1,0 +1,127 @@
+<template>
+	<view class="m-grid-item" :class="{'m-grid-item--border': showItemBorder}" @click="handleClick">
+		<view class="m-grid-item__content">
+			<slot name="icon">
+				<view v-if="icon" class="m-grid-item__icon">
+					<m-icon :name="icon" :size="iconSize" :color="iconColor"></m-icon>
+				</view>
+			</slot>
+			<slot name="text">
+				<text class="m-grid-item__text">{{ text }}</text>
+			</slot>
+			<slot></slot>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+	import { PropType } from 'vue'
+
+	export default {
+		name: 'mGridItem',
+		emits: ['click'],
+		inject: {
+			mGridBorder: {
+				from: 'mGridBorder',
+				default: null,
+				type: Boolean as unknown as PropType<boolean | null>
+			}
+		},
+		props: {
+			// 图标名称
+			icon: {
+				type: String,
+				default: ''
+			},
+			// 文字
+			text: {
+				type: String,
+				default: ''
+			},
+			// 图标大小
+			iconSize: {
+				type: String,
+				default: '48rpx'
+			},
+			// 图标颜色
+			iconColor: {
+				type: String,
+				default: '#333333'
+			},
+			// 是否显示边框
+			border: {
+				type: Boolean,
+				default: true
+			},
+			// 跳转链接
+			url: {
+				type: String,
+				default: ''
+			},
+			// 跳转类型
+			linkType: {
+				type: String,
+				default: 'navigateTo'
+			}
+		},
+		computed: {
+			showItemBorder(): boolean {
+				const fromGrid = this.mGridBorder
+				if (fromGrid !== null && fromGrid !== undefined) {
+					return fromGrid as boolean
+				}
+				return this.border as boolean
+			}
+		},
+		methods: {
+			handleClick() {
+				this.$emit('click')
+				if (this.url) {
+					if (this.linkType === 'navigateTo') {
+						uni.navigateTo({ url: this.url })
+					} else if (this.linkType === 'redirectTo') {
+						uni.redirectTo({ url: this.url })
+					} else if (this.linkType === 'switchTab') {
+						uni.switchTab({ url: this.url })
+					}
+				}
+			}
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+.m-grid-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 24rpx 16rpx;
+	box-sizing: border-box;
+	/* 与 m-grid 内 .m-grid__item 一致：继承父级 --col-num，按列数均分一行宽度 */
+	width: calc(100% / var(--col-num, 4));
+
+	.m-grid-item__content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.m-grid-item__icon {
+		margin-bottom: 12rpx;
+	}
+
+	.m-grid-item__text {
+		font-size: 24rpx;
+		color: #333333;
+		line-height: 1.4;
+		text-align: center;
+	}
+
+	&.m-grid-item--border {
+		border-right: 1rpx solid #ebedf0;
+		border-bottom: 1rpx solid #ebedf0;
+	}
+}
+</style>

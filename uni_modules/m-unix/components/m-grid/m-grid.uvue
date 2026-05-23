@@ -1,0 +1,133 @@
+<template>
+	<view class="m-grid" :class="{'m-grid--border': border, 'm-grid--square': square}" :style="gridStyle">
+		<slot>
+			<view class="m-grid__item" v-for="(item, index) in list" :key="index" @click="handleItemClick(item, index)">
+				<slot name="item" :item="item" :index="index">
+					<view class="m-grid__icon">
+						<image :src="item.icon" mode="aspectFit"></image>
+					</view>
+					<text class="m-grid__text">{{ item.text }}</text>
+				</slot>
+			</view>
+		</slot>
+	</view>
+</template>
+
+<script lang="uts">
+export default {
+	name: 'mGrid',
+	emits: ['click'],
+	provide() {
+		return {
+			mGridBorder: this.border as boolean
+		}
+	},
+	props: {
+		// 宫格列数
+		col: {
+			type: [Number, String],
+			default: 4
+		},
+		// 宫格列数（别名）
+		column: {
+			type: [Number, String],
+			default: 4
+		},
+		// 宫格数据
+		list: {
+			type: Array as PropType<any[]>,
+			default: () => []
+		},
+		// 是否固定为正方形
+		square: {
+			type: Boolean,
+			default: false
+		},
+		// 是否显示边框
+		border: {
+			type: Boolean,
+			default: true
+		}
+	},
+	computed: {
+		actualCol(): number {
+			const c = this.column ?? this.col
+			return typeof c === 'string' ? parseInt(c) : c
+		},
+		gridStyle(): string {
+			return '--col-num: ' + this.actualCol + ';'
+		}
+	},
+	methods: {
+		handleItemClick(item: any, index: number) {
+			this.$emit('click', { item, index })
+		}
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.m-grid {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	background-color: #ffffff;
+
+	.m-grid__item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		width: calc(100% / var(--col-num));
+		padding: 20rpx 10rpx;
+
+		.m-grid__icon {
+			width: 96rpx;
+			height: 96rpx;
+
+			image {
+				width: 100%;
+				height: 100%;
+			}
+		}
+
+		.m-grid__text {
+			margin-top: 10rpx;
+			font-size: 24rpx;
+			color: #606266;
+			line-height: 1.4;
+			text-align: center;
+		}
+	}
+
+	&.m-grid--border {
+		border-top: 1rpx solid #ebedf0;
+		border-left: 1rpx solid #ebedf0;
+		box-sizing: border-box;
+
+		.m-grid__item {
+			border-right: 1rpx solid #ebedf0;
+			border-bottom: 1rpx solid #ebedf0;
+		}
+	}
+
+	&.m-grid--square {
+		.m-grid__item {
+			position: relative;
+			height: 0;
+			padding-top: calc((100% / var(--col-num)) - 20rpx);
+
+			/* 小程序 WXSS 不支持通用选择器 *，需写具体标签名 */
+			> view,
+			> text,
+			> image {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+		}
+	}
+}
+</style>

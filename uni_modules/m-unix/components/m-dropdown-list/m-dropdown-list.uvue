@@ -1,0 +1,283 @@
+<template>
+	<view class="m-dropdown-list" :style="{ backgroundColor: backgroundColor }">
+		<view class="m-dropdown-list__selection" :class="{ 'm-dropdown-list__selection--raised': show }">
+			<view class="m-dropdown-list__anchor">
+				<view class="m-dropdown-list__trigger">
+					<slot name="selectionbox"></slot>
+				</view>
+			</view>
+		</view>
+		<!-- 遮罩单独一层；面板与遮罩同级，避免 fixed 嵌套导致部分端 top/left 相对错位 -->
+		<view v-if="show" class="m-dropdown-list__overlay">
+			<view
+				v-if="isMask"
+				class="m-dropdown-list__panel-mask"
+				:style="{ backgroundColor: maskBackground }"
+				@tap="onMaskTap"
+			></view>
+		</view>
+		<view v-if="show && layoutReady" class="m-dropdown-list__panel" :style="panelFixedStyle">
+			<slot name="dropdownbox"></slot>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+export default {
+	name: 'mDropdownList',
+	emits: ['close'],
+	props: {
+		show: {
+			type: Boolean,
+			default: false
+		},
+		backgroundColor: {
+			type: String,
+			default: 'transparent'
+		},
+		top: {
+			type: Number,
+			default: 0
+		},
+		height: {
+			type: Number,
+			default: 0
+		},
+		selectHeight: {
+			type: Number,
+			default: 0
+		},
+		isMask: {
+			type: Boolean,
+			default: false
+		},
+		maskBackground: {
+			type: String,
+			default: 'transparent'
+		},
+		/** 面板顶边相对触发器底边的额外间距（px），避免列表压住下拉框；默认 1，可设为 0 与框底紧贴 */
+		offsetBottomPx: {
+			type: Number,
+			default: 50
+		}
+	},
+	data() {
+		return {
+			panelTopPx: 0 as number,
+			panelLeftPx: -1 as number,
+			panelWidthPx: -1 as number,
+			layoutReady: false as boolean
+		}
+	},
+	watch: {
+		show(val: boolean) {
+			if (val) {
+				this.layoutReady = false
+				this.$nextTick(() => {
+					this.measureAndShow()
+				})
+			} else {
+				this.layoutReady = false
+			}
+		}
+	},
+	computed: {
+		panelBottomGapPx(): number {
+			const o = this.offsetBottomPx as number
+			return o >= 0 ? o : 1
+		},
+		panelFixedStyle(): UTSJSONObject {
+			const h = this.height as number
+			const st = {
+				position: 'fixed',
+				top: this.panelTopPx + 'px',
+				'z-index': '1002'
+			} as UTSJSONObject
+			const lw = this.panelLeftPx as number
+			const ww = this.panelWidthPx as number
+			if (lw >= 0 && ww > 0) {
+				st['left'] = lw + 'px'
+				st['width'] = ww + 'px'
+				st['right'] = 'auto'
+			} else {
+				st['left'] = '0'
+				st['right'] = '0'
+				st['width'] = 'auto'
+			}
+			if (h > 0) {
+				const px = uni.rpx2px(h)
+				if (px != null && (px as number) > 0) {
+					st['height'] = (px as number) + 'px'
+				} else {
+					st['height'] = h + 'rpx'
+				}
+			}
+			return st
+		}
+	},
+	methods: {
+		measureAndShow() {
+			const that = this
+			setTimeout(function () {
+				if (that.show && !that.layoutReady) {
+					that.applyFallbackLayout()
+					that.layoutReady = true
+				}
+			}, 320) as number
+			const runQuery = function () {
+				const q = uni.createSelectorQuery().in(that)
+				q.select('.m-dropdown-list__trigger').boundingClientRect(function (rect) {
+					if (!that.show) {
+						return
+					}
+					if (rect != null) {
+						const t = rect.top as number
+						const hh = rect.height as number
+						const l = rect.left as number
+						const w = rect.width as number
+						const gap = that.panelBottomGapPx as number
+						that.panelTopPx = Math.ceil(t + hh) + gap
+						if (w > 0) {
+							that.panelLeftPx = l
+							that.panelWidthPx = w
+						} else {
+							that.panelLeftPx = -1
+							that.panelWidthPx = -1
+						}
+						that.layoutReady = true
+					} else {
+						setTimeout(function () {
+							if (!that.show) {
+								return
+							}
+							const q2 = uni.createSelectorQuery().in(that)
+							q2.select('.m-dropdown-list__trigger').boundingClientRect(function (rect2) {
+								if (!that.show) {
+									return
+								}
+								if (rect2 != null) {
+									const t2 = rect2.top as number
+									const hh2 = rect2.height as number
+									const l2 = rect2.left as number
+									const w2 = rect2.width as number
+									const gap2 = that.panelBottomGapPx as number
+									that.panelTopPx = Math.ceil(t2 + hh2) + gap2
+									if (w2 > 0) {
+										that.panelLeftPx = l2
+										that.panelWidthPx = w2
+									} else {
+										that.panelLeftPx = -1
+										that.panelWidthPx = -1
+									}
+								} else {
+									that.applyFallbackLayout()
+								}
+								that.layoutReady = true
+							})
+							q2.exec()
+						}, 48) as number
+					}
+				})
+				q.exec()
+			}
+			this.$nextTick(() => {
+				this.$nextTick(() => {
+					setTimeout(function () {
+						runQuery()
+					}, 32) as number
+				})
+			})
+		},
+		applyFallbackLayout() {
+			const tProp = this.top as number
+			let px = uni.rpx2px(tProp > 0 ? tProp : 88)
+			if (px == null || (px as number) <= 0) {
+				px = 88 as number
+			}
+			this.panelTopPx = px as number
+			this.panelLeftPx = -1
+			this.panelWidthPx = -1
+		},
+		onMaskTap() {
+			this.$emit('close')
+		}
+	}
+}
+</script>
+
+<style lang="scss">
+.m-dropdown-list {
+	position: relative;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-dropdown-list__selection {
+	width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+
+/* 展开时高于遮罩与面板，避免半透明层或列表视觉上压住下拉触发区 */
+.m-dropdown-list__selection--raised {
+	position: relative;
+	z-index: 1003;
+}
+
+.m-dropdown-list__anchor {
+	position: relative;
+	max-width: 100%;
+	flex-shrink: 0;
+	box-sizing: border-box;
+}
+
+.m-dropdown-list__trigger {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.m-dropdown-list__overlay {
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 1000;
+	pointer-events: none;
+	box-sizing: border-box;
+}
+
+.m-dropdown-list__panel-mask {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 1;
+	pointer-events: auto;
+}
+
+.m-dropdown-list__panel {
+	position: fixed;
+	z-index: 1002;
+	box-sizing: border-box;
+	background-color: #ffffff;
+	border-radius: 0 0 8rpx 8rpx;
+	overflow: hidden;
+	border-left-width: 1rpx;
+	border-right-width: 1rpx;
+	border-bottom-width: 1rpx;
+	border-top-width: 0;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-color: #e5e5e5;
+	border-right-color: #e5e5e5;
+	border-bottom-color: #e5e5e5;
+	box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.1);
+	pointer-events: auto;
+}
+</style>

@@ -1,0 +1,323 @@
+<template>
+	<view class="m-watermark" :style="rootStyle">
+		<!-- 叠层放在 slot 容器内并绝对铺满，避免与根节点兄弟布局时部分端高度为 0 导致不绘制 -->
+		<view class="m-watermark__slot">
+			<slot></slot>
+			<!-- 无原图时：用叠层文字盖在插槽内容上（不依赖 canvas 透明） -->
+			<view
+				v-if="showTextOverlay"
+				class="m-watermark__overlay"
+				:style="overlayWrapStyle"
+			>
+				<view
+					v-for="idx in tileList"
+					:key="idx"
+					class="m-watermark__cell"
+					:style="cellMarginStyle"
+				>
+					<view class="m-watermark__rot" :style="tileRotateStyle">
+						<text class="m-watermark__tile" :style="tileFontStyle">{{ content }}</text>
+					</view>
+				</view>
+			</view>
+		</view>
+		<!-- 有原图时：canvas 绘制图片 + 水印，可长按保存 -->
+		<canvas
+			v-if="hasImage"
+			:canvas-id="canvasId"
+			class="m-watermark__canvas"
+			:style="canvasStyle"
+			@longpress="saveImage"
+		></canvas>
+	</view>
+</template>
+
+<script lang="uts">
+import { PropType } from 'vue'
+import { toCssLength, parseCssNumber } from '@/uni_modules/m-unix/components/m-tools/Ut.uts'
+
+export default {
+	name: 'mWatermark',
+	props: {
+		image: {
+			type: String,
+			default: ''
+		},
+		content: {
+			type: String,
+			default: ''
+		},
+		fontSize: {
+			type: [Number, String],
+			default: 20
+		},
+		/**
+		 * 水印文字颜色。uni-app x 部分端对 text 的 rgba 支持不稳定，默认用实色 #hex；
+		 * 需要更淡时配合 opacity，深色图/底可改用 #ffffff 等浅色。
+		 */
+		color: {
+			type: String,
+			default: '#c8c8c8'
+		},
+		gap: {
+			type: Array as PropType<number[]>,
+			default: () => [50, 50]
+		},
+		rotate: {
+			type: [Number, String],
+			default: -30
+		},
+		/** 整体叠层透明度 0~1，与 color 中的 alpha 可叠加 */
+		opacity: {
+			type: Number,
+			default: -1
+		},
+		customStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: () => ({})
+		}
+	},
+	data() {
+		return {
+			canvasId: '',
+			width: 0,
+			height: 0
+		}
+	},
+	computed: {
+		hasImage(): boolean {
+			return (this.image as string).trim().length > 0
+		},
+		hasContent(): boolean {
+			return (this.content as string).trim().length > 0
+		},
+		showTextOverlay(): boolean {
+			return this.hasContent && !this.hasImage
+		},
+		rootStyle(): UTSJSONObject {
+			const st = {
+				position: 'relative',
+				width: '100%',
+				overflow: 'hidden'
+			} as UTSJSONObject
+			if (this.customStyle != null) {
+				Object.assign(st, this.customStyle)
+			}
+			return st
+		},
+		canvasStyle(): UTSJSONObject {
+			return {
+				position: 'absolute',
+				left: '0',
+				top: '0',
+				width: '100%',
+				height: '100%',
+				zIndex: '4'
+			}
+		},
+		overlayWrapStyle(): UTSJSONObject {
+			const o = this.opacity as number
+			if (o >= 0 && o <= 1) {
+				return { opacity: o } as UTSJSONObject
+			}
+			return {} as UTSJSONObject
+		},
+		cellMarginStyle(): UTSJSONObject {
+			const g = this.gap as number[]
+			const gx = (g.length > 0 ? g[0] : 50) as number
+			const gy = (g.length > 1 ? g[1] : 50) as number
+			return {
+				marginLeft: gx / 2 + 'rpx',
+				marginRight: gx / 2 + 'rpx',
+				marginTop: gy / 2 + 'rpx',
+				marginBottom: gy / 2 + 'rpx'
+			} as UTSJSONObject
+		},
+		tileFontStyle(): UTSJSONObject {
+			const fs = toCssLength(this.fontSize as number | string)
+			return {
+				'font-size': fs,
+				color: this.color as string
+			} as UTSJSONObject
+		},
+		tileRotateStyle(): UTSJSONObject {
+			const deg = String(this.rotate)
+			return {
+				transform: 'rotate(' + deg + 'deg)'
+			} as UTSJSONObject
+		},
+		tileList(): number[] {
+			const arr: number[] = []
+			for (let i = 0; i < 72; i++) {
+				arr.push(i)
+			}
+			return arr
+		}
+	},
+	created() {
+		this.canvasId = 'm-watermark-' + Math.random().toString(36).substring(2, 11)
+	},
+	watch: {
+		image() {
+			this.scheduleDraw()
+		},
+		content() {
+			this.scheduleDraw()
+		},
+		fontSize() {
+			this.scheduleDraw()
+		},
+		color() {
+			this.scheduleDraw()
+		},
+		gap() {
+			this.scheduleDraw()
+		},
+		rotate() {
+			this.scheduleDraw()
+		}
+	},
+	mounted() {
+		this.scheduleDraw()
+	},
+	methods: {
+		scheduleDraw() {
+			if (!this.hasImage) {
+				return
+			}
+			this.$nextTick(() => {
+				this.draw()
+			})
+		},
+		draw() {
+			if (!this.hasImage) {
+				return
+			}
+			const that = this
+			const query = uni.createSelectorQuery().in(this)
+			query.select('.m-watermark').boundingClientRect(function(rect) {
+				if (rect == null || rect.width <= 0 || rect.height <= 0) {
+					return
+				}
+				that.width = rect.width
+				that.height = rect.height
+				const pixelRatio = uni.getSystemInfoSync().pixelRatio
+				const canvas = uni.createCanvasContext(that.canvasId, that)
+				const img = (that.image as string).trim()
+				if (img.length > 0) {
+					canvas.drawImage(img, 0, 0, that.width, that.height)
+				}
+				const text = (that.content as string).trim()
+				if (text.length > 0) {
+					canvas.beginPath()
+					const fontPx = parseCssNumber(that.fontSize as number | string)
+					canvas.setFontSize(fontPx * pixelRatio)
+					canvas.setFillStyle(that.color as any)
+					const rotateNum = (Number(that.rotate) * Math.PI) / 180
+					canvas.rotate(rotateNum)
+					const gapX = ((that.gap[0] != null ? that.gap[0] : 50) as number) * pixelRatio
+					const gapY = ((that.gap[1] != null ? that.gap[1] : 50) as number) * pixelRatio
+					const step = fontPx * pixelRatio + gapY
+					let x = 0
+					let y = gapY
+					while (y < that.height * pixelRatio + step) {
+						x = 0
+						while (x < that.width * pixelRatio + step) {
+							canvas.fillText(text, x, y)
+							x += text.length * fontPx * pixelRatio + gapX
+						}
+						y += step
+					}
+					canvas.stroke()
+				}
+				canvas.draw(false, () => {})
+			})
+			query.exec()
+		},
+		saveImage() {
+			if (!this.hasImage) {
+				uni.showToast({
+					title: '文字叠层模式不支持导出',
+					icon: 'none'
+				})
+				return
+			}
+			uni.canvasToTempFilePath(
+				{
+					canvasId: this.canvasId,
+					success: (res) => {
+						uni.saveImageToPhotosAlbum({
+							filePath: res.tempFilePath,
+							success: () => {
+								uni.showToast({
+									title: '保存成功',
+									icon: 'success'
+								})
+							},
+							fail: () => {
+								uni.showToast({
+									title: '保存失败',
+									icon: 'none'
+								})
+							}
+						})
+					},
+					fail: () => {
+						uni.showToast({
+							title: '生成失败',
+							icon: 'none'
+						})
+					}
+				},
+				this
+			)
+		}
+	}
+};
+</script>
+
+<style scoped lang="scss">
+.m-watermark {
+	box-sizing: border-box;
+}
+
+.m-watermark__slot {
+	position: relative;
+	width: 100%;
+	min-height: 1rpx;
+	overflow: hidden;
+}
+
+.m-watermark__overlay {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 10;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-content: center;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.m-watermark__cell {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.m-watermark__tile {
+	line-height: 1.2;
+	white-space: nowrap;
+}
+
+.m-watermark__canvas {
+	display: block;
+}
+</style>
