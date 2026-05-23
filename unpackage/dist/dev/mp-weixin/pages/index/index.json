@@ -2,6 +2,6 @@
   "usingComponents": {
     "m-icon": "../../uni_modules/m-unix/components/m-icon/m-icon",
     "m-button": "../../uni_modules/m-unix/components/m-button/m-button",
-    "m-popup": "../../uni_modules/m-unix/components/m-popup/m-popup"
+    "m-bottom-popup": "../../uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup"
   }
 }

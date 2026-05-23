@@ -14,19 +14,19 @@
 			<view>只在微信小程序中显示</view>
 			<!-- #endif -->
 		  </view>
-		  <m-icon name="print" size="40rpx"></m-icon>
+		  <m-icon name="download" size="40rpx"></m-icon>
 		  <m-button type="primary" @click="show = true">确定</m-button>
-		  <m-popup
+		  <m-bottom-popup
 		  			:show="show"
-		  			position="bottom"
-		  			round
-		  			closeable
+		  			:height="600"
+		  			:radius="true"
 		  			@close="show = false"
 		  		>
 		  			<view>
-		  				<text>弹出内容</text>
+		  				<!-- 弹窗内容 -->
+		  				<text>这里是弹窗内容</text>
 		  			</view>
-		  		</m-popup>
+		  		</m-bottom-popup>
 	</view>
 </template>
 
