@@ -1,0 +1,1 @@
+{"version":3,"file":"m-tag.js","sources":["/Users/xyhc/Documents/zd_iot_app_ui/uni_modules/m-unix/components/m-tag/m-tag.uvue?type=component"],"sourcesContent":["import Component from '/Users/xyhc/Documents/zd_iot_app_ui/uni_modules/m-unix/components/m-tag/m-tag.uvue'\nwx.createComponent(Component)"],"names":["Component"],"mappings":";;AACA,GAAG,gBAAgBA,wBAAS,YAAA;"}

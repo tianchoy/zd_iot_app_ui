@@ -1,7 +1,10 @@
 {
   "usingComponents": {
+    "top-nav-bar": "../../components/topNavBar/topNavBar",
     "m-icon": "../../uni_modules/m-unix/components/m-icon/m-icon",
     "m-button": "../../uni_modules/m-unix/components/m-button/m-button",
-    "m-bottom-popup": "../../uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup"
+    "m-tag": "../../uni_modules/m-unix/components/m-tag/m-tag",
+    "m-div": "../../uni_modules/m-unix/components/m-div/m-div",
+    "custom-service": "../../components/customService/customService"
   }
 }

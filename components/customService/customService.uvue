@@ -1,0 +1,13 @@
+<template>
+	<m-fab type="primary" size="40rpx" icon="customer-service"  :draggable="true" @click="connect_service" />
+</template>
+
+<script setup lang="uts">
+	const connect_service = ()=>{
+		console.log('联系客服')
+	}
+</script>
+
+<style lang="scss">
+
+</style>

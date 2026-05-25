@@ -1,0 +1,1 @@
+<m-fab bindclick="{{b}}" u-i="fe4bf484-0" bind:__l="__l" id="{{a}}" virtualHostId="{{a}}" u-p="{{c||''}}" class="{{[d]}}" virtualHostClass="{{[d]}}" style="{{virtualHostStyle}}" virtualHostStyle="{{virtualHostStyle || ''}}" hidden="{{virtualHostHidden || false}}" virtualHostHidden="{{virtualHostHidden || false}}"/>

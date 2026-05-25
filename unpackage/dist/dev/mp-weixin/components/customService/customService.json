@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "m-fab": "../../uni_modules/m-unix/components/m-fab/m-fab"
+  }
+}

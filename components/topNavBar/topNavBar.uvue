@@ -1,0 +1,107 @@
+<template>
+	<view :style="isShowStyle?{ height: statusBarHeight + 'px','background-color':backgroundColor,position:'fixed',width:'100%',letf:0,top:0,'z-index':'100'}
+		:
+		{ height: statusBarHeight + 'px','background-color':backgroundColor,} ">
+	</view>
+	<view class="navbar" :style="isShowStyle?{
+    height: navBarHeight +'px',
+    background: backgroundColor,
+	position:'fixed',width:'100%',letf:'0',top:statusBarHeight + 'px','z-index':'100'
+  }
+  :
+  {
+    height: navBarHeight +'px',
+    background: backgroundColor
+  }">
+		<view class="back-btn">
+			<m-icon v-if="showBack" name="arrow-left-bold" size="40rpx"  class="icon" @click="emit('back')"></m-icon>
+		</view>
+		<view class="title" :style="{ color: textColor,'line-height':navBarHeight + 'px'}">
+			<slot name="title">{{ title }}</slot>
+		</view>
+		<view class="capsule" :style="{
+      right: 200+'rpx',
+    }">
+			<view class="capsule-item">
+				<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
+					<uv-icon :name="Icon" v-if="isIcon" size="26" :color="iconColor"></uv-icon>
+					<text v-else>{{rightText}}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	const props = defineProps({
+		title: String,
+		showBack: { type: Boolean, default: true },
+		backText: { type: String, default: '' },
+		showCapsule: { type: Boolean, default: true },
+		backgroundColor: { type: String, default: '#f4f7fb' },
+		textColor: { type: String, default: '#000000' },
+		isIcon: { type: Boolean, default: true },
+		Icon: { type: String, default: 'plus-circle' },
+		rightText: { type: String, default: '' },
+		isShowStyle: { type: Boolean, default: true },
+		iconColor: { type: String, default: '#606266' }
+	});
+
+	const emit = defineEmits(['back', 'capsuleClick']);
+
+	const statusBarHeight = ref(45);
+	const navBarHeight = ref(44);
+	const menuButtonInfo = ref({
+		top: 4,
+		right: 10,
+		width: 87,
+		height: 32
+	});
+</script>
+
+<style scoped>
+	.navbar {
+		position: relative;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.back-btn {
+		display: flex;
+		align-items: center;
+		width: 70rpx;
+		height: 40rpx;
+		z-index: 10;
+		justify-content: center;
+	}
+
+	.title {
+		text-align: center;
+		font-weight: bold;
+		font-size: 36rpx;
+	}
+
+	.capsule {
+		text-align: center;
+	}
+
+	.capsule-item {
+		width: 40px;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.icon {
+		width: 40rpx;
+		height: 40rpx;
+	}
+
+	.menu-icon {
+		width: 60rpx;
+		height: 60rpx;
+	}
+</style>

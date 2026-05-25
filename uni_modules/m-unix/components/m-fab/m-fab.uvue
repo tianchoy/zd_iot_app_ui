@@ -34,9 +34,13 @@
 				@touchend="onDragEnd"
 				@touchcancel="onDragEnd"
 			>
-				<slot v-if="custom"></slot>
-				<m-icon v-else-if="iconName !== ''" :name="iconName" :size="iconSize" :color="color" />
-				<text v-else class="m-fab__plus" :style="{ color: color }">+</text>
+				<view class="m-fab__main-child" v-if="custom">
+					<slot></slot>
+				</view>
+				<view class="m-fab__main-child" v-else-if="iconName !== ''">
+					<m-icon :name="iconName" :size="iconSize" :color="color" />
+				</view>
+				<text v-else class="m-fab__main-child m-fab__plus" :style="{ color: color }">+</text>
 			</view>
 		</view>
 	</view>
@@ -71,11 +75,11 @@ export default {
 		},
 		width: {
 			type: [Number, String],
-			default: 108
+			default: 80
 		},
 		height: {
 			type: [Number, String],
-			default: 108
+			default: 80
 		},
 		radius: {
 			type: String,
@@ -518,7 +522,6 @@ export default {
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
 }
 
 .m-fab__main--drag {
@@ -526,10 +529,8 @@ export default {
 	touch-action: none;
 }
 
-/* 避免图标/文字子节点成为触摸目标，导致 touchmove 无法稳定派发到主按钮（H5 常见）；勿用 > *（微信小程序 WXSS 不支持通用选择器 *） */
-.m-fab__main--drag-pass > view,
-.m-fab__main--drag-pass > text,
-.m-fab__main--drag-pass > image {
+/* 避免图标/文字子节点成为触摸目标，导致 touchmove 无法稳定派发到主按钮（H5 常见） */
+.m-fab__main--drag-pass > .m-fab__main-child {
 	pointer-events: none;
 }
 

@@ -1,0 +1,1 @@
+{"version":3,"file":"card.js","sources":["pages/card/card.uvue?type=page"],"sourcesContent":["import MiniProgramPage from '/Users/xyhc/Documents/zd_iot_app_ui/pages/card/card.uvue'\nwx.createPage(MiniProgramPage)"],"names":[],"mappings":";;;;;;;;AACA,GAAG,WAAW,eAAe;"}
