@@ -1,4 +1,11 @@
 {
   "navigationBarTitleText": "",
-  "usingComponents": {}
+  "usingComponents": {
+    "top-nav-bar": "../../components/topNavBar/topNavBar",
+    "m-icon": "../../uni_modules/m-unix/components/m-icon/m-icon",
+    "m-button": "../../uni_modules/m-unix/components/m-button/m-button",
+    "m-segmented-control": "../../uni_modules/m-unix/components/m-segmented-control/m-segmented-control",
+    "m-tag": "../../uni_modules/m-unix/components/m-tag/m-tag",
+    "m-div": "../../uni_modules/m-unix/components/m-div/m-div"
+  }
 }

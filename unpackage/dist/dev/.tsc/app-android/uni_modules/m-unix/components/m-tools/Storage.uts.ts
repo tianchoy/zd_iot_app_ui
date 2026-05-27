@@ -1,0 +1,107 @@
+/**
+ * 全局存储工具 - 基于 uni.setStorageSync / uni.getStorageSync
+ * auth 相关变更会触发 notifyAuthChange，供 useAuth 全局响应
+ */
+import { getHostProjectConfig } from './ProjectConfig.uts'
+import { notifyAuthChange } from './AuthNotifier.uts'
+
+function tokenKey(): string {
+	return getHostProjectConfig().storage.token
+}
+
+function userInfoKey(): string {
+	return getHostProjectConfig().storage.userInfo
+}
+
+type AnyRecord = {
+	[key: string]: any
+}
+
+type StorageApi = {
+	get: (key: string) => any | null
+	set: (key: string, value: any) => void
+	remove: (key: string) => void
+	clear: () => void
+	getToken: () => string
+	setToken: (token: string) => void
+	getUserInfo: () => any | null
+	setUserInfo: (info: AnyRecord) => void
+	clearAuth: () => void
+}
+
+function storageGet(key: string): any | null {
+	try {
+		const val = uni.getStorageSync(key) as any
+		return val
+	} catch (e) {
+		return null
+	}
+}
+
+function storageSet(key: string, value: any): void {
+	try {
+		uni.setStorageSync(key, value)
+	} catch (e) {
+		__f__('error','at uni_modules/m-unix/components/m-tools/Storage.uts:45','storage set error', e)
+	}
+}
+
+function storageRemove(key: string): void {
+	try {
+		uni.removeStorageSync(key)
+	} catch (e) {
+		__f__('error','at uni_modules/m-unix/components/m-tools/Storage.uts:53','storage remove error', e)
+	}
+}
+
+function storageClear(): void {
+	try {
+		uni.clearStorageSync()
+	} catch (e) {
+		__f__('error','at uni_modules/m-unix/components/m-tools/Storage.uts:61','storage clear error', e)
+	}
+}
+
+export const storage: StorageApi = {
+	get(key: string): any | null {
+		return storageGet(key)
+	},
+
+	set(key: string, value: any): void {
+		storageSet(key, value)
+	},
+
+	remove(key: string): void {
+		storageRemove(key)
+	},
+
+	clear(): void {
+		storageClear()
+	},
+
+	// 快捷方法
+	getToken(): string {
+		const token = storageGet(tokenKey())
+		return token != null ? (token as string) : ''
+	},
+
+	setToken(token: string): void {
+		storageSet(tokenKey(), token)
+		notifyAuthChange()
+	},
+
+	getUserInfo(): any | null {
+		return storageGet(userInfoKey())
+	},
+
+	setUserInfo(info: AnyRecord): void {
+		storageSet(userInfoKey(), info)
+		notifyAuthChange()
+	},
+
+	clearAuth(): void {
+		storageRemove(tokenKey())
+		storageRemove(userInfoKey())
+		notifyAuthChange()
+	},
+}

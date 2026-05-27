@@ -12,10 +12,13 @@
 				v-for="(tab, idx) in tabs"
 				:key="idx"
 				class="m-tabs__item"
-				:style="{ width: itemWidthComputed }"
+				:style="{ width: itemWidthComputed}"
 				@tap="onTabTap(idx, tab)"
 			>
-				<view class="m-tabs__item-inner">
+				<view 
+					class="m-tabs__item-inner" 
+					:style="itemInnerStyle(idx, tab)"
+				>
 					<text
 						class="m-tabs__text"
 						:style="textStyle(idx, tab)"
@@ -148,6 +151,37 @@ export default {
 		customStyle: {
 			type: Object as PropType<UTSJSONObject>,
 			default: () => ({})
+		},
+		itemStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: () => ({})
+		},
+		// ========== 新增选中项样式参数 ==========
+		selectedBgColor: {
+			type: String,
+			default: ''
+		},
+		selectedBorderColor: {
+			type: String,
+			default: ''
+		},
+		selectedBorderWidth: {
+			type: String,
+			default: '0'
+		},
+		selectedBorderRadius: {
+			type: String,
+			default: '0'
+		},
+		// 未选中项背景色（可选）
+		unselectedBgColor: {
+			type: String,
+			default: ''
+		},
+		// 是否显示选中项边框
+		showSelectedBorder: {
+			type: Boolean,
+			default: false
 		}
 	},
 	computed: {
@@ -223,15 +257,63 @@ export default {
 		tabDisabled(tab: TabItem): boolean {
 			return tab['disabled'] === true
 		},
+		// 计算每个选项卡内层的样式（支持选中/未选中背景色、边框）
+		itemInnerStyle(idx: number, tab: TabItem): UTSJSONObject {
+			const st = {} as UTSJSONObject
+			const isSelected = (this.currentTab as number) === idx
+			const isDisabled = this.tabDisabled(tab)
+			
+			// 基础样式（合并用户传入的 itemStyle）
+			if (this.itemStyle != null) {
+				Object.assign(st, this.itemStyle)
+			}
+			
+			if (isDisabled) {
+				// 禁用状态样式
+				st['opacity'] = '0.5'
+			} else if (isSelected) {
+				// 选中状态样式
+				if (this.selectedBgColor && this.selectedBgColor !== '') {
+					st['backgroundColor'] = this.selectedBgColor
+				}
+				if (this.showSelectedBorder && this.selectedBorderColor) {
+					st['borderColor'] = this.selectedBorderColor
+					st['borderWidth'] = this.selectedBorderWidth
+					st['borderStyle'] = 'solid'
+				}
+				if (this.selectedBorderRadius && this.selectedBorderRadius !== '0') {
+					st['borderRadius'] = this.selectedBorderRadius
+				}
+			} else {
+				// 未选中状态样式
+				if (this.unselectedBgColor && this.unselectedBgColor !== '') {
+					st['backgroundColor'] = this.unselectedBgColor
+				}
+			}
+			
+			return st
+		},
 		textStyle(idx: number, tab: TabItem): UTSJSONObject {
 			const st = {} as UTSJSONObject
 			const sel = (this.currentTab as number) === idx
 			const dis = this.tabDisabled(tab)
-			st['color'] = dis ? '#cccccc' : (sel ? this.selectedColor as string : this.color as string)
+			
+			// 字体颜色（优先使用选中色，支持禁用色）
+			if (dis) {
+				st['color'] = '#cccccc'
+			} else if (sel) {
+				// 如果传入了 selectedColor 则使用，否则保持原逻辑
+				st['color'] = this.selectedColor as string
+			} else {
+				st['color'] = this.color as string
+			}
+			
 			st['font-size'] = (this.size as number) + 'rpx'
+			
 			if (this.bold && sel) {
 				st['font-weight'] = 'bold'
 			}
+			
 			if (sel) {
 				const sc = this.scale
 				const f = typeof sc === 'number' ? sc as number : parseFloat('' + sc)
@@ -285,6 +367,7 @@ export default {
 	position: relative;
 	padding: 8rpx 4rpx;
 	flex: 1;
+	transition: all 0.3s ease;
 }
 
 .m-tabs__text {

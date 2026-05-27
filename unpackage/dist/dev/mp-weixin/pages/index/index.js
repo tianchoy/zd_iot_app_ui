@@ -6,23 +6,29 @@ if (!Array) {
   const _easycom_m_button_1 = common_vendor.resolveComponent("m-button");
   const _easycom_m_tag_1 = common_vendor.resolveComponent("m-tag");
   const _easycom_m_div_1 = common_vendor.resolveComponent("m-div");
-  (_easycom_topNavBar_1 + _easycom_m_icon_1 + _easycom_m_button_1 + _easycom_m_tag_1 + _easycom_m_div_1)();
+  const _easycom_customService_1 = common_vendor.resolveComponent("customService");
+  (_easycom_topNavBar_1 + _easycom_m_icon_1 + _easycom_m_button_1 + _easycom_m_tag_1 + _easycom_m_div_1 + _easycom_customService_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
 const _easycom_m_icon = () => "../../uni_modules/m-unix/components/m-icon/m-icon.js";
 const _easycom_m_button = () => "../../uni_modules/m-unix/components/m-button/m-button.js";
 const _easycom_m_tag = () => "../../uni_modules/m-unix/components/m-tag/m-tag.js";
 const _easycom_m_div = () => "../../uni_modules/m-unix/components/m-div/m-div.js";
+const _easycom_customService = () => "../../components/customService/customService.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_m_icon + _easycom_m_button + _easycom_m_tag + _easycom_m_div + common_vendor.unref(customService))();
+  (_easycom_topNavBar + _easycom_m_icon + _easycom_m_button + _easycom_m_tag + _easycom_m_div + _easycom_customService)();
 }
-const customService = () => "../../components/customService/customService.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
     const title = common_vendor.ref("Hello");
     common_vendor.ref(false);
     const card_number = common_vendor.ref("");
+    const cardDetail = (card_number2 = null) => {
+      common_vendor.index.navigateTo({
+        url: "/pages/cardDetail/cardDetail?card_number=" + card_number2
+      });
+    };
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
@@ -70,10 +76,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "25rpx",
           shape: "circle"
         }),
-        k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        l: `${_ctx.u_s_b_h}px`,
-        m: `${_ctx.u_s_a_i_b}px`,
-        n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        k: common_vendor.o(($event) => {
+          return cardDetail("1064916585160");
+        }, "1f"),
+        l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        m: `${_ctx.u_s_b_h}px`,
+        n: `${_ctx.u_s_a_i_b}px`,
+        o: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

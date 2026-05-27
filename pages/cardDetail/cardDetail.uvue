@@ -1,0 +1,591 @@
+<template>
+	<view class="container">
+		<topNavBar title="卡片详情" :show-back="true" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+		<view class="card-box">
+			<view class="card-item" @click="cardDetail('1064916585160')">
+				<view class="item-head">
+					<view class="item-head-label">
+						<text class="card-item-title">1064916585160</text>
+						<text class="card-item-content">ICCID: 89860421123456789012</text>
+					</view>
+					<m-tag text="标签" :round="true" :plain="true" size="small"  type="primary"></m-tag>
+				</view>
+				<view class="item-package">
+					<text class="package-label">当前套餐:</text>
+					<text class="package-value">车联网月包20G</text>
+				</view>
+				<m-div backgroundColor="#f1f5f9" textClass="divider"></m-div>
+				<view class="card-metrics">
+					<view class="metric-box">
+						<view class="metric-label">到期时间</view>
+						<view class="metric-value">2026-04-30</view>
+					</view>
+					<view class="metric-box">
+						<view class="metric-label">本月流量</view>
+						<view class="metric-value">11.34GB / 20GB</view>
+					</view>
+				</view>
+				<view class="card-bottom">
+					<text class="cycle-label">总流量 20GB</text>
+				</view>
+			</view>
+			<view class="card-botton">
+				<m-button type="black" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true">诊断</m-button>
+				<m-button type="black" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true" :disabledGray="true" :disabled="true">已绑定</m-button>
+				<m-button type="primary" :plain="false" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true" :shadow="true">去充值</m-button>
+			</view>
+		</view>
+		<view class="card-box">
+			<m-tabs 
+			:tabs="tabs" 
+			width="auto" 
+			:padding="0"
+			:isSlider="false" 
+			:currentTab="active" 
+			@change="changeTab" 
+			:unlined="true" 
+			:bold="true"
+			:itemStyle="{backgroundColor:'#fff',borderRadius:'24rpx',padding:'0 40rpx',border:'1rpx solid #e7edf5'}" 
+			:selectedBgColor="'#eff6ff'"
+			:selectedBorderColor="'#bfdbfe'"
+			/>
+			<view class="card-content">
+				<view class="section-title">{{activeName}}</view>
+				<view class="section-content" v-if="activeName == '基本信息'">
+					<view class="base-info-box">
+						<view class="base-info">
+							<view class="info-item">
+								<text class="info-label">卡片号</text>
+								<text class="info-value">{{card_number}}</text>
+							</view>
+							<view class="info-item">
+								<text class="info-label">ICCID</text>
+								<text class="info-value">{{card_number}}</text>
+							</view>
+							<view class="info-item">
+								<text class="info-label">IMSI</text>
+								<text class="info-value">{{card_number}}</text>
+							</view>
+							<view class="info-item">
+								<text class="info-label">最近使用</text>
+								<text class="info-value">{{card_number}}</text>
+							</view>
+						</view>
+					</view>
+					<view class="section-title">套餐状态</view>
+					<view class="pkg-content">
+						<view class="pkg-item">
+							<text class="pkg-label">当前套餐:</text>
+							<text class="pkg-value">车联网月包20G</text>
+						</view>
+						<view class="pkg-item">
+							<text class="pkg-label">套餐流量:</text>
+							<text class="pkg-value">20GB</text>
+						</view>
+						<view class="pkg-item">
+							<text class="pkg-label">套餐有效期:</text>
+							<text class="pkg-value">2026-04-30</text>
+						</view>
+						<view class="pkg-item">
+							<text class="pkg-label">待生效期数:</text>
+							<view class="pkg-value">
+								<text>11</text>
+								<text class="pkg-icon" @click="showMore">
+									<m-icon v-if="!pkgMore" name="arrow-down-filling" size="20rpx"></m-icon>
+									<m-icon v-else name="arrow-up-filling" size="20rpx"></m-icon>
+								</text>
+							</view>
+						</view>
+						<view class="pkg-date" v-if="pkgMore">
+							<view class="date-list">
+								<text class="date-label">
+									<text class="date-period">第 1 期</text>
+									<text>2026-04-30</text>
+								</text>
+								<m-tag text="标签" :round="true" :plain="true" size="small"  type="primary"></m-tag>
+							</view>
+						</view>
+						<view class="pkg-item">
+							<text class="pkg-label">下期开始时间:</text>
+							<text class="pkg-value">2026-04-30</text>
+						</view>
+						<view class="pkg-item">
+							<text class="pkg-label">当前期次:</text>
+							<text class="pkg-value">第 1 期</text>
+						</view>
+						<view class="pkg-item">
+							<text class="pkg-label">当前期有效期:</text>
+							<text class="pkg-value">2026-04-30</text>
+						</view>
+						<view class="pkg-item">
+							<text class="pkg-label">计费方式:</text>
+							<text class="pkg-value">按月计费</text>
+						</view>
+					</view>
+					<view class="section-title">流量使用</view>
+					<view class="data-total">
+						<view class="total-item">
+							<text class="total-label">本月已用:</text>
+							<text class="total-value">20GB</text>
+						</view>
+						<view class="total-item">
+							<text class="total-label">剩余流量:</text>
+							<text class="total-value">20GB</text>
+						</view>
+						<view class="total-item">
+							<text class="total-label">总流量:</text>
+							<text class="total-value">20GB</text>
+						</view>	
+					</view>
+				</view>
+				<view class="section-content" v-if="activeName == '卡片套餐'">
+					<m-segmented-control 
+					:values="pkgTabs" 
+					:current="current" 
+					:textActiveColor="'#2563eb'" 
+					@click="handleClick" 
+					:customStyle="{height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" 
+					/>
+					<view class="card-pkg-box">
+						<view class="card-pkg-all-box" v-if="current == 0">
+							<view class="item">
+								<view class="item-head">
+									<text class="item-label">车联网月包20G</text>
+									<m-tag text="全部" :round="true" :plain="true" size="small"  type="primary"></m-tag>
+								</view>
+								<view class="item-sub-title">生效时间：待生效</view>
+								<view class="item-data">
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+								</view>
+							</view>
+						</view>
+						<view class="card-pkg-active-box" v-if="current == 1">
+							<view class="item">
+								<view class="item-head">
+									<text class="item-label">车联网月包20G</text>
+									<m-tag text="在用" :round="true" :plain="true" size="small"  type="primary"></m-tag>
+								</view>
+								<view class="item-sub-title">生效时间：待生效</view>
+								<view class="item-data">
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+								</view>
+							</view>
+						</view>
+						<view class="card-pkg-exp-box" v-if="current == 2">
+							<view class="item">
+								<view class="item-head">
+									<text class="item-label">车联网月包20G</text>
+									<m-tag text="待生效" :round="true" :plain="true" size="small"  type="primary"></m-tag>
+								</view>
+								<view class="item-sub-title">生效时间：待生效</view>
+								<view class="item-data">
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+								</view>
+							</view>
+						</view>
+						<view class="card-pkg-fail-box" v-if="current == 3">
+							<view class="item">
+								<view class="item-head">
+									<text class="item-label">车联网月包20G</text>
+									<m-tag text="已失效" :round="true" :plain="true" size="small"  type="primary"></m-tag>
+								</view>
+								<view class="item-sub-title">生效时间：待生效</view>
+								<view class="item-data">
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+									<view class="item-data-item">
+										<text class="item-data-label">套餐流量</text>
+										<text class="item-data-value">20GB</text>
+									</view>
+								</view>
+							</view>
+						</view>
+					</view>
+				</view>
+				<view class="section-content card-order" v-if="activeName == '卡片订单'">
+					<view class="item">
+						<view class="item-head">
+							<text class="item-label">车联网月包20G</text>
+							<m-tag text="已失效" :round="true" :plain="true" size="small"  type="primary"></m-tag>
+						</view>
+						<view class="item-sub-title">订单号: {{card_number}}</view>
+						<view class="item-data">
+							<text>2023-01-01</text>
+							<text class="total-value">¥200</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	const card_number = ref('')
+	const active = ref(0)
+	const activeName = ref('基本信息')
+	const pkgMore = ref(false)
+	const tabs = ref([
+        { name: '基本信息'},
+        { name: '卡片套餐' },
+        { name: '卡片订单' }
+      ])
+
+	const pkgTabs = ref(['全部', '在用套餐','待生效','已失效'])
+
+	const current = ref(0)
+	const handleClick = (e: UTSJSONObject) => {
+		current.value = e.index
+	}
+
+	const changeTab = (e: TabItem) => {
+		active.value = e.index
+		activeName.value = e.item.name
+	}
+
+	const showMore = () => {
+		console.log(pkgMore.value)
+		pkgMore.value = !pkgMore.value
+	}
+
+	onLoad((options) => {
+		console.log(options.card_number)
+        card_number.value = options.card_number
+	})
+</script>
+
+<style lang="scss" scoped>
+.container{
+	display: flex;
+	flex-direction: column;
+	background-color: #f4f7fb;
+	margin-top: 180rpx;
+
+	.card-box{
+		display: flex;
+		flex-direction: column;
+		margin: 0 24rpx 24rpx 24rpx;
+		background-color: #ffffff;
+		border:1rpx solid #e7edf5;
+		border-radius: 24rpx;
+		padding: 24rpx;
+		
+		.card-item{
+			display: flex;
+			flex-direction: column;
+			.item-head{
+				display: flex;
+				flex-direction: row;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: 10px;
+				.card-item-title{
+					font-size: 32rpx;
+					font-weight: 800;
+					color: #0f172a;
+					line-height: 1.25;
+					word-break: break-all;
+				}
+				.card-item-content{
+					margin-top: 5px;
+					font-size: 12px;
+					color: #94a3b8;
+					line-height: 1.45;
+					word-break: break-all;
+				}
+			}
+			.item-package{
+				margin: 20rpx 0;
+				display: flex;
+				flex-direction: row;
+				align-items: baseline;
+				gap: 20rpx;
+				min-width: 0;
+				.package-label{
+					font-size: 12px;
+					color: #64748b;
+					line-height: 1.4;
+				}
+				.package-value{
+					flex: 1;
+					font-size: 25rpx;
+					font-weight: 700;
+					color: #334155;
+					line-height: 1.45;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+			}
+			.card-metrics{
+				display:grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 20rpx;
+				margin: 20rpx 0;
+				.metric-box{
+					background: #f8fbff;
+					border: 1rpx solid #e8eef7;
+					border-radius: 25rpx;
+					padding: 20rpx 20rpx 10rpx;
+					min-width: 0;
+					.metric-label{
+						font-size: 25rpx;
+						color: #94a3b8;
+						line-height: 1.4;
+					}
+					.metric-value{
+						margin-top: 15rpx;
+						font-size: 25rpx;
+						font-weight: 800;
+						color: #0f172a;
+						line-height: 1.4;
+						word-break: break-all;
+					}
+				}
+			}
+			.card-bottom{
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				gap: 20rpx;
+				.cycle-label{
+					font-size: 25rpx;
+					color: #64748b;
+					line-height: 1.45;
+				}
+			}
+		}
+		.card-botton{
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			padding: 20rpx 0;
+		}
+
+		.card-content{
+			margin: 20rpx 0 20rpx 20rpx;
+			.section-title{
+				font-size: 28rpx;
+				font-weight: 800;
+				color: #0f172a;
+				margin-bottom: 20rpx;
+			}
+			.base-info-box{
+				display: flex;
+				flex-direction: column;
+				.base-info{
+					display: flex;
+					flex-direction: column;
+					padding-bottom: 24rpx;
+					border-bottom: 1rpx solid #eef2f7;
+					margin-bottom: 24rpx;
+					.info-item{
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						justify-content: space-between;
+						font-size: 26rpx;
+						padding: 14rpx 0;
+						.info-label{
+							color: #64748b;
+						}
+						.info-value{
+							font-weight: bold;
+							color: #0f172a;
+						}
+					}
+				}
+			}
+			.pkg-content{
+				display: flex;
+				flex-direction: column;
+				background: #f8fbff;
+				border: 1rpx solid #e8eef7;
+				border-radius: 24rpx;
+				padding:24rpx;
+				margin-bottom: 20rpx;
+				.pkg-item{
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: space-between;
+					font-size: 26rpx;
+					margin-bottom: 12rpx;
+					.pkg-label{
+						color: #64748b;
+					}
+					.pkg-value{
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						justify-content: center;
+						font-weight: bold;
+						color: #0f172a;
+						.pkg-icon{
+							background-color: #ffffff;
+							width: 40rpx;
+							height: 40rpx;
+							border-radius: 50%;
+							margin-left: 25rpx;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							line-height: 15rpx;
+						}
+					}
+				}
+				.pkg-item:last-child{
+					margin-bottom: 0;
+				}
+
+				.pkg-date{
+					margin: 20rpx 0;
+					border-top: 1rpx solid #eef2f7;
+					padding-top: 20rpx;
+					.date-list{
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						justify-content: space-between;
+						padding: 14rpx 0;
+						font-size: 26rpx;
+						color: #334155;
+						.date-period{
+							margin-right: 10rpx;
+						}
+					}
+				}
+			}
+			.data-total{
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				font-size: 26rpx;
+				color: #334155;
+				.total-item{
+					background: #f8fbff;
+					border: 1rpx solid #e8eef7;
+					border-radius: 25rpx;
+					padding: 20rpx 20rpx 10rpx;
+					margin:0 10rpx;
+					flex: 1;
+					.total-label{
+						font-size: 20rpx;
+						color: #94a3b8;
+						line-height: 1.4;
+						margin-bottom: 10rpx;
+					}
+					.total-value{
+						font-size: 25rpx;
+						font-weight: 800;
+						color: #0f172a;
+						line-height: 1.4;
+						word-break: break-all;
+					}
+				}
+			}
+
+			.card-pkg-box,.card-order{
+				.item{
+					background: #ffffff;
+					border: 1rpx solid #e7edf5;
+					border-radius: 18rpx;
+					padding: 20rpx;
+					cursor: pointer;
+					margin-top:20rpx;
+					.item-head{
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						justify-content: space-between;
+						font-size: 26rpx;
+						color: #334155;
+						margin-bottom: 12rpx;
+						.item-label{
+							color: #64748b;
+							font-weight: bold;
+						}
+					}
+					.item-sub-title{
+						font-size: 22rpx;
+						color: #64748b;
+						line-height: 1.55;
+					}
+					.item-data{
+						display: flex;
+						flex-direction: row;
+						margin-top: 20rpx;
+						font-size: 22rpx;
+						color: #64748b;
+						line-height: 1.55;
+						.item-data-item{
+							flex: 1;
+							text-align: center;
+							background: #f8fbff;
+							border: 1rpx solid #e8eef7;
+							border-radius: 24rpx;
+							padding: 20rpx;
+							margin: 10rpx;
+						}
+					}
+				}
+			}
+			.card-order{
+				.item-data{
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: space-between;
+					.total-value{
+						font-size: 30rpx;
+						font-weight: 900;
+						color: #ef4444;
+					}
+				}
+			}
+		}
+	}
+}
+</style>

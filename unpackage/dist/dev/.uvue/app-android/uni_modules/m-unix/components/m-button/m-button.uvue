@@ -1,0 +1,350 @@
+import { GlobalColor } from '@/uni_modules/m-unix/components/m-tools/utype/type.uts';
+import { toCssLength } from '@/uni_modules/m-unix/components/m-tools/Ut.uts';
+const __sfc__ = defineComponent({
+    name: 'mButton',
+    emits: ['click', 'getuserinfo', 'contact', 'getphonenumber', 'error', 'chooseavatar', 'launchapp'],
+    props: {
+        //样式类型 primary, white, danger, warning, green,blue, gray，black,brown,gray-primary,gray-danger,gray-warning,gray-green
+        type: {
+            type: String as unknown as PropType<string>,
+            default: 'primary'
+        },
+        //是否加阴影 移除
+        shadow: {
+            type: Boolean,
+            default: false
+        },
+        // 宽度 rpx或 %
+        width: {
+            type: String as unknown as PropType<string>,
+            default: '100%'
+        },
+        //高度 rpx
+        height: {
+            type: String as unknown as PropType<string>,
+            default: ''
+        },
+        // medium / small / mini / tiny（超级迷你，较 mini 更小）
+        btnSize: {
+            type: String as unknown as PropType<string>,
+            default: ''
+        },
+        //字体大小 rpx
+        size: {
+            type: [Number, String] as unknown as PropType<number | string>,
+            default: 0
+        },
+        bold: {
+            type: Boolean,
+            default: false
+        },
+        margin: {
+            type: String as unknown as PropType<string>,
+            default: '0'
+        },
+        //形状 circle(圆角), square(默认方形)，rightAngle(平角)
+        shape: {
+            type: String as unknown as PropType<string>,
+            default: 'square'
+        },
+        plain: {
+            type: Boolean,
+            default: false
+        },
+        //link样式，去掉边框，结合plain一起使用
+        link: {
+            type: Boolean,
+            default: false
+        },
+        disabled: {
+            type: Boolean,
+            default: false
+        },
+        //禁用后背景是否为灰色 （非空心button生效）
+        disabledGray: {
+            type: Boolean,
+            default: false
+        },
+        loading: {
+            type: Boolean,
+            default: false
+        },
+        formType: {
+            type: String as unknown as PropType<string>,
+            default: ''
+        },
+        openType: {
+            type: String as unknown as PropType<string>,
+            default: ''
+        },
+        appParameter: {
+            type: String as unknown as PropType<string>,
+            default: ''
+        },
+        index: {
+            type: [Number, String] as unknown as PropType<number | string>,
+            default: 0
+        },
+        //是否需要阻止重复点击【默认200ms】
+        preventClick: {
+            type: Boolean,
+            default: false
+        }
+    },
+    computed: {
+        getWidth(): string {
+            //medium 184*40 / small 120 40/ mini 58*32
+            let width = this.width;
+            // console.log(this.btnSize)
+            if (this.btnSize != "") {
+                width = {
+                    'medium': '368rpx',
+                    'small': '240rpx',
+                    'mini': '116rpx',
+                    'tiny': '112rpx'
+                }[this.btnSize] || this.width;
+            }
+            return width;
+        },
+        getHeight(): string {
+            //medium 184*40 / small 120 40/ mini 58*32
+            let height = this.height || '96rpx';
+            if (this.btnSize != "") {
+                height = {
+                    'medium': '80rpx',
+                    'small': '80rpx',
+                    'mini': '64rpx',
+                    'tiny': '48rpx'
+                }[this.btnSize] || '96rpx';
+            }
+            return height;
+        },
+        getSize(): number {
+            // 显式传入 size（非 0）时优先；否则按 btnSize。btnSize 做 trim+小写，避免模板/端上大小写不一致导致档位不生效。
+            const sz = this.size;
+            if (typeof sz === 'number') {
+                if (sz as number !== 0) {
+                    return sz as number;
+                }
+            }
+            else {
+                const s = ('' + (sz as string)).trim();
+                if (s.length > 0) {
+                    const n = parseInt(s, 10);
+                    if (!isNaN(n) && n !== 0) {
+                        return n;
+                    }
+                }
+            }
+            const bs = ('' + this.btnSize).trim().toLowerCase();
+            if (bs === 'large') {
+                return 34;
+            }
+            if (bs === 'medium') {
+                return 30;
+            }
+            if (bs === 'small') {
+                return 26;
+            }
+            if (bs === 'mini') {
+                return 18;
+            }
+            if (bs === 'tiny') {
+                return 12;
+            }
+            return 28;
+        },
+        fontSizeCss(): string {
+            return toCssLength(this.getSize as number | string);
+        },
+        /** 非微信端 loading 小圆点与按钮字色一致 */
+        loadingSpinnerColor(): string {
+            return this.getColor(this.type as string, this.plain as boolean);
+        }
+    },
+    data() {
+        return {
+            time: 0
+        };
+    },
+    methods: {
+        hexToRGB(hex: string) {
+            if (hex.length === 4) {
+                let text = hex.substring(1, 4);
+                hex = '#' + text + text;
+            }
+            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return isTruthy(result) ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : {};
+        },
+        getColorByType(type: string, isText?: boolean, plain?: boolean): any {
+            // 默认主题颜色
+            let color: any = '';
+            const colors = { __$originalPosition: new UTSSourceMapPosition("colors", "uni_modules/m-unix/components/m-button/m-button.uvue", 242, 10),
+                'primary': '#5677fc',
+                'white': '#fff',
+                'danger': '#EB0909',
+                'warning': '#ff7900',
+                'green': '#07c160',
+                'blue': '#007aff',
+                'gray': '#bfbfbf',
+                'black': '#333333',
+                'brown': '#ac9157',
+                'gray-primary': '#f2f2f2',
+                'gray-danger': '#f2f2f2',
+                'gray-warning': '#f2f2f2',
+                'gray-green': '#f2f2f2'
+            } as UTSJSONObject;
+            if (isTruthy(isText)) {
+                if (type != "" && ~type.indexOf('gray-') != 0) {
+                    const tp = type.replace('gray-', '');
+                    if (resolveInOperator(colors, tp)) {
+                        color = colors[tp];
+                    }
+                }
+                else if (type === 'white') {
+                    color = '#333';
+                }
+                else {
+                    if (isTruthy(plain)) {
+                        color = colors[type];
+                    }
+                    else {
+                        color = '#fff';
+                    }
+                }
+            }
+            else {
+                color = isTruthy(colors[type]) ? colors[type] : colors["primary"];
+            }
+            return color;
+        },
+        getShadow(type: string, plain: boolean): string {
+            const color = this.getColorByType(type);
+            if (plain || !isTruthy(color))
+                return 'none';
+            const rgb = this.hexToRGB(color);
+            return `0 10rpx 14rpx 0 rgba(${rgb["r"]}, ${rgb["g"]}, ${rgb["b"]}, 0.2)`;
+        },
+        getBgColor(type: string, plain: boolean): any {
+            return plain ? 'transparent' : this.getColorByType(type);
+        },
+        getColor(type: string, plain: boolean): any {
+            return this.getColorByType(type, true, plain);
+        },
+        handleClick() {
+            if (this.disabled)
+                return;
+            if (this.loading)
+                return;
+            if (this.preventClick) {
+                if (new Date().getTime() - this.time <= 200)
+                    return;
+                this.time = new Date().getTime();
+                setTimeout(() => {
+                    this.time = 0;
+                }, 200);
+            }
+            this.$emit('click', {
+                index: Number(this.index)
+            });
+        },
+        bindgetuserinfo({ detail = {} } = {}) {
+            this.$emit('getuserinfo', detail);
+        },
+        bindcontact({ detail = {} } = {}) {
+            this.$emit('contact', detail);
+        },
+        bindgetphonenumber({ detail = {} } = {}) {
+            this.$emit('getphonenumber', detail);
+        },
+        binderror({ detail = {} } = {}) {
+            this.$emit('error', detail);
+        },
+        bindchooseavatar({ detail = {} } = {}) {
+            this.$emit('chooseavatar', detail);
+        },
+        bindlaunchapp({ detail = {} } = {}) {
+            this.$emit('launchapp', detail);
+        },
+        getDisabledClass: function (disabled: boolean, type: string, plain: boolean): string {
+            let className = '';
+            if (disabled && type != 'white' && type.indexOf('-') == -1) {
+                let classVal = this.disabledGray ? 'm-gray-disabled' : 'm-dark-disabled';
+                className = plain ? 'm-dark-disabled-outline' : classVal;
+            }
+            return className;
+        },
+        getShapeClass: function (shape: string, plain: boolean): string {
+            let className = '';
+            if (shape == 'circle') {
+                className = plain ? 'm-outline-fillet' : 'm-fillet';
+            }
+            else if (shape == 'rightAngle') {
+                className = plain ? 'm-outline-rightAngle' : 'm-rightAngle';
+            }
+            return className;
+        },
+        getHoverClass: function (disabled: boolean, type: string, plain: boolean): string {
+            let className = '';
+            if (!disabled) {
+                className = plain ? 'm-outline-hover' : 'm-' + (type != "" ? type : 'primary') + '-hover';
+            }
+            return className;
+        }
+    }
+});
+export default __sfc__;
+function GenUniModulesMUnixComponentsMButtonMButtonRender(this: InstanceType<typeof __sfc__>): any | null {
+    const _ctx = this;
+    const _cache = this.$.renderCache;
+    const _component_m_loading = resolveEasyComponent("m-loading", _easycom_m_loading);
+    return _cE("view", _uM({
+        class: _nC(["m-button__wrap", [(_ctx.width === '100%' || !(_ctx.width != "") || _ctx.width === true) && (!(_ctx.btnSize != "") || _ctx.btnSize === true) ? 'm-btn__flex-1' : '', _ctx.getShapeClass(_ctx.shape, _ctx.plain), !_ctx.disabled ? 'm-button__hover' : '']]),
+        style: _nS(_uM({ width: _ctx.getWidth, height: _ctx.getHeight, margin: _ctx.margin }))
+    }), [
+        _cE("button", _uM({
+            class: _nC(["m-btn", [
+                    _ctx.plain ? 'm-' + _ctx.type + '-outline' : 'm-btn-' + (_ctx.type != "" ? _ctx.type : 'primary'),
+                    _ctx.getDisabledClass(_ctx.disabled, _ctx.type, _ctx.plain),
+                    _ctx.getShapeClass(_ctx.shape, _ctx.plain),
+                    _ctx.bold ? 'm-text-bold' : '',
+                    _ctx.link ? 'm-btn__link' : '',
+                    _ctx.loading ? 'm-btn--loading' : ''
+                ]]),
+            style: _nS(_uM({ width: _ctx.getWidth, height: _ctx.getHeight, lineHeight: _ctx.getHeight, 'font-size': _ctx.fontSizeCss, background: _ctx.getBgColor(_ctx.type, _ctx.plain), color: _ctx.getColor(_ctx.type, _ctx.plain), boxShadow: _ctx.shadow ? _ctx.getShadow(_ctx.type, _ctx.plain) : 'none' })),
+            "form-type": _ctx.formType,
+            disabled: _ctx.disabled,
+            onClick: _ctx.handleClick
+        }), [
+            _cE("view", _uM({
+                class: "m-btn__inner",
+                style: _nS(_uM({ 'font-size': _ctx.fontSizeCss }))
+            }), [
+                isTrue(_ctx.loading)
+                    ? _cV(_component_m_loading, _uM({
+                        key: 0,
+                        text: "",
+                        size: "14rpx",
+                        color: _ctx.loadingSpinnerColor
+                    }), null, 8 /* PROPS */, ["color"])
+                    : _cC("v-if", true),
+                renderSlot(_ctx.$slots, "default")
+            ], 4 /* STYLE */)
+        ], 14 /* CLASS, STYLE, PROPS */, ["form-type", "disabled", "onClick"]),
+        isTrue(!_ctx.link && _ctx.plain)
+            ? _cE("view", _uM({
+                key: 0,
+                class: _nC(["m-button__border", [_ctx.getShapeClass(_ctx.shape, _ctx.plain), _ctx.getDisabledClass(_ctx.disabled, _ctx.type, _ctx.plain)]]),
+                style: _nS(_uM({ borderColor: _ctx.getBgColor(_ctx.type) }))
+            }), null, 6 /* CLASS, STYLE */)
+            : _cC("v-if", true)
+    ], 6 /* CLASS, STYLE */);
+}
+export type MButtonComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesMUnixComponentsMButtonMButtonStyles = [_uM([["m-button__wrap", _pS(_uM([["position", "relative"], ["overflow", "visible"], ["boxSizing", "border-box"]]))], ["m-button__hover", _pS(_uM([["content:active::after", "\"\""], ["position:active::after", "absolute"], ["width:active::after", "100%"], ["height:active::after", "100%"], ["left:active::after", 0], ["top:active::after", 0], ["backgroundColor:active::after", "rgba(0,0,0,0.15)"], ["borderTopLeftRadius:active::after", "6rpx"], ["borderTopRightRadius:active::after", "6rpx"], ["borderBottomRightRadius:active::after", "6rpx"], ["borderBottomLeftRadius:active::after", "6rpx"], ["pointerEvents:active::after", "none"]]))], ["m-btn", _pS(_uM([["width", "100%"], ["position", "relative"], ["!borderTopWidth", 0], ["!borderRightWidth", 0], ["!borderBottomWidth", 0], ["!borderLeftWidth", 0], ["!borderTopStyle", "none"], ["!borderRightStyle", "none"], ["!borderBottomStyle", "none"], ["!borderLeftStyle", "none"], ["!borderTopColor", "#000000"], ["!borderRightColor", "#000000"], ["!borderBottomColor", "#000000"], ["!borderLeftColor", "#000000"], ["boxSizing", "border-box"], ["borderTopLeftRadius", "6rpx"], ["borderTopRightRadius", "6rpx"], ["borderBottomRightRadius", "6rpx"], ["borderBottomLeftRadius", "6rpx"], ["paddingLeft", 0], ["paddingRight", 0], ["overflow", "visible"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["borderTopWidth::after", 0], ["borderRightWidth::after", 0], ["borderBottomWidth::after", 0], ["borderLeftWidth::after", 0], ["borderTopStyle::after", "none"], ["borderRightStyle::after", "none"], ["borderBottomStyle::after", "none"], ["borderLeftStyle::after", "none"], ["borderTopColor::after", "#000000"], ["borderRightColor::after", "#000000"], ["borderBottomColor::after", "#000000"], ["borderLeftColor::after", "#000000"]]))], ["m-btn__inner", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["width", "100%"], ["gap", "12rpx"]]))], ["m-btn--loading", _pS(_uM([["pointerEvents", "none"]]))], ["m-btn__flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["m-button__border", _pS(_uM([["position", "absolute"], ["left", 0], ["top", 0], ["right", 0], ["bottom", 0], ["width", "100%"], ["height", "100%"], ["boxSizing", "border-box"], ["borderTopLeftRadius", "6rpx"], ["borderTopRightRadius", "6rpx"], ["borderBottomRightRadius", "6rpx"], ["borderBottomLeftRadius", "6rpx"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "rgba(0,0,0,0)"], ["borderRightColor", "rgba(0,0,0,0)"], ["borderBottomColor", "rgba(0,0,0,0)"], ["borderLeftColor", "rgba(0,0,0,0)"], ["pointerEvents", "none"]]))], ["m-text-bold", _pS(_uM([["fontWeight", "bold"]]))], ["m-dark-disabled", _pS(_uM([["!opacity", 0.6], ["!color", "#fafbfc"]]))], ["m-dark-disabled-outline", _pS(_uM([["!opacity", 0.5]]))], ["m-gray-disabled", _pS(_uM([["!backgroundImage", "none"], ["!backgroundColor", "#f3f3f3"], ["!color", "#919191"], ["boxShadow", "none"]]))], ["m-fillet", _pS(_uM([["!borderTopLeftRadius", "220rpx"], ["!borderTopRightRadius", "220rpx"], ["!borderBottomRightRadius", "220rpx"], ["!borderBottomLeftRadius", "220rpx"], ["!borderTopLeftRadius::after", "220rpx"], ["!borderTopRightRadius::after", "220rpx"], ["!borderBottomRightRadius::after", "220rpx"], ["!borderBottomLeftRadius::after", "220rpx"]]))], ["m-outline-fillet", _pS(_uM([["!borderTopLeftRadius", "220rpx"], ["!borderTopRightRadius", "220rpx"], ["!borderBottomRightRadius", "220rpx"], ["!borderBottomLeftRadius", "220rpx"], ["!borderTopLeftRadius::after", "220rpx"], ["!borderTopRightRadius::after", "220rpx"], ["!borderBottomRightRadius::after", "220rpx"], ["!borderBottomLeftRadius::after", "220rpx"]]))], ["m-rightAngle", _pS(_uM([["!borderTopLeftRadius", 0], ["!borderTopRightRadius", 0], ["!borderBottomRightRadius", 0], ["!borderBottomLeftRadius", 0], ["!borderTopLeftRadius::after", 0], ["!borderTopRightRadius::after", 0], ["!borderBottomRightRadius::after", 0], ["!borderBottomLeftRadius::after", 0]]))], ["m-outline-rightAngle", _pS(_uM([["!borderTopLeftRadius", 0], ["!borderTopRightRadius", 0], ["!borderBottomRightRadius", 0], ["!borderBottomLeftRadius", 0], ["!borderTopLeftRadius::after", 0], ["!borderTopRightRadius::after", 0], ["!borderBottomRightRadius::after", 0], ["!borderBottomLeftRadius::after", 0]]))], ["m-btn__link", _pS(_uM([["!borderTopWidth::after", 0], ["!borderRightWidth::after", 0], ["!borderBottomWidth::after", 0], ["!borderLeftWidth::after", 0], ["!borderTopStyle::after", "none"], ["!borderRightStyle::after", "none"], ["!borderBottomStyle::after", "none"], ["!borderLeftStyle::after", "none"], ["!borderTopColor::after", "#000000"], ["!borderRightColor::after", "#000000"], ["!borderBottomColor::after", "#000000"], ["!borderLeftColor::after", "#000000"]]))]])];
+import _easycom_m_loading from '@/uni_modules/m-unix/components/m-loading/m-loading.uvue';
+//# sourceMappingURL=m-button.uvue.map

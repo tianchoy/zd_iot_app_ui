@@ -1,0 +1,167 @@
+import { PropType } from 'vue';
+const __sfc__ = defineComponent({
+    name: 'mTag',
+    emits: ['click', 'close'],
+    props: {
+        // 类型 primary/ success/ warning/ danger/ info/ default
+        type: {
+            type: String,
+            default: 'default'
+        },
+        // 尺寸 large / medium / small / mini
+        size: {
+            type: String,
+            default: 'medium'
+        },
+        // 文字
+        text: {
+            type: String,
+            default: ''
+        },
+        // 镂空样式
+        plain: {
+            type: Boolean,
+            default: false
+        },
+        // 是否圆角
+        round: {
+            type: Boolean,
+            default: false
+        },
+        // 是否标记样式
+        mark: {
+            type: Boolean,
+            default: false
+        },
+        // 是否可关闭
+        closable: {
+            type: Boolean,
+            default: false
+        },
+        // 是否禁用
+        disabled: {
+            type: Boolean,
+            default: false
+        },
+        // 自定义颜色
+        color: {
+            type: String,
+            default: ''
+        },
+        // 自定义背景色
+        bgColor: {
+            type: String,
+            default: ''
+        },
+        // 自定义样式（勿与合并结果同名 computed，否则冲突）
+        customStyle: {
+            type: Object as PropType<UTSJSONObject>,
+            default: (): UTSJSONObject => ({})
+        }
+    },
+    computed: {
+        mergedCustomStyle(): UTSJSONObject {
+            const style: UTSJSONObject = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/m-unix/components/m-tag/m-tag.uvue", 93, 10), };
+            if (this.color !== '') {
+                style["color"] = this.color;
+            }
+            if (this.bgColor !== '') {
+                style["backgroundColor"] = this.bgColor;
+            }
+            Object.assign(style, this.customStyle);
+            return style;
+        },
+        closeIconSize(): string {
+            if (this.size === 'mini') {
+                return '24rpx';
+            }
+            if (this.size === 'small') {
+                return '28rpx';
+            }
+            if (this.size === 'large') {
+                return '36rpx';
+            }
+            return '32rpx';
+        },
+        // 关闭图标与标签字色一致（避免父 view 的 color 未作用到 m-icon 内 text）
+        closeIconColor(): string {
+            if (this.color !== '') {
+                return this.color;
+            }
+            if (this.plain) {
+                if (this.type === 'primary') {
+                    return '#409eff';
+                }
+                if (this.type === 'success') {
+                    return '#67c23a';
+                }
+                if (this.type === 'warning') {
+                    return '#e6a23c';
+                }
+                if (this.type === 'danger') {
+                    return '#f56c6c';
+                }
+                if (this.type === 'info') {
+                    return '#909399';
+                }
+                return '#606266';
+            }
+            if (this.type === 'default') {
+                return '#606266';
+            }
+            return '#ffffff';
+        }
+    },
+    methods: {
+        handleClick(e: any) {
+            if (!this.disabled) {
+                this.$emit('click', e);
+            }
+        },
+        handleClose(e: any) {
+            if (!this.disabled) {
+                this.$emit('close', e);
+            }
+        }
+    }
+});
+export default __sfc__;
+function GenUniModulesMUnixComponentsMTagMTagRender(this: InstanceType<typeof __sfc__>): any | null {
+    const _ctx = this;
+    const _cache = this.$.renderCache;
+    const _component_m_icon = resolveEasyComponent("m-icon", _easycom_m_icon);
+    return _cE("view", _uM({
+        class: _nC(["m-tag", [
+                `m-tag--${_ctx.type}`,
+                `m-tag--${_ctx.size}`,
+                _uM({ 'm-tag--plain': _ctx.plain }),
+                _uM({ 'm-tag--round': _ctx.round }),
+                _uM({ 'm-tag--mark': _ctx.mark }),
+                _uM({ 'm-tag--disabled': _ctx.disabled })
+            ]]),
+        style: _nS(_ctx.mergedCustomStyle),
+        onClick: _ctx.handleClick
+    }), [
+        renderSlot(_ctx.$slots, "default"),
+        isTrue(_ctx.text)
+            ? _cE("text", _uM({
+                key: 0,
+                class: "m-tag__text"
+            }), _tD(_ctx.text), 1 /* TEXT */)
+            : _cC("v-if", true),
+        isTrue(_ctx.closable)
+            ? _cV(_component_m_icon, _uM({
+                key: 1,
+                class: "m-tag__close",
+                name: "close",
+                size: _ctx.closeIconSize,
+                color: _ctx.closeIconColor,
+                onClick: withModifiers(_ctx.handleClose, ["stop"])
+            }), null, 8 /* PROPS */, ["size", "color", "onClick"])
+            : _cC("v-if", true)
+    ], 14 /* CLASS, STYLE, PROPS */, ["onClick"]);
+}
+export type MTagComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesMUnixComponentsMTagMTagStyles = [_uM([["m-tag", _uM([["", _uM([["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["boxSizing", "border-box"], ["paddingTop", "8rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "8rpx"], ["paddingLeft", "16rpx"], ["lineHeight", 1], ["borderTopLeftRadius", "6rpx"], ["borderTopRightRadius", "6rpx"], ["borderBottomRightRadius", "6rpx"], ["borderBottomLeftRadius", "6rpx"]])], [".m-tag--large", _uM([["fontSize", "32rpx"], ["paddingTop", "16rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "24rpx"]])], [".m-tag--medium", _uM([["fontSize", "28rpx"], ["paddingTop", "12rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "12rpx"], ["paddingLeft", "20rpx"]])], [".m-tag--small", _uM([["fontSize", "24rpx"], ["paddingTop", "6rpx"], ["paddingRight", "14rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "14rpx"]])], [".m-tag--mini", _uM([["fontSize", "20rpx"], ["paddingTop", "4rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "10rpx"]])], [".m-tag--primary", _uM([["backgroundColor", "#409eff"], ["color", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#409eff"], ["borderRightColor", "#409eff"], ["borderBottomColor", "#409eff"], ["borderLeftColor", "#409eff"]])], [".m-tag--success", _uM([["backgroundColor", "#67c23a"], ["color", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#67c23a"], ["borderRightColor", "#67c23a"], ["borderBottomColor", "#67c23a"], ["borderLeftColor", "#67c23a"]])], [".m-tag--warning", _uM([["backgroundColor", "#e6a23c"], ["color", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e6a23c"], ["borderRightColor", "#e6a23c"], ["borderBottomColor", "#e6a23c"], ["borderLeftColor", "#e6a23c"]])], [".m-tag--danger", _uM([["backgroundColor", "#f56c6c"], ["color", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#f56c6c"], ["borderRightColor", "#f56c6c"], ["borderBottomColor", "#f56c6c"], ["borderLeftColor", "#f56c6c"]])], [".m-tag--info", _uM([["backgroundColor", "#909399"], ["color", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#909399"], ["borderRightColor", "#909399"], ["borderBottomColor", "#909399"], ["borderLeftColor", "#909399"]])], [".m-tag--default", _uM([["backgroundColor", "#f5f7fa"], ["color", "#606266"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dcdfe6"], ["borderRightColor", "#dcdfe6"], ["borderBottomColor", "#dcdfe6"], ["borderLeftColor", "#dcdfe6"]])], [".m-tag--plain", _uM([["!backgroundColor", "rgba(0,0,0,0)"]])], [".m-tag--plain.m-tag--primary", _uM([["color", "#409eff"], ["borderTopColor", "#409eff"], ["borderRightColor", "#409eff"], ["borderBottomColor", "#409eff"], ["borderLeftColor", "#409eff"]])], [".m-tag--plain.m-tag--success", _uM([["color", "#67c23a"], ["borderTopColor", "#67c23a"], ["borderRightColor", "#67c23a"], ["borderBottomColor", "#67c23a"], ["borderLeftColor", "#67c23a"]])], [".m-tag--plain.m-tag--warning", _uM([["color", "#e6a23c"], ["borderTopColor", "#e6a23c"], ["borderRightColor", "#e6a23c"], ["borderBottomColor", "#e6a23c"], ["borderLeftColor", "#e6a23c"]])], [".m-tag--plain.m-tag--danger", _uM([["color", "#f56c6c"], ["borderTopColor", "#f56c6c"], ["borderRightColor", "#f56c6c"], ["borderBottomColor", "#f56c6c"], ["borderLeftColor", "#f56c6c"]])], [".m-tag--plain.m-tag--info", _uM([["color", "#909399"], ["borderTopColor", "#909399"], ["borderRightColor", "#909399"], ["borderBottomColor", "#909399"], ["borderLeftColor", "#909399"]])], [".m-tag--plain.m-tag--default", _uM([["color", "#606266"], ["borderTopColor", "#dcdfe6"], ["borderRightColor", "#dcdfe6"], ["borderBottomColor", "#dcdfe6"], ["borderLeftColor", "#dcdfe6"]])], [".m-tag--round", _uM([["borderTopLeftRadius", "100rpx"], ["borderTopRightRadius", "100rpx"], ["borderBottomRightRadius", "100rpx"], ["borderBottomLeftRadius", "100rpx"]])], [".m-tag--mark", _uM([["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"]])], [".m-tag--disabled", _uM([["opacity", 0.5]])]])], ["m-tag__close", _uM([[".m-tag ", _uM([["marginLeft", "8rpx"], ["flexShrink", 0], ["opacity", 0.85]])]])]])];
+import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue';
+//# sourceMappingURL=m-tag.uvue.map

@@ -1,0 +1,312 @@
+@import "../../uvue.wxss";
+:host{display:flex;flex-direction:column}
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+page .container.data-v-2bc48812 {
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f7fb;
+  margin-top: 180rpx;
+}
+page .container .card-box.data-v-2bc48812 {
+  display: flex;
+  flex-direction: column;
+  margin: 0 24rpx 24rpx 24rpx;
+  background-color: #ffffff;
+  border: 1rpx solid #e7edf5;
+  border-radius: 24rpx;
+  padding: 24rpx;
+}
+page .container .card-box .card-item.data-v-2bc48812 {
+  display: flex;
+  flex-direction: column;
+}
+page .container .card-box .card-item .item-head.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+page .container .card-box .card-item .item-head .card-item-title.data-v-2bc48812 {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+  word-break: break-all;
+}
+page .container .card-box .card-item .item-head .card-item-content.data-v-2bc48812 {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.45;
+  word-break: break-all;
+}
+page .container .card-box .card-item .item-package.data-v-2bc48812 {
+  margin: 20rpx 0;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 20rpx;
+  min-width: 0;
+}
+page .container .card-box .card-item .item-package .package-label.data-v-2bc48812 {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+}
+page .container .card-box .card-item .item-package .package-value.data-v-2bc48812 {
+  flex: 1;
+  font-size: 25rpx;
+  font-weight: 700;
+  color: #334155;
+  line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+page .container .card-box .card-item .card-metrics.data-v-2bc48812 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  margin: 20rpx 0;
+}
+page .container .card-box .card-item .card-metrics .metric-box.data-v-2bc48812 {
+  background: #f8fbff;
+  border: 1rpx solid #e8eef7;
+  border-radius: 25rpx;
+  padding: 20rpx 20rpx 10rpx;
+  min-width: 0;
+}
+page .container .card-box .card-item .card-metrics .metric-box .metric-label.data-v-2bc48812 {
+  font-size: 25rpx;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+page .container .card-box .card-item .card-metrics .metric-box .metric-value.data-v-2bc48812 {
+  margin-top: 15rpx;
+  font-size: 25rpx;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.4;
+  word-break: break-all;
+}
+page .container .card-box .card-item .card-bottom.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+page .container .card-box .card-item .card-bottom .cycle-label.data-v-2bc48812 {
+  font-size: 25rpx;
+  color: #64748b;
+  line-height: 1.45;
+}
+page .container .card-box .card-botton.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+}
+page .container .card-box .card-content.data-v-2bc48812 {
+  margin: 20rpx 0 20rpx 20rpx;
+}
+page .container .card-box .card-content .section-title.data-v-2bc48812 {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 20rpx;
+}
+page .container .card-box .card-content .base-info-box.data-v-2bc48812 {
+  display: flex;
+  flex-direction: column;
+}
+page .container .card-box .card-content .base-info-box .base-info.data-v-2bc48812 {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid #eef2f7;
+  margin-bottom: 24rpx;
+}
+page .container .card-box .card-content .base-info-box .base-info .info-item.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 26rpx;
+  padding: 14rpx 0;
+}
+page .container .card-box .card-content .base-info-box .base-info .info-item .info-label.data-v-2bc48812 {
+  color: #64748b;
+}
+page .container .card-box .card-content .base-info-box .base-info .info-item .info-value.data-v-2bc48812 {
+  font-weight: bold;
+  color: #0f172a;
+}
+page .container .card-box .card-content .pkg-content.data-v-2bc48812 {
+  display: flex;
+  flex-direction: column;
+  background: #f8fbff;
+  border: 1rpx solid #e8eef7;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+page .container .card-box .card-content .pkg-content .pkg-item.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 26rpx;
+  margin-bottom: 12rpx;
+}
+page .container .card-box .card-content .pkg-content .pkg-item .pkg-label.data-v-2bc48812 {
+  color: #64748b;
+}
+page .container .card-box .card-content .pkg-content .pkg-item .pkg-value.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #0f172a;
+}
+page .container .card-box .card-content .pkg-content .pkg-item .pkg-value .pkg-icon.data-v-2bc48812 {
+  background-color: #ffffff;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  margin-left: 25rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 15rpx;
+}
+page .container .card-box .card-content .pkg-content .pkg-item.data-v-2bc48812:last-child {
+  margin-bottom: 0;
+}
+page .container .card-box .card-content .pkg-content .pkg-date.data-v-2bc48812 {
+  margin: 20rpx 0;
+  border-top: 1rpx solid #eef2f7;
+  padding-top: 20rpx;
+}
+page .container .card-box .card-content .pkg-content .pkg-date .date-list.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 0;
+  font-size: 26rpx;
+  color: #334155;
+}
+page .container .card-box .card-content .pkg-content .pkg-date .date-list .date-period.data-v-2bc48812 {
+  margin-right: 10rpx;
+}
+page .container .card-box .card-content .data-total.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 26rpx;
+  color: #334155;
+}
+page .container .card-box .card-content .data-total .total-item.data-v-2bc48812 {
+  background: #f8fbff;
+  border: 1rpx solid #e8eef7;
+  border-radius: 25rpx;
+  padding: 20rpx 20rpx 10rpx;
+  margin: 0 10rpx;
+  flex: 1;
+}
+page .container .card-box .card-content .data-total .total-item .total-label.data-v-2bc48812 {
+  font-size: 20rpx;
+  color: #94a3b8;
+  line-height: 1.4;
+  margin-bottom: 10rpx;
+}
+page .container .card-box .card-content .data-total .total-item .total-value.data-v-2bc48812 {
+  font-size: 25rpx;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.4;
+  word-break: break-all;
+}
+page .container .card-box .card-content .card-pkg-box .item.data-v-2bc48812,page  .container .card-box .card-content .card-order .item.data-v-2bc48812 {
+  background: #ffffff;
+  border: 1rpx solid #e7edf5;
+  border-radius: 18rpx;
+  padding: 20rpx;
+  cursor: pointer;
+  margin-top: 20rpx;
+}
+page .container .card-box .card-content .card-pkg-box .item .item-head.data-v-2bc48812,page  .container .card-box .card-content .card-order .item .item-head.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 26rpx;
+  color: #334155;
+  margin-bottom: 12rpx;
+}
+page .container .card-box .card-content .card-pkg-box .item .item-head .item-label.data-v-2bc48812,page  .container .card-box .card-content .card-order .item .item-head .item-label.data-v-2bc48812 {
+  color: #64748b;
+  font-weight: bold;
+}
+page .container .card-box .card-content .card-pkg-box .item .item-sub-title.data-v-2bc48812,page  .container .card-box .card-content .card-order .item .item-sub-title.data-v-2bc48812 {
+  font-size: 22rpx;
+  color: #64748b;
+  line-height: 1.55;
+}
+page .container .card-box .card-content .card-pkg-box .item .item-data.data-v-2bc48812,page  .container .card-box .card-content .card-order .item .item-data.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  margin-top: 20rpx;
+  font-size: 22rpx;
+  color: #64748b;
+  line-height: 1.55;
+}
+page .container .card-box .card-content .card-pkg-box .item .item-data .item-data-item.data-v-2bc48812,page  .container .card-box .card-content .card-order .item .item-data .item-data-item.data-v-2bc48812 {
+  flex: 1;
+  text-align: center;
+  background: #f8fbff;
+  border: 1rpx solid #e8eef7;
+  border-radius: 24rpx;
+  padding: 20rpx;
+  margin: 10rpx;
+}
+page .container .card-box .card-content .card-order .item-data.data-v-2bc48812 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+page .container .card-box .card-content .card-order .item-data .total-value.data-v-2bc48812 {
+  font-size: 30rpx;
+  font-weight: 900;
+  color: #ef4444;
+}

@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "",
-  "usingComponents": {}
+  "usingComponents": {
+    "top-nav-bar": "../../components/topNavBar/topNavBar",
+    "m-icon": "../../uni_modules/m-unix/components/m-icon/m-icon"
+  }
 }

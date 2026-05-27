@@ -39,9 +39,13 @@ export default {
 			type: Number,
 			default: 0
 		},
+		textActiveColor:{
+			type: String,
+			default: '#334155'
+		},
 		activeColor: {
 			type: String,
-			default: '#5677fc'
+			default: '#e5edf6	'
 		},
 		height: {
 			type: String,
@@ -53,7 +57,7 @@ export default {
 		},
 		radius: {
 			type: String,
-			default: '4px'
+			default: '24rpx'
 		},
 		disabled: {
 			type: Boolean,
@@ -132,7 +136,7 @@ export default {
 			const active = idx === this.innerCurrent
 			return {
 				'font-size': this.size,
-				color: active ? this.activeColor : this.inactiveColor,
+				color: active ? this.textActiveColor : this.inactiveColor,
 				transition: 'color 0.28s ease'
 			}
 		},
@@ -168,7 +172,7 @@ export default {
 	align-items: stretch;
 	position: relative;
 	box-sizing: border-box;
-	padding: 4rpx;
+	padding: 20rpx 0;
 	width: 100%;
 	min-height: 0;
 }
@@ -205,5 +209,6 @@ export default {
 	line-height: 1.2;
 	position: relative;
 	z-index: 2;
+	color: #334155;
 }
 </style>

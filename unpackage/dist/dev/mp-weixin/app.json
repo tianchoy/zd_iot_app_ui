@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/card/card",
-    "pages/mine/mine"
+    "pages/mine/mine",
+    "pages/cardDetail/cardDetail"
   ],
   "window": {
     "navigationStyle": "custom",

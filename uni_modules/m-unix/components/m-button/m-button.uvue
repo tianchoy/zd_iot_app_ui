@@ -247,7 +247,7 @@
 				'green': '#07c160',
 				'blue': '#007aff',
 				'gray': '#bfbfbf',
-				'black': '#333333',
+				'black': '#334155',
 				'brown': '#ac9157',
 				'gray-primary': '#f2f2f2',
 				'gray-danger': '#f2f2f2',
@@ -261,7 +261,7 @@
 							color = colors[tp]
 						}
 					} else if (type === 'white') {
-						color = '#333'
+						color = '#334155'
 					} else {
 						if (plain) {
 							color = colors[type]

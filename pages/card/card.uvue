@@ -1,17 +1,216 @@
 <template>
-	<!-- #ifdef APP -->
-	<scroll-view style="flex:1">
-	<!-- #endif -->
-		
-	<!-- #ifdef APP -->
-	</scroll-view>
-	<!-- #endif -->
+	<view class="container">
+		<topNavBar title="卡片" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+		<view class="card-box">
+			<view class="card-label">卡号查询</view>
+			<view class="search-value">
+				<input
+					v-model="card_number"
+					placeholder="请输入 ICCID / MSISDN"
+					class="search-input"
+				/>
+				<m-button type="white" :plain="true" class="scan-btn" width="90rpx">
+					<m-icon name="scanning" size="40rpx"></m-icon>
+				</m-button>
+				<m-button type="primary" width="120rpx">查询</m-button>
+			</view>
+			<m-segmented-control :values="tabs" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
+		</view>
+		<view class="card-box">
+			<view class="card-list">
+				<view class="card-item">
+					<view class="item-head">
+						<view class="item-head-label">
+							<text class="card-item-title">1064916585160</text>
+							<text class="card-item-content">ICCID: 89860421123456789012</text>
+						</view>
+						<m-tag text="标签" :round="true" :plain="true" size="small"  type="primary"></m-tag>
+					</view>
+					<view class="item-package">
+						<text class="package-label">当前套餐:</text>
+						<text class="package-value">车联网月包20G</text>
+					</view>
+					<m-div backgroundColor="#f1f5f9" textClass="divider"></m-div>
+					<view class="card-metrics">
+						<view class="metric-box">
+							<view class="metric-label">到期时间</view>
+							<view class="metric-value">2026-04-30</view>
+						</view>
+						<view class="metric-box">
+							<view class="metric-label">本月流量</view>
+							<view class="metric-value">11.34GB / 20GB</view>
+						</view>
+                  	</view>
+					<view class="card-bottom">
+						<view class="card-cycle-text">
+							<text class="cycle-label">当前周期：</text>
+							<text class="cycle-value">第1期 / 共12期</text>
+						</view>
+						<m-button type="primary" width="200rpx" btnSize="mini" size="25rpx" shape="circle">去充值</m-button>
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
 </template>
 
-<script setup>
-		
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const card_number = ref('')
+const tabs = ref(['全部', '正常','异常'])
+const current = ref(0)
+
+const handleClick = (e: UTSJSONObject) => {
+	console.log(e.index)
+	current.value = e.index
+}
+
+
+
 </script>
 
-<style lang="scss">
-
+<style lang="scss" scoped>
+	.container{
+		display: flex;
+		flex-direction: column;
+		gap: 40rpx;
+		background-color: #f4f7fb;
+		margin-top: 180rpx;
+		.card-box{
+			display: flex;
+			flex-direction: column;
+			margin: 0 24rpx;
+			background-color: #ffffff;
+			border:1rpx solid #e7edf5;
+			border-radius: 24rpx;
+			padding: 24rpx;
+			gap: 20rpx;
+			.search-value{
+				display: flex;
+				flex-direction: row;
+				border:1rpx solid #dbe5f0;
+				border-radius: 24rpx;
+				.search-input{
+					flex:1;
+					padding: 0 25rpx;
+					height: 95rpx;
+					border: none;
+					background: transparent;
+					color: #0f172a;
+					font-size: 30rpx;
+					outline: none;
+				}
+				.scan-btn{
+					border-left: 1px solid #eef2f7;
+				}
+			}
+			
+			.card-item{
+				display: flex;
+				flex-direction: column;
+				border-bottom: 1px solid #e7edf5;
+				padding-bottom: 24rpx;
+				margin-bottom: 20rpx;
+				.item-head{
+					display: flex;
+					flex-direction: row;
+					align-items: flex-start;
+					justify-content: space-between;
+					gap: 10px;
+					.card-item-title{
+						font-size: 32rpx;
+						font-weight: 800;
+						color: #0f172a;
+						line-height: 1.25;
+						word-break: break-all;
+					}
+					.card-item-content{
+						margin-top: 5px;
+						font-size: 12px;
+						color: #94a3b8;
+						line-height: 1.45;
+						word-break: break-all;
+					}
+				}
+				.item-package{
+					margin: 20rpx 0;
+					display: flex;
+					flex-direction: row;
+					align-items: baseline;
+					gap: 20rpx;
+					min-width: 0;
+					.package-label{
+						font-size: 12px;
+						color: #64748b;
+						line-height: 1.4;
+					}
+					.package-value{
+						flex: 1;
+						font-size: 25rpx;
+						font-weight: 700;
+						color: #334155;
+						line-height: 1.45;
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
+				}
+				.card-metrics{
+					display:grid;
+					grid-template-columns: repeat(2, 1fr);
+					gap: 20rpx;
+					margin: 20rpx 0;
+					.metric-box{
+						background: #f8fbff;
+						border: 1rpx solid #e8eef7;
+						border-radius: 25rpx;
+						padding: 20rpx 20rpx 10rpx;
+						min-width: 0;
+						.metric-label{
+							font-size: 25rpx;
+							color: #94a3b8;
+							line-height: 1.4;
+						}
+						.metric-value{
+							margin-top: 15rpx;
+							font-size: 25rpx;
+							font-weight: 800;
+							color: #0f172a;
+							line-height: 1.4;
+							word-break: break-all;
+						}
+					}
+				}
+				.card-bottom{
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: space-between;
+					gap: 20rpx;
+					.card-cycle-text{
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						gap: 10rpx;
+						.cycle-label{
+							font-size: 25rpx;
+							color: #64748b;
+							line-height: 1.45;
+						}
+						.cycle-value{
+							font-size: 25rpx;
+							color: #334155;
+							font-weight: 800;
+						}
+					}
+				}
+			}
+			.card-item:last-child{
+				border-bottom: none;
+				margin-bottom: 0;
+				padding-bottom: 0;
+			}
+		}
+	}
 </style>

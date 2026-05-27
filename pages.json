@@ -20,6 +20,12 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
+		},
+		{
+			"path": "pages/cardDetail/cardDetail",
+			"style": {
+				"navigationBarTitleText": ""
+			}
 		}
 	],
 	"tabBar": {

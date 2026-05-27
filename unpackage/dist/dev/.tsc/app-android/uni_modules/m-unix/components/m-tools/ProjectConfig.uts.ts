@@ -1,0 +1,319 @@
+/**
+ * 宿主工程业务配置桥接：不强制依赖 @/common/config。
+ * - 未调用 injectMUnixHostProjectConfig 时：使用库内默认（baseUrl 空、默认 storage key 等），组件与工具可正常编译运行。
+ * - 在 main.uts 中于 import m-unix 包之前执行 injectMUnixHostProjectConfig(宿主 config)，则与原先直接 import @/common/config 行为一致。
+ */
+
+export type HostStorageConfig = {
+	token: string
+	userInfo: string
+}
+
+export type HostApiLoginConfig = {
+	tokenLogin: string
+	codeGetOpenIdLogin: string
+	codeGetPhoneRegisterOrLogin: string
+}
+
+export type HostApiUpdateConfig = {
+	checkUpdate: string
+}
+
+export type HostApiUploadConfig = {
+	image: string
+}
+
+export type HostApiConfig = {
+	login: HostApiLoginConfig
+	update: HostApiUpdateConfig
+	upload: HostApiUploadConfig
+	/** 二维码 PNG 等外链接口根，可为空 */
+	qrCodeImageApiBase: string
+}
+
+export type HostConfigInfo = {
+	name: string
+	logo: string
+	desc: string
+	versionCode: number
+	versionName: string
+	/** 可选：应用更新下载地址等 */
+	appDownloadUrl?: string
+	appDownloadUrlAndroid?: string
+	/** 用户协议文章 ID（m-login 跳转用） */
+	userAgreementArticleId?: string
+	/** 隐私政策文章 ID */
+	privacyPolicyArticleId?: string
+}
+
+/**
+ * 与 common/config.ts 中业务侧结构对齐的最小集合（mUi 为可选主题覆盖，类型随宿主而定）
+ */
+export type MUnixHostProjectConfig = {
+	env: string
+	localBaseUrl: string
+	devBaseUrl: string
+	prodBaseUrl: string
+	baseUrl: string
+	storage: HostStorageConfig
+	loginRequiredPaths: string[]
+	loginPagePath: string
+	api: HostApiConfig
+	configInfo: HostConfigInfo
+	mUi: any | null
+}
+
+const LOGO_BUILTIN = '/uni_modules/m-unix/static/m-app-logo.png'
+
+const BUILTIN_DEFAULT: MUnixHostProjectConfig = {
+	env: 'local',
+	localBaseUrl: '',
+	devBaseUrl: '',
+	prodBaseUrl: '',
+	baseUrl: '',
+	storage: {
+		token: 'token',
+		userInfo: 'userInfo',
+	},
+	loginRequiredPaths: [],
+	loginPagePath: '/pages_Me/login/login',
+	api: {
+		login: {
+			tokenLogin: '',
+			codeGetOpenIdLogin: '',
+			codeGetPhoneRegisterOrLogin: '',
+		},
+		update: {
+			checkUpdate: '',
+		},
+		upload: {
+			image: '',
+		},
+		qrCodeImageApiBase: '',
+	},
+	configInfo: {
+		name: 'mUnix',
+		logo: LOGO_BUILTIN,
+		desc: '',
+		versionCode: 0,
+		versionName: '0.0.0',
+	},
+	mUi: null,
+}
+
+let _hostOverride: MUnixHostProjectConfig | null = null
+
+function mergeStorage(base: HostStorageConfig, p: any): HostStorageConfig {
+	const out: HostStorageConfig = {
+		token: base.token,
+		userInfo: base.userInfo,
+	}
+	if (p == null) {
+		return out
+	}
+	const pt = p['token']
+	if (pt != null && ('' + pt).length > 0) {
+		out.token = '' + pt
+	}
+	const pu = p['userInfo']
+	if (pu != null && ('' + pu).length > 0) {
+		out.userInfo = '' + pu
+	}
+	return out
+}
+
+function mergeApi(base: HostApiConfig, p: any): HostApiConfig {
+	const out: HostApiConfig = {
+		login: { ...base.login },
+		update: { ...base.update },
+		upload: { ...base.upload },
+		qrCodeImageApiBase: base.qrCodeImageApiBase,
+	}
+	if (p == null) {
+		return out
+	}
+	const pl = p['login']
+	if (pl != null && typeof pl === 'object') {
+		const a = pl as UTSJSONObject
+		const t1 = a['tokenLogin']
+		if (t1 != null) {
+			out.login.tokenLogin = '' + t1
+		}
+		const t2 = a['codeGetOpenIdLogin']
+		if (t2 != null) {
+			out.login.codeGetOpenIdLogin = '' + t2
+		}
+		const t3 = a['codeGetPhoneRegisterOrLogin']
+		if (t3 != null) {
+			out.login.codeGetPhoneRegisterOrLogin = '' + t3
+		}
+	}
+	const pu = p['update']
+	if (pu != null && typeof pu === 'object') {
+		const u = pu as UTSJSONObject
+		const c = u['checkUpdate']
+		if (c != null) {
+			out.update.checkUpdate = '' + c
+		}
+	}
+	const pupload = p['upload']
+	if (pupload != null && typeof pupload === 'object') {
+		const up = pupload as UTSJSONObject
+		const im = up['image']
+		if (im != null) {
+			out.upload.image = '' + im
+		}
+	}
+	const pq = p['qrCodeImageApiBase']
+	if (pq != null) {
+		out.qrCodeImageApiBase = '' + pq
+	}
+	return out
+}
+
+function mergeConfigInfo(base: HostConfigInfo, p: any): HostConfigInfo {
+	const out: HostConfigInfo = {
+		name: base.name,
+		logo: base.logo,
+		desc: base.desc,
+		versionCode: base.versionCode,
+		versionName: base.versionName,
+	}
+	if (p == null) {
+		return out
+	}
+	const o = p as UTSJSONObject
+	const n = o['name']
+	if (n != null) {
+		out.name = '' + n
+	}
+	const l = o['logo']
+	if (l != null) {
+		out.logo = '' + l
+	}
+	const d = o['desc']
+	if (d != null) {
+		out.desc = '' + d
+	}
+	const vc = o['versionCode']
+	if (vc != null) {
+		const num = parseInt('' + vc, 10)
+		if (!isNaN(num)) {
+			out.versionCode = num
+		}
+	}
+	const vn = o['versionName']
+	if (vn != null) {
+		out.versionName = '' + vn
+	}
+	const ad = o['appDownloadUrl']
+	if (ad != null) {
+		out.appDownloadUrl = '' + ad
+	}
+	const ada = o['appDownloadUrlAndroid']
+	if (ada != null) {
+		out.appDownloadUrlAndroid = '' + ada
+	}
+	const ua = o['userAgreementArticleId']
+	if (ua != null) {
+		out.userAgreementArticleId = '' + ua
+	}
+	const pp = o['privacyPolicyArticleId']
+	if (pp != null) {
+		out.privacyPolicyArticleId = '' + pp
+	}
+	return out
+}
+
+function mergeHostPatch(patch: any): MUnixHostProjectConfig {
+	const base = BUILTIN_DEFAULT
+	const out: MUnixHostProjectConfig = {
+		env: base.env,
+		localBaseUrl: base.localBaseUrl,
+		devBaseUrl: base.devBaseUrl,
+		prodBaseUrl: base.prodBaseUrl,
+		baseUrl: base.baseUrl,
+		storage: { ...base.storage },
+		loginRequiredPaths: [],
+		loginPagePath: base.loginPagePath,
+		api: {
+			login: { ...base.login },
+			update: { ...base.update },
+			upload: { ...base.upload },
+			qrCodeImageApiBase: base.qrCodeImageApiBase,
+		},
+		configInfo: {
+			name: base.configInfo.name,
+			logo: base.configInfo.logo,
+			desc: base.configInfo.desc,
+			versionCode: base.configInfo.versionCode,
+			versionName: base.configInfo.versionName,
+		},
+		mUi: base.mUi,
+	}
+	if (patch == null) {
+		return out
+	}
+	const p = patch as UTSJSONObject
+	const e = p['env']
+	if (e != null) {
+		out.env = '' + e
+	}
+	const lb = p['localBaseUrl']
+	if (lb != null) {
+		out.localBaseUrl = '' + lb
+	}
+	const db = p['devBaseUrl']
+	if (db != null) {
+		out.devBaseUrl = '' + db
+	}
+	const pb = p['prodBaseUrl']
+	if (pb != null) {
+		out.prodBaseUrl = '' + pb
+	}
+	const bu = p['baseUrl']
+	if (bu != null) {
+		out.baseUrl = '' + bu
+	}
+	out.storage = mergeStorage(base.storage, p['storage'])
+	const paths = p['loginRequiredPaths']
+	if (paths != null && paths instanceof Array) {
+		const arr: string[] = []
+		const pa = paths as any[]
+		for (let i = 0; i < pa.length; i++) {
+			arr.push('' + pa[i])
+		}
+		out.loginRequiredPaths = arr
+	}
+	const lp = p['loginPagePath']
+	if (lp != null && ('' + lp).length > 0) {
+		out.loginPagePath = '' + lp
+	}
+	out.api = mergeApi(base.api, p['api'])
+	out.configInfo = mergeConfigInfo(base.configInfo, p['configInfo'])
+	const mui = p['mUi']
+	if (mui != null) {
+		out.mUi = mui
+	}
+	return out
+}
+
+/**
+ * 在应用入口最早处调用（建议在 main.uts 内、import m-unix 入口之前），传入与 common/config.ts 导出的 config 相同结构的对象。
+ */
+export function injectMUnixHostProjectConfig(hostConfig: any): void {
+	_hostOverride = mergeHostPatch(hostConfig)
+}
+
+/** 清除注入（测试或动态切换环境时可调） */
+export function clearMUnixHostProjectConfig(): void {
+	_hostOverride = null
+}
+
+/** 当前生效的宿主业务配置（未注入时为库内默认） */
+export function getHostProjectConfig(): MUnixHostProjectConfig {
+	if (_hostOverride != null) {
+		return _hostOverride
+	}
+	return mergeHostPatch(null)
+}
