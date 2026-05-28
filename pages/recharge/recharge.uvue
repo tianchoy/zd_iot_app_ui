@@ -1,0 +1,449 @@
+<template>
+	<topNavBar title="充值首页" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<view class="container">
+		
+		<view class="card-info">
+			<view class="card-title">
+				<text class="title">卡片信息</text>
+				<m-tag text="标签" :round="true" :plain="true" size="small" type="primary"></m-tag>
+			</view>
+			<view class="card-number">
+				<text>1234567890123456</text>
+			</view>
+			<view class="info-list">
+				<view class="info-item">
+					<text class="label">当前套餐</text>
+					<text class="value">车联网月包20G（名称较长时自动换行展示）</text>
+				</view>
+				<view class="info-item">
+					<text class="label">卡片余额</text>
+					<text class="value">¥1000.00</text>
+				</view>
+			</view>
+			<view class="flow-box">
+				<view class="flow-label">充值成功</view>
+				<LinearProgress :value="progress1" />
+			</view>
+			<view class="card-bottom">
+				<m-button type="white" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true">卡片套餐</m-button>
+				<m-button type="white" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true">订单记录</m-button>
+			</view>
+		</view>
+		<view class="pkg-box">
+			<m-tabs 
+			:tabs="tabs" 
+			width="100rpx" 
+			:padding="0"
+			:isSlider="true" 
+			:currentTab="active" 
+			@change="changeTab" 
+			:unlined="false" 
+			:bold="true"
+			/>
+			<view class="pkg-content">
+				<!-- 套餐包列表 -->
+				<block v-if="active === 0">
+					<view 
+						v-for="(item, index) in packageList" 
+						:key="index" 
+						class="pkg-card"
+						:class="{ 'pkg-card-selected': selectedPackageIndex === index }"
+						@click="selectPackage(index)"
+					>
+						<view class="pkg-info">
+							<view class="pkg-name">
+								<text class="pkg-title">{{ item.name }}</text>
+								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
+							</view>
+							<view class="pkg-desc">
+								<text class="pkg-icon">流量 {{ item.data }}</text>
+								<text class="pkg-icon">有效期 {{ item.validity }}</text>
+							</view>
+						</view>
+						<view class="pkg-price">
+							<view class="price-wrapper">
+								<text class="price-symbol">¥</text>
+								<text class="price-number">{{ item.price }}</text>
+							</view>
+							<view class="price-original" v-if="item.originalPrice">
+								<text>¥{{ item.originalPrice }}</text>
+							</view>
+						</view>
+					</view>
+				</block>
+				<!-- 加油包列表 -->
+				<block v-else>
+					<view 
+						v-for="(item, index) in refillList" 
+						:key="index" 
+						class="pkg-card"
+						:class="{ 'pkg-card-selected': selectedRefillIndex === index }"
+						@click="selectRefill(index)"
+					>
+						<view class="pkg-info">
+							<view class="pkg-name">
+								<text class="pkg-title">{{ item.name }}</text>
+								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
+							</view>
+							<view class="pkg-desc">
+								<text class="pkg-icon">流量 {{ item.data }}</text>
+								<text class="pkg-icon">有效期 {{ item.validity }}</text>
+							</view>
+						</view>
+						<view class="pkg-price">
+							<view class="price-wrapper">
+								<text class="price-symbol">¥</text>
+								<text class="price-number">{{ item.price }}</text>
+							</view>
+							<view class="price-original" v-if="item.originalPrice">
+								<text>¥{{ item.originalPrice }}</text>
+							</view>
+						</view>
+					</view>
+				</block>
+			</view>
+		</view>
+	</view>
+	<m-bottom-popup
+		:show="showPopup"
+		<!-- #ifdef MP-WEIXIN -->
+		:height="'50%'"
+		<!-- #endif -->
+		<!-- #ifndef MP-WEIXIN -->
+		:height="'75%'"
+		<!-- #endif -->
+		:radius="true"
+		@close="showPopup = false"
+	>
+		<Payment 
+			:amount="currentPrice" 
+			@cancel="handleCancelPayment"
+			@confirm="handleConfirmPayment"
+		/>
+	</m-bottom-popup>
+	<m-sticky-bottom>
+		<view class="bottom-box">
+			<view class="price-box">
+				<text class="price-label">当前套餐金额</text>
+				<text class="price-value">¥{{ currentPrice }}</text>
+			</view>
+			<m-button type="primary" @click="choosePayment" :plain="false" :margin="'0 20rpx'" width="200rpx" height="70rpx" shape="circle" :bold="true" :shadow="false">去支付</m-button>
+		</view>
+	</m-sticky-bottom>
+</template>
+
+<script setup lang="uts">
+	import { ref, computed } from 'vue';
+	import LinearProgress from '@/components/progress.uvue';
+	import Payment from '@/components/payment.uvue';
+		
+	const showPopup = ref(false);
+	const progress1 = ref(80);
+
+	const active = ref(0);
+	const tabs = ref([
+		{
+			name: '套餐包'
+		},
+		{
+			name: '加油包',
+		}
+	]);
+
+	// 套餐包列表数据
+	const packageList = ref([
+		{
+			name: '车联网月包20G',
+			tag: '推荐',
+			data: '20GB',
+			validity: '30天',
+			price: '90',
+			originalPrice: '100'
+		},
+		{
+			name: '车联网月包10G',
+			tag: '',
+			data: '10GB',
+			validity: '30天',
+			price: '50',
+			originalPrice: ''
+		},
+		{
+			name: '工业设备月包5G',
+			tag: '',
+			data: '5GB',
+			validity: '30天',
+			price: '30',
+			originalPrice: ''
+		}
+	]);
+
+	// 加油包列表数据
+	const refillList = ref([
+		{
+			name: '加油包5G',
+			tag: '推荐',
+			data: '5GB',
+			validity: '7天',
+			price: '20',
+			originalPrice: '30'
+		},
+		{
+			name: '加油包10G',
+			tag: '',
+			data: '10GB',
+			validity: '15天',
+			price: '35',
+			originalPrice: '45'
+		},
+		{
+			name: '加油包20G',
+			tag: '',
+			data: '20GB',
+			validity: '30天',
+			price: '60',
+			originalPrice: '80'
+		}
+	]);
+
+	// 选中的套餐包索引
+	const selectedPackageIndex = ref(0);
+	// 选中的加油包索引
+	const selectedRefillIndex = ref(0);
+
+	// 当前显示的套餐金额
+	const currentPrice = computed(() => {
+		if (active.value === 0) {
+			return packageList.value[selectedPackageIndex.value]?.price || '0';
+		} else {
+			return refillList.value[selectedRefillIndex.value]?.price || '0';
+		}
+	});
+
+	const changeTab = (e: any) => {
+		active.value = e.index;
+	}
+
+	const selectPackage = (index: number) => {
+		selectedPackageIndex.value = index;
+	}
+
+	const selectRefill = (index: number) => {
+		selectedRefillIndex.value = index;
+	}
+	// 选择支付方式
+	const choosePayment = () => {
+		showPopup.value = true;
+	}
+
+	// 取消支付
+	const handleCancelPayment = () => {
+		showPopup.value = false;
+	}
+
+	// 确认支付
+	const handleConfirmPayment = (e) => {
+		console.log(e);
+		// 处理确认逻辑
+		showPopup.value = false;
+	}
+
+	const goBack = () => {
+		uni.navigateBack({
+			delta: 1
+		})
+	}
+</script>
+
+<style lang="scss" scoped>
+	.container{
+		display: flex;
+		flex-direction: column;
+		background-color: #f4f7fb;
+		.card-info{
+			background: #ffffff;
+			border: 1rpx solid #e7edf5;
+			border-radius: 20rpx;
+			padding: 24rpx;
+			margin: 0 24rpx;
+			.card-title{
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				font-size: 30rpx;
+				font-weight: bold;
+				color: #333;
+				.title{
+					font-size: 30rpx;
+					font-weight: bold;
+					color: #333;
+				}
+			}
+			.card-number{
+				color: #475569;
+				margin-top: 24rpx;
+			}
+			.info-list{
+				display: flex;
+				flex-direction: column;
+				.info-item{
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: space-between;
+					font-size: 26rpx;
+					padding: 14rpx 0;
+					.label{
+						color: #64748b;
+						margin-right: 20rpx;
+					}
+					.value{
+						font-weight: bold;
+						white-space: pre-wrap;
+						word-break: break-all;
+						line-height: 1.5;
+					}
+				}
+			}
+			.flow-box{
+				margin-top: 24rpx;
+				background: #f8fbff;
+				border: 1rpx solid #e8eef7;
+				border-radius: 16rpx;
+				padding: 20rpx;
+				.flow-label{
+					font-size: 24rpx;
+					color: #64748b;
+					margin-bottom: 12rpx;
+				}
+			}
+			.card-bottom{
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+				margin-top: 24rpx;
+			}
+		}
+		.pkg-box{
+			background: #ffffff;
+			border: 1rpx solid #e7edf5;
+			border-radius: 20rpx;
+			padding: 24rpx;
+			margin: 24rpx;
+		}
+		.pkg-content {
+			margin-top: 20rpx;
+		}
+		.pkg-card {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			background: #ffffff;
+			border: 2rpx solid #e7edf5;
+			border-radius: 20rpx;
+			padding: 28rpx 24rpx;
+			margin-bottom: 20rpx;
+			transition: all 0.2s ease;
+			
+			&:last-child {
+				margin-bottom: 0;
+			}
+			
+			.pkg-info {
+				flex: 1;
+				.pkg-name {
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					margin-bottom: 12rpx;
+					flex-wrap: wrap;
+					.pkg-title {
+						font-size: 30rpx;
+						font-weight: bold;
+						color: #1e293b;
+					}
+					.pkg-tag {
+						background: linear-gradient(135deg, #ff9a3c, #ff6b3c);
+						color: #ffffff;
+						font-size: 20rpx;
+						padding: 4rpx 16rpx;
+						border-radius: 20rpx;
+						margin-left: 12rpx;
+					}
+				}
+				.pkg-desc {
+					display: flex;
+					flex-direction: row;
+					font-size: 24rpx;
+					color: #64748b;
+					.pkg-icon{
+						display: inline-flex;
+						align-items: center;
+						padding: 10rpx 20rpx;
+						border-radius: 24rpx;
+						background: #f8fafc;
+						border: 1rpx solid #e2e8f0;
+						color: #475569;
+						font-size: 20rpx;
+						font-weight: 700;
+						margin-right: 20rpx;
+					}
+				}
+			}
+			.pkg-price {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				.price-wrapper {
+					display: flex;
+					flex-direction: row;
+					align-items: baseline;
+					.price-symbol {
+						font-size: 24rpx;
+						color: #ef4444;
+						font-weight: bold;
+					}
+					.price-number {
+						font-size: 40rpx;
+						color: #ef4444;
+						font-weight: bold;
+					}
+				}
+				.price-original {
+					font-size: 22rpx;
+					color: #94a3b8;
+					text-decoration: line-through;
+					margin-top: 4rpx;
+				}
+			}
+		}
+		.pkg-card-selected {
+			border: 2rpx solid #3b82f6;
+			background: #f8fafc;
+			box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.08);
+		}
+	}
+	.bottom-box{
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		background: #ffffff;
+		.price-box{
+			display: flex;
+			flex-direction: column;
+			.price-label{
+				font-size: 24rpx;
+				color: #64748b;
+			}
+			.price-value{
+				font-weight: bold;
+				color: #ef4444;
+				font-size: 40rpx;
+			}
+		}
+	}
+</style>

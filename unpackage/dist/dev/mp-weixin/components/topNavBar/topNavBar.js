@@ -27,83 +27,166 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   emits: ["back", "capsuleClick"],
   setup(__props, _a) {
     var __emit = _a.emit;
+    const props = __props;
     const emit = __emit;
-    const statusBarHeight = common_vendor.ref(45);
+    const statusBarHeight = common_vendor.ref(20);
     const navBarHeight = common_vendor.ref(44);
-    common_vendor.ref(new common_vendor.UTSJSONObject({
-      top: 4,
-      right: 10,
-      width: 87,
-      height: 32
-    }));
+    const totalNavHeight = common_vendor.computed(() => {
+      return statusBarHeight.value + navBarHeight.value;
+    });
+    const statusBarStyle = common_vendor.computed(() => {
+      return new common_vendor.UTSJSONObject({
+        height: statusBarHeight.value + "px",
+        backgroundColor: props.backgroundColor,
+        position: "fixed",
+        width: "100%",
+        left: 0,
+        top: 0,
+        zIndex: 100
+      });
+    });
+    const navBarStyle = common_vendor.computed(() => {
+      return new common_vendor.UTSJSONObject({
+        height: navBarHeight.value + "px",
+        backgroundColor: props.backgroundColor,
+        position: "fixed",
+        width: "100%",
+        left: 0,
+        top: statusBarHeight.value + "px",
+        zIndex: 100
+      });
+    });
+    const getNavBarInfo = () => {
+      try {
+        const systemInfo = common_vendor.index.getSystemInfoSync();
+        statusBarHeight.value = systemInfo.statusBarHeight || 20;
+        const menuButtonInfo = common_vendor.index.getMenuButtonBoundingClientRect();
+        if (menuButtonInfo) {
+          const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height;
+          navBarHeight.value = navHeight > 0 ? navHeight : 44;
+        }
+      } catch (e) {
+        common_vendor.index.__f__("error", "at components/topNavBar/topNavBar.uvue:107", "获取导航栏信息失败", e);
+      }
+    };
+    const handleBack = () => {
+      if (props.showBack) {
+        const hasListener = emit && typeof emit === "function";
+        if (hasListener) {
+          emit("back");
+        }
+        common_vendor.index.navigateBack();
+      }
+    };
+    common_vendor.onMounted(() => {
+      getNavBarInfo();
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.s(__props.isShowStyle ? {
-          height: common_vendor.unref(statusBarHeight) + "px",
-          "background-color": __props.backgroundColor,
-          position: "fixed",
-          width: "100%",
-          letf: 0,
-          top: 0,
-          "z-index": "100"
-        } : {
-          height: common_vendor.unref(statusBarHeight) + "px",
-          "background-color": __props.backgroundColor
-        }),
-        b: common_vendor.s({
+        a: __props.isShowStyle
+      }, __props.isShowStyle ? {
+        b: common_vendor.s(statusBarStyle.value),
+        c: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,
           "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-        }),
-        c: __props.showBack
+        })
+      } : {}, {
+        d: __props.isShowStyle
+      }, __props.isShowStyle ? common_vendor.e({
+        e: __props.showBack
       }, __props.showBack ? {
-        d: common_vendor.o(($event) => {
-          return emit("back");
-        }, "94"),
-        e: common_vendor.p({
+        f: common_vendor.o(handleBack, "60"),
+        g: common_vendor.p({
           name: "arrow-left-bold",
           size: "40rpx",
           class: "icon data-v-83d0d8fa"
         })
       } : {}, {
-        f: common_vendor.t(__props.title),
-        g: __props.textColor,
-        h: common_vendor.unref(navBarHeight) + "px",
-        i: __props.showCapsule
+        h: __props.showBack ? "visible" : "hidden",
+        i: common_vendor.t(__props.title),
+        j: __props.textColor,
+        k: common_vendor.unref(navBarHeight) + "px",
+        l: __props.showCapsule
       }, __props.showCapsule ? common_vendor.e({
-        j: __props.isIcon
+        m: __props.isIcon
       }, __props.isIcon ? {
-        k: common_vendor.p({
+        n: common_vendor.p({
           name: __props.Icon,
           size: "26",
           color: __props.iconColor,
           class: "data-v-83d0d8fa"
         })
       } : {
-        l: common_vendor.t(__props.rightText)
+        o: common_vendor.t(__props.rightText)
       }, {
-        m: common_vendor.o(($event) => {
+        p: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        }, "4f")
+        }, "c6")
       }) : {}, {
-        n: "200rpx",
-        o: common_vendor.s(__props.isShowStyle ? {
-          height: common_vendor.unref(navBarHeight) + "px",
-          background: __props.backgroundColor,
-          position: "fixed",
-          width: "100%",
-          letf: "0",
-          top: common_vendor.unref(statusBarHeight) + "px",
-          "z-index": "100"
-        } : {
-          height: common_vendor.unref(navBarHeight) + "px",
-          background: __props.backgroundColor
-        }),
-        p: common_vendor.s({
+        q: common_vendor.s(navBarStyle.value),
+        r: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`,
           "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
         })
-      });
+      }) : common_vendor.e({
+        s: common_vendor.s({
+          height: common_vendor.unref(statusBarHeight) + "px",
+          backgroundColor: __props.backgroundColor
+        }),
+        t: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+        }),
+        v: __props.showBack
+      }, __props.showBack ? {
+        w: common_vendor.o(handleBack, "e4"),
+        x: common_vendor.p({
+          name: "arrow-left-bold",
+          size: "40rpx",
+          class: "icon data-v-83d0d8fa"
+        })
+      } : {}, {
+        y: __props.showBack ? "visible" : "hidden",
+        z: common_vendor.t(__props.title),
+        A: __props.textColor,
+        B: common_vendor.unref(navBarHeight) + "px",
+        C: __props.showCapsule
+      }, __props.showCapsule ? common_vendor.e({
+        D: __props.isIcon
+      }, __props.isIcon ? {
+        E: common_vendor.p({
+          name: __props.Icon,
+          size: "26",
+          color: __props.iconColor,
+          class: "data-v-83d0d8fa"
+        })
+      } : {
+        F: common_vendor.t(__props.rightText)
+      }, {
+        G: common_vendor.o(($event) => {
+          return emit("capsuleClick", "menu");
+        }, "59")
+      }) : {}, {
+        H: common_vendor.s({
+          height: common_vendor.unref(navBarHeight) + "px",
+          backgroundColor: __props.backgroundColor
+        }),
+        I: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+        })
+      }), {
+        J: __props.isShowStyle
+      }, __props.isShowStyle ? {
+        K: common_vendor.s({
+          height: totalNavHeight.value + "px"
+        }),
+        L: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`,
+          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+        })
+      } : {});
       return __returned__;
     };
   }

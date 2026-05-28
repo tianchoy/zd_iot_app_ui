@@ -7,6 +7,7 @@ if (!Math) {
   "./pages/card/card.js";
   "./pages/mine/mine.js";
   "./pages/cardDetail/cardDetail.js";
+  "./pages/recharge/recharge.js";
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App",

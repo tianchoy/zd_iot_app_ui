@@ -1,6 +1,7 @@
 <template>
+	<topNavBar title="我的" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
-		<topNavBar title="我的" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+		
 		<view class="card-info">
 			<text class="persion-name">Hi,{{title}}</text>
 			<view class="persion-card">
@@ -45,7 +46,6 @@
 	flex-direction: column;
 	gap: 40rpx;
 	background-color: #f4f7fb;
-	margin-top: 180rpx;
 	.card-info{
 		display: flex;
 		flex-direction: column;

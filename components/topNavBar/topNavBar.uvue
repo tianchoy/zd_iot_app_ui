@@ -1,107 +1,184 @@
 <template>
-	<view :style="isShowStyle?{ height: statusBarHeight + 'px','background-color':backgroundColor,position:'fixed',width:'100%',letf:0,top:0,'z-index':'100'}
-		:
-		{ height: statusBarHeight + 'px','background-color':backgroundColor,} ">
-	</view>
-	<view class="navbar" :style="isShowStyle?{
-    height: navBarHeight +'px',
-    background: backgroundColor,
-	position:'fixed',width:'100%',letf:'0',top:statusBarHeight + 'px','z-index':'100'
-  }
-  :
-  {
-    height: navBarHeight +'px',
-    background: backgroundColor
-  }">
-		<view class="back-btn">
-			<m-icon v-if="showBack" name="arrow-left-bold" size="40rpx"  class="icon" @click="emit('back')"></m-icon>
+	<!-- 状态栏占位（固定定位） -->
+	<view v-if="isShowStyle" :style="statusBarStyle"></view>
+	<!-- 导航栏（固定定位） -->
+	<view v-if="isShowStyle" class="navbar" :style="navBarStyle">
+		<view class="back-btn" :style="{ visibility: showBack ? 'visible' : 'hidden' }">
+			<m-icon v-if="showBack" name="arrow-left-bold" size="40rpx" class="icon" @click="handleBack"></m-icon>
 		</view>
-		<view class="title" :style="{ color: textColor,'line-height':navBarHeight + 'px'}">
+		<view class="title" :style="{ color: textColor, 'line-height': navBarHeight + 'px' }">
 			<slot name="title">{{ title }}</slot>
 		</view>
-		<view class="capsule" :style="{
-      right: 200+'rpx',
-    }">
+		<view class="capsule">
 			<view class="capsule-item">
 				<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
-					<uv-icon :name="Icon" v-if="isIcon" size="26" :color="iconColor"></uv-icon>
+					<uv-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></uv-icon>
 					<text v-else>{{rightText}}</text>
 				</view>
 			</view>
 		</view>
 	</view>
+	
+	<!-- 非固定定位模式（普通布局） -->
+	<template v-else>
+		<view :style="{ height: statusBarHeight + 'px', backgroundColor: backgroundColor }"></view>
+		<view class="navbar" :style="{ height: navBarHeight + 'px', backgroundColor: backgroundColor }">
+			<view class="back-btn" :style="{ visibility: showBack ? 'visible' : 'hidden' }">
+				<m-icon v-if="showBack" name="arrow-left-bold" size="40rpx" class="icon" @click="handleBack"></m-icon>
+			</view>
+			<view class="title" :style="{ color: textColor, 'line-height': navBarHeight + 'px' }">
+				<slot name="title">{{ title }}</slot>
+			</view>
+			<view class="capsule">
+				<view class="capsule-item">
+					<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
+						<uv-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></uv-icon>
+						<text v-else>{{rightText}}</text>
+					</view>
+				</view>
+			</view>
+		</view>
+	</template>
+	
+	<!-- 固定定位模式下的占位元素（防止内容被遮挡） -->
+	<view v-if="isShowStyle" :style="{ height: totalNavHeight + 'px' }"></view>
 </template>
 
 <script setup lang="uts">
-	const props = defineProps({
-		title: String,
-		showBack: { type: Boolean, default: true },
-		backText: { type: String, default: '' },
-		showCapsule: { type: Boolean, default: true },
-		backgroundColor: { type: String, default: '#f4f7fb' },
-		textColor: { type: String, default: '#000000' },
-		isIcon: { type: Boolean, default: true },
-		Icon: { type: String, default: 'plus-circle' },
-		rightText: { type: String, default: '' },
-		isShowStyle: { type: Boolean, default: true },
-		iconColor: { type: String, default: '#606266' }
-	});
+import { onMounted, computed } from 'vue'
 
-	const emit = defineEmits(['back', 'capsuleClick']);
+const props = defineProps({
+	title: String,
+	showBack: { type: Boolean, default: true },
+	backText: { type: String, default: '' },
+	showCapsule: { type: Boolean, default: true },
+	backgroundColor: { type: String, default: '#f4f7fb' },
+	textColor: { type: String, default: '#000000' },
+	isIcon: { type: Boolean, default: true },
+	Icon: { type: String, default: 'plus-circle' },
+	rightText: { type: String, default: '' },
+	isShowStyle: { type: Boolean, default: true },
+	iconColor: { type: String, default: '#606266' }
+});
 
-	const statusBarHeight = ref(45);
-	const navBarHeight = ref(44);
-	const menuButtonInfo = ref({
-		top: 4,
-		right: 10,
-		width: 87,
-		height: 32
-	});
+const emit = defineEmits(['back', 'capsuleClick']);
+
+const statusBarHeight = ref(20);
+const navBarHeight = ref(44);
+
+// 计算总高度
+const totalNavHeight = computed(() => statusBarHeight.value + navBarHeight.value);
+
+// 状态栏样式
+const statusBarStyle = computed(() => ({
+	height: statusBarHeight.value + 'px',
+	backgroundColor: props.backgroundColor,
+	position: 'fixed',
+	width: '100%',
+	left: 0,
+	top: 0,
+	zIndex: 100
+}));
+
+// 导航栏样式
+const navBarStyle = computed(() => ({
+	height: navBarHeight.value + 'px',
+	backgroundColor: props.backgroundColor,
+	position: 'fixed',
+	width: '100%',
+	left: 0,
+	top: statusBarHeight.value + 'px',
+	zIndex: 100
+}));
+
+// 获取导航栏信息
+const getNavBarInfo = () => {
+	// #ifdef MP-WEIXIN
+	try {
+		const systemInfo = uni.getSystemInfoSync();
+		statusBarHeight.value = systemInfo.statusBarHeight || 20;
+		
+		const menuButtonInfo = uni.getMenuButtonBoundingClientRect();
+		if (menuButtonInfo) {
+			const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height;
+			navBarHeight.value = navHeight > 0 ? navHeight : 44;
+		}
+	} catch (e) {
+		console.error('获取导航栏信息失败', e);
+	}
+	// #endif
+	
+	// #ifdef H5
+	statusBarHeight.value = 0;
+	navBarHeight.value = 44;
+	// #endif
+};
+
+// 处理返回事件
+const handleBack = () => {
+	if (props.showBack) {
+		// 检查是否有监听器
+		const hasListener = emit && typeof emit === 'function';
+		if (hasListener) {
+			emit('back');
+		}
+		// 默认返回上一页
+		uni.navigateBack();
+	}
+};
+
+onMounted(() => {
+	getNavBarInfo();
+});
 </script>
 
 <style scoped>
-	.navbar {
-		position: relative;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-	}
+.navbar {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 30rpx;
+	box-sizing: border-box;
+}
 
-	.back-btn {
-		display: flex;
-		align-items: center;
-		width: 70rpx;
-		height: 40rpx;
-		z-index: 10;
-		justify-content: center;
-	}
+.back-btn {
+	display: flex;
+	align-items: center;
+	width: 70rpx;
+	height: 40rpx;
+	z-index: 10;
+	justify-content: center;
+	flex-shrink: 0;
+}
 
-	.title {
-		text-align: center;
-		font-weight: bold;
-		font-size: 36rpx;
-	}
+.title {
+	flex: 1;
+	text-align: center;
+	font-weight: bold;
+	font-size: 36rpx;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: 0 20rpx;
+}
 
-	.capsule {
-		text-align: center;
-	}
+.capsule {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	flex-shrink: 0;
+	min-width: 70rpx;
+}
 
-	.capsule-item {
-		width: 40px;
-		height: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
+.capsule-item {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 
-	.icon {
-		width: 40rpx;
-		height: 40rpx;
-	}
-
-	.menu-icon {
-		width: 60rpx;
-		height: 60rpx;
-	}
+.icon {
+	width: 40rpx;
+	height: 40rpx;
+}
 </style>

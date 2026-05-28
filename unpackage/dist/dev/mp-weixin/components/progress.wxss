@@ -1,0 +1,29 @@
+:host{display:flex;flex-direction:column}
+
+.linear-progress.data-v-ce629c39 {
+        display: flex;
+        flex-direction: row;    
+        align-items: center;
+        justify-content: space-between;
+}
+.progress-header.data-v-ce629c39 {
+		display: flex;
+		justify-content: space-between;
+		margin-left: 10px;
+}
+.progress-label.data-v-ce629c39 {
+		font-size: 14px;
+		color: #3a3a3c;
+}
+.progress-percent.data-v-ce629c39 {
+		font-size: 14px;
+		color: #007aff;
+		font-weight: 500;
+}
+.progress-track.data-v-ce629c39 {
+		position: relative;
+        flex: 1;
+}
+.progress-fill.data-v-ce629c39 {
+		transition: width 0.3s ease-out;
+}

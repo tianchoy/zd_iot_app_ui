@@ -241,7 +241,7 @@
 			let color:any = ''
 			const colors = {
 				'primary': '#5677fc',
-				'white': '#fff',
+				'white': '#dbe5f0',
 				'danger': '#EB0909',
 				'warning': '#ff7900',
 				'green': '#07c160',

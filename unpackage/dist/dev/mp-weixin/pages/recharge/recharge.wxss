@@ -1,0 +1,215 @@
+@import "../../uvue.wxss";
+:host{display:flex;flex-direction:column}
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+page .container.data-v-722cdacb {
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f7fb;
+}
+page .container .card-info.data-v-722cdacb {
+  background: #ffffff;
+  border: 1rpx solid #e7edf5;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin: 0 24rpx;
+}
+page .container .card-info .card-title.data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+page .container .card-info .card-title .title.data-v-722cdacb {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+page .container .card-info .card-number.data-v-722cdacb {
+  color: #475569;
+  margin-top: 24rpx;
+}
+page .container .card-info .info-list.data-v-722cdacb {
+  display: flex;
+  flex-direction: column;
+}
+page .container .card-info .info-list .info-item.data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 26rpx;
+  padding: 14rpx 0;
+}
+page .container .card-info .info-list .info-item .label.data-v-722cdacb {
+  color: #64748b;
+  margin-right: 20rpx;
+}
+page .container .card-info .info-list .info-item .value.data-v-722cdacb {
+  font-weight: bold;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.5;
+}
+page .container .card-info .flow-box.data-v-722cdacb {
+  margin-top: 24rpx;
+  background: #f8fbff;
+  border: 1rpx solid #e8eef7;
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+page .container .card-info .flow-box .flow-label.data-v-722cdacb {
+  font-size: 24rpx;
+  color: #64748b;
+  margin-bottom: 12rpx;
+}
+page .container .card-info .card-bottom.data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24rpx;
+}
+page .container .pkg-box.data-v-722cdacb {
+  background: #ffffff;
+  border: 1rpx solid #e7edf5;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin: 24rpx;
+}
+page .container .pkg-content.data-v-722cdacb {
+  margin-top: 20rpx;
+}
+page .container .pkg-card.data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 2rpx solid #e7edf5;
+  border-radius: 20rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 20rpx;
+  transition: all 0.2s ease;
+}
+page .container .pkg-card.data-v-722cdacb:last-child {
+  margin-bottom: 0;
+}
+page .container .pkg-card .pkg-info.data-v-722cdacb {
+  flex: 1;
+}
+page .container .pkg-card .pkg-info .pkg-name.data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 12rpx;
+  flex-wrap: wrap;
+}
+page .container .pkg-card .pkg-info .pkg-name .pkg-title.data-v-722cdacb {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #1e293b;
+}
+page .container .pkg-card .pkg-info .pkg-name .pkg-tag.data-v-722cdacb {
+  background: linear-gradient(135deg, #ff9a3c, #ff6b3c);
+  color: #ffffff;
+  font-size: 20rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  margin-left: 12rpx;
+}
+page .container .pkg-card .pkg-info .pkg-desc.data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  font-size: 24rpx;
+  color: #64748b;
+}
+page .container .pkg-card .pkg-info .pkg-desc .pkg-icon.data-v-722cdacb {
+  display: inline-flex;
+  align-items: center;
+  padding: 10rpx 20rpx;
+  border-radius: 24rpx;
+  background: #f8fafc;
+  border: 1rpx solid #e2e8f0;
+  color: #475569;
+  font-size: 20rpx;
+  font-weight: 700;
+  margin-right: 20rpx;
+}
+page .container .pkg-card .pkg-price.data-v-722cdacb {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+page .container .pkg-card .pkg-price .price-wrapper.data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+}
+page .container .pkg-card .pkg-price .price-wrapper .price-symbol.data-v-722cdacb {
+  font-size: 24rpx;
+  color: #ef4444;
+  font-weight: bold;
+}
+page .container .pkg-card .pkg-price .price-wrapper .price-number.data-v-722cdacb {
+  font-size: 40rpx;
+  color: #ef4444;
+  font-weight: bold;
+}
+page .container .pkg-card .pkg-price .price-original.data-v-722cdacb {
+  font-size: 22rpx;
+  color: #94a3b8;
+  text-decoration: line-through;
+  margin-top: 4rpx;
+}
+page .container .pkg-card-selected.data-v-722cdacb {
+  border: 2rpx solid #3b82f6;
+  background: #f8fafc;
+  box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.08);
+}
+page .bottom-box.data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+}
+page .bottom-box .price-box.data-v-722cdacb {
+  display: flex;
+  flex-direction: column;
+}
+page .bottom-box .price-box .price-label.data-v-722cdacb {
+  font-size: 24rpx;
+  color: #64748b;
+}
+page .bottom-box .price-box .price-value.data-v-722cdacb {
+  font-weight: bold;
+  color: #ef4444;
+  font-size: 40rpx;
+}

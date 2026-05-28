@@ -30,7 +30,6 @@ page .container {
   flex-direction: column;
   gap: 40rpx;
   background-color: #f4f7fb;
-  margin-top: 180rpx;
 }
 page .card-info {
   display: flex;

@@ -25,7 +25,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const tabs = common_vendor.ref(["全部", "正常", "异常"]);
     const current = common_vendor.ref(0);
     const handleClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:65", e.index);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:66", e.index);
       current.value = e.index;
     };
     return (_ctx, _cache) => {
@@ -42,7 +42,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: card_number.value,
         c: common_vendor.o(($event) => {
           return card_number.value = $event.detail.value;
-        }, "d5"),
+        }, "76"),
         d: common_vendor.p({
           name: "scanning",
           size: "40rpx",
@@ -59,7 +59,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           width: "120rpx",
           class: "data-v-a89086b7"
         }),
-        g: common_vendor.o(handleClick, "87"),
+        g: common_vendor.o(handleClick, "99"),
         h: common_vendor.p({
           values: tabs.value,
           current: current.value,
@@ -92,10 +92,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           shape: "circle",
           class: "data-v-a89086b7"
         }),
-        l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        m: `${_ctx.u_s_b_h}px`,
-        n: `${_ctx.u_s_a_i_b}px`,
-        o: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        l: `${_ctx.u_s_b_h}px`,
+        m: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

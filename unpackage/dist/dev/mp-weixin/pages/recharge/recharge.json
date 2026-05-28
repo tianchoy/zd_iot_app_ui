@@ -1,0 +1,13 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "top-nav-bar": "../../components/topNavBar/topNavBar",
+    "m-tag": "../../uni_modules/m-unix/components/m-tag/m-tag",
+    "m-button": "../../uni_modules/m-unix/components/m-button/m-button",
+    "m-tabs": "../../uni_modules/m-unix/components/m-tabs/m-tabs",
+    "m-bottom-popup": "../../uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup",
+    "m-sticky-bottom": "../../uni_modules/m-unix/components/m-sticky-bottom/m-sticky-bottom",
+    "linear-progress": "../../components/progress",
+    "payment": "../../components/payment"
+  }
+}

@@ -1,6 +1,7 @@
 <template>
+	<topNavBar title="卡片详情" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
-		<topNavBar title="卡片详情" :show-back="true" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+		
 		<view class="card-box">
 			<view class="card-item" @click="cardDetail('1064916585160')">
 				<view class="item-head">
@@ -287,6 +288,12 @@
 		pkgMore.value = !pkgMore.value
 	}
 
+		const goBack = () => {
+			uni.navigateBack({
+				delta: 1
+			})
+		}
+
 	onLoad((options) => {
 		console.log(options.card_number)
         card_number.value = options.card_number
@@ -298,7 +305,6 @@
 	display: flex;
 	flex-direction: column;
 	background-color: #f4f7fb;
-	margin-top: 180rpx;
 
 	.card-box{
 		display: flex;

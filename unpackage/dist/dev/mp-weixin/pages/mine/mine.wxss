@@ -30,7 +30,6 @@ page .container.data-v-284ae985 {
   flex-direction: column;
   gap: 40rpx;
   background-color: #f4f7fb;
-  margin-top: 180rpx;
 }
 page .container .card-info.data-v-284ae985 {
   display: flex;

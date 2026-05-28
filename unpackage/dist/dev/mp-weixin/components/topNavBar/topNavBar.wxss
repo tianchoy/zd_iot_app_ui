@@ -1,40 +1,45 @@
 :host{display:flex;flex-direction:column}
 
 .navbar.data-v-83d0d8fa {
-		position: relative;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 30rpx;
+	box-sizing: border-box;
 }
 .back-btn.data-v-83d0d8fa {
-		display: flex;
-		align-items: center;
-		width: 70rpx;
-		height: 40rpx;
-		z-index: 10;
-		justify-content: center;
+	display: flex;
+	align-items: center;
+	width: 70rpx;
+	height: 40rpx;
+	z-index: 10;
+	justify-content: center;
+	flex-shrink: 0;
 }
 .title.data-v-83d0d8fa {
-		text-align: center;
-		font-weight: bold;
-		font-size: 36rpx;
+	flex: 1;
+	text-align: center;
+	font-weight: bold;
+	font-size: 36rpx;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: 0 20rpx;
 }
 .capsule.data-v-83d0d8fa {
-		text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	flex-shrink: 0;
+	min-width: 70rpx;
 }
 .capsule-item.data-v-83d0d8fa {
-		width: 40px;
-		height: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 .icon.data-v-83d0d8fa {
-		width: 40rpx;
-		height: 40rpx;
-}
-.menu-icon.data-v-83d0d8fa {
-		width: 60rpx;
-		height: 60rpx;
+	width: 40rpx;
+	height: 40rpx;
 }

@@ -24,9 +24,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const title = common_vendor.ref("Hello");
     common_vendor.ref(false);
     const card_number = common_vendor.ref("");
-    const cardDetail = (card_number2 = null) => {
+    const goRecharge = () => {
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:84", "aaaaa");
       common_vendor.index.navigateTo({
-        url: "/pages/cardDetail/cardDetail?card_number=" + card_number2
+        url: "/pages/recharge/recharge"
       });
     };
     return (_ctx, _cache) => {
@@ -43,7 +44,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.unref(card_number),
         d: common_vendor.o(($event) => {
           return common_vendor.isRef(card_number) ? card_number.value = $event.detail.value : null;
-        }, "65"),
+        }, "dc"),
         e: common_vendor.p({
           name: "scanning",
           size: "40rpx"
@@ -69,20 +70,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           backgroundColor: "#f1f5f9",
           textClass: "divider"
         }),
-        j: common_vendor.p({
+        j: common_vendor.o(goRecharge, "06"),
+        k: common_vendor.p({
           type: "primary",
           width: "200rpx",
           btnSize: "mini",
           size: "25rpx",
           shape: "circle"
         }),
-        k: common_vendor.o(($event) => {
-          return cardDetail("1064916585160");
-        }, "1f"),
-        l: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        m: `${_ctx.u_s_b_h}px`,
-        n: `${_ctx.u_s_a_i_b}px`,
-        o: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        l: `${_ctx.u_s_b_h}px`,
+        m: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

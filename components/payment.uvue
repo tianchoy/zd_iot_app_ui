@@ -1,0 +1,352 @@
+<!--
+纯支付内容组件，不含弹窗外层，配合 m-bottom-popup 使用
+根据平台类型（微信小程序 vs H5）动态显示支付方式选项
+-->
+
+<template>
+	<view class="payment-content">
+		<!-- 支付信息区域 -->
+		<view class="payment-info">
+			<text class="info-title">确认支付信息</text>
+
+			<view class="info-item">
+				<text class="item-label">卡号</text>
+				<text class="item-value">{{ cardNumber }}</text>
+			</view>
+
+			<view class="info-item">
+				<text class="item-label">商品</text>
+				<text class="item-value">{{ productName }}</text>
+			</view>
+
+			<view class="info-item">
+				<text class="item-label">流量</text>
+				<text class="item-value">{{ traffic }}</text>
+			</view>
+
+			<view class="info-item">
+				<text class="item-label">有效期</text>
+				<text class="item-value">{{ validityPeriod }}</text>
+			</view>
+
+			<!-- 支付方式区域：根据平台条件渲染 -->
+			<view class="payment-methods">
+				<!-- 条件编译：微信小程序平台 -->
+				<!-- #ifdef MP-WEIXIN -->
+				<view class="method-item fixed-method">
+					<text class="method-label">支付方式</text>
+					<text class="method-name">微信小程序支付</text>
+				</view>
+				<!-- #endif -->
+
+				<!-- 条件编译：非微信小程序平台 (H5) -->
+				<!-- #ifndef MP-WEIXIN -->
+				<view class="method-section">
+					<text class="section-title">选择支付方式</text>
+					<view class="method-option" 
+							v-for="method in paymentMethods" 
+							:key="method.id"
+							:class="{ 'method-selected': selectedMethodId === method.id }"
+							@click="selectPaymentMethod(method.id)">
+						<view class="method-left">
+							<text class="method-label">{{ method.label }}</text>
+							<text v-if="method.desc" class="method-desc">{{ method.desc }}</text>
+						</view>
+						<view class="method-right">
+							<view :class="['radio', { 'radio-selected': selectedMethodId === method.id }]"></view>
+						</view>
+					</view>
+				</view>
+				<!-- #endif -->
+			</view>
+
+			<view class="info-item">
+				<text class="item-label">应付金额</text>
+				<text class="item-value amount">{{ formattedAmount }}</text>
+			</view>
+		</view>
+
+		<!-- 提示信息 -->
+		<view class="tips">
+			<text class="tips-text">续费后套餐将在30分钟内生效，如续费后设备始终无法上线，请您联系客服处理！</text>
+		</view>
+
+		<!-- 按钮区域 -->
+		<view class="action-buttons">
+			<button class="btn cancel-btn" @click="handleCancel">取消</button>
+			<button class="btn confirm-btn" @click="handleConfirm">确认支付</button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+// 定义组件属性 (props)
+const props = defineProps<{
+	// 卡号（可选，有默认值）
+	cardNumber?: string;
+	// 商品名称（可选，有默认值）
+	productName?: string;
+	// 流量大小（可选，有默认值）
+	traffic?: string;
+	// 有效期描述（可选，有默认值）
+	validityPeriod?: string;
+	// 应付金额 (数字，单位：元)
+	amount: number;
+}>();
+
+// 设置默认值
+const cardNumber = props.cardNumber ?? '1064916585160';
+const productName = props.productName ?? '车联网月包20G';
+const traffic = props.traffic ?? '20GB';
+const validityPeriod = props.validityPeriod ?? '30天';
+
+// 定义组件事件
+const emit = defineEmits<{
+	(e: 'cancel'): void;
+	(e: 'confirm', paymentMethodId: string): void;
+}>();
+
+// 获取格式化后的金额显示
+const formattedAmount = computed(() => {
+	return `￥${props.amount}`;
+});
+
+const paymentMethods = ref<Array<{ id: string; label: string; desc?: string }>>([
+	{ id: 'wechat_h5', label: '微信H5支付', desc: '推荐使用微信完成支付' },
+	{ id: 'alipay', label: '支付宝支付', desc: '通过支付宝完成支付' },
+	{ id: 'bank_card', label: '银行卡支付', desc: '支持常见银行卡支付' }
+]);
+
+// 当前选中的支付方式ID
+const selectedMethodId = ref<string>('wechat_h5'); // 默认选中微信H5支付
+
+// 选择支付方式
+const selectPaymentMethod = (methodId: string) => {
+	selectedMethodId.value = methodId;
+};
+
+// --- 事件处理 ---
+const handleCancel = () => {
+	emit('cancel');
+};
+
+const handleConfirm = () => {
+	// #ifdef MP-WEIXIN
+	// 微信小程序环境：固定支付方式标识符
+	emit('confirm', 'wechat_miniprogram');
+	// #endif
+
+	// #ifndef MP-WEIXIN
+	// H5等环境：使用当前选中的支付方式
+	emit('confirm', selectedMethodId.value);
+	// #endif
+};
+</script>
+
+<style scoped>
+.payment-content {
+	background-color: #fff;
+	padding: 32rpx 32rpx 48rpx;
+	box-sizing: border-box;
+}
+
+.payment-info {
+	margin-bottom: 32rpx;
+}
+
+.info-title {
+	font-size: 36rpx;
+	font-weight: 600;
+	color: #333;
+	display: block;
+	text-align: center;
+    border-bottom: 1px solid #eef2f7;
+	margin-bottom: 40rpx;
+    padding-bottom: 20rpx;
+}
+
+.info-item {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	
+    padding: 10rpx 0;
+}
+
+.item-label {
+    font-size: 24rpx;
+	color: #666;
+}
+
+.item-value {
+    font-size: 24rpx;
+	color: #333;
+	font-weight: bold;
+}
+
+.amount {
+	color: #f23030;
+	font-size: 32rpx;
+	font-weight: 700;
+}
+
+// #ifndef MP-WEIXIN
+	.payment-methods {
+	margin-bottom: 24rpx;
+}
+// #endif
+
+
+/* 微信小程序平台：固定方式样式 */
+.method-item.fixed-method {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-bottom: 20rpx;
+}
+
+.method-item .method-label {
+	font-size: 24rpx;
+	color: #666;
+}
+
+.method-item .method-name {
+	font-size: 24rpx;
+	color: #333;
+	font-weight: 500;
+}
+
+/* H5平台：可选项样式 - 添加圆角边框 */
+.method-section {
+	margin-top: 8rpx;
+}
+
+.section-title {
+	font-size: 24rpx;
+	color: #666;
+	margin-bottom: 24rpx;
+	display: block;
+}
+
+.method-option {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 24rpx;
+	margin-bottom: 16rpx;
+	border: 2rpx solid #e5e5e5;
+	border-radius: 16rpx;
+	background-color: #fff;
+	transition: all 0.3s ease;
+}
+
+.method-option:last-child {
+	margin-bottom: 0;
+}
+
+/* 选中状态样式 */
+.method-option.method-selected {
+	border-color: #2563eb;
+	background-color: #f8fbff;
+}
+
+.method-left {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.method-label {
+	font-size: 24rpx;
+	color: #333;
+	font-weight: 500;
+	margin-bottom: 8rpx;
+}
+
+.method-desc {
+	font-size: 20rpx;
+	color: #999;
+}
+
+.method-right {
+	padding-left: 20rpx;
+}
+
+.radio {
+	width: 25rpx;
+	height: 25rpx;
+	border-radius: 50%;
+	border: 2rpx solid #ddd;
+	background-color: #fff;
+	position: relative;
+	box-sizing: border-box;
+	transition: all 0.2s ease;
+}
+
+.radio-selected {
+	border-color: #2563eb;
+	background-color: #2563eb;
+}
+
+.radio-selected::after {
+	content: "";
+	position: absolute;
+	top: 5rpx;
+	left: 5rpx;
+	width: 12rpx;
+	height: 12rpx;
+	border-radius: 50%;
+	background-color: #fff;
+}
+
+.tips {
+	background-color: #f9f9f9;
+	padding: 20rpx;
+	border-radius: 16rpx;
+	margin-bottom: 48rpx;
+}
+
+.tips-text {
+	font-size: 24rpx;
+	color: #999;
+	line-height: 1.4;
+}
+
+.action-buttons {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	gap: 24rpx;
+}
+
+.btn {
+	flex: 1;
+	text-align: center;
+	border-radius: 20rpx;
+	font-size: 32rpx;
+	font-weight: 500;
+	border: none;
+	background-color: transparent;
+}
+
+.cancel-btn {
+	background-color: #ffffff;
+    border: 1rpx solid #dbe5f0;
+	color: #334155;
+}
+
+.confirm-btn {
+	background: linear-gradient(135deg, #2563eb 0%, #4c88f4 100%);
+    color: #ffffff;
+}
+
+.confirm-btn:active {
+	opacity: 0.8;
+}
+
+.cancel-btn:active {
+	background-color: #e5e5e5;
+}
+</style>

@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/card/card",
     "pages/mine/mine",
-    "pages/cardDetail/cardDetail"
+    "pages/cardDetail/cardDetail",
+    "pages/recharge/recharge"
   ],
   "window": {
     "navigationStyle": "custom",

@@ -41,10 +41,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        f: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        g: `${_ctx.u_s_b_h}px`,
-        h: `${_ctx.u_s_a_i_b}px`,
-        i: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        f: `${_ctx.u_s_b_h}px`,
+        g: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

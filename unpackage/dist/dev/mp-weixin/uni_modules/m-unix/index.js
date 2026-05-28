@@ -962,10 +962,10 @@ function _sfc_render$1e(_ctx, _cache, $props, $setup, $data, $options) {
     p: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
-const Component$e = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$1d, [["render", _sfc_render$1e], ["__scopeId", "data-v-0b4ec55f"]]);
+const Component$f = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$1d, [["render", _sfc_render$1e], ["__scopeId", "data-v-0b4ec55f"]]);
 const __vite_glob_0_5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$e
+  default: Component$f
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$1c = common_vendor.defineComponent({
   name: "mBubblePopup",
@@ -1386,7 +1386,7 @@ const _sfc_main$1b = common_vendor.defineComponent({
       let color = "";
       const colors = new common_vendor.UTSJSONObject({
         "primary": "#5677fc",
-        "white": "#fff",
+        "white": "#dbe5f0",
         "danger": "#EB0909",
         "warning": "#ff7900",
         "green": "#07c160",
@@ -1548,10 +1548,10 @@ function _sfc_render$1c(_ctx, _cache, $props, $setup, $data, $options) {
     })
   });
 }
-const Component$d = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$1b, [["render", _sfc_render$1c], ["__scopeId", "data-v-bb5b2fb2"]]);
+const Component$e = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$1b, [["render", _sfc_render$1c], ["__scopeId", "data-v-bb5b2fb2"]]);
 const __vite_glob_0_7 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$d
+  default: Component$e
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$1a = common_vendor.defineComponent({
   name: "mCard",
@@ -2598,10 +2598,10 @@ function _sfc_render$16(_ctx, _cache, $props, $setup, $data, $options) {
     p: common_vendor.o((...args) => $options.onTap && $options.onTap(...args), "b4")
   });
 }
-const Component$c = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$15, [["render", _sfc_render$16], ["__scopeId", "data-v-a8a3e30d"]]);
+const Component$d = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$15, [["render", _sfc_render$16], ["__scopeId", "data-v-a8a3e30d"]]);
 const __vite_glob_0_13 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$c
+  default: Component$d
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$14 = common_vendor.defineComponent({
   name: "mClipboard",
@@ -3341,10 +3341,10 @@ function _sfc_render$11(_ctx, _cache, $props, $setup, $data, $options) {
     g: common_vendor.o((...args) => $options.handleClick && $options.handleClick(...args), "72")
   };
 }
-const Component$b = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$10, [["render", _sfc_render$11], ["__scopeId", "data-v-39837eb6"]]);
+const Component$c = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$10, [["render", _sfc_render$11], ["__scopeId", "data-v-39837eb6"]]);
 const __vite_glob_0_18 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$b
+  default: Component$c
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$$ = common_vendor.defineComponent({
   name: "mCountdownVerify",
@@ -4351,10 +4351,10 @@ function _sfc_render$Z(_ctx, _cache, $props, $setup, $data, $options) {
     r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
-const Component$a = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$Y, [["render", _sfc_render$Z], ["__scopeId", "data-v-16aa4b6b"]]);
+const Component$b = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$Y, [["render", _sfc_render$Z], ["__scopeId", "data-v-16aa4b6b"]]);
 const __vite_glob_0_22 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$a
+  default: Component$b
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$X = common_vendor.defineComponent({
   name: "mDiv",
@@ -4469,10 +4469,10 @@ function _sfc_render$Y(_ctx, _cache, $props, $setup, $data, $options) {
     })
   });
 }
-const Component$9 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$X, [["render", _sfc_render$Y], ["__scopeId", "data-v-c9c0d1ef"]]);
+const Component$a = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$X, [["render", _sfc_render$Y], ["__scopeId", "data-v-c9c0d1ef"]]);
 const __vite_glob_0_23 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$9
+  default: Component$a
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$W = common_vendor.defineComponent({
   name: "mDropdownList",
@@ -5270,10 +5270,10 @@ function _sfc_render$V(_ctx, _cache, $props, $setup, $data, $options) {
     w: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
-const Component$8 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$U, [["render", _sfc_render$V]]);
+const Component$9 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$U, [["render", _sfc_render$V]]);
 const __vite_glob_0_26 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$8
+  default: Component$9
 }, Symbol.toStringTag, { value: "Module" }));
 class FeedCommentItem extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -6392,10 +6392,10 @@ function _sfc_render$P(_ctx, _cache, $props, $setup, $data, $options) {
     f: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
-const Component$7 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$O, [["render", _sfc_render$P]]);
+const Component$8 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$O, [["render", _sfc_render$P]]);
 const __vite_glob_0_32 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$7
+  default: Component$8
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$N = common_vendor.defineComponent({
   name: "mInput",
@@ -7105,10 +7105,10 @@ function _sfc_render$L(_ctx, _cache, $props, $setup, $data, $options) {
     })
   });
 }
-const Component$6 = /* @__PURE__ */ common_vendor._export_sfc(__default__, [["render", _sfc_render$L], ["__scopeId", "data-v-288d639e"]]);
+const Component$7 = /* @__PURE__ */ common_vendor._export_sfc(__default__, [["render", _sfc_render$L], ["__scopeId", "data-v-288d639e"]]);
 const __vite_glob_0_36 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$6
+  default: Component$7
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$K = common_vendor.defineComponent({
   name: "mLoadmore",
@@ -8383,10 +8383,10 @@ function _sfc_render$F(_ctx, _cache, $props, $setup, $data, $options) {
     f: common_vendor.o((...args) => $options.handleClick && $options.handleClick(...args), "20")
   };
 }
-const Component$5 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$F, [["render", _sfc_render$F], ["__scopeId", "data-v-71b2926a"]]);
+const Component$6 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$F, [["render", _sfc_render$F], ["__scopeId", "data-v-71b2926a"]]);
 const __vite_glob_0_42 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$5
+  default: Component$6
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$E = common_vendor.defineComponent({
   name: "mPagination",
@@ -9679,10 +9679,10 @@ function _sfc_render$B(_ctx, _cache, $props, $setup, $data, $options) {
     n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
-const Component$4 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$B, [["render", _sfc_render$B], ["__scopeId", "data-v-852cc016"]]);
+const Component$5 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$B, [["render", _sfc_render$B], ["__scopeId", "data-v-852cc016"]]);
 const __vite_glob_0_46 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$4
+  default: Component$5
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$A = common_vendor.defineComponent({
   name: "mPrice",
@@ -11471,10 +11471,10 @@ function _sfc_render$p(_ctx, _cache, $props, $setup, $data, $options) {
     })
   });
 }
-const Component$3 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$p, [["render", _sfc_render$p], ["__scopeId", "data-v-74c1432a"]]);
+const Component$4 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$p, [["render", _sfc_render$p], ["__scopeId", "data-v-74c1432a"]]);
 const __vite_glob_0_58 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Component$3
+  default: Component$4
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$o = common_vendor.defineComponent({
   name: "mSkeleton",
@@ -11881,10 +11881,10 @@ function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
     f: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   };
 }
-const mStickyBottom = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$m, [["render", _sfc_render$m], ["__scopeId", "data-v-80210247"]]);
+const Component$3 = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main$m, [["render", _sfc_render$m], ["__scopeId", "data-v-80210247"]]);
 const __vite_glob_0_61 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: mStickyBottom
+  default: Component$3
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$l = common_vendor.defineComponent({
   name: "mSticky",
@@ -16652,20 +16652,21 @@ const install = (Vue) => {
 const mUnix = {
   install
 };
-exports.Component = Component$7;
-exports.Component$1 = Component$4;
+exports.Component = Component$8;
+exports.Component$1 = Component$5;
 exports.Component$10 = Component$1;
-exports.Component$11 = Component$9;
-exports.Component$12 = Component$3;
+exports.Component$11 = Component$a;
+exports.Component$12 = Component$4;
 exports.Component$13 = Component$2;
-exports.Component$14 = Component$8;
-exports.Component$2 = Component$6;
-exports.Component$3 = Component$c;
-exports.Component$4 = Component$d;
-exports.Component$5 = Component$b;
-exports.Component$6 = Component$e;
-exports.Component$7 = Component$a;
-exports.Component$8 = Component$5;
+exports.Component$14 = Component$3;
+exports.Component$15 = Component$9;
+exports.Component$2 = Component$7;
+exports.Component$3 = Component$d;
+exports.Component$4 = Component$e;
+exports.Component$5 = Component$c;
+exports.Component$6 = Component$f;
+exports.Component$7 = Component$b;
+exports.Component$8 = Component$6;
 exports.Component$9 = Component;
 exports.mUnix = mUnix;
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/uni_modules/m-unix/index.js.map
