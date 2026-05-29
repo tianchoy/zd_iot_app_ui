@@ -25,13 +25,15 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-page .container {
+page .container.data-v-00a60067 {
   display: flex;
   flex-direction: column;
   gap: 40rpx;
   background-color: #f4f7fb;
+  min-height: 100vh;
+  padding-bottom: 40rpx;
 }
-page .card-info {
+page .card-info.data-v-00a60067 {
   display: flex;
   flex-direction: column;
   padding: 24rpx;
@@ -42,17 +44,17 @@ page .card-info {
   color: #ffffff;
   box-shadow: 0 8rpx 18rpx rgba(37, 99, 235, 0.14);
 }
-page .card-info .persion-name {
+page .card-info .persion-name.data-v-00a60067 {
   font-size: 30rpx;
   font-weight: bold;
   color: #ffffff;
 }
-page .card-info .persion-card {
+page .card-info .persion-card.data-v-00a60067 {
   margin-top: 30rpx;
   display: flex;
   flex-direction: row;
 }
-page .card-info .persion-card .persion-card-item {
+page .card-info .persion-card .persion-card-item.data-v-00a60067 {
   min-height: 120rpx;
   border-radius: 18rpx;
   padding: 20rpx 24rpx;
@@ -61,18 +63,18 @@ page .card-info .persion-card .persion-card-item {
   flex: 1;
   margin: 0 10rpx;
 }
-page .card-info .persion-card .persion-card-item-title {
+page .card-info .persion-card .persion-card-item-title.data-v-00a60067 {
   font-size: 22rpx;
   line-height: 1.4;
   color: #ffffff;
 }
-page .card-info .persion-card .persion-card-item-content {
+page .card-info .persion-card .persion-card-item-content.data-v-00a60067 {
   margin-top: 20rpx;
   font-size: 40rpx;
   font-weight: 800;
   line-height: 1;
 }
-page .card-box {
+page .card-box.data-v-00a60067 {
   display: flex;
   flex-direction: column;
   margin: 0 24rpx;
@@ -82,7 +84,7 @@ page .card-box {
   padding: 24rpx;
   gap: 20rpx;
 }
-page .card-box .card-label {
+page .card-box .card-label.data-v-00a60067 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -91,16 +93,16 @@ page .card-box .card-label {
   font-weight: bold;
   color: #333;
 }
-page .card-box .card-label .view-all {
+page .card-box .card-label .view-all.data-v-00a60067 {
   color: #2563eb;
 }
-page .card-box .search-value {
+page .card-box .search-value.data-v-00a60067 {
   display: flex;
   flex-direction: row;
   border: 1rpx solid #dbe5f0;
   border-radius: 24rpx;
 }
-page .card-box .search-value .search-input {
+page .card-box .search-value .search-input.data-v-00a60067 {
   flex: 1;
   padding: 0 25rpx;
   height: 95rpx;
@@ -110,10 +112,10 @@ page .card-box .search-value .search-input {
   font-size: 30rpx;
   outline: none;
 }
-page .card-box .search-value .scan-btn {
+page .card-box .search-value .scan-btn.data-v-00a60067 {
   border-left: 1px solid #eef2f7;
 }
-page .card-box .card-item {
+page .card-box .card-item.data-v-00a60067 {
   display: flex;
   flex-direction: column;
   border: 1px solid #e7edf5;
@@ -121,28 +123,28 @@ page .card-box .card-item {
   padding: 24rpx;
   margin-bottom: 20rpx;
 }
-page .card-box .card-item .item-head {
+page .card-box .card-item .item-head.data-v-00a60067 {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
 }
-page .card-box .card-item .item-head .card-item-title {
+page .card-box .card-item .item-head .card-item-title.data-v-00a60067 {
   font-size: 32rpx;
   font-weight: 800;
   color: #0f172a;
   line-height: 1.25;
   word-break: break-all;
 }
-page .card-box .card-item .item-head .card-item-content {
+page .card-box .card-item .item-head .card-item-content.data-v-00a60067 {
   margin-top: 5px;
-  font-size: 12px;
+  font-size: 24rpx;
   color: #94a3b8;
   line-height: 1.45;
   word-break: break-all;
 }
-page .card-box .card-item .item-package {
+page .card-box .card-item .item-package.data-v-00a60067 {
   margin: 20rpx 0;
   display: flex;
   flex-direction: row;
@@ -150,14 +152,14 @@ page .card-box .card-item .item-package {
   gap: 20rpx;
   min-width: 0;
 }
-page .card-box .card-item .item-package .package-label {
-  font-size: 12px;
+page .card-box .card-item .item-package .package-label.data-v-00a60067 {
+  font-size: 24rpx;
   color: #64748b;
   line-height: 1.4;
 }
-page .card-box .card-item .item-package .package-value {
+page .card-box .card-item .item-package .package-value.data-v-00a60067 {
   flex: 1;
-  font-size: 25rpx;
+  font-size: 28rpx;
   font-weight: 700;
   color: #334155;
   line-height: 1.45;
@@ -165,52 +167,52 @@ page .card-box .card-item .item-package .package-value {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-page .card-box .card-item .card-metrics {
+page .card-box .card-item .card-metrics.data-v-00a60067 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20rpx;
   margin: 20rpx 0;
 }
-page .card-box .card-item .card-metrics .metric-box {
+page .card-box .card-item .card-metrics .metric-box.data-v-00a60067 {
   background: #f8fbff;
   border: 1rpx solid #e8eef7;
   border-radius: 25rpx;
-  padding: 20rpx 20rpx 10rpx;
+  padding: 20rpx;
   min-width: 0;
 }
-page .card-box .card-item .card-metrics .metric-box .metric-label {
-  font-size: 25rpx;
+page .card-box .card-item .card-metrics .metric-box .metric-label.data-v-00a60067 {
+  font-size: 24rpx;
   color: #94a3b8;
   line-height: 1.4;
 }
-page .card-box .card-item .card-metrics .metric-box .metric-value {
+page .card-box .card-item .card-metrics .metric-box .metric-value.data-v-00a60067 {
   margin-top: 15rpx;
-  font-size: 25rpx;
+  font-size: 26rpx;
   font-weight: 800;
   color: #0f172a;
   line-height: 1.4;
   word-break: break-all;
 }
-page .card-box .card-item .card-bottom {
+page .card-box .card-item .card-bottom.data-v-00a60067 {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 20rpx;
 }
-page .card-box .card-item .card-bottom .card-cycle-text {
+page .card-box .card-item .card-bottom .card-cycle-text.data-v-00a60067 {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 10rpx;
 }
-page .card-box .card-item .card-bottom .card-cycle-text .cycle-label {
-  font-size: 25rpx;
+page .card-box .card-item .card-bottom .card-cycle-text .cycle-label.data-v-00a60067 {
+  font-size: 24rpx;
   color: #64748b;
   line-height: 1.45;
 }
-page .card-box .card-item .card-bottom .card-cycle-text .cycle-value {
-  font-size: 25rpx;
+page .card-box .card-item .card-bottom .card-cycle-text .cycle-value.data-v-00a60067 {
+  font-size: 24rpx;
   color: #334155;
   font-weight: 800;
 }

@@ -1,0 +1,249 @@
+<template>
+	<view class="search-select">
+		<!-- 搜索框 -->
+		<view class="search-bar">
+			<view class="search-input-wrapper">
+				<text class="search-icon">🔍</text>
+				<input 
+					v-model="searchKeyword"
+					:placeholder="searchPlaceholder"
+					class="search-input"
+					@input="handleSearch"
+				/>
+				<text 
+					v-if="searchKeyword" 
+					class="clear-icon" 
+					@tap="clearSearch"
+				>✕</text>
+			</view>
+		</view>
+		
+		<!-- 选项列表 -->
+		<scroll-view 
+			class="options-list"
+			scroll-y
+			:enhanced="true"
+			:show-scrollbar="false"
+		>
+			<view v-if="filteredOptions.length === 0" class="empty-state">
+				<text class="empty-text">暂无数据</text>
+			</view>
+			<view
+				v-for="item in filteredOptions"
+				:key="item[valueKey]"
+				class="option-item"
+				:class="{ 'is-selected': isSelected(item) }"
+				@tap="selectOption(item)"
+			>
+				<text class="option-label">{{ item[labelKey] }}</text>
+				<view v-if="isSelected(item)" class="check-icon">
+					<text class="icon-check">✓</text>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, computed, watch } from 'vue'
+	
+	// 选项数据类型
+	interface SelectOption {
+		value: string | number
+		label: string
+		[key: string]: any
+	}
+	
+	// Props 定义
+	const props = defineProps({
+		// 绑定的值
+		modelValue: {
+			type: [String, Number] as any,
+			default: null
+		},
+		// 选项列表
+		options: {
+			type: Array as () => SelectOption[],
+			default: () => []
+		},
+		// 值字段名
+		valueKey: {
+			type: String,
+			default: 'value'
+		},
+		// 标签字段名
+		labelKey: {
+			type: String,
+			default: 'label'
+		},
+		// 搜索框占位符
+		searchPlaceholder: {
+			type: String,
+			default: '请输入关键词搜索'
+		}
+	})
+	
+	// Emits 定义
+	const emit = defineEmits<{
+		(e: 'update:modelValue', value: string | number | null): void
+		(e: 'change', value: string | number | null, item?: SelectOption): void
+	}>()
+	
+	// 响应式数据
+	const searchKeyword = ref<string>('')
+	
+	// 过滤后的选项列表
+	const filteredOptions = computed(() => {
+		if (!searchKeyword.value.trim()) {
+			return props.options
+		}
+		const keyword = searchKeyword.value.toLowerCase()
+		return props.options.filter(opt => {
+			const label = String(opt[props.labelKey]).toLowerCase()
+			const value = String(opt[props.valueKey]).toLowerCase()
+			return label.includes(keyword) || value.includes(keyword)
+		})
+	})
+	
+	// 判断是否选中
+	const isSelected = (item: SelectOption): boolean => {
+		return props.modelValue === item[props.valueKey]
+	}
+	
+	// 选择选项
+	const selectOption = (item: SelectOption) => {
+		const newValue = item[props.valueKey]
+		emit('update:modelValue', newValue)
+		emit('change', newValue, item)
+	}
+	
+	// 处理搜索
+	const handleSearch = () => {
+		// 搜索逻辑已在 computed 中处理
+	}
+	
+	// 清空搜索
+	const clearSearch = () => {
+		searchKeyword.value = ''
+	}
+	
+	// 监听弹窗关闭时清空搜索（外部调用）
+	const resetSearch = () => {
+		searchKeyword.value = ''
+	}
+	
+	// 暴露方法给父组件
+	defineExpose({
+		resetSearch
+	})
+</script>
+
+<style lang="scss" scoped>
+	.search-select {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		height: 100%;
+	}
+	
+	// 搜索框
+	.search-bar {
+		padding: 24rpx 32rpx;
+		border-bottom: 2rpx solid #f0f0f0;
+		
+		.search-input-wrapper {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			background-color: #f5f7fa;
+			border-radius: 32rpx;
+			padding: 16rpx 24rpx;
+			
+			.search-icon {
+				font-size: 28rpx;
+				color: #999999;
+				margin-right: 16rpx;
+			}
+			
+			.search-input {
+				flex: 1;
+				font-size: 28rpx;
+				color: #333333;
+				background: transparent;
+			}
+			
+			.clear-icon {
+				font-size: 28rpx;
+				color: #999999;
+				padding: 8rpx;
+				
+				&:active {
+					opacity: 0.6;
+				}
+			}
+		}
+	}
+	
+	// 选项列表
+	.options-list {
+		flex: 1;
+		max-height: 600rpx;
+		overflow-y: auto;
+	}
+	
+	.option-item {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding: 28rpx 32rpx;
+		border-bottom: 2rpx solid #f5f5f5;
+		
+		&:active {
+			background-color: #f9fafb;
+		}
+		
+		&.is-selected {
+			background-color: #eff6ff;
+			
+			.option-label {
+				color: #2563eb;
+			}
+		}
+		
+		.option-label {
+			flex: 1;
+			font-size: 28rpx;
+			color: #333333;
+		}
+		
+		.check-icon {
+			width: 48rpx;
+			height: 48rpx;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			
+			.icon-check {
+				font-size: 32rpx;
+				color: #2563eb;
+				font-weight: bold;
+			}
+		}
+	}
+	
+	// 空状态
+	.empty-state {
+		padding: 120rpx 0;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		
+		.empty-text {
+			font-size: 28rpx;
+			color: #999999;
+		}
+	}
+</style>

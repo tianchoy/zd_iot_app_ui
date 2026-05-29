@@ -98,7 +98,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: common_vendor.o(handleBack, "60"),
         g: common_vendor.p({
           name: "arrow-left-bold",
-          size: "40rpx",
+          size: "35rpx",
           class: "icon data-v-83d0d8fa"
         })
       } : {}, {

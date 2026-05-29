@@ -24,13 +24,84 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const card_number = common_vendor.ref("");
     const tabs = common_vendor.ref(["全部", "正常", "异常"]);
     const current = common_vendor.ref(0);
+    const allCardList = common_vendor.ref([
+      {
+        id: 1,
+        cardNumber: "1064916585160",
+        iccid: "89860421123456789012",
+        tag: "主卡",
+        status: "正常",
+        currentPackage: "车联网月包20G",
+        expireDate: "2026-04-30",
+        usedTraffic: "11.34GB",
+        totalTraffic: "20GB",
+        currentCycle: "第1期 / 共12期"
+      },
+      {
+        id: 2,
+        cardNumber: "1064916585161",
+        iccid: "89860421123456789013",
+        tag: "副卡",
+        status: "正常",
+        currentPackage: "车联网月包10G",
+        expireDate: "2026-05-15",
+        usedTraffic: "5.21GB",
+        totalTraffic: "10GB",
+        currentCycle: "第2期 / 共6期"
+      },
+      {
+        id: 3,
+        cardNumber: "1064916585162",
+        iccid: "89860421123456789014",
+        tag: "测试卡",
+        status: "异常",
+        currentPackage: "测试套餐1G",
+        expireDate: "2026-03-31",
+        usedTraffic: "1GB",
+        totalTraffic: "1GB",
+        currentCycle: "第1期 / 共1期"
+      },
+      {
+        id: 4,
+        cardNumber: "1064916585163",
+        iccid: "89860421123456789015",
+        tag: "备用卡",
+        status: "正常",
+        currentPackage: "工业设备月包5G",
+        expireDate: "2026-06-30",
+        usedTraffic: "2.15GB",
+        totalTraffic: "5GB",
+        currentCycle: "第1期 / 共3期"
+      },
+      {
+        id: 5,
+        cardNumber: "1064916585164",
+        iccid: "89860421123456789016",
+        tag: "体验卡",
+        status: "异常",
+        currentPackage: "体验套餐500M",
+        expireDate: "2026-02-28",
+        usedTraffic: "500MB",
+        totalTraffic: "500MB",
+        currentCycle: "第1期 / 共1期"
+      }
+    ]);
+    const filteredCardList = common_vendor.computed(() => {
+      const currentStatus = tabs.value[current.value];
+      if (currentStatus === "全部") {
+        return allCardList.value;
+      }
+      return allCardList.value.filter((card) => {
+        return card.status === currentStatus;
+      });
+    });
     const handleClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:66", e.index);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:159", e.index);
       current.value = e.index;
     };
     return (_ctx, _cache) => {
       "raw js";
-      const __returned__ = {
+      const __returned__ = common_vendor.e({
         a: common_vendor.p({
           title: "卡片",
           ["show-back"]: false,
@@ -71,13 +142,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           class: "data-v-a89086b7"
         }),
-        i: common_vendor.p({
-          text: "标签",
-          round: true,
-          plain: true,
-          size: "small",
-          type: "primary",
-          class: "data-v-a89086b7"
+        i: common_vendor.f(filteredCardList.value, (card, index, i0) => {
+          return {
+            a: common_vendor.t(card.cardNumber),
+            b: common_vendor.t(card.iccid),
+            c: "a89086b7-5-" + i0,
+            d: common_vendor.p({
+              text: card.tag,
+              round: true,
+              plain: true,
+              size: "small",
+              type: "primary",
+              class: "data-v-a89086b7"
+            }),
+            e: common_vendor.t(card.currentPackage),
+            f: "a89086b7-6-" + i0,
+            g: common_vendor.t(card.expireDate),
+            h: common_vendor.t(card.usedTraffic),
+            i: common_vendor.t(card.totalTraffic),
+            j: common_vendor.t(card.currentCycle),
+            k: "a89086b7-7-" + i0,
+            l: index
+          };
         }),
         j: common_vendor.p({
           backgroundColor: "#f1f5f9",
@@ -92,9 +178,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           shape: "circle",
           class: "data-v-a89086b7"
         }),
-        l: `${_ctx.u_s_b_h}px`,
-        m: `${_ctx.u_s_a_i_b}px`
-      };
+        l: filteredCardList.value.length === 0
+      }, filteredCardList.value.length === 0 ? {} : {}, {
+        m: `${_ctx.u_s_b_h}px`,
+        n: `${_ctx.u_s_a_i_b}px`
+      });
       return __returned__;
     };
   }

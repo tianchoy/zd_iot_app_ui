@@ -1,0 +1,204 @@
+<template>
+	<topNavBar title="订单记录" :show-back="true"  textColor="#333" :showCapsule="false"></topNavBar>
+	<view class="container">
+		<!-- 订单列表 -->
+		<view class="order-list">
+			<!-- 当前卡号 -->
+			<view class="card-number-section">
+				<text class="card-number-label">当前卡号</text>
+				<text class="card-number-value">1064916585160</text>
+			</view>
+			<view 
+				v-for="(order, index) in orderList" 
+				:key="index"
+				class="order-item"
+			>
+				<view class="order-header">
+					<text class="package-name">{{ order.packageName }}</text>
+					<text class="price">￥{{ order.amount }}</text>
+				</view>
+				<view class="order-info">
+					<text class="order-no">订单号：{{ order.orderNo }}</text>
+					<text class="status" :class="getStatusClass(order.status)">{{ order.status }}</text>
+				</view>
+				<view class="order-time">
+					<text class="time">{{ order.time }}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+	
+	// 订单列表数据
+	const orderList = ref([
+		{
+			packageName: '车联网月包20G',
+			amount: 90,
+			orderNo: '0202604280001',
+			status: '已完成',
+			time: '2026-04-28 10:12:30'
+		},
+		{
+			packageName: '车联网月包10G',
+			amount: 50,
+			orderNo: '0202604280002',
+			status: '待支付',
+			time: '2026-04-28 11:20:12'
+		},
+		{
+			packageName: '测试套餐1G',
+			amount: 10,
+			orderNo: '0202603010001',
+			status: '已退款',
+			time: '2026-03-01 08:10:00'
+		}
+	])
+	
+	// 返回充值页面
+	const goBackRecharge = () => {
+		uni.navigateBack({
+			delta: 1
+		})
+	}
+	
+	// 获取状态样式类
+	const getStatusClass = (status: string): string => {
+		switch (status) {
+			case '已完成':
+				return 'status-completed'
+			case '待支付':
+				return 'status-pending'
+			case '已退款':
+				return 'status-refunded'
+			default:
+				return ''
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.container {
+		display: flex;
+		flex-direction: column;
+		padding: 24rpx 32rpx;
+	}
+	
+	// 提示文字
+	.tip-text {
+		margin-bottom: 24rpx;
+		
+		text {
+			font-size: 26rpx;
+			color: #9ca3af;
+		}
+	}
+	
+	// 当前卡号区域
+	.card-number-section {
+		display: flex;
+		flex-direction: column;
+		align-items: baseline;
+		margin: 32rpx 0;
+		padding-bottom: 20rpx;
+		border-bottom: 2rpx solid #e5e7eb;
+		
+		.card-number-label {
+			font-size: 24rpx;
+			color: #64748b;;
+			margin-right: 24rpx;
+		}
+		
+		.card-number-value {
+			font-size: 32rpx;
+			color: #1f2937;
+			font-weight: bold;
+		}
+	}
+	
+	// 订单列表
+	.order-list {
+		display: flex;
+		flex-direction: column;
+		background: #fff;
+		padding:0 24rpx;
+		border-radius: 24rpx;
+		border: 1rpx solid #e2e8f0;
+		box-shadow: 0 8rpx 20rpx rgba(15, 23, 42, .04);
+	}
+	
+	.order-item {
+		display: flex;
+		flex-direction: column;
+		padding: 20rpx 0;
+		border-bottom: 2rpx solid #f0f0f0;
+		
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+	
+	.order-header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: baseline;
+		margin-bottom: 10rpx;
+		
+		.package-name {
+			font-size: 26rpx;
+			font-weight: 600;
+			color: #0f172a;
+		}
+		
+		.price {
+			font-size: 32rpx;
+			font-weight: 600;
+			color: #ef4444;
+		}
+	}
+	
+	.order-info {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 10rpx;
+		
+		.order-no {
+			font-size: 24rpx;
+			color: #0f172a;
+		}
+		
+		.status {
+			font-size: 24rpx;
+			padding: 6rpx 16rpx;
+			border-radius: 20rpx;
+		}
+		.status-completed {
+			background: #ecfdf5;
+			color: #059669;
+			border: 1px solid #a7f3d0;
+		}
+		
+		.status-pending {
+			background: #fffbeb;
+			color: #d97706;
+			border: 1px solid #fde68a;
+		}
+		
+		.status-refunded {
+			background-color: #fce4ec;
+			color: #c62828;
+		}
+	}
+	
+	.order-time {
+		.time {
+			font-size: 24rpx;
+			color: #0f172a;
+		}
+	}
+</style>

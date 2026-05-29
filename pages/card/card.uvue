@@ -17,58 +17,148 @@
 			</view>
 			<m-segmented-control :values="tabs" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
 		</view>
+		
 		<view class="card-box">
 			<view class="card-list">
-				<view class="card-item">
+				<view class="card-item" v-for="(card, index) in filteredCardList" :key="index">
 					<view class="item-head">
 						<view class="item-head-label">
-							<text class="card-item-title">1064916585160</text>
-							<text class="card-item-content">ICCID: 89860421123456789012</text>
+							<text class="card-item-title">{{ card.cardNumber }}</text>
+							<text class="card-item-content">ICCID: {{ card.iccid }}</text>
 						</view>
-						<m-tag text="标签" :round="true" :plain="true" size="small"  type="primary"></m-tag>
+						<m-tag :text="card.tag" :round="true" :plain="true" size="small" type="primary"></m-tag>
 					</view>
 					<view class="item-package">
 						<text class="package-label">当前套餐:</text>
-						<text class="package-value">车联网月包20G</text>
+						<text class="package-value">{{ card.currentPackage }}</text>
 					</view>
 					<m-div backgroundColor="#f1f5f9" textClass="divider"></m-div>
 					<view class="card-metrics">
 						<view class="metric-box">
 							<view class="metric-label">到期时间</view>
-							<view class="metric-value">2026-04-30</view>
+							<view class="metric-value">{{ card.expireDate }}</view>
 						</view>
 						<view class="metric-box">
 							<view class="metric-label">本月流量</view>
-							<view class="metric-value">11.34GB / 20GB</view>
+							<view class="metric-value">{{ card.usedTraffic }} / {{ card.totalTraffic }}</view>
 						</view>
-                  	</view>
+					</view>
 					<view class="card-bottom">
 						<view class="card-cycle-text">
 							<text class="cycle-label">当前周期：</text>
-							<text class="cycle-value">第1期 / 共12期</text>
+							<text class="cycle-value">{{ card.currentCycle }}</text>
 						</view>
 						<m-button type="primary" width="200rpx" btnSize="mini" size="25rpx" shape="circle">去充值</m-button>
 					</view>
 				</view>
 			</view>
 		</view>
+		
+		<!-- 空状态 -->
+		<view v-if="filteredCardList.length === 0" class="empty-state">
+			<text class="empty-text">暂无卡片数据</text>
+		</view>
 	</view>
 </template>
 
-<script setup lang="uts">
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, computed } from 'vue'
 
 const card_number = ref('')
-const tabs = ref(['全部', '正常','异常'])
+const tabs = ref(['全部', '正常', '异常'])
 const current = ref(0)
+
+// 卡片数据类型
+interface CardItem {
+	id: number
+	cardNumber: string
+	iccid: string
+	tag: string
+	status: string // '正常' 或 '异常'
+	currentPackage: string
+	expireDate: string
+	usedTraffic: string
+	totalTraffic: string
+	currentCycle: string
+}
+
+// 完整的卡片列表数据
+const allCardList = ref<CardItem[]>([
+	{
+		id: 1,
+		cardNumber: '1064916585160',
+		iccid: '89860421123456789012',
+		tag: '主卡',
+		status: '正常',
+		currentPackage: '车联网月包20G',
+		expireDate: '2026-04-30',
+		usedTraffic: '11.34GB',
+		totalTraffic: '20GB',
+		currentCycle: '第1期 / 共12期'
+	},
+	{
+		id: 2,
+		cardNumber: '1064916585161',
+		iccid: '89860421123456789013',
+		tag: '副卡',
+		status: '正常',
+		currentPackage: '车联网月包10G',
+		expireDate: '2026-05-15',
+		usedTraffic: '5.21GB',
+		totalTraffic: '10GB',
+		currentCycle: '第2期 / 共6期'
+	},
+	{
+		id: 3,
+		cardNumber: '1064916585162',
+		iccid: '89860421123456789014',
+		tag: '测试卡',
+		status: '异常',
+		currentPackage: '测试套餐1G',
+		expireDate: '2026-03-31',
+		usedTraffic: '1GB',
+		totalTraffic: '1GB',
+		currentCycle: '第1期 / 共1期'
+	},
+	{
+		id: 4,
+		cardNumber: '1064916585163',
+		iccid: '89860421123456789015',
+		tag: '备用卡',
+		status: '正常',
+		currentPackage: '工业设备月包5G',
+		expireDate: '2026-06-30',
+		usedTraffic: '2.15GB',
+		totalTraffic: '5GB',
+		currentCycle: '第1期 / 共3期'
+	},
+	{
+		id: 5,
+		cardNumber: '1064916585164',
+		iccid: '89860421123456789016',
+		tag: '体验卡',
+		status: '异常',
+		currentPackage: '体验套餐500M',
+		expireDate: '2026-02-28',
+		usedTraffic: '500MB',
+		totalTraffic: '500MB',
+		currentCycle: '第1期 / 共1期'
+	}
+])
+
+// 根据选中的 tab 过滤卡片列表
+const filteredCardList = computed(() => {
+	const currentStatus = tabs.value[current.value]
+	if (currentStatus === '全部') {
+		return allCardList.value
+	}
+	return allCardList.value.filter(card => card.status === currentStatus)
+})
 
 const handleClick = (e: UTSJSONObject) => {
 	console.log(e.index)
 	current.value = e.index
 }
-
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -77,6 +167,9 @@ const handleClick = (e: UTSJSONObject) => {
 		flex-direction: column;
 		gap: 40rpx;
 		background-color: #f4f7fb;
+		min-height: 100vh;
+		padding-bottom: 40rpx;
+		
 		.card-box{
 			display: flex;
 			flex-direction: column;
@@ -86,11 +179,13 @@ const handleClick = (e: UTSJSONObject) => {
 			border-radius: 24rpx;
 			padding: 24rpx;
 			gap: 20rpx;
+			
 			.search-value{
 				display: flex;
 				flex-direction: row;
 				border:1rpx solid #dbe5f0;
 				border-radius: 24rpx;
+				
 				.search-input{
 					flex:1;
 					padding: 0 25rpx;
@@ -110,14 +205,16 @@ const handleClick = (e: UTSJSONObject) => {
 				display: flex;
 				flex-direction: column;
 				border-bottom: 1px solid #e7edf5;
-				padding-bottom: 24rpx;
-				margin-bottom: 20rpx;
+				padding-bottom: 30rpx;
+				margin-bottom: 30rpx;
+				
 				.item-head{
 					display: flex;
 					flex-direction: row;
 					align-items: flex-start;
 					justify-content: space-between;
 					gap: 10px;
+					
 					.card-item-title{
 						font-size: 32rpx;
 						font-weight: 800;
@@ -140,6 +237,7 @@ const handleClick = (e: UTSJSONObject) => {
 					align-items: baseline;
 					gap: 20rpx;
 					min-width: 0;
+					
 					.package-label{
 						font-size: 12px;
 						color: #64748b;
@@ -161,12 +259,14 @@ const handleClick = (e: UTSJSONObject) => {
 					grid-template-columns: repeat(2, 1fr);
 					gap: 20rpx;
 					margin: 20rpx 0;
+					
 					.metric-box{
 						background: #f8fbff;
 						border: 1rpx solid #e8eef7;
 						border-radius: 25rpx;
 						padding: 20rpx 20rpx 10rpx;
 						min-width: 0;
+						
 						.metric-label{
 							font-size: 25rpx;
 							color: #94a3b8;
@@ -188,11 +288,13 @@ const handleClick = (e: UTSJSONObject) => {
 					align-items: center;
 					justify-content: space-between;
 					gap: 20rpx;
+					
 					.card-cycle-text{
 						display: flex;
 						flex-direction: row;
 						align-items: center;
 						gap: 10rpx;
+						
 						.cycle-label{
 							font-size: 25rpx;
 							color: #64748b;
@@ -210,6 +312,22 @@ const handleClick = (e: UTSJSONObject) => {
 				border-bottom: none;
 				margin-bottom: 0;
 				padding-bottom: 0;
+			}
+		}
+		
+		.empty-state {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 120rpx 32rpx;
+			background-color: #ffffff;
+			margin: 0 24rpx;
+			border-radius: 24rpx;
+			
+			.empty-text {
+				font-size: 28rpx;
+				color: #9ca3af;
 			}
 		}
 	}

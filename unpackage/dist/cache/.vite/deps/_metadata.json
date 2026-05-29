@@ -1,8 +1,15 @@
 {
-  "hash": "af5fc687",
+  "hash": "c85c558b",
   "configHash": "044e46a8",
-  "lockfileHash": "e3b0c442",
-  "browserHash": "cb34544d",
-  "optimized": {},
+  "lockfileHash": "a2aa069f",
+  "browserHash": "fe475146",
+  "optimized": {
+    "html5-qrcode": {
+      "src": "../../../../../node_modules/html5-qrcode/esm/index.js",
+      "file": "html5-qrcode.js",
+      "fileHash": "3ce35069",
+      "needsInterop": false
+    }
+  },
   "chunks": {}
 }

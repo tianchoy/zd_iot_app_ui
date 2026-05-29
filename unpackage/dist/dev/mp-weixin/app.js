@@ -13,6 +13,9 @@ if (!Math) {
   "./pages/myOrder/myOrder.js";
   "./pages/orderDetail/orderDetail.js";
   "./pages/scanCode/scanCode.js";
+  "./pages/h5Search/h5Search.js";
+  "./pages/orderRecord/orderRecord.js";
+  "./pages/myPkg/myPkg.js";
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App",

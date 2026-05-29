@@ -1,0 +1,295 @@
+<template>
+	<topNavBar title="我的套餐" :show-back="true" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<view class="container">
+		<view class="card-info">
+			<view class="info-title">当前卡号</view>
+			<view class="info-value">1064916585160</view>
+		</view>
+		<view class="pkg-box">
+			<m-segmented-control 
+				:values="pkgTabs" 
+				:current="current" 
+				:textActiveColor="'#2563eb'" 
+				@click="handleClick" 
+				:customStyle="{height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" 
+			/>
+			<!-- 套餐列表 -->
+		<scroll-view class="package-list" scroll-y :enhanced="true">
+			<view v-if="filteredPackages.length === 0" class="empty-state">
+				<text class="empty-text">暂无套餐</text>
+			</view>
+			<view 
+				v-for="(item, index) in filteredPackages" 
+				:key="index"
+				class="package-card"
+			>
+				<!-- 套餐头部 -->
+				<view class="package-header">
+					<text class="package-name">{{ item.name }}</text>
+					<text class="status-tag" :class="getStatusClass(item.status)">{{ item.status }}</text>
+				</view>
+				
+				<!-- 生效时间 -->
+				<view class="effective-time">
+					<text class="time-label">生效时间：</text>
+					<text class="time-value">{{ item.effectiveTime }}</text>
+				</view>
+				
+				<!-- 套餐数据指标 -->
+				<view class="package-metrics">
+					<view class="metric-item">
+						<text class="metric-label">流量</text>
+						<text class="metric-value">{{ item.totalTraffic }}</text>
+					</view>
+					<view class="metric-item">
+						<text class="metric-label">剩余</text>
+						<text class="metric-value">{{ item.remainingTraffic }}</text>
+					</view>
+					<view class="metric-item">
+						<text class="metric-label">到期</text>
+						<text class="metric-value">{{ item.expireDate }}</text>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, computed } from 'vue'
+	
+	// 套餐状态类型
+	type PackageStatus = '全部' | '在用套餐' | '待生效' | '已失效'
+	
+	// 套餐数据结构
+	interface PackageItem {
+		name: string
+		status: Exclude<PackageStatus, '全部'>
+		effectiveTime: string
+		totalTraffic: string
+		remainingTraffic: string
+		expireDate: string
+	}
+	
+	// Tab 列表
+	const pkgTabs = ref<PackageStatus[]>(['全部', '在用套餐', '待生效', '已失效'])
+	const current = ref<number>(0)
+	
+	// 套餐数据
+	const packageList = ref<PackageItem[]>([
+		{
+			name: '车联网月包20G',
+			status: '在用套餐',
+			effectiveTime: '2026-04-01',
+			totalTraffic: '20GB',
+			remainingTraffic: '8.66GB',
+			expireDate: '2026-04-30'
+		},
+		{
+			name: '车联网月包10G',
+			status: '待生效',
+			effectiveTime: '待生效',
+			totalTraffic: '10GB',
+			remainingTraffic: '10GB',
+			expireDate: '2026-05-30'
+		},
+		{
+			name: '工业设备月包5G',
+			status: '待生效',
+			effectiveTime: '待生效',
+			totalTraffic: '5GB',
+			remainingTraffic: '5GB',
+			expireDate: '2026-06-30'
+		},
+		{
+			name: '测试套餐1G',
+			status: '已失效',
+			effectiveTime: '2026-03-01',
+			totalTraffic: '1GB',
+			remainingTraffic: '0',
+			expireDate: '2026-03-31'
+		}
+	])
+	
+	// 根据 Tab 筛选套餐
+	const filteredPackages = computed(() => {
+		const currentStatus = pkgTabs.value[current.value]
+		if (currentStatus === '全部') {
+			return packageList.value
+		}
+		return packageList.value.filter(item => item.status === currentStatus)
+	})
+	
+	// Tab 切换处理
+	const handleClick = (e: UTSJSONObject) => {
+		current.value = e.index as number
+	}
+	
+	// 获取状态样式类
+	const getStatusClass = (status: string): string => {
+		switch (status) {
+			case '在用套餐':
+				return 'status-active'
+			case '待生效':
+				return 'status-pending'
+			case '已失效':
+				return 'status-expired'
+			default:
+				return ''
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.container {
+		display: flex;
+		flex-direction: column;
+		background-color: #f4f7fb;
+		min-height: 100vh;
+	}
+	
+	.card-info,.pkg-box {
+		display: flex;
+		flex-direction: column;
+		margin: 0 24rpx 24rpx;
+		background-color: #ffffff;
+		border-radius: 24rpx;
+		padding: 24rpx;
+		border: 1rpx solid #e2e8f0;
+		box-shadow: 0 8rpx 20rpx rgba(15, 23, 42, 0.04);
+		
+		.info-title {
+			font-size: 24rpx;
+			color: #64748b;
+			margin-bottom: 12rpx;
+		}
+		
+		.info-value {
+			font-size: 30rpx;
+			font-weight: bold;
+			color: #333;
+		}
+	}
+	
+	.pkg-box {
+		// 套餐列表
+		.package-list {
+			flex: 1;
+			margin: 24rpx 0;
+		}
+		
+		.package-card {
+			background-color: #ffffff;
+			border-radius: 24rpx;
+			padding: 28rpx;
+			margin-bottom: 24rpx;
+			border: 1rpx solid #e2e8f0;
+			box-shadow: 0 4rpx 12rpx rgba(15, 23, 42, 0.04);
+			
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+		
+		// 套餐头部
+		.package-header {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20rpx;
+			
+			.package-name {
+				font-size: 32rpx;
+				font-weight: 600;
+				color: #1f2937;
+			}
+			
+			.status-tag {
+				font-size: 24rpx;
+				padding: 6rpx 16rpx;
+				border-radius: 20rpx;
+			}
+			.status-active {
+				background: #ecfdf5;
+				color: #059669;
+				border: 1px solid #a7f3d0;
+			}
+			
+			.status-pending {
+				background-color: #fff3e0;
+				color: #ed6c02;
+				border: 1px solid #f3cea7;
+			}
+			
+			.status-expired {
+				background: #fef2f2;
+				color: #dc2626;
+				border: 1px solid #fecaca;
+			}
+		}
+		
+		// 生效时间
+		.effective-time {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			margin-bottom: 28rpx;
+			
+			.time-label {
+				font-size: 22rpx;
+				color: #64748b;;
+			}
+			
+			.time-value {
+				font-size: 22rpx;
+				color: #64748b;;
+			}
+		}
+		
+		// 套餐指标
+		.package-metrics {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			
+			.metric-item {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				flex: 1;
+				background-color: #f8fafc;
+				border-radius: 20rpx;
+				padding: 10rpx 0;
+				margin: 0 12rpx;
+				
+				.metric-label {
+					font-size: 22rpx;
+					color: #64748b;
+				}
+				
+				.metric-value {
+					font-size: 28rpx;
+					font-weight: bold;
+					color: #1f2937;
+				}
+			}
+		}
+		
+		// 空状态
+		.empty-state {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			padding-top: 200rpx;
+			
+			.empty-text {
+				font-size: 28rpx;
+				color: #9ca3af;
+			}
+		}
+	}
+
+</style>

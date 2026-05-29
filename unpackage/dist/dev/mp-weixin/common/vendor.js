@@ -6570,6 +6570,10 @@ function findScopedSlotInvoker(vueId, instance) {
     parent = parent.parent;
   }
 }
+function setRef(ref2, id, opts = {}) {
+  const { $templateRefs } = getCurrentInstance();
+  $templateRefs.push({ i: id, r: ref2, k: opts.k, f: opts.f });
+}
 function setUniElementId(id, options, ref2, refOpts) {
   const ins = getCurrentInstance();
   if (ins) {
@@ -6693,6 +6697,7 @@ const e = (target, ...sources) => extend(target, ...sources);
 const n = (value) => normalizeClass(value);
 const t = (val) => toDisplayString(val);
 const p = (props) => renderProps(props);
+const sr = (ref2, id, opts) => setRef(ref2, id, opts);
 const sei = setUniElementId;
 const gei = genUniElementId;
 const pvhc = parseVirtualHostClass;
@@ -9938,15 +9943,14 @@ exports.e = e;
 exports.f = f;
 exports.gei = gei;
 exports.index = index;
-exports.isRef = isRef;
 exports.n = n;
-exports.nextTick$1 = nextTick$1;
 exports.o = o;
 exports.onAppHide = onAppHide;
 exports.onAppShow = onAppShow;
 exports.onLaunch = onLaunch;
 exports.onLoad = onLoad;
 exports.onMounted = onMounted;
+exports.onUnmounted = onUnmounted;
 exports.p = p;
 exports.pvhc = pvhc;
 exports.r = r;
@@ -9954,6 +9958,7 @@ exports.ref = ref;
 exports.resolveComponent = resolveComponent;
 exports.s = s;
 exports.sei = sei;
+exports.sr = sr;
 exports.t = t;
 exports.unref = unref;
 exports.useCssVars = useCssVars;

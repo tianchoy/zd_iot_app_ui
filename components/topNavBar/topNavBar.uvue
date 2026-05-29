@@ -4,7 +4,7 @@
 	<!-- 导航栏（固定定位） -->
 	<view v-if="isShowStyle" class="navbar" :style="navBarStyle">
 		<view class="back-btn" :style="{ visibility: showBack ? 'visible' : 'hidden' }">
-			<m-icon v-if="showBack" name="arrow-left-bold" size="40rpx" class="icon" @click="handleBack"></m-icon>
+			<m-icon v-if="showBack" name="arrow-left-bold" size="35rpx" class="icon" @click="handleBack"></m-icon>
 		</view>
 		<view class="title" :style="{ color: textColor, 'line-height': navBarHeight + 'px' }">
 			<slot name="title">{{ title }}</slot>
@@ -155,7 +155,7 @@ onMounted(() => {
 	flex: 1;
 	text-align: center;
 	font-weight: bold;
-	font-size: 36rpx;
+	font-size: 30rpx;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;

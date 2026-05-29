@@ -9,7 +9,10 @@
     "pages/payFailed/payFailed",
     "pages/myOrder/myOrder",
     "pages/orderDetail/orderDetail",
-    "pages/scanCode/scanCode"
+    "pages/scanCode/scanCode",
+    "pages/h5Search/h5Search",
+    "pages/orderRecord/orderRecord",
+    "pages/myPkg/myPkg"
   ],
   "window": {
     "navigationStyle": "custom",

@@ -25,11 +25,42 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref(false);
     const card_number = common_vendor.ref("");
     const goRecharge = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:84", "aaaaa");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:86", "去充值");
       common_vendor.index.navigateTo({
-        url: "/pages/orderDetail/orderDetail"
+        url: "/pages/payFailed/payFailed"
       });
     };
+    const scanCode = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/scanCode/scanCode"
+      });
+    };
+    const handleQuery = () => {
+      if (!card_number.value) {
+        common_vendor.index.showToast({
+          title: "请输入卡号",
+          icon: "none"
+        });
+        return null;
+      }
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:106", "查询卡号:", card_number.value);
+    };
+    const onScanResult = (data = null) => {
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:112", "收到扫码结果:", data);
+      if (data && data.result) {
+        card_number.value = data.result;
+        common_vendor.index.showToast({
+          title: "扫码成功",
+          icon: "success"
+        });
+      }
+    };
+    common_vendor.onMounted(() => {
+      common_vendor.index.$on("scanResult", onScanResult);
+    });
+    common_vendor.onUnmounted(() => {
+      common_vendor.index.$off("scanResult", onScanResult);
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
@@ -38,52 +69,64 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-back"]: false,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
-          showCapsule: false
+          showCapsule: false,
+          class: "data-v-00a60067"
         }),
-        b: common_vendor.t(common_vendor.unref(title)),
-        c: common_vendor.unref(card_number),
+        b: common_vendor.t(title.value),
+        c: card_number.value,
         d: common_vendor.o(($event) => {
-          return common_vendor.isRef(card_number) ? card_number.value = $event.detail.value : null;
-        }, "dc"),
+          return card_number.value = $event.detail.value;
+        }, "e6"),
         e: common_vendor.p({
           name: "scanning",
-          size: "40rpx"
+          size: "40rpx",
+          class: "data-v-00a60067"
         }),
-        f: common_vendor.p({
+        f: common_vendor.o(scanCode, "53"),
+        g: common_vendor.p({
           type: "white",
           plain: true,
           width: "90rpx",
-          class: "scan-btn"
+          class: "scan-btn data-v-00a60067"
         }),
-        g: common_vendor.p({
+        h: common_vendor.o(handleQuery, "d3"),
+        i: common_vendor.p({
           type: "primary",
-          width: "120rpx"
+          width: "120rpx",
+          class: "data-v-00a60067"
         }),
-        h: common_vendor.p({
+        j: common_vendor.p({
           text: "标签",
           round: true,
           plain: true,
           size: "small",
-          type: "primary"
+          type: "primary",
+          class: "data-v-00a60067"
         }),
-        i: common_vendor.p({
-          backgroundColor: "#f1f5f9",
-          textClass: "divider"
-        }),
-        j: common_vendor.o(goRecharge, "06"),
         k: common_vendor.p({
+          backgroundColor: "#f1f5f9",
+          textClass: "divider",
+          class: "data-v-00a60067"
+        }),
+        l: common_vendor.o(goRecharge, "03"),
+        m: common_vendor.p({
           type: "primary",
           width: "200rpx",
           btnSize: "mini",
           size: "25rpx",
-          shape: "circle"
+          shape: "circle",
+          class: "data-v-00a60067"
         }),
-        l: `${_ctx.u_s_b_h}px`,
-        m: `${_ctx.u_s_a_i_b}px`
+        n: common_vendor.p({
+          class: "data-v-00a60067"
+        }),
+        o: `${_ctx.u_s_b_h}px`,
+        p: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };
   }
 });
-wx.createPage(_sfc_main);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-00a60067"]]);
+wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/index/index.js.map

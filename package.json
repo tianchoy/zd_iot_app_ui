@@ -22,5 +22,8 @@
         }
       }
     }
+  },
+  "dependencies": {
+    "html5-qrcode": "^2.3.8"
   }
 }

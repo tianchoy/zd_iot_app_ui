@@ -1,56 +1,34 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-if (!Array) {
-  const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
-  _easycom_topNavBar_1();
-}
-const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
-if (!Math) {
-  _easycom_topNavBar();
-}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "scanCode",
   setup(__props) {
     const goBackWithResult = (result) => {
+      common_vendor.index.__f__("log", "at pages/scanCode/scanCode.uvue:26", "扫码结果:", result);
       common_vendor.index.$emit("scanResult", new common_vendor.UTSJSONObject({ result }));
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: 1 }));
     };
-    const handleBack = () => {
-      common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: 1 }));
-    };
-    const startScanWx = () => {
+    common_vendor.onMounted(() => {
       common_vendor.index.scanCode(new common_vendor.UTSJSONObject({
         onlyFromCamera: true,
         scanType: ["qrCode", "barCode"],
         success: (res) => {
+          common_vendor.index.__f__("log", "at pages/scanCode/scanCode.uvue:47", "小程序扫码成功:", res.result);
           goBackWithResult(res.result);
         },
         fail: (err) => {
-          setTimeout(() => {
-            common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: 1 }));
-          }, 300);
+          common_vendor.index.__f__("log", "at pages/scanCode/scanCode.uvue:51", "小程序扫码失败或取消:", err);
+          common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: 1 }));
         }
       }));
-    };
-    common_vendor.onMounted(() => {
-      common_vendor.nextTick$1(() => {
-        startScanWx();
-      });
     });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.o(handleBack, "af"),
-        b: common_vendor.p({
-          title: "扫一扫",
-          ["show-back"]: true,
-          backgroundColor: "#000000",
-          textColor: "#ffffff",
-          showCapsule: false,
-          class: "data-v-5d02dbc4"
-        }),
-        c: `${_ctx.u_s_b_h}px`,
-        d: `${_ctx.u_s_a_i_b}px`
+        a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        b: `${_ctx.u_s_b_h}px`,
+        c: `${_ctx.u_s_a_i_b}px`,
+        d: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

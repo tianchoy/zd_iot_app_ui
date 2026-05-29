@@ -30,6 +30,8 @@ page .container.data-v-a89086b7 {
   flex-direction: column;
   gap: 40rpx;
   background-color: #f4f7fb;
+  min-height: 100vh;
+  padding-bottom: 40rpx;
 }
 page .container .card-box.data-v-a89086b7 {
   display: flex;
@@ -64,8 +66,8 @@ page .container .card-box .card-item.data-v-a89086b7 {
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid #e7edf5;
-  padding-bottom: 24rpx;
-  margin-bottom: 20rpx;
+  padding-bottom: 30rpx;
+  margin-bottom: 30rpx;
 }
 page .container .card-box .card-item .item-head.data-v-a89086b7 {
   display: flex;
@@ -164,4 +166,18 @@ page .container .card-box .card-item.data-v-a89086b7:last-child {
   border-bottom: none;
   margin-bottom: 0;
   padding-bottom: 0;
+}
+page .container .empty-state.data-v-a89086b7 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 32rpx;
+  background-color: #ffffff;
+  margin: 0 24rpx;
+  border-radius: 24rpx;
+}
+page .container .empty-state .empty-text.data-v-a89086b7 {
+  font-size: 28rpx;
+  color: #9ca3af;
 }
