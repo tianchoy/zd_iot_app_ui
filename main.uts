@@ -1,9 +1,7 @@
+import './utils/inject-m-unix'
 import App from './App.uvue'
-
 import { createSSRApp } from 'vue'
-
 import mUnix from '@/uni_modules/m-unix'
-
 export function createApp() {
 	const app = createSSRApp(App)
 	app.use(mUnix)

@@ -77,6 +77,8 @@
 
 <script setup lang="uts">
 	import { ref, onMounted, onUnmounted } from 'vue'
+	import { login } from '@/api/http.uts'
+	import { config } from '@/common/config.uts'
 	
 	const title = ref('Hello')
 	const show = ref(false)
@@ -125,6 +127,10 @@
 	onMounted(() => {
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
+		// 调用 getUserInfo 函数获取用户信息
+		login().then(res => {
+			console.log('获取到的用户信息:', res)
+		})
 	})
 	
 	onUnmounted(() => {

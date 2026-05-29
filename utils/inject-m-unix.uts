@@ -1,0 +1,10 @@
+// utils/inject-config.uts
+import { config } from '@/common/config.uts'
+import { injectMUnixHostProjectConfig, getHostProjectConfig } from '@/uni_modules/m-unix'
+
+// 注入配置到 m-unix
+injectMUnixHostProjectConfig(config)
+
+// 验证配置是否注入成功
+const injectedConfig = getHostProjectConfig()
+console.log('配置注入成功:', injectedConfig.baseUrl)

@@ -1,5 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_http = require("../../api/http.js");
+require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
@@ -25,7 +27,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref(false);
     const card_number = common_vendor.ref("");
     const goRecharge = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:86", "去充值");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:88", "去充值");
       common_vendor.index.navigateTo({
         url: "/pages/payFailed/payFailed"
       });
@@ -43,10 +45,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:106", "查询卡号:", card_number.value);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:108", "查询卡号:", card_number.value);
     };
     const onScanResult = (data = null) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:112", "收到扫码结果:", data);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:114", "收到扫码结果:", data);
       if (data && data.result) {
         card_number.value = data.result;
         common_vendor.index.showToast({
@@ -57,6 +59,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onMounted(() => {
       common_vendor.index.$on("scanResult", onScanResult);
+      api_http.login().then((res = null) => {
+        common_vendor.index.__f__("log", "at pages/index/index.uvue:132", "获取到的用户信息:", res);
+      });
     });
     common_vendor.onUnmounted(() => {
       common_vendor.index.$off("scanResult", onScanResult);

@@ -1,3 +1,4 @@
+@import "../../uvue.wxss";
 :host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
@@ -24,18 +25,18 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container.data-v-9fa4edd6 {
+page .container.data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background-color: #f5f7fa;
 }
-.main-content.data-v-9fa4edd6 {
+page .main-content.data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   padding: 0 24rpx;
 }
-.title-section.data-v-9fa4edd6 {
+page .title-section.data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   margin-bottom: 48rpx;
@@ -44,20 +45,20 @@
   padding: 24px 20rpx;
   color: #fff;
 }
-.title-section .main-title.data-v-9fa4edd6 {
+page .title-section .main-title.data-v-9fa4edd6 {
   font-size: 24rpx;
   font-weight: bold;
   margin-bottom: 16rpx;
 }
-.title-section .sub-title.data-v-9fa4edd6 {
+page .title-section .sub-title.data-v-9fa4edd6 {
   font-size: 50rpx;
   font-weight: bold;
   margin-bottom: 24rpx;
 }
-.title-section .desc-text.data-v-9fa4edd6 {
+page .title-section .desc-text.data-v-9fa4edd6 {
   font-size: 24rpx;
 }
-.card-box.data-v-9fa4edd6 {
+page .card-box.data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
@@ -67,13 +68,13 @@
   margin-bottom: 48rpx;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
 }
-.card-box .card-label.data-v-9fa4edd6 {
+page .card-box .card-label.data-v-9fa4edd6 {
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 24rpx;
 }
-.card-box .search-value.data-v-9fa4edd6 {
+page .card-box .search-value.data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -82,7 +83,7 @@
   background-color: #f9fafb;
   margin-bottom: 24rpx;
 }
-.card-box .search-value .search-input.data-v-9fa4edd6 {
+page .card-box .search-value .search-input.data-v-9fa4edd6 {
   flex: 1;
   padding: 24rpx 28rpx;
   height: 88rpx;
@@ -92,7 +93,7 @@
   font-size: 28rpx;
   outline: none;
 }
-.card-box .search-value .scan-btn.data-v-9fa4edd6 {
+page .card-box .search-value .scan-btn.data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -101,18 +102,18 @@
   height: 88rpx;
   border-left: 2rpx solid #e5e7eb;
 }
-.card-box .search-value .scan-btn.data-v-9fa4edd6:active {
+page .card-box .search-value .scan-btn.data-v-9fa4edd6:active {
   opacity: 0.6;
 }
-.card-box .select-country-wrapper.data-v-9fa4edd6 {
+page .card-box .select-country-wrapper.data-v-9fa4edd6 {
   margin-bottom: 32rpx;
 }
-.card-box .select-country-wrapper .select-label.data-v-9fa4edd6 {
+page .card-box .select-country-wrapper .select-label.data-v-9fa4edd6 {
   font-size: 28rpx;
   color: #666;
   margin-bottom: 16rpx;
 }
-.card-box .select-country-wrapper .select-trigger.data-v-9fa4edd6 {
+page .card-box .select-country-wrapper .select-trigger.data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -123,23 +124,23 @@
   padding: 24rpx 28rpx;
   min-height: 88rpx;
 }
-.card-box .select-country-wrapper .select-trigger .select-value.data-v-9fa4edd6 {
+page .card-box .select-country-wrapper .select-trigger .select-value.data-v-9fa4edd6 {
   flex: 1;
   font-size: 28rpx;
   color: #1f2937;
 }
-.card-box .select-country-wrapper .select-trigger .select-value.placeholder.data-v-9fa4edd6 {
+page .card-box .select-country-wrapper .select-trigger .select-value.placeholder.data-v-9fa4edd6 {
   color: #999;
 }
-.card-box .select-country-wrapper .select-trigger .select-arrow.data-v-9fa4edd6 {
+page .card-box .select-country-wrapper .select-trigger .select-arrow.data-v-9fa4edd6 {
   font-size: 24rpx;
   color: #999;
   margin-left: 16rpx;
 }
-.card-box .select-country-wrapper .select-trigger.data-v-9fa4edd6:active {
+page .card-box .select-country-wrapper .select-trigger.data-v-9fa4edd6:active {
   background-color: #f0f0f0;
 }
-.card-box .query-btn.data-v-9fa4edd6 {
+page .card-box .query-btn.data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -148,15 +149,15 @@
   border-radius: 24rpx;
   padding: 20rpx 0;
 }
-.card-box .query-btn .query-btn-text.data-v-9fa4edd6 {
+page .card-box .query-btn .query-btn-text.data-v-9fa4edd6 {
   color: #ffffff;
   font-size: 32rpx;
   font-weight: 600;
 }
-.card-box .query-btn.data-v-9fa4edd6:active {
+page .card-box .query-btn.data-v-9fa4edd6:active {
   opacity: 0.9;
 }
-.instruction-box.data-v-9fa4edd6 {
+page .instruction-box.data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -165,23 +166,23 @@
   padding: 24rpx;
   box-shadow: 0 8rpx 20rpx rgba(15, 23, 42, 0.04);
 }
-.instruction-box .instruction-title.data-v-9fa4edd6 {
+page .instruction-box .instruction-title.data-v-9fa4edd6 {
   font-size: 30rpx;
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 24rpx;
 }
-.instruction-box .instruction-list.data-v-9fa4edd6 {
+page .instruction-box .instruction-list.data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   gap: 16rpx;
 }
-.instruction-box .instruction-list .instruction-item.data-v-9fa4edd6 {
+page .instruction-box .instruction-list .instruction-item.data-v-9fa4edd6 {
   font-size: 26rpx;
   color: #6b7280;
   line-height: 1.6;
 }
-.popup-header.data-v-9fa4edd6 {
+page .popup-header.data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -189,12 +190,12 @@
   padding: 32rpx 32rpx 16rpx;
   border-bottom: 2rpx solid #f0f0f0;
 }
-.popup-header .popup-title.data-v-9fa4edd6 {
+page .popup-header .popup-title.data-v-9fa4edd6 {
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
 }
-.popup-header .popup-close.data-v-9fa4edd6 {
+page .popup-header .popup-close.data-v-9fa4edd6 {
   width: 56rpx;
   height: 56rpx;
   display: flex;
@@ -204,7 +205,7 @@
   font-size: 44rpx;
   color: #999;
 }
-.popup-header .popup-close.data-v-9fa4edd6:active {
+page .popup-header .popup-close.data-v-9fa4edd6:active {
   background-color: #f5f5f5;
   border-radius: 50%;
 }

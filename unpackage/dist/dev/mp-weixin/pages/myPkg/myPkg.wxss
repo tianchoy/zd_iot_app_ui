@@ -1,3 +1,4 @@
+@import "../../uvue.wxss";
 :host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
@@ -24,13 +25,13 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container.data-v-8137f92d {
+page .container.data-v-8137f92d {
   display: flex;
   flex-direction: column;
   background-color: #f4f7fb;
   min-height: 100vh;
 }
-.card-info.data-v-8137f92d, .pkg-box.data-v-8137f92d {
+page .card-info.data-v-8137f92d,page  .pkg-box.data-v-8137f92d {
   display: flex;
   flex-direction: column;
   margin: 0 24rpx 24rpx;
@@ -40,21 +41,21 @@
   border: 1rpx solid #e2e8f0;
   box-shadow: 0 8rpx 20rpx rgba(15, 23, 42, 0.04);
 }
-.card-info .info-title.data-v-8137f92d, .pkg-box .info-title.data-v-8137f92d {
+page .card-info .info-title.data-v-8137f92d,page  .pkg-box .info-title.data-v-8137f92d {
   font-size: 24rpx;
   color: #64748b;
   margin-bottom: 12rpx;
 }
-.card-info .info-value.data-v-8137f92d, .pkg-box .info-value.data-v-8137f92d {
+page .card-info .info-value.data-v-8137f92d,page  .pkg-box .info-value.data-v-8137f92d {
   font-size: 30rpx;
   font-weight: bold;
   color: #333;
 }
-.pkg-box .package-list.data-v-8137f92d {
+page .pkg-box .package-list.data-v-8137f92d {
   flex: 1;
   margin: 24rpx 0;
 }
-.pkg-box .package-card.data-v-8137f92d {
+page .pkg-box .package-card.data-v-8137f92d {
   background-color: #ffffff;
   border-radius: 24rpx;
   padding: 28rpx;
@@ -62,61 +63,61 @@
   border: 1rpx solid #e2e8f0;
   box-shadow: 0 4rpx 12rpx rgba(15, 23, 42, 0.04);
 }
-.pkg-box .package-card.data-v-8137f92d:last-child {
+page .pkg-box .package-card.data-v-8137f92d:last-child {
   margin-bottom: 0;
 }
-.pkg-box .package-header.data-v-8137f92d {
+page .pkg-box .package-header.data-v-8137f92d {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20rpx;
 }
-.pkg-box .package-header .package-name.data-v-8137f92d {
+page .pkg-box .package-header .package-name.data-v-8137f92d {
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
 }
-.pkg-box .package-header .status-tag.data-v-8137f92d {
+page .pkg-box .package-header .status-tag.data-v-8137f92d {
   font-size: 24rpx;
   padding: 6rpx 16rpx;
   border-radius: 20rpx;
 }
-.pkg-box .package-header .status-active.data-v-8137f92d {
+page .pkg-box .package-header .status-active.data-v-8137f92d {
   background: #ecfdf5;
   color: #059669;
   border: 1px solid #a7f3d0;
 }
-.pkg-box .package-header .status-pending.data-v-8137f92d {
+page .pkg-box .package-header .status-pending.data-v-8137f92d {
   background-color: #fff3e0;
   color: #ed6c02;
   border: 1px solid #f3cea7;
 }
-.pkg-box .package-header .status-expired.data-v-8137f92d {
+page .pkg-box .package-header .status-expired.data-v-8137f92d {
   background: #fef2f2;
   color: #dc2626;
   border: 1px solid #fecaca;
 }
-.pkg-box .effective-time.data-v-8137f92d {
+page .pkg-box .effective-time.data-v-8137f92d {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin-bottom: 28rpx;
 }
-.pkg-box .effective-time .time-label.data-v-8137f92d {
+page .pkg-box .effective-time .time-label.data-v-8137f92d {
   font-size: 22rpx;
   color: #64748b;
 }
-.pkg-box .effective-time .time-value.data-v-8137f92d {
+page .pkg-box .effective-time .time-value.data-v-8137f92d {
   font-size: 22rpx;
   color: #64748b;
 }
-.pkg-box .package-metrics.data-v-8137f92d {
+page .pkg-box .package-metrics.data-v-8137f92d {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
-.pkg-box .package-metrics .metric-item.data-v-8137f92d {
+page .pkg-box .package-metrics .metric-item.data-v-8137f92d {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -126,23 +127,23 @@
   padding: 10rpx 0;
   margin: 0 12rpx;
 }
-.pkg-box .package-metrics .metric-item .metric-label.data-v-8137f92d {
+page .pkg-box .package-metrics .metric-item .metric-label.data-v-8137f92d {
   font-size: 22rpx;
   color: #64748b;
 }
-.pkg-box .package-metrics .metric-item .metric-value.data-v-8137f92d {
+page .pkg-box .package-metrics .metric-item .metric-value.data-v-8137f92d {
   font-size: 28rpx;
   font-weight: bold;
   color: #1f2937;
 }
-.pkg-box .empty-state.data-v-8137f92d {
+page .pkg-box .empty-state.data-v-8137f92d {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   padding-top: 200rpx;
 }
-.pkg-box .empty-state .empty-text.data-v-8137f92d {
+page .pkg-box .empty-state .empty-text.data-v-8137f92d {
   font-size: 28rpx;
   color: #9ca3af;
 }

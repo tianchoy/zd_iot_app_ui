@@ -1,3 +1,4 @@
+@import "../../uvue.wxss";
 :host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
@@ -24,31 +25,31 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container.data-v-6ec85291 {
+page .container.data-v-6ec85291 {
   background-color: #f4f7fb;
   min-height: 100vh;
   padding: 24rpx;
   box-sizing: border-box;
 }
-.package-card.data-v-6ec85291 {
+page .package-card.data-v-6ec85291 {
   background-color: #ffffff;
   border-radius: 24rpx;
   padding: 32rpx;
   margin-bottom: 24rpx;
 }
-.package-card .package-header.data-v-6ec85291 {
+page .package-card .package-header.data-v-6ec85291 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16rpx;
 }
-.package-card .package-header .package-name.data-v-6ec85291 {
+page .package-card .package-header .package-name.data-v-6ec85291 {
   font-size: 36rpx;
   font-weight: 600;
   color: #1f2937;
 }
-.package-card .package-header .status-tag.data-v-6ec85291 {
+page .package-card .package-header .status-tag.data-v-6ec85291 {
   font-size: 24rpx;
   padding: 6rpx 16rpx;
   border-radius: 20rpx;
@@ -56,91 +57,91 @@
   color: #ed6c02;
   font-weight: 500;
 }
-.package-card .package-header .status-tag.status-pending.data-v-6ec85291 {
+page .package-card .package-header .status-tag.status-pending.data-v-6ec85291 {
   background-color: #fff3e0;
   color: #ed6c02;
 }
-.package-card .card-number-row.data-v-6ec85291 {
+page .package-card .card-number-row.data-v-6ec85291 {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
-.package-card .card-number-row .card-number-label.data-v-6ec85291 {
+page .package-card .card-number-row .card-number-label.data-v-6ec85291 {
   font-size: 28rpx;
   color: #9ca3af;
 }
-.package-card .card-number-row .card-number.data-v-6ec85291 {
+page .package-card .card-number-row .card-number.data-v-6ec85291 {
   font-size: 28rpx;
   color: #374151;
   font-weight: 500;
 }
-.info-card.data-v-6ec85291 {
+page .info-card.data-v-6ec85291 {
   background-color: #ffffff;
   border-radius: 24rpx;
   padding: 32rpx;
   margin-bottom: 24rpx;
 }
-.info-card .section-header.data-v-6ec85291 {
+page .info-card .section-header.data-v-6ec85291 {
   margin-bottom: 24rpx;
   padding-bottom: 20rpx;
   border-bottom: 1rpx solid #f0f2f6;
 }
-.info-card .section-header .section-title.data-v-6ec85291 {
+page .info-card .section-header .section-title.data-v-6ec85291 {
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
 }
-.info-card .info-row.data-v-6ec85291 {
+page .info-card .info-row.data-v-6ec85291 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: 20rpx 0;
 }
-.info-card .info-row .info-label.data-v-6ec85291 {
+page .info-card .info-row .info-label.data-v-6ec85291 {
   font-size: 24rpx;
   color: #64748b;
 }
-.info-card .info-row .info-value.data-v-6ec85291 {
+page .info-card .info-row .info-value.data-v-6ec85291 {
   font-size: 28rpx;
   color: #374151;
   text-align: right;
   font-weight: bold;
 }
-.info-card .info-row .price.data-v-6ec85291 {
+page .info-card .info-row .price.data-v-6ec85291 {
   font-size: 36rpx;
   font-weight: bold;
   color: #ef4444;
 }
-.info-card .info-row.data-v-6ec85291:first-child {
+page .info-card .info-row.data-v-6ec85291:first-child {
   padding-top: 0;
 }
-.info-card .info-row.data-v-6ec85291:last-child {
+page .info-card .info-row.data-v-6ec85291:last-child {
   padding-bottom: 0;
 }
-.notice-card.data-v-6ec85291 {
+page .notice-card.data-v-6ec85291 {
   background-color: #ffffff;
   border-radius: 24rpx;
   padding: 32rpx;
   margin-bottom: 24rpx;
 }
-.notice-card .section-header.data-v-6ec85291 {
+page .notice-card .section-header.data-v-6ec85291 {
   margin-bottom: 16rpx;
 }
-.notice-card .section-header .section-title.data-v-6ec85291 {
+page .notice-card .section-header .section-title.data-v-6ec85291 {
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
 }
-.notice-card .notice-text.data-v-6ec85291 {
+page .notice-card .notice-text.data-v-6ec85291 {
   font-size: 28rpx;
   color: #6b7280;
   line-height: 1.5;
 }
-.bottom-placeholder.data-v-6ec85291 {
+page .bottom-placeholder.data-v-6ec85291 {
   height: 140rpx;
 }
-.bottom-bar.data-v-6ec85291 {
+page .bottom-bar.data-v-6ec85291 {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -153,27 +154,27 @@
   padding: 24rpx 32rpx;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
 }
-.bottom-bar .amount-section.data-v-6ec85291 {
+page .bottom-bar .amount-section.data-v-6ec85291 {
   display: flex;
   flex-direction: column;
   align-items: baseline;
 }
-.bottom-bar .amount-section .amount-label.data-v-6ec85291 {
+page .bottom-bar .amount-section .amount-label.data-v-6ec85291 {
   font-size: 24rpx;
   color: #64748b;
   margin-right: 16rpx;
 }
-.bottom-bar .amount-section .amount-value.data-v-6ec85291 {
+page .bottom-bar .amount-section .amount-value.data-v-6ec85291 {
   font-size: 48rpx;
   font-weight: bold;
   color: #ef4444;
 }
-.bottom-bar .pay-button.data-v-6ec85291 {
+page .bottom-bar .pay-button.data-v-6ec85291 {
   background-color: #2563eb;
   padding: 20rpx 40rpx;
   border-radius: 24rpx;
 }
-.bottom-bar .pay-button .pay-button-text.data-v-6ec85291 {
+page .bottom-bar .pay-button .pay-button-text.data-v-6ec85291 {
   color: #ffffff;
   font-size: 30rpx;
   font-weight: 500;

@@ -1,3 +1,4 @@
+@import "../../uvue.wxss";
 :host{display:flex;flex-direction:column}
 /**
  * 这里是uni-app内置的常用样式变量
@@ -24,19 +25,19 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container.data-v-a151b594 {
+page .container.data-v-a151b594 {
   display: flex;
   flex-direction: column;
   padding: 24rpx 32rpx;
 }
-.tip-text.data-v-a151b594 {
+page .tip-text.data-v-a151b594 {
   margin-bottom: 24rpx;
 }
-.tip-text text.data-v-a151b594 {
+page .tip-text text.data-v-a151b594 {
   font-size: 26rpx;
   color: #9ca3af;
 }
-.card-number-section.data-v-a151b594 {
+page .card-number-section.data-v-a151b594 {
   display: flex;
   flex-direction: column;
   align-items: baseline;
@@ -44,17 +45,17 @@
   padding-bottom: 20rpx;
   border-bottom: 2rpx solid #e5e7eb;
 }
-.card-number-section .card-number-label.data-v-a151b594 {
+page .card-number-section .card-number-label.data-v-a151b594 {
   font-size: 24rpx;
   color: #64748b;
   margin-right: 24rpx;
 }
-.card-number-section .card-number-value.data-v-a151b594 {
+page .card-number-section .card-number-value.data-v-a151b594 {
   font-size: 32rpx;
   color: #1f2937;
   font-weight: bold;
 }
-.order-list.data-v-a151b594 {
+page .order-list.data-v-a151b594 {
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -63,63 +64,63 @@
   border: 1rpx solid #e2e8f0;
   box-shadow: 0 8rpx 20rpx rgba(15, 23, 42, 0.04);
 }
-.order-item.data-v-a151b594 {
+page .order-item.data-v-a151b594 {
   display: flex;
   flex-direction: column;
   padding: 20rpx 0;
   border-bottom: 2rpx solid #f0f0f0;
 }
-.order-item.data-v-a151b594:last-child {
+page .order-item.data-v-a151b594:last-child {
   border-bottom: none;
 }
-.order-header.data-v-a151b594 {
+page .order-header.data-v-a151b594 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 10rpx;
 }
-.order-header .package-name.data-v-a151b594 {
+page .order-header .package-name.data-v-a151b594 {
   font-size: 26rpx;
   font-weight: 600;
   color: #0f172a;
 }
-.order-header .price.data-v-a151b594 {
+page .order-header .price.data-v-a151b594 {
   font-size: 32rpx;
   font-weight: 600;
   color: #ef4444;
 }
-.order-info.data-v-a151b594 {
+page .order-info.data-v-a151b594 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10rpx;
 }
-.order-info .order-no.data-v-a151b594 {
+page .order-info .order-no.data-v-a151b594 {
   font-size: 24rpx;
   color: #0f172a;
 }
-.order-info .status.data-v-a151b594 {
+page .order-info .status.data-v-a151b594 {
   font-size: 24rpx;
   padding: 6rpx 16rpx;
   border-radius: 20rpx;
 }
-.order-info .status-completed.data-v-a151b594 {
+page .order-info .status-completed.data-v-a151b594 {
   background: #ecfdf5;
   color: #059669;
   border: 1px solid #a7f3d0;
 }
-.order-info .status-pending.data-v-a151b594 {
+page .order-info .status-pending.data-v-a151b594 {
   background: #fffbeb;
   color: #d97706;
   border: 1px solid #fde68a;
 }
-.order-info .status-refunded.data-v-a151b594 {
+page .order-info .status-refunded.data-v-a151b594 {
   background-color: #fce4ec;
   color: #c62828;
 }
-.order-time .time.data-v-a151b594 {
+page .order-time .time.data-v-a151b594 {
   font-size: 24rpx;
   color: #0f172a;
 }

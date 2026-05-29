@@ -101,7 +101,6 @@
 
 <style lang="scss" scoped>
 	.container {
-		background-color: #f5f5f5;
 		min-height: 100vh;
 		padding: 40rpx 32rpx;
 		display: flex;

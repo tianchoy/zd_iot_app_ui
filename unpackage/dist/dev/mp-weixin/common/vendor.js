@@ -9882,31 +9882,33 @@ const createSubpackageApp = initCreateSubpackageApp();
   wx.createPluginApp = global.createPluginApp = createPluginApp;
   wx.createSubpackageApp = global.createSubpackageApp = createSubpackageApp;
 }
-const createLifeCycleHook = (lifecycle, flag = 0) => (hook, target = getCurrentInstance()) => {
-  !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
-};
-const onShow = /* @__PURE__ */ createLifeCycleHook(
-  ON_SHOW,
-  1 | 2
-  /* HookFlags.PAGE */
-);
-const onHide = /* @__PURE__ */ createLifeCycleHook(
-  ON_HIDE,
-  1 | 2
-  /* HookFlags.PAGE */
-);
-const onLaunch = /* @__PURE__ */ createLifeCycleHook(
-  ON_LAUNCH,
-  1
-  /* HookFlags.APP */
-);
-const onLoad = /* @__PURE__ */ createLifeCycleHook(
-  ON_LOAD,
-  2
-  /* HookFlags.PAGE */
-);
-const onAppHide = onHide;
-const onAppShow = onShow;
+function __awaiter(thisArg, _arguments, P, generator) {
+  function adopt(value) {
+    return value instanceof P ? value : new P(function(resolve2) {
+      resolve2(value);
+    });
+  }
+  return new (P || (P = Promise))(function(resolve2, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e2) {
+        reject(e2);
+      }
+    }
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e2) {
+        reject(e2);
+      }
+    }
+    function step(result) {
+      result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
+    }
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+}
 function __read(o2, n2) {
   var m = typeof Symbol === "function" && o2[Symbol.iterator];
   if (!m)
@@ -9932,8 +9934,34 @@ typeof SuppressedError === "function" ? SuppressedError : function(error, suppre
   var e2 = new Error(message);
   return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
 };
+const createLifeCycleHook = (lifecycle, flag = 0) => (hook, target = getCurrentInstance()) => {
+  !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
+};
+const onShow = /* @__PURE__ */ createLifeCycleHook(
+  ON_SHOW,
+  1 | 2
+  /* HookFlags.PAGE */
+);
+const onHide = /* @__PURE__ */ createLifeCycleHook(
+  ON_HIDE,
+  1 | 2
+  /* HookFlags.PAGE */
+);
+const onLaunch = /* @__PURE__ */ createLifeCycleHook(
+  ON_LAUNCH,
+  1
+  /* HookFlags.APP */
+);
+const onLoad = /* @__PURE__ */ createLifeCycleHook(
+  ON_LOAD,
+  2
+  /* HookFlags.PAGE */
+);
+const onAppHide = onHide;
+const onAppShow = onShow;
 exports.UTS = UTS;
 exports.UTSJSONObject = UTSJSONObject;
+exports.__awaiter = __awaiter;
 exports.__read = __read;
 exports._export_sfc = _export_sfc;
 exports.computed = computed;

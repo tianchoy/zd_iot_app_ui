@@ -221,6 +221,7 @@ const BUILTIN_DEFAULT = new MUnixHostProjectConfig({
   }),
   mUi: null
 });
+let _hostOverride = null;
 function mergeStorage(base, p = null) {
   const out = new HostStorageConfig({
     token: base.token,
@@ -420,8 +421,15 @@ function mergeHostPatch(patch = null) {
   }
   return out;
 }
+function injectMUnixHostProjectConfig(hostConfig = null) {
+  _hostOverride = mergeHostPatch(hostConfig);
+}
 function getHostProjectConfig() {
+  if (_hostOverride != null) {
+    return _hostOverride;
+  }
   return mergeHostPatch(null);
 }
 exports.getHostProjectConfig = getHostProjectConfig;
+exports.injectMUnixHostProjectConfig = injectMUnixHostProjectConfig;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/m-unix/components/m-tools/ProjectConfig.js.map
