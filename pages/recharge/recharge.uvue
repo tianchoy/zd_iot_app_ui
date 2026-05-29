@@ -1,7 +1,6 @@
 <template>
 	<topNavBar title="充值首页" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
-		
 		<view class="card-info">
 			<view class="card-title">
 				<text class="title">卡片信息</text>

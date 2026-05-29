@@ -27,7 +27,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const goRecharge = () => {
       common_vendor.index.__f__("log", "at pages/index/index.uvue:84", "aaaaa");
       common_vendor.index.navigateTo({
-        url: "/pages/recharge/recharge"
+        url: "/pages/orderDetail/orderDetail"
       });
     };
     return (_ctx, _cache) => {

@@ -75,7 +75,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (hasListener) {
           emit("back");
         }
-        common_vendor.index.navigateBack();
       }
     };
     common_vendor.onMounted(() => {

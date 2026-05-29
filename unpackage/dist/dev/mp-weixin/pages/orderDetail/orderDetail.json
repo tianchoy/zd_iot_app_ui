@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "top-nav-bar": "../../components/topNavBar/topNavBar",
+    "m-bottom-popup": "../../uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup",
+    "payment": "../../components/payment"
+  }
+}

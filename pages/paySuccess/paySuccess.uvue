@@ -1,0 +1,215 @@
+<template>
+	<topNavBar title="支付结果" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<view class="container">
+		<!-- 成功状态区域 -->
+		<view class="status-section">
+			<view class="success-icon">
+				<text class="checkmark">✓</text>
+			</view>
+			<text class="status-text">支付成功</text>
+		</view>
+
+		<!-- 卡片详情区域 -->
+		<view class="card-container">
+			<!-- 卡号 -->
+			<view class="info-row">
+				<text class="label">卡号</text>
+				<text class="value">1064916585160</text>
+			</view>
+			
+			<!-- ICCID -->
+			<view class="info-row">
+				<text class="label">ICCID</text>
+				<text class="value">89860421123456789012</text>
+			</view>
+			
+			<!-- 订单编号 -->
+			<view class="info-row">
+				<text class="label">订单编号</text>
+				<text class="value">0202604280001</text>
+			</view>
+			
+			<!-- 套餐名称 -->
+			<view class="info-row">
+				<text class="label">套餐名称</text>
+				<text class="value">车联网月包20G</text>
+			</view>
+			
+			<!-- 套餐类型 -->
+			<view class="info-row">
+				<text class="label">套餐类型</text>
+				<text class="value">套餐包</text>
+			</view>
+			
+			<!-- 支付方式 -->
+			<view class="info-row">
+				<text class="label">支付方式</text>
+				<text class="value">微信小程序支付</text>
+			</view>
+			
+			<!-- 支付金额 (突出显示) -->
+			<view class="info-row">
+				<text class="label">支付金额</text>
+				<text class="value amount">￥90</text>
+			</view>
+		</view>
+		
+		<!-- 按钮区域 -->
+		<view class="button-section">
+			<button class="action-btn primary-btn" @click="handleViewOrder">查看订单</button>
+			<button class="action-btn secondary-btn" @click="handleBackCard">返回卡片详情</button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	// 查看订单点击处理
+	const handleViewOrder = () => {
+		// 平台兼容处理
+		// #ifdef APP
+		console.log('查看订单');
+		// #endif
+		// #ifdef MP-WEIXIN
+		console.log('查看订单');
+		// #endif
+		// #ifdef H5
+		console.log('查看订单');
+		// #endif
+	}
+	
+	// 返回卡片详情点击处理
+	const handleBackCard = () => {
+		// 平台兼容处理
+		// #ifdef APP
+		console.log('返回卡片详情');
+		// #endif
+		// #ifdef MP-WEIXIN
+		console.log('返回卡片详情');
+		// #endif
+		// #ifdef H5
+		console.log('返回卡片详情');
+		// #endif
+	}
+</script>
+
+<style lang="scss" scoped>
+	.container {
+		background-color: #f5f5f5;
+		padding: 40rpx 32rpx;
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+	}
+	
+	// 成功状态区域
+	.status-section {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-bottom: 40rpx;
+		
+		.success-icon {
+			width: 120rpx;
+			height: 120rpx;
+			background-color: #07c160;
+			border-radius: 50%;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			margin-bottom: 20rpx;
+			
+			.checkmark {
+				color: #ffffff;
+				font-size: 80rpx;
+				font-weight: 600;
+				line-height: 1;
+			}
+		}
+		
+		.status-text {
+			font-size: 40rpx;
+			font-weight: 500;
+			color: #333333;
+		}
+	}
+	
+	// 卡片容器
+	.card-container {
+		background-color: #ffffff;
+		border: 1px solid #e7edf5;
+		border-radius: 24rpx;
+		padding: 32rpx;
+		margin-bottom: 60rpx;
+		box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+	}
+	
+	// 信息行
+	.info-row {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 24rpx 0;
+		border-bottom: 1rpx solid #f0f0f0;
+		
+		.info-row:last-child {
+			border-bottom: none;
+		}
+		
+		.label {
+			font-size: 24rpx;
+			color: #64748b;
+			flex-shrink: 0;
+			width: 160rpx;
+		}
+		
+		.value {
+			font-size: 25rpx;
+			color: #0f172a;
+			font-weight: bold;
+			text-align: right;
+			flex: 1;
+			word-break: break-all;
+		}
+
+		.amount {
+			font-weight: bold;
+			color: #ff6b00;
+		}
+	}
+	
+	// 按钮区域
+	.button-section {
+		display: flex;
+		flex-direction: column;
+		gap: 24rpx;
+		
+		.action-btn {
+			width: 100%;
+			height: 88rpx;
+			line-height: 88rpx;
+			border-radius: 44rpx;
+			font-size: 30rpx;
+			font-weight: 500;
+			text-align: center;
+			border: none;
+			padding: 0;
+			
+			&::after {
+				border: none;
+			}
+		}
+		
+		.primary-btn {
+			background-color: #07c160;
+			color: #ffffff;
+		}
+		
+		.secondary-btn {
+			background-color: #ffffff;
+			color: #07c160;
+			border: 2rpx solid #07c160;
+		}
+	}
+</style>

@@ -112,7 +112,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleConfirmPayment = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:246", e);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:245", e);
       showPopup.value = false;
     };
     const goBack = () => {
@@ -162,7 +162,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           bold: true,
           class: "data-v-722cdacb"
         }),
-        g: common_vendor.o(changeTab, "b7"),
+        g: common_vendor.o(changeTab, "6c"),
         h: common_vendor.p({
           tabs: tabs.value,
           width: "100rpx",
@@ -221,15 +221,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         l: `${_ctx.u_s_b_h}px`,
         m: `${_ctx.u_s_a_i_b}px`,
-        n: common_vendor.o(handleCancelPayment, "ac"),
-        o: common_vendor.o(handleConfirmPayment, "09"),
+        n: common_vendor.o(handleCancelPayment, "e4"),
+        o: common_vendor.o(handleConfirmPayment, "22"),
         p: common_vendor.p({
           amount: currentPrice.value,
           class: "data-v-722cdacb"
         }),
         q: common_vendor.o(($event) => {
           return showPopup.value = false;
-        }, "da"),
+        }, "88"),
         r: common_vendor.p({
           show: showPopup.value,
           height: "50%",
@@ -237,7 +237,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-722cdacb"
         }),
         s: common_vendor.t(currentPrice.value),
-        t: common_vendor.o(choosePayment, "18"),
+        t: common_vendor.o(choosePayment, "12"),
         v: common_vendor.p({
           type: "primary",
           plain: false,

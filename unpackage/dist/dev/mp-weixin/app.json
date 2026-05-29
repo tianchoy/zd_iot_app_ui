@@ -4,7 +4,12 @@
     "pages/card/card",
     "pages/mine/mine",
     "pages/cardDetail/cardDetail",
-    "pages/recharge/recharge"
+    "pages/recharge/recharge",
+    "pages/paySuccess/paySuccess",
+    "pages/payFailed/payFailed",
+    "pages/myOrder/myOrder",
+    "pages/orderDetail/orderDetail",
+    "pages/scanCode/scanCode"
   ],
   "window": {
     "navigationStyle": "custom",

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "top-nav-bar": "../../components/topNavBar/topNavBar"
+  }
+}

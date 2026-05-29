@@ -1,0 +1,394 @@
+<template>
+	<view>
+		<topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+		<view class="container">
+			<view class="card-box">
+				<!-- 搜索框区域 -->
+				<view class="search-value">
+					<input
+						v-model="card_number"
+						placeholder="请输入 ICCID / MSISDN"
+						class="search-input"
+					/>
+					<m-button type="white" :plain="true" class="scan-btn" width="90rpx">
+						<m-icon name="scanning" size="40rpx"></m-icon>
+					</m-button>
+					<m-button type="primary" width="120rpx" @click="handleSearch">查询</m-button>
+				</view>
+				
+				<!-- Tab 选项卡 -->
+				<m-segmented-control 
+					:values="tabs" 
+					:current="current" 
+					:textActiveColor="'#2563eb'" 
+					@click="handleTabClick" 
+					:customStyle="{height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" 
+				/>
+			</view>
+			
+			<!-- 订单列表 -->
+			<scroll-view class="order-list" scroll-y :enhanced="true" :show-scrollbar="false">
+				<view v-if="filteredOrders.length === 0" class="empty-state">
+					<text class="empty-text">暂无订单</text>
+				</view>
+				<view v-else class="orders-container">
+					<view 
+						v-for="(order, index) in filteredOrders" 
+						:key="index"
+						class="order-card"
+					>
+						<!-- 订单头部：套餐名称和状态 -->
+						<view class="order-header">
+							<text class="package-name">{{ order.packageName }}</text>
+							<text class="status-tag" :class="getStatusClass(order.status)">{{ order.status }}</text>
+						</view>
+						
+						<!-- 订单详情 -->
+						<view class="order-details">
+							<view class="detail-row">
+								<text class="detail-label">订单号</text>
+								<text class="detail-value">{{ order.orderNo }}</text>
+							</view>
+							<view class="detail-row">
+								<text class="detail-label">卡号</text>
+								<text class="detail-value">{{ order.cardNo }}</text>
+							</view>
+							<view class="detail-row">
+								<text class="detail-label">ICCID</text>
+								<text class="detail-value">{{ order.iccid }}</text>
+							</view>
+							<view class="detail-row">
+								<text class="detail-value">{{ order.time }}</text>
+								<view class="order-footer">
+									<text class="price">¥{{ order.amount }}</text>
+									<text v-if="order.status === '待支付'" class="pay-btn" @click="handlePay(order)">去支付</text>
+								</view>
+							</view>
+						</view>
+						
+					</view>
+				</view>
+			</scroll-view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, computed } from 'vue'
+	
+	// 订单状态类型
+	type OrderStatus = '全部' | '待支付' | '已完成' | '已退款' | '已取消'
+	
+	// 订单数据结构
+	interface Order {
+		packageName: string
+		status: Exclude<OrderStatus, '全部'>
+		orderNo: string
+		cardNo: string
+		iccid: string
+		time: string
+		amount: number
+	}
+	
+	// Tab 列表
+	const tabs = ref<OrderStatus[]>(['全部', '待支付', '已完成', '已退款', '已取消'])
+	const current = ref<number>(0)
+	const card_number = ref<string>('')
+	
+	// 订单数据（根据图片内容）
+	const orders = ref<Order[]>([
+		{
+			packageName: '车联网月包20G',
+			status: '已完成',
+			orderNo: 'O202604280001',
+			cardNo: '1064916585160',
+			iccid: '89860421123456789012',
+			time: '2026-04-28 10:12:30',
+			amount: 90
+		},
+		{
+			packageName: '车联网月包10G',
+			status: '待支付',
+			orderNo: 'O202604280002',
+			cardNo: '1064916585160',
+			iccid: '89860421123456789012',
+			time: '2026-04-28 11:20:12',
+			amount: 50
+		},
+		{
+			packageName: '测试套餐1G',
+			status: '已退款',
+			orderNo: 'O202603010001',
+			cardNo: '1064916585160',
+			iccid: '89860421123456789012',
+			time: '2026-03-01 08:10:00',
+			amount: 10
+		},
+		{
+			packageName: '500MB加油包',
+			status: '已完成',
+			orderNo: 'PO202605120001',
+			cardNo: '14700002233',
+			iccid: '8986032044208356010',
+			time: '2026-05-12 11:02:00',
+			amount: 19
+		},
+		{
+			packageName: '1GB加油包',
+			status: '已取消',
+			orderNo: 'PO202605120002',
+			cardNo: '14700002233',
+			iccid: '8986032044208356010',
+			time: '2026-05-12 12:18:00',
+			amount: 29
+		}
+	])
+	
+	// 根据搜索词和Tab状态过滤订单
+	const filteredOrders = computed(() => {
+		let result = orders.value
+		
+		// 按Tab筛选
+		const currentStatus = tabs.value[current.value]
+		if (currentStatus !== '全部') {
+			result = result.filter(order => order.status === currentStatus)
+		}
+		
+		// 按搜索词筛选（ICCID或卡号）
+		if (card_number.value.trim().length > 0) {
+			const keyword = card_number.value.trim()
+			result = result.filter(order => 
+				order.iccid.includes(keyword) || order.cardNo.includes(keyword)
+			)
+		}
+		
+		return result
+	})
+	
+	// 处理Tab切换
+	const handleTabClick = (e: UTSJSONObject) => {
+		const index = e.index as number
+		current.value = index
+	}
+	
+	// 处理搜索
+	const handleSearch = () => {
+		// 搜索逻辑已通过computed实现，此处可添加额外逻辑如埋点等
+		console.log('搜索关键词:', card_number.value)
+	}
+	
+	// 获取状态样式类
+	const getStatusClass = (status: string): string => {
+		switch (status) {
+			case '已完成':
+				return 'status-completed'
+			case '待支付':
+				return 'status-pending'
+			case '已退款':
+				return 'status-refunded'
+			case '已取消':
+				return 'status-cancelled'
+			default:
+				return ''
+		}
+	}
+
+	// 处理返回
+	const handleBack = () => {
+		uni.navigateBack({
+			delta: 1
+		})
+	}
+	
+	// 去支付
+	const handlePay = (order: Order) => {
+		console.log('去支付:', order.orderNo)
+		// #ifdef MP-WEIXIN
+		// 微信小程序支付逻辑
+		uni.showToast({
+			title: `支付订单 ${order.orderNo}`,
+			icon: 'none'
+		})
+		// #endif
+		// #ifdef APP
+		// App支付逻辑
+		uni.showToast({
+			title: `支付订单 ${order.orderNo}`,
+			icon: 'none'
+		})
+		// #endif
+		// #ifdef H5
+		// H5支付逻辑
+		uni.showToast({
+			title: `支付订单 ${order.orderNo}`,
+			icon: 'none'
+		})
+		// #endif
+	}
+</script>
+
+<style lang="scss" scoped>
+	.container {
+		background-color: #f4f7fb;
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		
+		.card-box {
+			margin: 0 24rpx;
+			background-color: #ffffff;
+			border: 1rpx solid #e7edf5;
+			border-radius: 24rpx;
+			padding: 24rpx;
+			
+			.search-value {
+				display: flex;
+				flex-direction: row;
+				border: 1rpx solid #dbe5f0;
+				border-radius: 24rpx;
+				margin-bottom: 24rpx;
+				
+				.search-input {
+					flex: 1;
+					padding: 0 25rpx;
+					height: 95rpx;
+					border: none;
+					background: transparent;
+					color: #0f172a;
+					font-size: 30rpx;
+					outline: none;
+				}
+				
+				.scan-btn {
+					border-left: 1px solid #eef2f7;
+				}
+			}
+		}
+		
+		.order-list {
+			flex: 1;
+			padding: 24rpx 24rpx 40rpx 24rpx;
+			height: calc(100vh - 280rpx);
+			
+			.empty-state {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding-top: 200rpx;
+				
+				.empty-text {
+					font-size: 28rpx;
+					color: #999999;
+				}
+			}
+			
+			.orders-container {
+				.order-card {
+					background-color: #ffffff;
+					border-radius: 24rpx;
+					padding: 28rpx;
+					margin-bottom: 24rpx;
+					box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+					
+					.order-header {
+						display: flex;
+						flex-direction: row;
+						justify-content: space-between;
+						align-items: center;
+						padding-bottom: 20rpx;
+						border-bottom: 1rpx solid #f0f2f6;
+						margin-bottom: 20rpx;
+						
+						.package-name {
+							font-size: 32rpx;
+							font-weight: 600;
+							color: #1f2937;
+						}
+						
+						.status-tag {
+							font-size: 24rpx;
+							padding: 6rpx 16rpx;
+							border-radius: 20rpx;
+							background-color: #f3f4f6;
+							color: #6b7280;
+							
+							&.status-completed {
+								background-color: #e8f5e9;
+								color: #2e7d32;
+							}
+							
+							&.status-pending {
+								background-color: #fff3e0;
+								color: #ed6c02;
+							}
+							
+							&.status-refunded {
+								background-color: #fce4ec;
+								color: #c62828;
+							}
+							
+							&.status-cancelled {
+								background-color: #eeeeee;
+								color: #757575;
+							}
+						}
+					}
+					
+					.order-details {
+						margin-bottom: 20rpx;
+						
+						.detail-row {
+							display: flex;
+							flex-direction: row;
+							align-items: center;
+							margin-bottom: 16rpx;
+							
+							&:last-child {
+								margin-bottom: 0;
+							}
+							
+							.detail-label {
+								width: 100rpx;
+								font-size: 26rpx;
+								color: #9ca3af;
+								flex-shrink: 0;
+							}
+							
+							.detail-value {
+								flex: 1;
+								font-size: 26rpx;
+								color: #374151;
+								word-break: break-all;
+							}
+						}
+					}
+					
+					.order-footer {
+						display: flex;
+						flex-direction: row;
+						justify-content: space-between;
+						align-items: center;
+						padding-top: 20rpx;
+						
+						.price {
+							font-size: 28rpx;
+							font-weight: bold;
+							color: #ef4444;
+							margin-right: 20rpx;
+						}
+						
+						.pay-btn {
+							background: #eff6ff;
+							border: 1px solid #bfdbfe;
+							color: #2563eb;
+							font-size: 24rpx;
+							padding: 10rpx 25rpx;
+							border-radius: 40rpx;
+							font-weight: bold;
+						}
+					}
+				}
+			}
+		}
+	}
+</style>

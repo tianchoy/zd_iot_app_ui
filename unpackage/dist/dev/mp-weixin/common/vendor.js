@@ -8789,7 +8789,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.3.229";
   const port = "8090";
-  const id = "mp-weixin_IMXgZH";
+  const id = "mp-weixin_zpNxiT";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -9940,6 +9940,7 @@ exports.gei = gei;
 exports.index = index;
 exports.isRef = isRef;
 exports.n = n;
+exports.nextTick$1 = nextTick$1;
 exports.o = o;
 exports.onAppHide = onAppHide;
 exports.onAppShow = onAppShow;

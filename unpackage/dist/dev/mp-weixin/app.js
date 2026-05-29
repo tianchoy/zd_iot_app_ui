@@ -8,6 +8,11 @@ if (!Math) {
   "./pages/mine/mine.js";
   "./pages/cardDetail/cardDetail.js";
   "./pages/recharge/recharge.js";
+  "./pages/paySuccess/paySuccess.js";
+  "./pages/payFailed/payFailed.js";
+  "./pages/myOrder/myOrder.js";
+  "./pages/orderDetail/orderDetail.js";
+  "./pages/scanCode/scanCode.js";
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App",

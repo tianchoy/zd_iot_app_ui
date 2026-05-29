@@ -1,0 +1,1 @@
+{"version":3,"file":"payFailed.js","sources":["pages/payFailed/payFailed.uvue?type=page"],"sourcesContent":["import MiniProgramPage from '/Users/xyhc/Documents/zd_iot_app_ui/pages/payFailed/payFailed.uvue'\nwx.createPage(MiniProgramPage)"],"names":[],"mappings":";;;;;;;;AACA,GAAG,WAAW,eAAe;"}
