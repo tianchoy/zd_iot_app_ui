@@ -4,15 +4,15 @@
 		<view class="card-info">
 			<text class="persion-name">Hi,{{title}}</text>
 			<view class="persion-card">
-				<view class="persion-card-item">
+				<view class="persion-card-item" @click="cardType(0)">
 					<text class="persion-card-item-title">我的卡片</text>
 					<text class="persion-card-item-content">12</text>
 				</view>
-				<view class="persion-card-item">
+				<view class="persion-card-item" @click="cardType(1)">
 					<text class="persion-card-item-title">在用卡片</text>
 					<text class="persion-card-item-content">12</text>
 				</view>
-				<view class="persion-card-item">
+				<view class="persion-card-item" @click="cardType(2)">
 					<text class="persion-card-item-title">异常卡片</text>
 					<text class="persion-card-item-content">12</text>
 				</view>
@@ -35,7 +35,7 @@
 		<view class="card-box">
 			<view class="card-label">
 				<text>最近常用卡片</text>
-				<text class="view-all">查看全部</text>
+				<text class="view-all" @click="cardType(0)">查看全部</text>
 			</view>
 			<view class="card-list">
 				<view class="card-item">
@@ -78,7 +78,6 @@
 <script setup lang="uts">
 	import { ref, onMounted, onUnmounted } from 'vue'
 	import { login } from '@/api/http.uts'
-	import { config } from '@/common/config.uts'
 	
 	const title = ref('Hello')
 	const show = ref(false)
@@ -87,7 +86,7 @@
 	const goRecharge = () => {
 		console.log('去充值')
 		uni.navigateTo({
-			url: '/pages/payFailed/payFailed'
+			url: '/pages/recharge/recharge'
 		})
 	}
 	
@@ -123,14 +122,22 @@
 			// handleQuery()
 		}
 	}
+
+	// 卡片类型切换
+	const cardType = (type: number) => {
+		console.log(type)
+		uni.reLaunch({
+			url: '/pages/card/card?type=' + type
+		})
+	}
 	
 	onMounted(() => {
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
 		// 调用 getUserInfo 函数获取用户信息
-		login().then(res => {
-			console.log('获取到的用户信息:', res)
-		})
+		// login().then(res => {
+		// 	console.log('获取到的用户信息:', res)
+		// })
 	})
 	
 	onUnmounted(() => {

@@ -90,6 +90,26 @@ page .container .card-box .card-item .item-head .card-item-content.data-v-a89086
   line-height: 1.45;
   word-break: break-all;
 }
+page .container .card-box .card-item .item-head .status-tag.data-v-a89086b7 {
+  font-size: 24rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+}
+page .container .card-box .card-item .item-head .status-completed.data-v-a89086b7 {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: 1rpx solid #a7f3d0;
+}
+page .container .card-box .card-item .item-head .status-pending.data-v-a89086b7 {
+  background: #fff7ed;
+  color: #ea580c;
+  border-color: 1rpx solid #fdba74;
+}
+page .container .card-box .card-item .item-head .status-refunded.data-v-a89086b7 {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: 1rpx solid #fecaca;
+}
 page .container .card-box .card-item .item-package.data-v-a89086b7 {
   margin: 20rpx 0;
   display: flex;

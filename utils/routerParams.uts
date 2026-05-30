@@ -1,0 +1,55 @@
+// utils/routerParams.ts
+export function getPageParams(): Record<string, any> {
+  const pages = getCurrentPages()
+  const currentPage = pages[pages.length - 1] as any
+  
+  // #ifdef MP-WEIXIN
+  // 小程序端
+  if (currentPage?.$page?.options) {
+    return currentPage.$page.options
+  }
+  if (currentPage?.options) {
+    return currentPage.options
+  }
+  // #endif
+  
+  // #ifdef APP
+  // App 端（uni-app x）
+  if (currentPage?.$page?.query) {
+    return currentPage.$page.query
+  }
+  if (currentPage?.query) {
+    return currentPage.query
+  }
+  // #endif
+  
+  // #ifdef H5
+  // H5 端：解析 URL
+  const params: Record<string, any> = {}
+  try {
+    const search = window.location.search
+    if (search && search.length > 1) {
+      const urlParams = new URLSearchParams(search.substring(1))
+      urlParams.forEach((value, key) => {
+        params[key] = value
+      })
+    }
+    // 也尝试从 hash 中获取（如果使用 hash 路由）
+    const hash = window.location.hash
+    if (hash && hash.includes('?')) {
+      const hashParams = hash.split('?')[1]
+      const hashUrlParams = new URLSearchParams(hashParams)
+      hashUrlParams.forEach((value, key) => {
+        if (!params[key]) {
+          params[key] = value
+        }
+      })
+    }
+  } catch (e) {
+    console.error('解析 URL 参数失败:', e)
+  }
+  return params
+  // #endif
+  
+  return {}
+}

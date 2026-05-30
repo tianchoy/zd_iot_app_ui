@@ -2,8 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
   const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
-  const _component_uv_icon = common_vendor.resolveComponent("uv-icon");
-  (_easycom_m_icon_1 + _component_uv_icon)();
+  _easycom_m_icon_1();
 }
 const _easycom_m_icon = () => "../../uni_modules/m-unix/components/m-icon/m-icon.js";
 if (!Math) {
@@ -19,7 +18,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     backgroundColor: { type: String, default: "#f4f7fb" },
     textColor: { type: String, default: "#000000" },
     isIcon: { type: Boolean, default: true },
-    Icon: { type: String, default: "plus-circle" },
+    Icon: { type: String, default: "add-circle" },
     rightText: { type: String, default: "" },
     isShowStyle: { type: Boolean, default: true },
     iconColor: { type: String, default: "#606266" }
@@ -139,7 +138,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         v: __props.showBack
       }, __props.showBack ? {
-        w: common_vendor.o(handleBack, "e4"),
+        w: common_vendor.o(handleBack, "2a"),
         x: common_vendor.p({
           name: "arrow-left-bold",
           size: "40rpx",
@@ -165,7 +164,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         G: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        }, "59")
+        }, "8d")
       }) : {}, {
         H: common_vendor.s({
           height: common_vendor.unref(navBarHeight) + "px",

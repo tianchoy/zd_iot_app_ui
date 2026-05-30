@@ -1,5 +1,5 @@
 <template>
-	<topNavBar title="我的套餐" :show-back="true" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<topNavBar title="我的套餐" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
 		<view class="card-info">
 			<view class="info-title">当前卡号</view>
@@ -139,6 +139,14 @@
 				return ''
 		}
 	}
+
+	// 返回上一页
+	const goBack = () => {
+		uni.navigateBack({
+			delta: 1
+		})
+	}
+		
 </script>
 
 <style lang="scss" scoped>

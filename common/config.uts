@@ -1,37 +1,13 @@
 // common/config.ts
-
-// 将所有嵌套对象单独定义为 interface
 export interface AuthApiPaths {
   login: string
   logout: string
   refreshToken: string
 }
 
-export interface UserApiPaths {
-  profile: string
-  update: string
-  list: string
-}
-
-export interface ArticleApiPaths {
-  list: string
-  detail: string
-  create: string
-  update: string
-  delete: string
-}
-
-export interface UploadApiPaths {
-  image: string
-  file: string
-}
-
 // ApiPaths 只引用已定义的 interface
 export interface ApiPaths {
   auth: AuthApiPaths
-  user: UserApiPaths
-  article: ArticleApiPaths
-  upload: UploadApiPaths
 }
 
 // 其他配置类型
@@ -95,28 +71,11 @@ export const config: ProjectConfig = {
       logout: '/auth/logout',
       refreshToken: '/auth/refresh'
     },
-    user: {
-      profile: '/user/profile',
-      update: '/user/update',
-      list: '/user/list'
-    },
-    article: {
-      list: '/article/list',
-      detail: '/article/detail',
-      create: '/article/create',
-      update: '/article/update',
-      delete: '/article/delete'
-    },
-    upload: {
-      image: '/upload/image',
-      file: '/upload/file'
-    }
   },
   
   storage: {
     token: 'access_token',
     refreshToken: 'refresh_token',
-    userInfo: 'user_info'
   },
   
   configInfo: {

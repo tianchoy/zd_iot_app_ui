@@ -26,7 +26,7 @@
 							<text class="card-item-title">{{ card.cardNumber }}</text>
 							<text class="card-item-content">ICCID: {{ card.iccid }}</text>
 						</view>
-						<m-tag :text="card.tag" :round="true" :plain="true" size="small" type="primary"></m-tag>
+						<text class="status-tag" :class="getStatusClass(card.status)">{{ card.status }}</text>
 					</view>
 					<view class="item-package">
 						<text class="package-label">当前套餐:</text>
@@ -62,10 +62,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed,onMounted } from 'vue'
+import { getPageParams } from '@/utils/routerParams'
 
 const card_number = ref('')
-const tabs = ref(['全部', '正常', '异常'])
+const tabs = ref(['全部', '在用', '异常'])
 const current = ref(0)
 
 // 卡片数据类型
@@ -89,7 +90,7 @@ const allCardList = ref<CardItem[]>([
 		cardNumber: '1064916585160',
 		iccid: '89860421123456789012',
 		tag: '主卡',
-		status: '正常',
+		status: '在用',
 		currentPackage: '车联网月包20G',
 		expireDate: '2026-04-30',
 		usedTraffic: '11.34GB',
@@ -101,7 +102,7 @@ const allCardList = ref<CardItem[]>([
 		cardNumber: '1064916585161',
 		iccid: '89860421123456789013',
 		tag: '副卡',
-		status: '正常',
+		status: '在用',
 		currentPackage: '车联网月包10G',
 		expireDate: '2026-05-15',
 		usedTraffic: '5.21GB',
@@ -125,7 +126,7 @@ const allCardList = ref<CardItem[]>([
 		cardNumber: '1064916585163',
 		iccid: '89860421123456789015',
 		tag: '备用卡',
-		status: '正常',
+		status: '在用',
 		currentPackage: '工业设备月包5G',
 		expireDate: '2026-06-30',
 		usedTraffic: '2.15GB',
@@ -137,7 +138,7 @@ const allCardList = ref<CardItem[]>([
 		cardNumber: '1064916585164',
 		iccid: '89860421123456789016',
 		tag: '体验卡',
-		status: '异常',
+		status: '停机',
 		currentPackage: '体验套餐500M',
 		expireDate: '2026-02-28',
 		usedTraffic: '500MB',
@@ -155,10 +156,33 @@ const filteredCardList = computed(() => {
 	return allCardList.value.filter(card => card.status === currentStatus)
 })
 
+// 获取状态样式类
+const getStatusClass = (status: string): string => {
+	switch (status) {
+		case '在用':
+			return 'status-completed'
+		case '异常':
+			return 'status-pending'
+		case '停机':
+			return 'status-refunded'
+		default:
+			return ''
+	}
+}
+
 const handleClick = (e: UTSJSONObject) => {
 	console.log(e.index)
-	current.value = e.index
+	if(e.index != null){
+		current.value = e.index
+	}
 }
+
+onLoad((options) => {
+	console.log(options)
+	if(options.type){
+		current.value = Number(options.type)
+	}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -228,6 +252,29 @@ const handleClick = (e: UTSJSONObject) => {
 						color: #94a3b8;
 						line-height: 1.45;
 						word-break: break-all;
+					}
+
+					.status-tag {
+						font-size: 24rpx;
+						padding: 6rpx 16rpx;
+						border-radius: 20rpx;
+					}
+					.status-completed {
+						background: #ecfdf5;
+						color: #059669;
+						border-color:1rpx solid #a7f3d0;
+					}
+					
+					.status-pending {
+						background: #fff7ed;
+						color: #ea580c;
+						border-color:1rpx solid #fdba74;
+					}
+					
+					.status-refunded {
+						background: #fef2f2;
+						color: #dc2626;
+						border-color:1rpx solid #fecaca;
 					}
 				}
 				.item-package{

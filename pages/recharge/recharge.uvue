@@ -24,8 +24,8 @@
 				<LinearProgress :value="progress1" />
 			</view>
 			<view class="card-bottom">
-				<m-button type="white" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true">卡片套餐</m-button>
-				<m-button type="white" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true">订单记录</m-button>
+				<m-button type="white" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true" @click="toMyPackage">卡片套餐</m-button>
+				<m-button type="white" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true" @click="toOrderRecord">订单记录</m-button>
 			</view>
 		</view>
 		<view class="pkg-box">
@@ -156,24 +156,24 @@
 			tag: '推荐',
 			data: '20GB',
 			validity: '30天',
-			price: '90',
-			originalPrice: '100'
+			price: 90,
+			originalPrice: 100
 		},
 		{
 			name: '车联网月包10G',
 			tag: '',
 			data: '10GB',
 			validity: '30天',
-			price: '50',
-			originalPrice: ''
+			price: 50,
+			originalPrice: 0
 		},
 		{
 			name: '工业设备月包5G',
 			tag: '',
 			data: '5GB',
 			validity: '30天',
-			price: '30',
-			originalPrice: ''
+			price: 30,
+			originalPrice: 0
 		}
 	]);
 
@@ -184,24 +184,24 @@
 			tag: '推荐',
 			data: '5GB',
 			validity: '7天',
-			price: '20',
-			originalPrice: '30'
+			price: 20,
+			originalPrice: 30
 		},
 		{
 			name: '加油包10G',
 			tag: '',
 			data: '10GB',
 			validity: '15天',
-			price: '35',
-			originalPrice: '45'
+			price: 35,
+			originalPrice: 45
 		},
 		{
 			name: '加油包20G',
 			tag: '',
 			data: '20GB',
 			validity: '30天',
-			price: '60',
-			originalPrice: '80'
+			price: 60,
+			originalPrice: 80
 		}
 	]);
 
@@ -210,12 +210,11 @@
 	// 选中的加油包索引
 	const selectedRefillIndex = ref(0);
 
-	// 当前显示的套餐金额
-	const currentPrice = computed(() => {
+	const currentPrice = computed((): number => {
 		if (active.value === 0) {
-			return packageList.value[selectedPackageIndex.value]?.price || '0';
+			return packageList.value[selectedPackageIndex.value]?.price ?? 0;
 		} else {
-			return refillList.value[selectedRefillIndex.value]?.price || '0';
+			return refillList.value[selectedRefillIndex.value]?.price ?? 0;
 		}
 	});
 
@@ -252,6 +251,21 @@
 			delta: 1
 		})
 	}
+
+	// 跳转我的套餐
+	const toMyPackage = () => {
+		uni.navigateTo({
+			url: '/pages/myPkg/myPkg'
+		})
+	}
+
+	// 跳转订单记录
+	const toOrderRecord = () => {
+		uni.navigateTo({
+			url: '/pages/orderRecord/orderRecord'
+		})
+	}
+	
 </script>
 
 <style lang="scss" scoped>

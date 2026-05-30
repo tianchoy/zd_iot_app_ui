@@ -25,28 +25,11 @@ const config = {
       login: "/auth/login",
       logout: "/auth/logout",
       refreshToken: "/auth/refresh"
-    },
-    user: {
-      profile: "/user/profile",
-      update: "/user/update",
-      list: "/user/list"
-    },
-    article: {
-      list: "/article/list",
-      detail: "/article/detail",
-      create: "/article/create",
-      update: "/article/update",
-      delete: "/article/delete"
-    },
-    upload: {
-      image: "/upload/image",
-      file: "/upload/file"
     }
   },
   storage: {
     token: "access_token",
-    refreshToken: "refresh_token",
-    userInfo: "user_info"
+    refreshToken: "refresh_token"
   },
   configInfo: {
     name: "我的应用",

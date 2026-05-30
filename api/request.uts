@@ -103,7 +103,7 @@ async function request<T = any>(
     // token 过期
     if (result.code === 401) {
       clearToken()
-      uni.navigateTo({ url: '/pages/login/login' })
+      uni.navigateTo({ url: '/pages/index/index' })
       if (reqConfig.showError) {
         uni.showToast({
           title: '登录已过期，请重新登录',

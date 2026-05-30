@@ -66,7 +66,7 @@ function request(url, method, data = null, requestConfig = null) {
       const result = response.data;
       if (result.code === 401) {
         common_config.clearToken();
-        common_vendor.index.navigateTo({ url: "/pages/login/login" });
+        common_vendor.index.navigateTo({ url: "/pages/index/index" });
         if (reqConfig.showError) {
           common_vendor.index.showToast({
             title: "登录已过期，请重新登录",
@@ -100,7 +100,7 @@ function request(url, method, data = null, requestConfig = null) {
     }
   });
 }
-const api = new common_vendor.UTSJSONObject({
+new common_vendor.UTSJSONObject({
   get(url, params = null, config = null) {
     return request(url, "GET", params, config);
   },
@@ -114,5 +114,4 @@ const api = new common_vendor.UTSJSONObject({
     return request(url, "DELETE", data, config);
   }
 });
-exports.api = api;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

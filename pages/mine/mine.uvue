@@ -5,22 +5,22 @@
 		<view class="card-info">
 			<text class="persion-name">Hi,{{title}}</text>
 			<view class="persion-card">
-				<view class="persion-card-item">
+				<view class="persion-card-item"  @click="cardType(0)">
 					<text class="persion-card-item-title">我的卡片</text>
 					<text class="persion-card-item-content"> 12</text>
 				</view>
-				<view class="persion-card-item">
+				<view class="persion-card-item"  @click="cardType(1)">
 					<text class="persion-card-item-title">在用卡片</text>
 					<text class="persion-card-item-content"> 12</text>
 				</view>
-				<view class="persion-card-item">
+				<view class="persion-card-item"  @click="cardType(2)">
 					<text class="persion-card-item-title">异常卡片</text>
 					<text class="persion-card-item-content"> 12</text>
 				</view>
 			</view>
 		</view>
 		<view class="card-box">
-			<view class="item">
+			<view class="item"  @click="toOrder">
 				<text class="order-label">我的订单</text>
 				<m-icon name="arrow-right-bold" size="20rpx"></m-icon>
 			</view>
@@ -38,6 +38,20 @@
 
 <script setup lang="uts">
 	const title = ref('用户');
+
+	// 卡片类型切换
+	const cardType = (type: number) => {
+		console.log(type)
+		uni.reLaunch({
+			url: '/pages/card/card?type=' + type
+		})
+	}
+	// 跳转订单记录
+	const toOrder = () => {
+		uni.navigateTo({
+			url: '/pages/myOrder/myOrder'
+		})
+	}
 </script>
 
 <style lang="scss" scoped>

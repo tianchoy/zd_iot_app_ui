@@ -46,17 +46,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return "";
       }
     };
+    const goBack = () => {
+      common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
+        delta: 1
+      }));
+    };
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.p({
+        a: common_vendor.o(goBack, "f5"),
+        b: common_vendor.p({
           title: "订单记录",
           ["show-back"]: true,
           textColor: "#333",
           showCapsule: false,
           class: "data-v-a151b594"
         }),
-        b: common_vendor.f(orderList.value, (order, index, i0) => {
+        c: common_vendor.f(orderList.value, (order, index, i0) => {
           return {
             a: common_vendor.t(order.packageName),
             b: common_vendor.t(order.amount),
@@ -67,8 +73,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: index
           };
         }),
-        c: `${_ctx.u_s_b_h}px`,
-        d: `${_ctx.u_s_a_i_b}px`
+        d: `${_ctx.u_s_b_h}px`,
+        e: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

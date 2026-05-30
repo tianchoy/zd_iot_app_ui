@@ -1,4 +1,3 @@
-// api/auth.ts
 import { api, ApiResponse } from '@/api/request'
 import { config, setToken, clearToken } from '@/common/config'
 
@@ -17,20 +16,13 @@ export interface LoginData {
 
 // 登录
 export async function login(params: any) {
-  console.log('开始请求', params)
+  console.log('login called', params)
   
   try {
-    // 使用公开测试 API
-    const response = await api.get(config.baseUrl + config.api.login)
-    console.log('请求成功', response)
-    
-    return {
-      code: 200,
-      data: response.data,
-      message: 'success'
-    }
+    const res = await api.post(config.api.auth.login, params)
+    return res
   } catch (error) {
-    console.error('请求失败', error)
+    console.error('login error', error)
     throw error
   }
 }

@@ -1,5 +1,5 @@
 <template>
-	<topNavBar title="订单记录" :show-back="true"  textColor="#333" :showCapsule="false"></topNavBar>
+	<topNavBar title="订单记录" :show-back="true" @back="goBack" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
 		<!-- 订单列表 -->
 		<view class="order-list">
@@ -76,6 +76,13 @@
 			default:
 				return ''
 		}
+	}
+
+	// 返回上一页
+	const goBack = () => {
+		uni.navigateBack({
+			delta: 1
+		})
 	}
 </script>
 

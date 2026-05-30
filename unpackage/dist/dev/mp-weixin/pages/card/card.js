@@ -5,24 +5,22 @@ if (!Array) {
   const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
   const _easycom_m_button_1 = common_vendor.resolveComponent("m-button");
   const _easycom_m_segmented_control_1 = common_vendor.resolveComponent("m-segmented-control");
-  const _easycom_m_tag_1 = common_vendor.resolveComponent("m-tag");
   const _easycom_m_div_1 = common_vendor.resolveComponent("m-div");
-  (_easycom_topNavBar_1 + _easycom_m_icon_1 + _easycom_m_button_1 + _easycom_m_segmented_control_1 + _easycom_m_tag_1 + _easycom_m_div_1)();
+  (_easycom_topNavBar_1 + _easycom_m_icon_1 + _easycom_m_button_1 + _easycom_m_segmented_control_1 + _easycom_m_div_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
 const _easycom_m_icon = () => "../../uni_modules/m-unix/components/m-icon/m-icon.js";
 const _easycom_m_button = () => "../../uni_modules/m-unix/components/m-button/m-button.js";
 const _easycom_m_segmented_control = () => "../../uni_modules/m-unix/components/m-segmented-control/m-segmented-control.js";
-const _easycom_m_tag = () => "../../uni_modules/m-unix/components/m-tag/m-tag.js";
 const _easycom_m_div = () => "../../uni_modules/m-unix/components/m-div/m-div.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_m_icon + _easycom_m_button + _easycom_m_segmented_control + _easycom_m_tag + _easycom_m_div)();
+  (_easycom_topNavBar + _easycom_m_icon + _easycom_m_button + _easycom_m_segmented_control + _easycom_m_div)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "card",
   setup(__props) {
     const card_number = common_vendor.ref("");
-    const tabs = common_vendor.ref(["全部", "正常", "异常"]);
+    const tabs = common_vendor.ref(["全部", "在用", "异常"]);
     const current = common_vendor.ref(0);
     const allCardList = common_vendor.ref([
       {
@@ -30,7 +28,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         cardNumber: "1064916585160",
         iccid: "89860421123456789012",
         tag: "主卡",
-        status: "正常",
+        status: "在用",
         currentPackage: "车联网月包20G",
         expireDate: "2026-04-30",
         usedTraffic: "11.34GB",
@@ -42,7 +40,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         cardNumber: "1064916585161",
         iccid: "89860421123456789013",
         tag: "副卡",
-        status: "正常",
+        status: "在用",
         currentPackage: "车联网月包10G",
         expireDate: "2026-05-15",
         usedTraffic: "5.21GB",
@@ -66,7 +64,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         cardNumber: "1064916585163",
         iccid: "89860421123456789015",
         tag: "备用卡",
-        status: "正常",
+        status: "在用",
         currentPackage: "工业设备月包5G",
         expireDate: "2026-06-30",
         usedTraffic: "2.15GB",
@@ -78,7 +76,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         cardNumber: "1064916585164",
         iccid: "89860421123456789016",
         tag: "体验卡",
-        status: "异常",
+        status: "停机",
         currentPackage: "体验套餐500M",
         expireDate: "2026-02-28",
         usedTraffic: "500MB",
@@ -95,10 +93,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return card.status === currentStatus;
       });
     });
-    const handleClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:159", e.index);
-      current.value = e.index;
+    const getStatusClass = (status) => {
+      switch (status) {
+        case "在用":
+          return "status-completed";
+        case "异常":
+          return "status-pending";
+        case "停机":
+          return "status-refunded";
+        default:
+          return "";
+      }
     };
+    const handleClick = (e) => {
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:174", e.index);
+      if (e.index != null) {
+        current.value = e.index;
+      }
+    };
+    common_vendor.onLoad((options) => {
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:181", options);
+      if (options.type) {
+        current.value = Number(options.type);
+      }
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
@@ -146,22 +164,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return {
             a: common_vendor.t(card.cardNumber),
             b: common_vendor.t(card.iccid),
-            c: "a89086b7-5-" + i0,
-            d: common_vendor.p({
-              text: card.tag,
-              round: true,
-              plain: true,
-              size: "small",
-              type: "primary",
-              class: "data-v-a89086b7"
-            }),
+            c: common_vendor.t(card.status),
+            d: common_vendor.n(getStatusClass(card.status)),
             e: common_vendor.t(card.currentPackage),
-            f: "a89086b7-6-" + i0,
+            f: "a89086b7-5-" + i0,
             g: common_vendor.t(card.expireDate),
             h: common_vendor.t(card.usedTraffic),
             i: common_vendor.t(card.totalTraffic),
             j: common_vendor.t(card.currentCycle),
-            k: "a89086b7-7-" + i0,
+            k: "a89086b7-6-" + i0,
             l: index
           };
         }),

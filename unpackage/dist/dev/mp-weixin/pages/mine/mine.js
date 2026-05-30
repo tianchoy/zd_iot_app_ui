@@ -14,6 +14,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "mine",
   setup(__props) {
     const title = common_vendor.ref("用户");
+    const cardType = (type) => {
+      common_vendor.index.__f__("log", "at pages/mine/mine.uvue:44", type);
+      common_vendor.index.reLaunch({
+        url: "/pages/card/card?type=" + type
+      });
+    };
+    const toOrder = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/myOrder/myOrder"
+      });
+    };
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
@@ -26,23 +37,33 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-284ae985"
         }),
         b: common_vendor.t(common_vendor.unref(title)),
-        c: common_vendor.p({
+        c: common_vendor.o(($event) => {
+          return cardType(0);
+        }, "b4"),
+        d: common_vendor.o(($event) => {
+          return cardType(1);
+        }, "2b"),
+        e: common_vendor.o(($event) => {
+          return cardType(2);
+        }, "45"),
+        f: common_vendor.p({
           name: "arrow-right-bold",
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        d: common_vendor.p({
+        g: common_vendor.o(toOrder, "31"),
+        h: common_vendor.p({
           name: "arrow-right-bold",
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        e: common_vendor.p({
+        i: common_vendor.p({
           name: "arrow-right-bold",
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        f: `${_ctx.u_s_b_h}px`,
-        g: `${_ctx.u_s_a_i_b}px`
+        j: `${_ctx.u_s_b_h}px`,
+        k: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

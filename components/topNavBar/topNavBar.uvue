@@ -12,7 +12,7 @@
 		<view class="capsule">
 			<view class="capsule-item">
 				<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
-					<uv-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></uv-icon>
+					<m-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></m-icon>
 					<text v-else>{{rightText}}</text>
 				</view>
 			</view>
@@ -32,7 +32,7 @@
 			<view class="capsule">
 				<view class="capsule-item">
 					<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
-						<uv-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></uv-icon>
+						<m-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></m-icon>
 						<text v-else>{{rightText}}</text>
 					</view>
 				</view>
@@ -55,7 +55,7 @@ const props = defineProps({
 	backgroundColor: { type: String, default: '#f4f7fb' },
 	textColor: { type: String, default: '#000000' },
 	isIcon: { type: Boolean, default: true },
-	Icon: { type: String, default: 'plus-circle' },
+	Icon: { type: String, default: 'add-circle' },
 	rightText: { type: String, default: '' },
 	isShowStyle: { type: Boolean, default: true },
 	iconColor: { type: String, default: '#606266' }

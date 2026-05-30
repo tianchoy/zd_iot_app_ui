@@ -40,24 +40,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         tag: "推荐",
         data: "20GB",
         validity: "30天",
-        price: "90",
-        originalPrice: "100"
+        price: 90,
+        originalPrice: 100
       }),
       new common_vendor.UTSJSONObject({
         name: "车联网月包10G",
         tag: "",
         data: "10GB",
         validity: "30天",
-        price: "50",
-        originalPrice: ""
+        price: 50,
+        originalPrice: 0
       }),
       new common_vendor.UTSJSONObject({
         name: "工业设备月包5G",
         tag: "",
         data: "5GB",
         validity: "30天",
-        price: "30",
-        originalPrice: ""
+        price: 30,
+        originalPrice: 0
       })
     ]);
     const refillList = common_vendor.ref([
@@ -66,34 +66,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         tag: "推荐",
         data: "5GB",
         validity: "7天",
-        price: "20",
-        originalPrice: "30"
+        price: 20,
+        originalPrice: 30
       }),
       new common_vendor.UTSJSONObject({
         name: "加油包10G",
         tag: "",
         data: "10GB",
         validity: "15天",
-        price: "35",
-        originalPrice: "45"
+        price: 35,
+        originalPrice: 45
       }),
       new common_vendor.UTSJSONObject({
         name: "加油包20G",
         tag: "",
         data: "20GB",
         validity: "30天",
-        price: "60",
-        originalPrice: "80"
+        price: 60,
+        originalPrice: 80
       })
     ]);
     const selectedPackageIndex = common_vendor.ref(0);
     const selectedRefillIndex = common_vendor.ref(0);
     const currentPrice = common_vendor.computed(() => {
-      var _a, _b;
+      var _a, _b, _c, _d;
       if (active.value === 0) {
-        return ((_a = packageList.value[selectedPackageIndex.value]) === null || _a === void 0 ? null : _a.price) || "0";
+        return (_b = (_a = packageList.value[selectedPackageIndex.value]) === null || _a === void 0 ? null : _a.price) !== null && _b !== void 0 ? _b : 0;
       } else {
-        return ((_b = refillList.value[selectedRefillIndex.value]) === null || _b === void 0 ? null : _b.price) || "0";
+        return (_d = (_c = refillList.value[selectedRefillIndex.value]) === null || _c === void 0 ? null : _c.price) !== null && _d !== void 0 ? _d : 0;
       }
     });
     const changeTab = (e = null) => {
@@ -112,13 +112,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleConfirmPayment = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:245", e);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:244", e);
       showPopup.value = false;
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
         delta: 1
       }));
+    };
+    const toMyPackage = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/myPkg/myPkg"
+      });
+    };
+    const toOrderRecord = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/orderRecord/orderRecord"
+      });
     };
     return (_ctx, _cache) => {
       "raw js";
@@ -144,15 +154,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           value: progress1.value,
           class: "data-v-722cdacb"
         }),
-        e: common_vendor.p({
-          type: "white",
-          plain: true,
-          margin: "0 20rpx",
-          height: "70rpx",
-          shape: "circle",
-          bold: true,
-          class: "data-v-722cdacb"
-        }),
+        e: common_vendor.o(toMyPackage, "50"),
         f: common_vendor.p({
           type: "white",
           plain: true,
@@ -162,8 +164,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           bold: true,
           class: "data-v-722cdacb"
         }),
-        g: common_vendor.o(changeTab, "6c"),
+        g: common_vendor.o(toOrderRecord, "a5"),
         h: common_vendor.p({
+          type: "white",
+          plain: true,
+          margin: "0 20rpx",
+          height: "70rpx",
+          shape: "circle",
+          bold: true,
+          class: "data-v-722cdacb"
+        }),
+        i: common_vendor.o(changeTab, "be"),
+        j: common_vendor.p({
           tabs: tabs.value,
           width: "100rpx",
           padding: 0,
@@ -173,9 +185,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           bold: true,
           class: "data-v-722cdacb"
         }),
-        i: active.value === 0
+        k: active.value === 0
       }, active.value === 0 ? {
-        j: common_vendor.f(packageList.value, (item, index, i0) => {
+        l: common_vendor.f(packageList.value, (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.name),
             b: item.tag
@@ -197,7 +209,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       } : {
-        k: common_vendor.f(refillList.value, (item, index, i0) => {
+        m: common_vendor.f(refillList.value, (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.name),
             b: item.tag
@@ -219,26 +231,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }, {
-        l: `${_ctx.u_s_b_h}px`,
-        m: `${_ctx.u_s_a_i_b}px`,
-        n: common_vendor.o(handleCancelPayment, "e4"),
-        o: common_vendor.o(handleConfirmPayment, "22"),
-        p: common_vendor.p({
+        n: `${_ctx.u_s_b_h}px`,
+        o: `${_ctx.u_s_a_i_b}px`,
+        p: common_vendor.o(handleCancelPayment, "68"),
+        q: common_vendor.o(handleConfirmPayment, "06"),
+        r: common_vendor.p({
           amount: currentPrice.value,
           class: "data-v-722cdacb"
         }),
-        q: common_vendor.o(($event) => {
+        s: common_vendor.o(($event) => {
           return showPopup.value = false;
-        }, "88"),
-        r: common_vendor.p({
+        }, "d0"),
+        t: common_vendor.p({
           show: showPopup.value,
           height: "50%",
           radius: true,
           class: "data-v-722cdacb"
         }),
-        s: common_vendor.t(currentPrice.value),
-        t: common_vendor.o(choosePayment, "12"),
-        v: common_vendor.p({
+        v: common_vendor.t(currentPrice.value),
+        w: common_vendor.o(choosePayment, "ed"),
+        x: common_vendor.p({
           type: "primary",
           plain: false,
           margin: "0 20rpx",
@@ -249,7 +261,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           shadow: false,
           class: "data-v-722cdacb"
         }),
-        w: common_vendor.p({
+        y: common_vendor.p({
           class: "data-v-722cdacb"
         })
       });
