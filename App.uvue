@@ -61,4 +61,16 @@
 	.uni-column {
 		flex-direction: column;
 	}
+	.mr-24{
+		margin-right: 24rpx !important;
+	}
+	.ml-24{
+		margin-left: 24rpx !important;
+	}
+	.mb-24{
+		margin-bottom: 24rpx !important;
+	}
+	.mt-24{
+		margin-top: 24rpx !important;
+	}
 </style>

@@ -2,7 +2,7 @@
 	<topNavBar title="我的" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
 		
-		<view class="card-info">
+		<view class="card-info mb-24">
 			<text class="persion-name">Hi,{{title}}</text>
 			<view class="persion-card">
 				<view class="persion-card-item"  @click="cardType(0)">

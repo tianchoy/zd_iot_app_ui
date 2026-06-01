@@ -131,7 +131,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: card_number.value,
         c: common_vendor.o(($event) => {
           return card_number.value = $event.detail.value;
-        }, "76"),
+        }, "9c"),
         d: common_vendor.p({
           name: "scanning",
           size: "40rpx",
@@ -148,7 +148,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           width: "120rpx",
           class: "data-v-a89086b7"
         }),
-        g: common_vendor.o(handleClick, "99"),
+        g: common_vendor.o(handleClick, "50"),
         h: common_vendor.p({
           values: tabs.value,
           current: current.value,

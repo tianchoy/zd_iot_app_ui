@@ -133,7 +133,7 @@ page .container .card-box .card-item .card-metrics.data-v-a89086b7 {
   margin: 20rpx 0;
 }
 page .container .card-box .card-item .card-metrics .metric-box.data-v-a89086b7 {
-  width: 48%;
+  flex: 1;
   box-sizing: border-box;
   background: #f8fbff;
   border: 1rpx solid #e8eef7;

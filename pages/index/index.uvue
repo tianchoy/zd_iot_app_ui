@@ -18,7 +18,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="card-box">
+		<view class="card-box mt-24 mb-24">
 			<view class="card-label">卡号查询</view>
 			<view class="search-value">
 				<input
@@ -33,7 +33,7 @@
 			</view>
 		</view>
 		<view class="card-box">
-			<view class="card-label">
+			<view class="card-label mb-24">
 				<text>最近常用卡片</text>
 				<text class="view-all" @click="cardType(0)">查看全部</text>
 			</view>
@@ -52,7 +52,7 @@
 					</view>
 					<m-div backgroundColor="#f1f5f9" textClass="divider"></m-div>
 					<view class="card-metrics">
-						<view class="metric-box">
+						<view class="metric-box mr-24">
 							<view class="metric-label">到期时间</view>
 							<view class="metric-value">2026-04-30</view>
 						</view>
@@ -292,7 +292,7 @@
 				flex-wrap: wrap;
 				margin: 20rpx 0;
 				.metric-box{
-					width: 48%;
+					flex:1;
 					box-sizing: border-box;
 					background: #f8fbff;
 					border: 1rpx solid #e8eef7;

@@ -2,9 +2,9 @@
 	<topNavBar title="卡片" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
 		
-		<view class="card-box">
+		<view class="card-box mb-24">
 			<view class="card-label">卡号查询</view>
-			<view class="search-value">
+			<view class="search-value mt-24 mb-24">
 				<input
 					v-model="card_number"
 					placeholder="请输入 ICCID / MSISDN"
@@ -34,7 +34,7 @@
 					</view>
 					<m-div backgroundColor="#f1f5f9" textClass="divider"></m-div>
 					<view class="card-metrics">
-						<view class="metric-box">
+						<view class="metric-box mr-24">
 							<view class="metric-label">到期时间</view>
 							<view class="metric-value">{{ card.expireDate }}</view>
 						</view>
@@ -301,7 +301,7 @@ onLoad((options) => {
 					margin: 20rpx 0;
 					
 					.metric-box{
-						width: 48%;
+						flex:1;
 						box-sizing: border-box;
 						background: #f8fbff;
 						border: 1rpx solid #e8eef7;

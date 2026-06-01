@@ -39,19 +39,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.t(common_vendor.unref(title)),
         c: common_vendor.o(($event) => {
           return cardType(0);
-        }, "b4"),
+        }, "37"),
         d: common_vendor.o(($event) => {
           return cardType(1);
-        }, "2b"),
+        }, "31"),
         e: common_vendor.o(($event) => {
           return cardType(2);
-        }, "45"),
+        }, "6c"),
         f: common_vendor.p({
           name: "arrow-right-bold",
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        g: common_vendor.o(toOrder, "31"),
+        g: common_vendor.o(toOrder, "87"),
         h: common_vendor.p({
           name: "arrow-right-bold",
           size: "20rpx",
