@@ -117,11 +117,7 @@ const getNavBarInfo = () => {
 // 处理返回事件
 const handleBack = () => {
 	if (props.showBack) {
-		// 检查是否有监听器
-		const hasListener = emit && typeof emit === 'function';
-		if (hasListener) {
-			emit('back');
-		}
+		emit('back');
 		// 默认返回上一页
 		// uni.navigateBack();
 	}

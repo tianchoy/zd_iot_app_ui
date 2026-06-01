@@ -2,7 +2,6 @@
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
 require("./utils/inject-m-unix.js");
-const uni_modules_mUnix_index = require("./uni_modules/m-unix/index.js");
 if (!Math) {
   "./pages/index/index.js";
   "./pages/card/card.js";
@@ -36,7 +35,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 function createApp() {
   const app = common_vendor.createSSRApp(_sfc_main);
-  app.use(uni_modules_mUnix_index.mUnix);
   return {
     app
   };

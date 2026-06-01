@@ -66,18 +66,27 @@ const __sfc__ = defineComponent({
 			} as UTSJSONObject
 		},
 		dotSizeStyle(): UTSJSONObject {
+			const style: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("style", "uni_modules/m-unix/components/m-loading/m-loading.uvue", 78, 10),
+				backgroundColor: this.color
+			}
 			if (!this.hasCustomDotSize) {
-				return {} as UTSJSONObject
+				return style
 			}
 			const w = toCssLength(this.size as string)
+			style.width = w
+			style.height = w
+			return style
+		},
+		textStyle(): UTSJSONObject {
 			return {
-				width: w,
-				height: w
+				color: this.color
 			} as UTSJSONObject
 		},
 		dotGapStyle(): UTSJSONObject {
 			if (!this.hasCustomDotSize) {
-				return {} as UTSJSONObject
+				return {
+					marginLeft: '16rpx'
+				} as UTSJSONObject
 			}
 			const normalized = toCssLength(this.size as string)
 			const n = parseCssNumber(normalized)
@@ -102,9 +111,10 @@ const __sfc__ = defineComponent({
 			}
 			const gapObj = this.dotGapStyle as UTSJSONObject
 			const ml = gapObj['marginLeft']
-			const merged: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("merged", "uni_modules/m-unix/components/m-loading/m-loading.uvue", 114, 10),
+			const merged: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("merged", "uni_modules/m-unix/components/m-loading/m-loading.uvue", 123, 10),
 				width: base['width'],
 				height: base['height'],
+				backgroundColor: base['backgroundColor'],
 				marginLeft: ml
 			}
 			return merged
@@ -134,10 +144,11 @@ const _cache = this.$.renderCache
     isTrue(_ctx.text)
       ? _cE("text", _uM({
           key: 0,
-          class: "m-loading__text"
-        }), _tD(_ctx.text), 1 /* TEXT */)
+          class: "m-loading__text",
+          style: _nS(_ctx.textStyle)
+        }), _tD(_ctx.text), 5 /* TEXT, STYLE */)
       : _cC("v-if", true)
   ], 2 /* CLASS */)
 }
 export type MLoadingComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesMUnixComponentsMLoadingMLoadingStyles = [_uM([["m-loading", _uM([["", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"]])], [".m-loading--full", _uM([["position", "fixed"], ["top", 0], ["left", 0], ["right", 0], ["bottom", 0], ["zIndex", 999], ["backgroundColor", "rgba(255,255,255,0.8)"]])]])], ["m-loading__spinner", _uM([[".m-loading ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["height", "40rpx"], ["gap", "16rpx"]])], [".m-loading .m-loading__spinner--anim", _uM([["animationPlayState", "running"]])]])], ["m-loading__dot", _uM([[".m-loading .m-loading__spinner ", _uM([["width", "16rpx"], ["height", "16rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"]])]])], ["m-loading__text", _uM([[".m-loading ", _uM([["marginTop", "16rpx"], ["fontSize", "28rpx"]])]])]])]
+const GenUniModulesMUnixComponentsMLoadingMLoadingStyles = [_uM([["m-loading", _uM([["", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"]])], [".m-loading--full", _uM([["position", "fixed"], ["top", 0], ["left", 0], ["right", 0], ["bottom", 0], ["zIndex", 999], ["backgroundColor", "rgba(255,255,255,0.8)"]])]])], ["m-loading__spinner", _uM([[".m-loading ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["height", "40rpx"]])]])], ["m-loading__dot", _uM([[".m-loading .m-loading__spinner ", _uM([["width", "16rpx"], ["height", "16rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"]])]])], ["m-loading__text", _uM([[".m-loading ", _uM([["marginTop", "16rpx"], ["fontSize", "28rpx"]])]])]])]

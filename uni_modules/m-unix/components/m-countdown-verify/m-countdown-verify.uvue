@@ -291,9 +291,6 @@ export default {
 	flex-shrink: 0;
 }
 
-.m-countdown-verify--hover:active {
-	opacity: 0.75;
-}
 
 .m-countdown-verify__txt {
 	line-height: 1.2;
@@ -301,6 +298,6 @@ export default {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	max-width: 100%;
+	max-width: 750rpx;
 }
 </style>

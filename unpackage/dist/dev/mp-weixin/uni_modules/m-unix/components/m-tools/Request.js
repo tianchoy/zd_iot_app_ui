@@ -3,22 +3,6 @@ const common_vendor = require("../../../../common/vendor.js");
 const uni_modules_mUnix_components_mTools_ProjectConfig = require("./ProjectConfig.js");
 const uni_modules_mUnix_components_mTools_Storage = require("./Storage.js");
 const uni_modules_mUnix_components_mTools_Upload = require("./Upload.js");
-class AnyRecord extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {};
-      },
-      name: "AnyRecord"
-    };
-  }
-  constructor(options, metadata = AnyRecord.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    delete this.__props__;
-  }
-}
 class ApiResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$(T) {
     return {
@@ -50,8 +34,8 @@ class RequestOptions extends common_vendor.UTS.UTSType {
         return {
           url: { type: String, optional: false },
           method: { type: "Unknown", optional: true },
-          data: { type: AnyRecord, optional: true },
-          header: { type: AnyRecord, optional: true },
+          data: { type: "Unknown", optional: true },
+          header: { type: "Unknown", optional: true },
           baseUrl: { type: String, optional: true },
           timeout: { type: Number, optional: true },
           withToken: { type: Boolean, optional: true },
@@ -96,7 +80,7 @@ class QuickRequestParams extends common_vendor.UTS.UTSType {
       get fields() {
         return {
           url: { type: String, optional: false },
-          data: { type: AnyRecord, optional: true },
+          data: { type: "Unknown", optional: true },
           options: { type: RequestOptions, optional: true }
         };
       },
@@ -125,9 +109,9 @@ function buildUrl(url, baseUrl) {
 function buildQueryString(data) {
   const parts = [];
   for (const key in data) {
-    const value = data[key];
-    if (value != null && value !== "") {
-      parts.push(key + "=" + encodeURIComponent(String(value)));
+    const value = data.getString(key);
+    if (value != null && value.length > 0) {
+      parts.push(key + "=" + encodeURIComponent(value));
     }
   }
   return parts.length > 0 ? "?" + parts.join("&") : "";
@@ -149,7 +133,9 @@ function navigateToLogin(loginPage) {
   }, 1200);
 }
 function request(options) {
-  const url = options.url, _a = options.method, method = _a == void 0 ? "GET" : _a, data = options.data, header = options.header, baseUrl = options.baseUrl, _b = options.timeout, timeout = _b == void 0 ? DEFAULT_TIMEOUT : _b, _c = options.withToken, withToken = _c == void 0 ? true : _c, _d = options.showError, showError = _d == void 0 ? true : _d, _e = options.showLoading, showLoading = _e == void 0 ? false : _e, loadingText = options.loadingText, _f = options.redirectOnUnauthorized, redirectOnUnauthorized = _f == void 0 ? true : _f, loginPage = options.loginPage, successCodes = options.successCodes, unauthorizedCodes = options.unauthorizedCodes, onErrorCode = options.onErrorCode;
+  const url = options.url, _a = options.method, method = _a == void 0 ? "GET" : _a, data = options.data;
+  options.header;
+  const baseUrl = options.baseUrl, _b = options.timeout, timeout = _b == void 0 ? DEFAULT_TIMEOUT : _b, _c = options.withToken, withToken = _c == void 0 ? true : _c, _d = options.showError, showError = _d == void 0 ? true : _d, _e = options.showLoading, showLoading = _e == void 0 ? false : _e, loadingText = options.loadingText, _f = options.redirectOnUnauthorized, redirectOnUnauthorized = _f == void 0 ? true : _f, loginPage = options.loginPage, successCodes = options.successCodes, unauthorizedCodes = options.unauthorizedCodes, onErrorCode = options.onErrorCode;
   if (showLoading) {
     showLoadingModal(loadingText !== null && loadingText !== void 0 ? loadingText : "加载中...");
   }
@@ -160,7 +146,12 @@ function request(options) {
     fullUrl += buildQueryString(data);
     requestData = new common_vendor.UTSJSONObject({});
   }
-  const reqHeader = new common_vendor.UTSJSONObject(Object.assign({ "Content-Type": "application/json" }, header));
+  const reqHeader = new common_vendor.UTSJSONObject(
+    {
+      "Content-Type": "application/json"
+    }
+    // 添加 Token
+  );
   if (withToken) {
     const token = uni_modules_mUnix_components_mTools_Storage.storage.getToken();
     if (token != "") {

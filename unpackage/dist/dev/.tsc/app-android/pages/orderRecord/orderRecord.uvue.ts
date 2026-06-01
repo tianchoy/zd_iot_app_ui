@@ -1,0 +1,111 @@
+import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
+import { ref } from 'vue'
+	
+	// 订单列表数据
+	
+const __sfc__ = defineComponent({
+  __name: 'orderRecord',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	const orderList = ref([
+		{
+			packageName: '车联网月包20G',
+			amount: 90,
+			orderNo: '0202604280001',
+			status: '已完成',
+			time: '2026-04-28 10:12:30'
+		},
+		{
+			packageName: '车联网月包10G',
+			amount: 50,
+			orderNo: '0202604280002',
+			status: '待支付',
+			time: '2026-04-28 11:20:12'
+		},
+		{
+			packageName: '测试套餐1G',
+			amount: 10,
+			orderNo: '0202603010001',
+			status: '已退款',
+			time: '2026-03-01 08:10:00'
+		}
+	])
+	
+	// 返回充值页面
+	const goBackRecharge = () => {
+		uni.navigateBack({
+			delta: 1
+		})
+	}
+	
+	// 获取状态样式类
+	const getStatusClass = (status: string): string => {
+		switch (status) {
+			case '已完成':
+				return 'status-completed'
+			case '待支付':
+				return 'status-pending'
+			case '已退款':
+				return 'status-refunded'
+			default:
+				return ''
+		}
+	}
+
+	// 返回上一页
+	const goBack = () => {
+		uni.navigateBack({
+			delta: 1
+		})
+	}
+
+return (): any | null => {
+
+const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar)
+
+  return _cE(Fragment, null, [
+    _cV(_component_topNavBar, _uM({
+      title: "订单记录",
+      "show-back": true,
+      onBack: goBack,
+      textColor: "#333",
+      showCapsule: false
+    })),
+    _cE("view", _uM({ class: "container" }), [
+      _cE("view", _uM({ class: "order-list" }), [
+        _cE("view", _uM({ class: "card-number-section" }), [
+          _cE("text", _uM({ class: "card-number-label" }), "当前卡号"),
+          _cE("text", _uM({ class: "card-number-value" }), "1064916585160")
+        ]),
+        _cE(Fragment, null, RenderHelpers.renderList(orderList.value, (order, index, __index, _cached): any => {
+          return _cE("view", _uM({
+            key: index,
+            class: "order-item"
+          }), [
+            _cE("view", _uM({ class: "order-header" }), [
+              _cE("text", _uM({ class: "package-name" }), _tD(order.packageName), 1 /* TEXT */),
+              _cE("text", _uM({ class: "price" }), "￥" + _tD(order.amount), 1 /* TEXT */)
+            ]),
+            _cE("view", _uM({ class: "order-info" }), [
+              _cE("text", _uM({ class: "order-no" }), "订单号：" + _tD(order.orderNo), 1 /* TEXT */),
+              _cE("text", _uM({
+                class: _nC(["status", getStatusClass(order.status)])
+              }), _tD(order.status), 3 /* TEXT, CLASS */)
+            ]),
+            _cE("view", _uM({ class: "order-time" }), [
+              _cE("text", _uM({ class: "time order-time-text" }), _tD(order.time), 1 /* TEXT */)
+            ])
+          ])
+        }), 128 /* KEYED_FRAGMENT */)
+      ])
+    ])
+  ], 64 /* STABLE_FRAGMENT */)
+}
+}
+
+})
+export default __sfc__
+const GenPagesOrderRecordOrderRecordStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "24rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "32rpx"]]))], ["tip-text", _pS(_uM([["marginBottom", "24rpx"]]))], ["tip-text-value", _pS(_uM([["fontSize", "26rpx"], ["color", "#9ca3af"]]))], ["card-number-section", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-start"], ["marginTop", "32rpx"], ["marginRight", 0], ["marginBottom", "32rpx"], ["marginLeft", 0], ["paddingBottom", "20rpx"], ["borderBottomWidth", "2rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#e5e7eb"]]))], ["card-number-label", _uM([[".card-number-section ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginRight", "24rpx"]])]])], ["card-number-value", _uM([[".card-number-section ", _uM([["fontSize", "32rpx"], ["color", "#1f2937"], ["fontWeight", "bold"]])]])], ["order-list", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["paddingTop", 0], ["paddingRight", "24rpx"], ["paddingBottom", 0], ["paddingLeft", "24rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["boxShadow", "0 8rpx 20rpx rgba(15, 23, 42, 0.04)"]]))], ["order-item", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["borderBottomWidth", "2rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"]]))], ["order-header", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "flex-start"], ["marginBottom", "10rpx"]]))], ["package-name", _uM([[".order-header ", _uM([["fontSize", "26rpx"], ["fontWeight", 600], ["color", "#0f172a"]])]])], ["price", _uM([[".order-header ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#ef4444"]])]])], ["order-info", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "10rpx"]]))], ["order-no", _uM([[".order-info ", _uM([["fontSize", "24rpx"], ["color", "#0f172a"]])]])], ["status", _uM([[".order-info ", _uM([["fontSize", "24rpx"], ["paddingTop", "6rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["status-completed", _uM([[".order-info ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ecfdf5"], ["color", "#059669"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#a7f3d0"], ["borderRightColor", "#a7f3d0"], ["borderBottomColor", "#a7f3d0"], ["borderLeftColor", "#a7f3d0"]])]])], ["status-pending", _uM([[".order-info ", _uM([["backgroundImage", "none"], ["backgroundColor", "#fffbeb"], ["color", "#d97706"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#fde68a"], ["borderRightColor", "#fde68a"], ["borderBottomColor", "#fde68a"], ["borderLeftColor", "#fde68a"]])]])], ["status-refunded", _uM([[".order-info ", _uM([["backgroundColor", "#fce4ec"], ["color", "#c62828"]])]])], ["time", _uM([[".order-time ", _uM([["fontSize", "24rpx"], ["color", "#0f172a"]])]])]])]

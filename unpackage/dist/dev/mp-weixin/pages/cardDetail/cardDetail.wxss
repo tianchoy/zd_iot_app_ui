@@ -48,28 +48,24 @@ page .container .card-box .card-item .item-head.data-v-2bc48812 {
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
 }
 page .container .card-box .card-item .item-head .card-item-title.data-v-2bc48812 {
   font-size: 32rpx;
   font-weight: 800;
   color: #0f172a;
   line-height: 1.25;
-  word-break: break-all;
 }
 page .container .card-box .card-item .item-head .card-item-content.data-v-2bc48812 {
   margin-top: 5px;
   font-size: 12px;
   color: #94a3b8;
   line-height: 1.45;
-  word-break: break-all;
 }
 page .container .card-box .card-item .item-package.data-v-2bc48812 {
   margin: 20rpx 0;
   display: flex;
   flex-direction: row;
-  align-items: baseline;
-  gap: 20rpx;
+  align-items: center;
   min-width: 0;
 }
 page .container .card-box .card-item .item-package .package-label.data-v-2bc48812 {
@@ -88,12 +84,14 @@ page .container .card-box .card-item .item-package .package-value.data-v-2bc4881
   text-overflow: ellipsis;
 }
 page .container .card-box .card-item .card-metrics.data-v-2bc48812 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20rpx;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   margin: 20rpx 0;
 }
 page .container .card-box .card-item .card-metrics .metric-box.data-v-2bc48812 {
+  width: 48%;
+  box-sizing: border-box;
   background: #f8fbff;
   border: 1rpx solid #e8eef7;
   border-radius: 25rpx;
@@ -111,14 +109,12 @@ page .container .card-box .card-item .card-metrics .metric-box .metric-value.dat
   font-weight: 800;
   color: #0f172a;
   line-height: 1.4;
-  word-break: break-all;
 }
 page .container .card-box .card-item .card-bottom.data-v-2bc48812 {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 20rpx;
 }
 page .container .card-box .card-item .card-bottom .cycle-label.data-v-2bc48812 {
   font-size: 25rpx;
@@ -206,9 +202,6 @@ page .container .card-box .card-content .pkg-content .pkg-item .pkg-value .pkg-i
   justify-content: center;
   line-height: 15rpx;
 }
-page .container .card-box .card-content .pkg-content .pkg-item.data-v-2bc48812:last-child {
-  margin-bottom: 0;
-}
 page .container .card-box .card-content .pkg-content .pkg-date.data-v-2bc48812 {
   margin: 20rpx 0;
   border-top: 1rpx solid #eef2f7;
@@ -253,14 +246,12 @@ page .container .card-box .card-content .data-total .total-item .total-value.dat
   font-weight: 800;
   color: #0f172a;
   line-height: 1.4;
-  word-break: break-all;
 }
 page .container .card-box .card-content .card-pkg-box .item.data-v-2bc48812,page  .container .card-box .card-content .card-order .item.data-v-2bc48812 {
   background: #ffffff;
   border: 1rpx solid #e7edf5;
   border-radius: 18rpx;
   padding: 20rpx;
-  cursor: pointer;
   margin-top: 20rpx;
 }
 page .container .card-box .card-content .card-pkg-box .item .item-head.data-v-2bc48812,page  .container .card-box .card-content .card-order .item .item-head.data-v-2bc48812 {

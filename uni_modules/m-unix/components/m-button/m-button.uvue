@@ -152,27 +152,37 @@
 			getWidth() {
 				//medium 184*40 / small 120 40/ mini 58*32
 				let width = this.width;
-				// console.log(this.btnSize)
-				if (this.btnSize) {
-					width = {
-						'medium': '368rpx',
-						'small': '240rpx',
-						'mini': '116rpx',
-						'tiny': '112rpx'
-					} [this.btnSize] || this.width
+				const bs = this.btnSize as string
+				if (bs.length > 0) {
+					if (bs === 'medium') {
+						width = '368rpx'
+					} else if (bs === 'small') {
+						width = '240rpx'
+					} else if (bs === 'mini') {
+						width = '116rpx'
+					} else if (bs === 'tiny') {
+						width = '112rpx'
+					}
 				}
 				return width
 			},
 			getHeight() {
 				//medium 184*40 / small 120 40/ mini 58*32
-				let height = this.height  || '96rpx';
-				if (this.btnSize) {
-					height = {
-						'medium': '80rpx',
-						'small': '80rpx',
-						'mini': '64rpx',
-						'tiny': '48rpx'
-					} [this.btnSize] || '96rpx'
+				let height = this.height
+				if (height.length === 0) {
+					height = '96rpx'
+				}
+				const bs = this.btnSize as string
+				if (bs.length > 0) {
+					if (bs === 'medium') {
+						height = '80rpx'
+					} else if (bs === 'small') {
+						height = '80rpx'
+					} else if (bs === 'mini') {
+						height = '64rpx'
+					} else if (bs === 'tiny') {
+						height = '48rpx'
+					}
 				}
 				return height
 			},
@@ -365,17 +375,6 @@
 		box-sizing: border-box;
 	}
 
-	.m-button__hover:active::after {
-		content: '';
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		left: 0;
-		top: 0;
-		background-color: rgba(0, 0, 0, 0.15);
-		border-radius: 6rpx;
-		pointer-events: none;
-	}
 
 	/* button start*/
 
@@ -401,7 +400,6 @@
 		justify-content: center;
 		width: 100%;
 		/* 子项间距：避免使用 * + *（微信小程序 WXSS 不支持通用选择器 *） */
-		gap: 12rpx;
 	}
 
 	.m-btn--loading {

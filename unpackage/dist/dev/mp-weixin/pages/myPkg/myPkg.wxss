@@ -29,7 +29,7 @@ page .container.data-v-8137f92d {
   display: flex;
   flex-direction: column;
   background-color: #f4f7fb;
-  min-height: 100vh;
+  min-height: 1000rpx;
 }
 page .card-info.data-v-8137f92d,page  .pkg-box.data-v-8137f92d {
   display: flex;
@@ -62,9 +62,6 @@ page .pkg-box .package-card.data-v-8137f92d {
   margin-bottom: 24rpx;
   border: 1rpx solid #e2e8f0;
   box-shadow: 0 4rpx 12rpx rgba(15, 23, 42, 0.04);
-}
-page .pkg-box .package-card.data-v-8137f92d:last-child {
-  margin-bottom: 0;
 }
 page .pkg-box .package-header.data-v-8137f92d {
   display: flex;

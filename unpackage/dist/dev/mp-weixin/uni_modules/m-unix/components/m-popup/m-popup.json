@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "m-overlay": "../m-overlay/m-overlay"
-  }
-}

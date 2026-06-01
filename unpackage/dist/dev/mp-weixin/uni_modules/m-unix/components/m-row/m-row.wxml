@@ -1,1 +1,0 @@
-<view class="{{['m-row', 'data-v-2dc624a2', b && 'm-row--gutter', c]}}" style="{{d + ';' + e + ';' + (virtualHostStyle || '')}}" id="{{a}}" change:eS="{{uV.sS}}" eS="{{$eS[a]}}" change:eA="{{uV.sA}}" eA="{{$eA[a]}}" hidden="{{virtualHostHidden || false}}"><slot></slot></view><wxs src="/common/uniView.wxs" module="uV"/>

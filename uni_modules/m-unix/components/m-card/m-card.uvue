@@ -147,10 +147,7 @@ export default {
 	}
 
 	/* 仅标题区（无横排缩略图）时，头部分割线与留白 */
-	.m-card__header:not(.m-card__header--row) .m-card__header-main {
-		padding-bottom: 16rpx;
-		border-bottom: 1rpx solid #f0f0f0;
-	}
+
 
 	.m-card__content {
 		position: relative;

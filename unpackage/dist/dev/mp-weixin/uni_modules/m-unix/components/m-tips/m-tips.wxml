@@ -1,1 +1,0 @@
-<view wx:if="{{a}}" style="{{c + ';' + d}}" class="{{['m-tips-class', 'm-toptips', 'data-v-4f2af771', e]}}">{{b}}</view><view wx:else class="{{['m-tips-class', 'm-toast', 'data-v-4f2af771', h, i]}}" style="{{'--status-bar-height:' + j + ';' + ('--uni-safe-area-inset-bottom:' + k)}}"><view class="m-tips-content data-v-4f2af771" style="{{g}}">{{f}}</view></view>

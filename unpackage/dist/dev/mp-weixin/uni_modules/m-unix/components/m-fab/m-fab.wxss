@@ -62,7 +62,6 @@
 }
 .m-fab__main--drag {
   /* 减少拖动时误触页面滚动（H5 等端） */
-  touch-action: none;
 }
 
 /* 避免图标/文字子节点成为触摸目标，导致 touchmove 无法稳定派发到主按钮（H5 常见） */

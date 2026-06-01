@@ -438,7 +438,7 @@ export default {
 		flex-wrap: wrap;
 		align-self: stretch;
 		width: 100%;
-		max-width: 100%;
+		max-width: 750rpx;
 		min-width: 0;
 		box-sizing: border-box;
 	}

@@ -1,5 +1,130 @@
 "use strict";
 const common_vendor = require("./vendor.js");
+class AuthApiPaths extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          login: { type: String, optional: false },
+          logout: { type: String, optional: false },
+          refreshToken: { type: String, optional: false }
+        };
+      },
+      name: "AuthApiPaths"
+    };
+  }
+  constructor(options, metadata = AuthApiPaths.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.login = this.__props__.login;
+    this.logout = this.__props__.logout;
+    this.refreshToken = this.__props__.refreshToken;
+    delete this.__props__;
+  }
+}
+class ApiPaths extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          auth: { type: AuthApiPaths, optional: false }
+        };
+      },
+      name: "ApiPaths"
+    };
+  }
+  constructor(options, metadata = ApiPaths.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.auth = this.__props__.auth;
+    delete this.__props__;
+  }
+}
+class ConfigInfo extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: String, optional: false },
+          versionCode: { type: Number, optional: false },
+          versionName: { type: String, optional: false },
+          appId: { type: String, optional: true },
+          logo: { type: String, optional: true },
+          desc: { type: String, optional: true }
+        };
+      },
+      name: "ConfigInfo"
+    };
+  }
+  constructor(options, metadata = ConfigInfo.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    this.versionCode = this.__props__.versionCode;
+    this.versionName = this.__props__.versionName;
+    this.appId = this.__props__.appId;
+    this.logo = this.__props__.logo;
+    this.desc = this.__props__.desc;
+    delete this.__props__;
+  }
+}
+class StorageKeys extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          token: { type: String, optional: false },
+          refreshToken: { type: String, optional: false }
+        };
+      },
+      name: "StorageKeys"
+    };
+  }
+  constructor(options, metadata = StorageKeys.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.token = this.__props__.token;
+    this.refreshToken = this.__props__.refreshToken;
+    delete this.__props__;
+  }
+}
+class ProjectConfig extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          baseUrl: { type: String, optional: false },
+          timeout: { type: Number, optional: false },
+          env: { type: String, optional: false },
+          api: { type: ApiPaths, optional: false },
+          storage: { type: StorageKeys, optional: false },
+          configInfo: { type: ConfigInfo, optional: false },
+          loginPagePath: { type: String, optional: true },
+          loginRequiredPaths: { type: common_vendor.UTS.UTSType.withGenerics(Array, [String]), optional: true }
+        };
+      },
+      name: "ProjectConfig"
+    };
+  }
+  constructor(options, metadata = ProjectConfig.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.baseUrl = this.__props__.baseUrl;
+    this.timeout = this.__props__.timeout;
+    this.env = this.__props__.env;
+    this.api = this.__props__.api;
+    this.storage = this.__props__.storage;
+    this.configInfo = this.__props__.configInfo;
+    this.loginPagePath = this.__props__.loginPagePath;
+    this.loginRequiredPaths = this.__props__.loginRequiredPaths;
+    delete this.__props__;
+  }
+}
 const ENV = "prod";
 const API_CONFIG = new common_vendor.UTSJSONObject({
   local: new common_vendor.UTSJSONObject({
@@ -15,38 +140,43 @@ const API_CONFIG = new common_vendor.UTSJSONObject({
     timeout: 3e4
   })
 });
-const currentConfig = API_CONFIG[ENV];
-const config = {
-  baseUrl: currentConfig.baseUrl,
-  timeout: currentConfig.timeout,
+API_CONFIG.prod;
+const config = new ProjectConfig({
+  baseUrl: "https://api.yourdomain.com/api",
+  timeout: 3e4,
   env: ENV,
-  api: {
-    auth: {
+  api: new ApiPaths({
+    auth: new AuthApiPaths({
       login: "/auth/login",
       logout: "/auth/logout",
       refreshToken: "/auth/refresh"
-    }
-  },
-  storage: {
+    })
+  }),
+  storage: new StorageKeys({
     token: "access_token",
     refreshToken: "refresh_token"
-  },
-  configInfo: {
+  }),
+  configInfo: new ConfigInfo({
+    logo: null,
+    desc: null,
     name: "我的应用",
     versionCode: 1,
     versionName: "1.0.0",
     appId: "your-app-id"
-  },
-  loginPagePath: "/pages/login/login",
-  loginRequiredPaths: ["/pages/user", "/pages/order"]
-};
+  }),
+  loginPagePath: "",
+  loginRequiredPaths: []
+});
 function getToken() {
-  return common_vendor.index.getStorageSync(config.storage.token) || "";
+  const token = common_vendor.index.getStorageSync(config.storage.token);
+  if (token == null) {
+    return "";
+  }
+  return token;
 }
 function clearToken() {
   common_vendor.index.removeStorageSync(config.storage.token);
   common_vendor.index.removeStorageSync(config.storage.refreshToken);
-  common_vendor.index.removeStorageSync(config.storage.userInfo);
 }
 exports.clearToken = clearToken;
 exports.config = config;

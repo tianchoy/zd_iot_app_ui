@@ -70,10 +70,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleBack = () => {
       if (props.showBack) {
-        const hasListener = emit && typeof emit === "function";
-        if (hasListener) {
-          emit("back");
-        }
+        emit("back");
       }
     };
     common_vendor.onMounted(() => {

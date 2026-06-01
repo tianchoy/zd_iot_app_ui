@@ -8,11 +8,6 @@ import { uploadFileRequest } from './Upload.uts'
 
 // ========== 类型定义 ==========
 
-/** 任意键值对 */
-export type AnyRecord = {
-	[key: string]: any
-}
-
 /** 请求方法类型 */
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
@@ -30,9 +25,9 @@ export type RequestOptions = {
 	/** 请求方法，默认 GET */
 	method?: HttpMethod
 	/** 请求数据 */
-	data?: AnyRecord
+	data?: UTSJSONObject
 	/** 请求头 */
-	header?: AnyRecord
+	header?: UTSJSONObject
 	/** 基础地址，默认使用 getHostProjectConfig().baseUrl */
 	baseUrl?: string
 	/** 超时时间（毫秒），默认 30000 */
@@ -54,13 +49,13 @@ export type RequestOptions = {
 	/** 未授权的响应码，默认 401 或 403 */
 	unauthorizedCodes?: number[]
 	/** 自定义错误码处理 */
-	onErrorCode?: (response: ApiResponse) => void
+	onErrorCode?: (response: ApiResponse<any>) => void
 }
 
 /** 快捷请求方法参数 */
 type QuickRequestParams = {
 	url: string
-	data?: AnyRecord
+	data?: UTSJSONObject
 	options?: RequestOptions
 }
 
@@ -86,12 +81,12 @@ function buildUrl(url: string, baseUrl: string): string {
 /**
  * 构建 GET 请求参数
  */
-function buildQueryString(data: AnyRecord): string {
+function buildQueryString(data: UTSJSONObject): string {
 	const parts: string[] = []
 	for (const key in data) {
-		const value = data[key]
-		if (value != null && value !== '') {
-			parts.push(key + '=' + encodeURIComponent(String(value)))
+		const value = data.getString(key)
+		if (value != null && value.length > 0) {
+			parts.push(key + '=' + encodeURIComponent(value))
 		}
 	}
 	return parts.length > 0 ? '?' + parts.join('&') : ''
@@ -170,9 +165,8 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 	}
 
 	// 构建请求头
-	const reqHeader: AnyRecord = {
-		'Content-Type': 'application/json',
-		...header
+	const reqHeader: UTSJSONObject = {
+		'Content-Type': 'application/json'
 	}
 
 	// 添加 Token
@@ -259,28 +253,28 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 /**
  * GET 请求
  */
-export function get<T = any>(url: string, data?: AnyRecord, options?: RequestOptions): Promise<ApiResponse<T>> {
+export function get<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
 	return request<T>({ url, method: 'GET', data, ...options })
 }
 
 /**
  * POST 请求
  */
-export function post<T = any>(url: string, data?: AnyRecord, options?: RequestOptions): Promise<ApiResponse<T>> {
+export function post<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
 	return request<T>({ url, method: 'POST', data, ...options })
 }
 
 /**
  * PUT 请求
  */
-export function put<T = any>(url: string, data?: AnyRecord, options?: RequestOptions): Promise<ApiResponse<T>> {
+export function put<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
 	return request<T>({ url, method: 'PUT', data, ...options })
 }
 
 /**
  * DELETE 请求
  */
-export function del<T = any>(url: string, data?: AnyRecord, options?: RequestOptions): Promise<ApiResponse<T>> {
+export function del<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
 	return request<T>({ url, method: 'DELETE', data, ...options })
 }
 
@@ -309,22 +303,22 @@ export function loadingRequest<T = any>(options: RequestOptions, loadingText?: s
 
 export const http = {
 	/** GET 请求 */
-	get<T = any>(url: string, data?: AnyRecord, options?: RequestOptions): Promise<ApiResponse<T>> {
+	get<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
 		return get<T>(url, data, options)
 	},
 
 	/** POST 请求 */
-	post<T = any>(url: string, data?: AnyRecord, options?: RequestOptions): Promise<ApiResponse<T>> {
+	post<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
 		return post<T>(url, data, options)
 	},
 
 	/** PUT 请求 */
-	put<T = any>(url: string, data?: AnyRecord, options?: RequestOptions): Promise<ApiResponse<T>> {
+	put<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
 		return put<T>(url, data, options)
 	},
 
 	/** DELETE 请求 */
-	delete<T = any>(url: string, data?: AnyRecord, options?: RequestOptions): Promise<ApiResponse<T>> {
+	delete<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
 		return del<T>(url, data, options)
 	},
 

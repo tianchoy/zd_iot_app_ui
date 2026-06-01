@@ -28,7 +28,7 @@
 page .container.data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 1000rpx;
   background-color: #f5f7fa;
 }
 page .main-content.data-v-9fa4edd6 {
@@ -91,7 +91,6 @@ page .card-box .search-value .search-input.data-v-9fa4edd6 {
   background: transparent;
   color: #1f2937;
   font-size: 28rpx;
-  outline: none;
 }
 page .card-box .search-value .scan-btn.data-v-9fa4edd6 {
   display: flex;
@@ -101,9 +100,6 @@ page .card-box .search-value .scan-btn.data-v-9fa4edd6 {
   width: 88rpx;
   height: 88rpx;
   border-left: 2rpx solid #e5e7eb;
-}
-page .card-box .search-value .scan-btn.data-v-9fa4edd6:active {
-  opacity: 0.6;
 }
 page .card-box .select-country-wrapper.data-v-9fa4edd6 {
   margin-bottom: 32rpx;
@@ -137,9 +133,6 @@ page .card-box .select-country-wrapper .select-trigger .select-arrow.data-v-9fa4
   color: #999;
   margin-left: 16rpx;
 }
-page .card-box .select-country-wrapper .select-trigger.data-v-9fa4edd6:active {
-  background-color: #f0f0f0;
-}
 page .card-box .query-btn.data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
@@ -153,9 +146,6 @@ page .card-box .query-btn .query-btn-text.data-v-9fa4edd6 {
   color: #ffffff;
   font-size: 32rpx;
   font-weight: 600;
-}
-page .card-box .query-btn.data-v-9fa4edd6:active {
-  opacity: 0.9;
 }
 page .instruction-box.data-v-9fa4edd6 {
   display: flex;
@@ -175,7 +165,6 @@ page .instruction-box .instruction-title.data-v-9fa4edd6 {
 page .instruction-box .instruction-list.data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
 }
 page .instruction-box .instruction-list .instruction-item.data-v-9fa4edd6 {
   font-size: 26rpx;
@@ -204,8 +193,4 @@ page .popup-header .popup-close.data-v-9fa4edd6 {
   justify-content: center;
   font-size: 44rpx;
   color: #999;
-}
-page .popup-header .popup-close.data-v-9fa4edd6:active {
-  background-color: #f5f5f5;
-  border-radius: 50%;
 }

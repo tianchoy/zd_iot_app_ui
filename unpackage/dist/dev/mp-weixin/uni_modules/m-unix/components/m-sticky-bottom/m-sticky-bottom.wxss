@@ -37,5 +37,5 @@
   padding: 20rpx 30rpx;
 }
 .m-sticky-bottom .m-sticky-bottom__content.m-sticky-bottom__content--safearea.data-v-80210247 {
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  padding-bottom: 40rpx;
 }

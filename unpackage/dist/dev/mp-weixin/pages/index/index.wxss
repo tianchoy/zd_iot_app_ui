@@ -28,9 +28,8 @@
 page .container.data-v-00a60067 {
   display: flex;
   flex-direction: column;
-  gap: 40rpx;
   background-color: #f4f7fb;
-  min-height: 100vh;
+  min-height: 1000rpx;
   padding-bottom: 40rpx;
 }
 page .card-info.data-v-00a60067 {
@@ -82,7 +81,6 @@ page .card-box.data-v-00a60067 {
   border: 1rpx solid #e7edf5;
   border-radius: 24rpx;
   padding: 24rpx;
-  gap: 20rpx;
 }
 page .card-box .card-label.data-v-00a60067 {
   display: flex;
@@ -110,7 +108,6 @@ page .card-box .search-value .search-input.data-v-00a60067 {
   background: transparent;
   color: #0f172a;
   font-size: 30rpx;
-  outline: none;
 }
 page .card-box .search-value .scan-btn.data-v-00a60067 {
   border-left: 1px solid #eef2f7;
@@ -128,28 +125,24 @@ page .card-box .card-item .item-head.data-v-00a60067 {
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
 }
 page .card-box .card-item .item-head .card-item-title.data-v-00a60067 {
   font-size: 32rpx;
   font-weight: 800;
   color: #0f172a;
   line-height: 1.25;
-  word-break: break-all;
 }
 page .card-box .card-item .item-head .card-item-content.data-v-00a60067 {
   margin-top: 5px;
   font-size: 24rpx;
   color: #94a3b8;
   line-height: 1.45;
-  word-break: break-all;
 }
 page .card-box .card-item .item-package.data-v-00a60067 {
   margin: 20rpx 0;
   display: flex;
   flex-direction: row;
-  align-items: baseline;
-  gap: 20rpx;
+  align-items: center;
   min-width: 0;
 }
 page .card-box .card-item .item-package .package-label.data-v-00a60067 {
@@ -168,12 +161,14 @@ page .card-box .card-item .item-package .package-value.data-v-00a60067 {
   text-overflow: ellipsis;
 }
 page .card-box .card-item .card-metrics.data-v-00a60067 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20rpx;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   margin: 20rpx 0;
 }
 page .card-box .card-item .card-metrics .metric-box.data-v-00a60067 {
+  width: 48%;
+  box-sizing: border-box;
   background: #f8fbff;
   border: 1rpx solid #e8eef7;
   border-radius: 25rpx;
@@ -191,20 +186,17 @@ page .card-box .card-item .card-metrics .metric-box .metric-value.data-v-00a6006
   font-weight: 800;
   color: #0f172a;
   line-height: 1.4;
-  word-break: break-all;
 }
 page .card-box .card-item .card-bottom.data-v-00a60067 {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 20rpx;
 }
 page .card-box .card-item .card-bottom .card-cycle-text.data-v-00a60067 {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10rpx;
 }
 page .card-box .card-item .card-bottom .card-cycle-text .cycle-label.data-v-00a60067 {
   font-size: 24rpx;

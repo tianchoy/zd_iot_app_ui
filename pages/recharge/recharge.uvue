@@ -314,7 +314,6 @@
 					.value{
 						font-weight: bold;
 						white-space: pre-wrap;
-						word-break: break-all;
 						line-height: 1.5;
 					}
 				}
@@ -360,10 +359,7 @@
 			padding: 28rpx 24rpx;
 			margin-bottom: 20rpx;
 			transition: all 0.2s ease;
-			
-			&:last-child {
-				margin-bottom: 0;
-			}
+
 			
 			.pkg-info {
 				flex: 1;
@@ -393,7 +389,7 @@
 					font-size: 24rpx;
 					color: #64748b;
 					.pkg-icon{
-						display: inline-flex;
+						display: flex;
 						align-items: center;
 						padding: 10rpx 20rpx;
 						border-radius: 24rpx;
@@ -413,7 +409,7 @@
 				.price-wrapper {
 					display: flex;
 					flex-direction: row;
-					align-items: baseline;
+					align-items: center;
 					.price-symbol {
 						font-size: 24rpx;
 						color: #ef4444;
@@ -428,7 +424,6 @@
 				.price-original {
 					font-size: 22rpx;
 					color: #94a3b8;
-					text-decoration: line-through;
 					margin-top: 4rpx;
 				}
 			}

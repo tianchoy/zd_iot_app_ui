@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "m-icon": "../m-icon/m-icon",
-    "m-tree": "./m-tree"
-  }
-}

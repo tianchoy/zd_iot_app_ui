@@ -1,0 +1,145 @@
+// utils/request.ts
+import { http } from '@/uni_modules/m-unix/components/m-tools/Request.uts';
+import { config, getToken, clearToken } from '@/common/config';
+// 定义响应类型接口
+export type ApiResponse<T = any> = {
+    code: number;
+    data: T;
+    message: string;
+    timestamp?: number;
+};
+export type RequestConfig = {
+    showLoading?: boolean;
+    loadingText?: string;
+    showError?: boolean;
+    needAuth?: boolean;
+};
+// 默认配置
+const defaultConfig: RequestConfig = {
+    showLoading: true,
+    loadingText: '加载中...',
+    showError: true,
+    needAuth: false
+};
+// 加载状态
+let loadingCount = 0;
+let loadingTimer: number | null = null;
+function showLoading(text: string) {
+    if (loadingCount === 0) {
+        loadingTimer = setTimeout(() => {
+            uni.showLoading({ title: text, mask: true });
+        }, 200);
+    }
+    loadingCount++;
+}
+function hideLoading() {
+    loadingCount--;
+    if (loadingCount <= 0) {
+        loadingCount = 0;
+        if (loadingTimer != null) {
+            clearTimeout(loadingTimer);
+            loadingTimer = null;
+        }
+        uni.hideLoading();
+    }
+}
+// 通用请求方法
+async function request<T = any>(url: string, method: string, data?: any, requestConfig?: RequestConfig): Promise<ApiResponse<T>> {
+    const reqConfig = { ...defaultConfig, ...requestConfig } as UTSJSONObject;
+    // 检查登录
+    if (isTruthy(reqConfig["needAuth"])) {
+        const token = getToken();
+        if (!(token != "")) {
+            // uni.navigateTo({ url: '/pages/login/login' })
+            return Promise.reject(new Error('未登录'));
+        }
+    }
+    // 显示 loading
+    if (isTruthy(reqConfig["showLoading"])) {
+        showLoading(isTruthy(reqConfig["loadingText"]) ? reqConfig["loadingText"] : '加载中...');
+    }
+    try {
+        // 构建请求头
+        const header: Record<string, string> = {
+            'Content-Type': 'application/json'
+        };
+        if (isTruthy(reqConfig["needAuth"])) {
+            const token = getToken();
+            if (token != "") {
+                header['Authorization'] = `Bearer ${token}`;
+            }
+        }
+        // 发起请求
+        let response: any;
+        if (method === 'GET') {
+            response = await http.get(url, data);
+        }
+        else if (method === 'POST') {
+            response = await http.post(url, data);
+        }
+        else if (method === 'PUT') {
+            response = await http.put(url, data);
+        }
+        else {
+            response = await http.delete(url, data);
+        }
+        const result = response.data as ApiResponse<T>;
+        // token 过期
+        if (result.code === 401) {
+            clearToken();
+            uni.navigateTo({ url: '/pages/index/index' });
+            if (isTruthy(reqConfig["showError"])) {
+                uni.showToast({
+                    title: '登录已过期，请重新登录',
+                    icon: 'none'
+                });
+            }
+            return Promise.reject(result);
+        }
+        // 业务错误
+        if (result.code !== 200 && result.code !== 0) {
+            if (isTruthy(reqConfig["showError"])) {
+                uni.showToast({
+                    title: result.message != "" ? result.message : '请求失败',
+                    icon: 'none'
+                });
+            }
+            return Promise.reject(result);
+        }
+        return result;
+    }
+    catch (error: any) {
+        if (isTruthy(reqConfig["showError"])) {
+            uni.showToast({
+                title: isTruthy(error.message) ? error.message : '网络错误',
+                icon: 'none'
+            });
+        }
+        throw error;
+    }
+    finally {
+        if (isTruthy(reqConfig["showLoading"])) {
+            hideLoading();
+        }
+    }
+}
+// 导出请求方法
+export function get<T = any>(url: string, params?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+    return request<T>(url, 'GET', params, config);
+}
+export function post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+    return request<T>(url, 'POST', data, config);
+}
+export function put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+    return request<T>(url, 'PUT', data, config);
+}
+export function del<T = any>(url: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+    return request<T>(url, 'DELETE', data, config);
+}
+export const api = {
+    get,
+    post,
+    put,
+    delete: del
+} as UTSJSONObject;
+//# sourceMappingURL=request.uts.map

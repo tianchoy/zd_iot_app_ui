@@ -27,7 +27,7 @@
 /* 文章场景相关 */
 page .container.data-v-6ec85291 {
   background-color: #f4f7fb;
-  min-height: 100vh;
+  min-height: 1000rpx;
   padding: 24rpx;
   box-sizing: border-box;
 }
@@ -113,12 +113,6 @@ page .info-card .info-row .price.data-v-6ec85291 {
   font-weight: bold;
   color: #ef4444;
 }
-page .info-card .info-row.data-v-6ec85291:first-child {
-  padding-top: 0;
-}
-page .info-card .info-row.data-v-6ec85291:last-child {
-  padding-bottom: 0;
-}
 page .notice-card.data-v-6ec85291 {
   background-color: #ffffff;
   border-radius: 24rpx;
@@ -157,7 +151,7 @@ page .bottom-bar.data-v-6ec85291 {
 page .bottom-bar .amount-section.data-v-6ec85291 {
   display: flex;
   flex-direction: column;
-  align-items: baseline;
+  align-items: flex-start;
 }
 page .bottom-bar .amount-section .amount-label.data-v-6ec85291 {
   font-size: 24rpx;

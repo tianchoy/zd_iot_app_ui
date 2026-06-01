@@ -182,7 +182,7 @@
 }
 
 .m-update__desc {
-	display: block;
+	display: flex;
 	font-size: 28rpx;
 	color: #666;
 	line-height: 1.6;

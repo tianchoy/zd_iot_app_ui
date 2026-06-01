@@ -1,0 +1,18 @@
+import { api, ApiResponse } from '@/api/request';
+import { config, setToken, clearToken } from '@/common/config';
+// 定义类型
+export type LoginParams = {
+    phone: string;
+    password: string;
+};
+export type LoginData = {
+    token: string;
+    refreshToken: string;
+    userId: number;
+    nickname: string;
+};
+// 登录
+export const login = async (params: LoginParams): Promise<any> => {
+    return api.post<LoginData>(config.api.auth.login, params);
+};
+//# sourceMappingURL=http.uts.map

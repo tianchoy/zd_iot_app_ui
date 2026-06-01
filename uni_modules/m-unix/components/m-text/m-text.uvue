@@ -262,7 +262,4 @@ export default {
 	flex-shrink: 1;
 }
 
-.m-text--hl:active {
-	opacity: 0.75;
-}
 </style>

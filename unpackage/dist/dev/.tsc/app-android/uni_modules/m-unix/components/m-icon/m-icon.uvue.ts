@@ -262,4 +262,4 @@ const _cache = this.$.renderCache
   }), _tD(_ctx.iconChar), 13 /* TEXT, STYLE, PROPS */, ["onClick"])
 }
 export type MIconComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesMUnixComponentsMIconMIconStyles = [_uM([["m-icon", _pS(_uM([["lineHeight", 1]]))]])]
+const GenUniModulesMUnixComponentsMIconMIconStyles = [_uM([["m-icon", _pS(_uM([["display", "flex"], ["lineHeight", 1]]))]])]

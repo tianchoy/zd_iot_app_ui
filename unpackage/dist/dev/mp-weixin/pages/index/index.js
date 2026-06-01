@@ -1,7 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-require("../../api/request.js");
-require("../../common/config.js");
+require("../../api/http.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");

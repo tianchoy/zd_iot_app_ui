@@ -148,7 +148,7 @@
 <style lang="scss" scoped>
 	.container {
 		background-color: #f4f7fb;
-		min-height: 100vh;
+		min-height: 1000rpx;
 		padding: 24rpx;
 		box-sizing: border-box;
 	}
@@ -249,13 +249,8 @@
 				color: #ef4444;
 			}
 		}
-		.info-row:first-child {
-			padding-top: 0;
-		}
-		
-		.info-row:last-child {
-			padding-bottom: 0;
-		}
+
+
 	}
 	
 	// 说明卡片
@@ -306,7 +301,7 @@
 		.amount-section {
 			display: flex;
 			flex-direction: column; 
-			align-items: baseline;
+			align-items: flex-start;
 			
 			.amount-label {
 				font-size: 24rpx;

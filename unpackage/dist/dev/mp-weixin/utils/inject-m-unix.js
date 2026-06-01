@@ -1,7 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
 const common_config = require("../common/config.js");
-require("../uni_modules/m-unix/index.js");
 const uni_modules_mUnix_components_mTools_ProjectConfig = require("../uni_modules/m-unix/components/m-tools/ProjectConfig.js");
 uni_modules_mUnix_components_mTools_ProjectConfig.injectMUnixHostProjectConfig(common_config.config);
 const injectedConfig = uni_modules_mUnix_components_mTools_ProjectConfig.getHostProjectConfig();

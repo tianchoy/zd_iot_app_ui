@@ -40,7 +40,7 @@
   min-height: 20rpx;
 }
 .m-bp__safearea.data-v-0b4ec55f {
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: 0;
 }
 .m-popup-radius.data-v-0b4ec55f {
   border-top-left-radius: 24rpx;

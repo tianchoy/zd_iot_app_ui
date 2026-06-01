@@ -336,7 +336,6 @@ export default {
 	flex-direction: row;
 	flex-wrap: nowrap;
 	width: max-content;
-	animation: m-notice-marquee linear infinite;
 }
 
 .m-notice-bar__dup {
@@ -351,7 +350,7 @@ export default {
 }
 
 .m-notice-bar__text {
-	line-height: inherit;
+	line-height: 1.6;
 }
 
 .m-notice-bar__content--single {
@@ -382,12 +381,4 @@ export default {
 	}
 }
 
-@keyframes m-notice-marquee {
-	0% {
-		transform: translateX(0);
-	}
-	100% {
-		transform: translateX(-50%);
-	}
-}
 </style>

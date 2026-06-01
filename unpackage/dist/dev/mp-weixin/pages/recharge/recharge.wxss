@@ -74,7 +74,6 @@ page .container .card-info .info-list .info-item .label.data-v-722cdacb {
 page .container .card-info .info-list .info-item .value.data-v-722cdacb {
   font-weight: bold;
   white-space: pre-wrap;
-  word-break: break-all;
   line-height: 1.5;
 }
 page .container .card-info .flow-box.data-v-722cdacb {
@@ -118,9 +117,6 @@ page .container .pkg-card.data-v-722cdacb {
   margin-bottom: 20rpx;
   transition: all 0.2s ease;
 }
-page .container .pkg-card.data-v-722cdacb:last-child {
-  margin-bottom: 0;
-}
 page .container .pkg-card .pkg-info.data-v-722cdacb {
   flex: 1;
 }
@@ -151,7 +147,7 @@ page .container .pkg-card .pkg-info .pkg-desc.data-v-722cdacb {
   color: #64748b;
 }
 page .container .pkg-card .pkg-info .pkg-desc .pkg-icon.data-v-722cdacb {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   padding: 10rpx 20rpx;
   border-radius: 24rpx;
@@ -170,7 +166,7 @@ page .container .pkg-card .pkg-price.data-v-722cdacb {
 page .container .pkg-card .pkg-price .price-wrapper.data-v-722cdacb {
   display: flex;
   flex-direction: row;
-  align-items: baseline;
+  align-items: center;
 }
 page .container .pkg-card .pkg-price .price-wrapper .price-symbol.data-v-722cdacb {
   font-size: 24rpx;
@@ -185,7 +181,6 @@ page .container .pkg-card .pkg-price .price-wrapper .price-number.data-v-722cdac
 page .container .pkg-card .pkg-price .price-original.data-v-722cdacb {
   font-size: 22rpx;
   color: #94a3b8;
-  text-decoration: line-through;
   margin-top: 4rpx;
 }
 page .container .pkg-card-selected.data-v-722cdacb {

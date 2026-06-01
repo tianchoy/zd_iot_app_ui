@@ -103,7 +103,7 @@ const BUILTIN_DEFAULT: MUnixHostProjectConfig = {
 
 let _hostOverride: MUnixHostProjectConfig | null = null
 
-function mergeStorage(base: HostStorageConfig, p: any): HostStorageConfig {
+function mergeStorage(base: HostStorageConfig, p: any | null): HostStorageConfig {
 	const out: HostStorageConfig = {
 		token: base.token,
 		userInfo: base.userInfo,
@@ -111,18 +111,18 @@ function mergeStorage(base: HostStorageConfig, p: any): HostStorageConfig {
 	if (p == null) {
 		return out
 	}
-	const pt = p['token']
+	const pt = p.token
 	if (pt != null && ('' + pt).length > 0) {
 		out.token = '' + pt
 	}
-	const pu = p['userInfo']
+	const pu = p.userInfo
 	if (pu != null && ('' + pu).length > 0) {
 		out.userInfo = '' + pu
 	}
 	return out
 }
 
-function mergeApi(base: HostApiConfig, p: any): HostApiConfig {
+function mergeApi(base: HostApiConfig, p: any | null): HostApiConfig {
 	const out: HostApiConfig = {
 		login: { ...base.login },
 		update: { ...base.update },
@@ -132,46 +132,46 @@ function mergeApi(base: HostApiConfig, p: any): HostApiConfig {
 	if (p == null) {
 		return out
 	}
-	const pl = p['login']
+	const pl = p.login
 	if (pl != null && typeof pl === 'object') {
-		const a = pl as UTSJSONObject
-		const t1 = a['tokenLogin']
+		const a = pl as any
+		const t1 = a.tokenLogin
 		if (t1 != null) {
 			out.login.tokenLogin = '' + t1
 		}
-		const t2 = a['codeGetOpenIdLogin']
+		const t2 = a.codeGetOpenIdLogin
 		if (t2 != null) {
 			out.login.codeGetOpenIdLogin = '' + t2
 		}
-		const t3 = a['codeGetPhoneRegisterOrLogin']
+		const t3 = a.codeGetPhoneRegisterOrLogin
 		if (t3 != null) {
 			out.login.codeGetPhoneRegisterOrLogin = '' + t3
 		}
 	}
-	const pu = p['update']
+	const pu = p.update
 	if (pu != null && typeof pu === 'object') {
-		const u = pu as UTSJSONObject
-		const c = u['checkUpdate']
+		const u = pu as any
+		const c = u.checkUpdate
 		if (c != null) {
 			out.update.checkUpdate = '' + c
 		}
 	}
-	const pupload = p['upload']
+	const pupload = p.upload
 	if (pupload != null && typeof pupload === 'object') {
-		const up = pupload as UTSJSONObject
-		const im = up['image']
+		const up = pupload as any
+		const im = up.image
 		if (im != null) {
 			out.upload.image = '' + im
 		}
 	}
-	const pq = p['qrCodeImageApiBase']
+	const pq = p.qrCodeImageApiBase
 	if (pq != null) {
 		out.qrCodeImageApiBase = '' + pq
 	}
 	return out
 }
 
-function mergeConfigInfo(base: HostConfigInfo, p: any): HostConfigInfo {
+function mergeConfigInfo(base: HostConfigInfo, p: any | null): HostConfigInfo {
 	const out: HostConfigInfo = {
 		name: base.name,
 		logo: base.logo,
@@ -182,43 +182,43 @@ function mergeConfigInfo(base: HostConfigInfo, p: any): HostConfigInfo {
 	if (p == null) {
 		return out
 	}
-	const o = p as UTSJSONObject
-	const n = o['name']
+	const o = p as any
+	const n = o.name
 	if (n != null) {
 		out.name = '' + n
 	}
-	const l = o['logo']
+	const l = o.logo
 	if (l != null) {
 		out.logo = '' + l
 	}
-	const d = o['desc']
+	const d = o.desc
 	if (d != null) {
 		out.desc = '' + d
 	}
-	const vc = o['versionCode']
+	const vc = o.versionCode
 	if (vc != null) {
 		const num = parseInt('' + vc, 10)
 		if (!isNaN(num)) {
 			out.versionCode = num
 		}
 	}
-	const vn = o['versionName']
+	const vn = o.versionName
 	if (vn != null) {
 		out.versionName = '' + vn
 	}
-	const ad = o['appDownloadUrl']
+	const ad = o.appDownloadUrl
 	if (ad != null) {
 		out.appDownloadUrl = '' + ad
 	}
-	const ada = o['appDownloadUrlAndroid']
+	const ada = o.appDownloadUrlAndroid
 	if (ada != null) {
 		out.appDownloadUrlAndroid = '' + ada
 	}
-	const ua = o['userAgreementArticleId']
+	const ua = o.userAgreementArticleId
 	if (ua != null) {
 		out.userAgreementArticleId = '' + ua
 	}
-	const pp = o['privacyPolicyArticleId']
+	const pp = o.privacyPolicyArticleId
 	if (pp != null) {
 		out.privacyPolicyArticleId = '' + pp
 	}
@@ -237,10 +237,18 @@ function mergeHostPatch(patch: any): MUnixHostProjectConfig {
 		loginRequiredPaths: [],
 		loginPagePath: base.loginPagePath,
 		api: {
-			login: { ...base.login },
-			update: { ...base.update },
-			upload: { ...base.upload },
-			qrCodeImageApiBase: base.qrCodeImageApiBase,
+			login: {
+				tokenLogin: base.api.login.tokenLogin,
+				codeGetOpenIdLogin: base.api.login.codeGetOpenIdLogin,
+				codeGetPhoneRegisterOrLogin: base.api.login.codeGetPhoneRegisterOrLogin,
+			},
+			update: {
+				checkUpdate: base.api.update.checkUpdate,
+			},
+			upload: {
+				image: base.api.upload.image,
+			},
+			qrCodeImageApiBase: base.api.qrCodeImageApiBase,
 		},
 		configInfo: {
 			name: base.configInfo.name,
@@ -254,29 +262,29 @@ function mergeHostPatch(patch: any): MUnixHostProjectConfig {
 	if (patch == null) {
 		return out
 	}
-	const p = patch as UTSJSONObject
-	const e = p['env']
+	const p = patch as any
+	const e = p.env
 	if (e != null) {
 		out.env = '' + e
 	}
-	const lb = p['localBaseUrl']
+	const lb = p.localBaseUrl
 	if (lb != null) {
 		out.localBaseUrl = '' + lb
 	}
-	const db = p['devBaseUrl']
+	const db = p.devBaseUrl
 	if (db != null) {
 		out.devBaseUrl = '' + db
 	}
-	const pb = p['prodBaseUrl']
+	const pb = p.prodBaseUrl
 	if (pb != null) {
 		out.prodBaseUrl = '' + pb
 	}
-	const bu = p['baseUrl']
+	const bu = p.baseUrl
 	if (bu != null) {
 		out.baseUrl = '' + bu
 	}
-	out.storage = mergeStorage(base.storage, p['storage'])
-	const paths = p['loginRequiredPaths']
+	out.storage = mergeStorage(base.storage, p.storage)
+	const paths = p.loginRequiredPaths
 	if (paths != null && paths instanceof Array) {
 		const arr: string[] = []
 		const pa = paths as any[]
@@ -285,13 +293,13 @@ function mergeHostPatch(patch: any): MUnixHostProjectConfig {
 		}
 		out.loginRequiredPaths = arr
 	}
-	const lp = p['loginPagePath']
+	const lp = p.loginPagePath
 	if (lp != null && ('' + lp).length > 0) {
 		out.loginPagePath = '' + lp
 	}
-	out.api = mergeApi(base.api, p['api'])
-	out.configInfo = mergeConfigInfo(base.configInfo, p['configInfo'])
-	const mui = p['mUi']
+	out.api = mergeApi(base.api, p.api)
+	out.configInfo = mergeConfigInfo(base.configInfo, p.configInfo)
+	const mui = p.mUi
 	if (mui != null) {
 		out.mUi = mui
 	}
@@ -312,8 +320,9 @@ export function clearMUnixHostProjectConfig(): void {
 
 /** 当前生效的宿主业务配置（未注入时为库内默认） */
 export function getHostProjectConfig(): MUnixHostProjectConfig {
-	if (_hostOverride != null) {
-		return _hostOverride
+	const hostOverride = _hostOverride
+	if (hostOverride != null) {
+		return hostOverride
 	}
-	return mergeHostPatch(null)
+	return BUILTIN_DEFAULT
 }

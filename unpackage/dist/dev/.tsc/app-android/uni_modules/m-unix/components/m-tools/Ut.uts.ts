@@ -114,8 +114,13 @@ export function checkNumber(number: string): boolean {
 	return regexCard.test(number)
 }
 
+export type MoneyUnitValue = {
+	num: string
+	unit: string
+}
+
 /** 数值转单位（元/万/亿） */
-export function changeMoney(num: number): { num: string; unit: string } {
+export function changeMoney(num: number): MoneyUnitValue {
 	const n = Number(num)
 	if (n <= 1) return { num: String(n), unit: '元' }
 	const units = ['元', '万', '亿', '万亿']
@@ -413,7 +418,7 @@ const getReqUrl = () => {
 	return (
 		envConfig[process.env.NODE_ENV] ||
 		(() => {
-			__f__('error','at uni_modules/m-unix/components/m-tools/Ut.uts:416',`未知环境: ${process.env.NODE_ENV}`)
+			__f__('error','at uni_modules/m-unix/components/m-tools/Ut.uts:421',`未知环境: ${process.env.NODE_ENV}`)
 			return ''
 		})()
 	)
@@ -572,9 +577,9 @@ const tools = {
 			uni.navigateTo({
 				url: '/pages/me/login'
 			})
-			return __f__('error','at uni_modules/m-unix/components/m-tools/Ut.uts:575','登录失效');
+			return __f__('error','at uni_modules/m-unix/components/m-tools/Ut.uts:580','登录失效');
 		}
-		if (!url) return __f__('error','at uni_modules/m-unix/components/m-tools/Ut.uts:577','跳转路径不能为空');
+		if (!url) return __f__('error','at uni_modules/m-unix/components/m-tools/Ut.uts:582','跳转路径不能为空');
 
 		// 处理参数（自动编码）
 		const query = Object.keys(params).map(k =>
@@ -601,7 +606,7 @@ const tools = {
 		}
 	},
 	back(delta = 1) {
-		__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:604',"Back")
+		__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:609',"Back")
 		uni.navigateBack({ delta,animationType:"slide-out-left" });
 	},
 	upx2px(upx : number, def ?: number) {
@@ -613,22 +618,22 @@ const tools = {
 	runType: () : RunType => {
 		switch (uni.getDeviceInfo().platform) {
 			case 'android':
-				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:616','运行Android上');
+				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:621','运行Android上');
 				return RunType.Android;
 			case 'ios':
-				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:619','运行iOS上');
+				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:624','运行iOS上');
 				return RunType.IOS;
 			case 'harmonyos':
-				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:622','运行鸿蒙系统上');
+				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:627','运行鸿蒙系统上');
 				return RunType.HarmonyOs;
 			case 'mac':
-				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:625','运行mac上');
+				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:630','运行mac上');
 				return RunType.IOS;
 			case 'windows':
-				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:628','运行Windows上');
+				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:633','运行Windows上');
 				return RunType.Windows;
 			default:
-				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:631','运行在开发者工具上');
+				__f__('log','at uni_modules/m-unix/components/m-tools/Ut.uts:636','运行在开发者工具上');
 				return RunType.WxAppl;
 		}
 	},
@@ -911,7 +916,11 @@ const tools = {
 					uni.hideLoading()
 					let d : R<T> | null = null
 					try {
-						d = JSON.parse(res.data.replace(/\ufeff/g, "") || "{}") as R<T>
+						let responseText = res.data.replace(/\ufeff/g, "")
+							if (responseText.length === 0) {
+								responseText = "{}"
+							}
+							d = JSON.parse(responseText) as R<T>
 					} catch (e) {
 						reject(e)
 						mToastMsg("上传响应解析失败");

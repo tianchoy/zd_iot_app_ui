@@ -114,8 +114,13 @@ export function checkNumber(number: string): boolean {
 	return regexCard.test(number)
 }
 
+export type MoneyUnitValue = {
+	num: string
+	unit: string
+}
+
 /** 数值转单位（元/万/亿） */
-export function changeMoney(num: number): { num: string; unit: string } {
+export function changeMoney(num: number): MoneyUnitValue {
 	const n = Number(num)
 	if (n <= 1) return { num: String(n), unit: '元' }
 	const units = ['元', '万', '亿', '万亿']
@@ -911,7 +916,11 @@ const tools = {
 					uni.hideLoading()
 					let d : R<T> | null = null
 					try {
-						d = JSON.parse(res.data.replace(/\ufeff/g, "") || "{}") as R<T>
+						let responseText = res.data.replace(/\ufeff/g, "")
+							if (responseText.length === 0) {
+								responseText = "{}"
+							}
+							d = JSON.parse(responseText) as R<T>
 					} catch (e) {
 						reject(e)
 						mToastMsg("上传响应解析失败");

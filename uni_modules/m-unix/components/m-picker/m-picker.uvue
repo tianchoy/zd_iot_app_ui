@@ -572,7 +572,7 @@ export default {
 	transition: transform 0.28s ease;
 	border-top-left-radius: 16rpx;
 	border-top-right-radius: 16rpx;
-	padding-bottom: env(safe-area-inset-bottom);
+	padding-bottom: 0;
 }
 
 .m-picker__panel--show {

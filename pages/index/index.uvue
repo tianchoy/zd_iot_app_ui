@@ -134,11 +134,15 @@
 	onMounted(() => {
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
-		// 调用 getUserInfo 函数获取用户信息
-		// login().then(res => {
-		// 	console.log('获取到的用户信息:', res)
-		// })
+		// getLogin()
 	})
+
+	const getLogin = async () => {
+		const res = await login({
+			phone: '13800000000',
+			password: '123456'
+		})
+	}
 	
 	onUnmounted(() => {
 		// 移除事件监听
@@ -150,9 +154,8 @@
 	.container{
 		display: flex;
 		flex-direction: column;
-		gap: 40rpx;
 		background-color: #f4f7fb;
-		min-height: 100vh;
+		min-height: 1000rpx;
 		padding-bottom: 40rpx;
 	}
 	.card-info{
@@ -205,7 +208,6 @@
 		border:1rpx solid #e7edf5;
 		border-radius: 24rpx;
 		padding: 24rpx;
-		gap: 20rpx;
 		.card-label{
 			display: flex;
 			flex-direction: row;
@@ -231,7 +233,6 @@
 				background: transparent;
 				color: #0f172a;
 				font-size: 30rpx;
-				outline: none;
 			}
 			.scan-btn{
 				border-left: 1px solid #eef2f7;
@@ -250,28 +251,24 @@
 				flex-direction: row;
 				align-items: flex-start;
 				justify-content: space-between;
-				gap: 10px;
 				.card-item-title{
 					font-size: 32rpx;
 					font-weight: 800;
 					color: #0f172a;
 					line-height: 1.25;
-					word-break: break-all;
 				}
 				.card-item-content{
 					margin-top: 5px;
 					font-size: 24rpx;
 					color: #94a3b8;
 					line-height: 1.45;
-					word-break: break-all;
 				}
 			}
 			.item-package{
 				margin: 20rpx 0;
 				display: flex;
 				flex-direction: row;
-				align-items: baseline;
-				gap: 20rpx;
+				align-items: center;
 				min-width: 0;
 				.package-label{
 					font-size: 24rpx;
@@ -290,11 +287,13 @@
 				}
 			}
 			.card-metrics{
-				display:grid;
-				grid-template-columns: repeat(2, 1fr);
-				gap: 20rpx;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
 				margin: 20rpx 0;
 				.metric-box{
+					width: 48%;
+					box-sizing: border-box;
 					background: #f8fbff;
 					border: 1rpx solid #e8eef7;
 					border-radius: 25rpx;
@@ -311,7 +310,6 @@
 						font-weight: 800;
 						color: #0f172a;
 						line-height: 1.4;
-						word-break: break-all;
 					}
 				}
 			}
@@ -320,12 +318,10 @@
 				flex-direction: row;
 				align-items: center;
 				justify-content: space-between;
-				gap: 20rpx;
 				.card-cycle-text{
 					display: flex;
 					flex-direction: row;
 					align-items: center;
-					gap: 10rpx;
 					.cycle-label{
 						font-size: 24rpx;
 						color: #64748b;

@@ -4,23 +4,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "scanCode",
   setup(__props) {
     const goBackWithResult = (result) => {
-      common_vendor.index.__f__("log", "at pages/scanCode/scanCode.uvue:26", "扫码结果:", result);
+      common_vendor.index.__f__("log", "at pages/scanCode/scanCode.uvue:38", "扫码结果:", result);
       common_vendor.index.$emit("scanResult", new common_vendor.UTSJSONObject({ result }));
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: 1 }));
     };
     common_vendor.onMounted(() => {
-      common_vendor.index.scanCode(new common_vendor.UTSJSONObject({
-        onlyFromCamera: true,
-        scanType: ["qrCode", "barCode"],
-        success: (res) => {
-          common_vendor.index.__f__("log", "at pages/scanCode/scanCode.uvue:47", "小程序扫码成功:", res.result);
-          goBackWithResult(res.result);
-        },
-        fail: (err) => {
-          common_vendor.index.__f__("log", "at pages/scanCode/scanCode.uvue:51", "小程序扫码失败或取消:", err);
-          common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: 1 }));
-        }
-      }));
+      setTimeout(() => {
+        common_vendor.index.scanCode(new common_vendor.UTSJSONObject({
+          onlyFromCamera: true,
+          scanType: ["qrCode", "barCode"],
+          success: (res) => {
+            common_vendor.index.__f__("log", "at pages/scanCode/scanCode.uvue:73", "小程序扫码成功:", res.result);
+            goBackWithResult(res.result);
+          },
+          fail: (err) => {
+            common_vendor.index.__f__("log", "at pages/scanCode/scanCode.uvue:77", "小程序扫码失败或取消:", err);
+            common_vendor.index.showToast({
+              title: "扫码失败或已取消",
+              icon: "none",
+              duration: 1500,
+              complete: () => {
+                setTimeout(() => {
+                  common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: 1 }));
+                }, 500);
+              }
+            });
+          }
+        }));
+      }, 100);
     });
     return (_ctx, _cache) => {
       "raw js";

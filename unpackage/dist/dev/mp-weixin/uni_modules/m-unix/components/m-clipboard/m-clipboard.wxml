@@ -1,1 +1,0 @@
-<view bindtap="{{b}}" style="{{'--status-bar-height:' + c + ';' + ('--uni-safe-area-inset-bottom:' + d) + ';' + (virtualHostStyle || '')}}" id="{{a}}" change:eS="{{uV.sS}}" eS="{{$eS[a]}}" change:eA="{{uV.sA}}" eA="{{$eA[a]}}" class="{{['m-clipboard', 'data-v-8feb8df6', e]}}" hidden="{{virtualHostHidden || false}}"><slot></slot></view><wxs src="/common/uniView.wxs" module="uV"/>

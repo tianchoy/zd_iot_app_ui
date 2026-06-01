@@ -43,7 +43,7 @@ export default {
 		padding: 20rpx 30rpx;
 
 		&.m-sticky-bottom__content--safearea {
-			padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+			padding-bottom: 40rpx;
 		}
 	}
 }

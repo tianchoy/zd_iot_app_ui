@@ -7,39 +7,65 @@
       <view class="album-btn" @click="chooseFromAlbumH5">
         <text class="album-btn-text">从相册选择</text>
       </view>
+      <view class="back-btn" @click="handleBack">
+        <text class="back-btn-text">返回</text>
+      </view>
+    </view>
+    <!-- #endif -->
+    
+    <!-- #ifdef MP-WEIXIN || APP -->
+    <view class="other-scan-container">
+      <view class="scan-tip">
+        <text class="tip-icon">📷</text>
+        <text class="tip-text">正在启动相机...</text>
+      </view>
     </view>
     <!-- #endif -->
   </view>
 </template>
 
 <script setup lang="uts">
-  import { onMounted, onUnmounted } from 'vue'
-  
-  // #ifdef H5
-  import Html5Qrcode from 'html5-qrcode'
-  let html5QrCode: any = null
-  let isScanSuccess = false
-  // #endif
-  
-  // 返回上一页并传递结果
-  const goBackWithResult = (result: string) => {
-    console.log('扫码结果:', result)
-    uni.$emit('scanResult', { result: result })
-    uni.navigateBack({ delta: 1 })
-  }
-  
-  const handleBack = () => {
-    // #ifdef H5
-    if (html5QrCode) {
-      html5QrCode.stop().catch(() => {})
+import { onMounted, onUnmounted } from 'vue'
+
+// #ifdef H5
+import { Html5Qrcode, Html5QrcodeScanType } from 'html5-qrcode'
+let html5QrCode: any = null
+let isScanSuccess = false
+// #endif
+
+// 返回上一页并传递结果
+const goBackWithResult = (result: string) => {
+  console.log('扫码结果:', result)
+  uni.$emit('scanResult', { result: result })
+  uni.navigateBack({ delta: 1 })
+}
+
+const stopScanH5 = async () => {
+  if (!html5QrCode) return
+  try {
+    const state = html5QrCode.getState()
+    if (state === 2 || state === 3) {
+      await html5QrCode.stop()
     }
-    // #endif
-    uni.navigateBack({ delta: 1 })
+  } catch (err) {
+    console.log('停止扫描失败:', err)
+  } finally {
+    html5QrCode = null
   }
-  
-  // ==================== 微信小程序 ====================
-  // #ifdef MP-WEIXIN
-  onMounted(() => {
+}
+
+const handleBack = () => {
+  // #ifdef H5
+  stopScanH5()
+  // #endif
+  uni.navigateBack({ delta: 1 })
+}
+
+// ==================== 微信小程序 ====================
+// #ifdef MP-WEIXIN
+onMounted(() => {
+  // 延迟一下，确保页面完全加载
+  setTimeout(() => {
     uni.scanCode({
       onlyFromCamera: true,
       scanType: ['qrCode', 'barCode'],
@@ -49,15 +75,27 @@
       },
       fail: (err) => {
         console.log('小程序扫码失败或取消:', err)
-        uni.navigateBack({ delta: 1 })
+        uni.showToast({
+          title: '扫码失败或已取消',
+          icon: 'none',
+          duration: 1500,
+          complete: () => {
+            setTimeout(() => {
+              uni.navigateBack({ delta: 1 })
+            }, 500)
+          }
+        })
       }
     })
-  })
-  // #endif
-  
-  // ==================== App ====================
-  // #ifdef APP
-  onMounted(() => {
+  }, 100)
+})
+// #endif
+
+// ==================== App ====================
+// #ifdef APP
+onMounted(() => {
+  // 延迟一下，确保页面完全加载
+  setTimeout(() => {
     uni.scanCode({
       scanType: ['qrCode', 'barCode'],
       success: (res) => {
@@ -66,143 +104,283 @@
       },
       fail: (err) => {
         console.log('App扫码失败或取消:', err)
+        uni.showToast({
+          title: '扫码失败或已取消',
+          icon: 'none',
+          duration: 1500,
+          complete: () => {
+            setTimeout(() => {
+              uni.navigateBack({ delta: 1 })
+            }, 500)
+          }
+        })
+      }
+    })
+  }, 100)
+})
+// #endif
+
+// ==================== H5 ====================
+// #ifdef H5
+const startScanH5 = async () => {
+  try {
+    // 检查浏览器是否支持摄像头
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error('当前浏览器不支持摄像头访问')
+    }
+    
+    const container = document.getElementById('qr-reader')
+    if (!container) {
+      throw new Error('容器不存在')
+    }
+    
+    // 清空容器内容，避免重复渲染
+    container.innerHTML = ''
+    
+    // 创建扫描器实例
+    html5QrCode = new Html5Qrcode('qr-reader')
+    
+    // 配置扫描参数
+    const config = {
+      fps: 10, // 每秒扫描次数
+      qrbox: { width: 300, height: 300 }, // 扫描框大小
+      aspectRatio: 1.0, // 宽高比
+      showTorchButton: true, // 显示闪光灯按钮
+      showZoomSlider: true, // 显示缩放滑块
+      defaultZoomValue: 2, // 默认缩放值
+      supportedScanTypes: [
+        Html5QrcodeScanType.SCAN_TYPE_CAMERA,
+        Html5QrcodeScanType.SCAN_TYPE_FILE
+      ]
+    }
+    
+    // 开始扫描
+    await html5QrCode.start(
+      { facingMode: 'environment' }, // 使用后置摄像头
+      config,
+      (decodedText: string) => {
+        // 扫描成功回调
+        if (!isScanSuccess) {
+          isScanSuccess = true
+          console.log('扫码成功:', decodedText)
+          
+          stopScanH5()
+          
+          // 返回结果
+          goBackWithResult(decodedText)
+        }
+      },
+      (errorMessage: string) => {
+        // 扫描错误回调（持续扫描中，不处理单个错误）
+        // console.log('扫描中:', errorMessage)
+      }
+    )
+  } catch (err) {
+    console.error('启动扫码失败:', err)
+    
+    let errorMsg = '无法启动摄像头'
+    if (err instanceof Error) {
+      if (err.message.includes('NotAllowedError')) {
+        errorMsg = '请允许摄像头权限后重试'
+      } else if (err.message.includes('NotFoundError')) {
+        errorMsg = '未检测到摄像头设备'
+      } else if (err.message.includes('NotReadableError')) {
+        errorMsg = '摄像头被其他应用占用'
+      } else {
+        errorMsg = err.message
+      }
+    }
+    
+    uni.showModal({
+      title: '提示',
+      content: errorMsg,
+      showCancel: false,
+      success: () => {
         uni.navigateBack({ delta: 1 })
       }
     })
-  })
-  // #endif
+  }
+}
+
+const chooseFromAlbumH5 = () => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.style.display = 'none'
+  document.body.appendChild(input)
   
-  // ==================== H5 ====================
-  // #ifdef H5
-  const startScanH5 = async () => {
-    try {
-      const container = document.getElementById('qr-reader')
-      if (!container) {
-        throw new Error('容器不存在')
-      }
-      
-      html5QrCode = new Html5Qrcode('qr-reader')
-      
-      const config = {
-        fps: 10,
-        qrbox: { width: 300, height: 300 },
-        aspectRatio: 1.0
-      }
-      
-      await html5QrCode.start(
-        { facingMode: 'environment' },
-        config,
-        (decodedText: string) => {
-          if (!isScanSuccess) {
-            isScanSuccess = true
-            html5QrCode.stop().catch(() => {})
-            goBackWithResult(decodedText)
-          }
-        },
-        (errorMessage: string) => {
-          // 持续扫描中，不处理
-        }
-      )
-    } catch (err) {
-      console.error('启动扫码失败', err)
-      uni.showModal({
-        title: '提示',
-        content: '无法启动摄像头，请检查权限或使用相册识别',
-        showCancel: false,
-        success: () => {
-          uni.navigateBack({ delta: 1 })
-        }
+  input.onchange = async (e: any) => {
+    const file = e.target.files[0]
+    if (!file) {
+      document.body.removeChild(input)
+      return
+    }
+    
+    // 检查文件类型
+    if (!file.type.startsWith('image/')) {
+      uni.showToast({
+        title: '请选择图片文件',
+        icon: 'none'
       })
+      document.body.removeChild(input)
+      return
     }
-  }
-  
-  const chooseFromAlbumH5 = () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.onchange = async (e: any) => {
-      const file = e.target.files[0]
-      if (!file) return
+    
+    // 检查文件大小（限制10MB）
+    if (file.size > 10 * 1024 * 1024) {
+      uni.showToast({
+        title: '图片不能超过10MB',
+        icon: 'none'
+      })
+      document.body.removeChild(input)
+      return
+    }
+    
+    uni.showLoading({ title: '识别中...', mask: true })
+    
+    try {
+      // 创建临时扫描器实例
+      const imageScanner = new Html5Qrcode('qr-reader')
+      const result = await imageScanner.scanFile(file, false)
       
-      uni.showLoading({ title: '识别中...' })
+      uni.hideLoading()
       
-      try {
-        const imageScanner = new Html5Qrcode()
-        const result = await imageScanner.scanFile(file, false)
-        uni.hideLoading()
+      if (result && !isScanSuccess) {
+        isScanSuccess = true
+        console.log('相册识别成功:', result)
         goBackWithResult(result)
-      } catch (err) {
-        uni.hideLoading()
-        uni.showToast({
-          title: '未识别到二维码',
-          icon: 'none'
-        })
+      } else {
+        throw new Error('未识别到二维码')
       }
+    } catch (err) {
+      uni.hideLoading()
+      console.error('相册识别失败:', err)
+      uni.showToast({
+        title: '未识别到二维码',
+        icon: 'none',
+        duration: 2000
+      })
+    } finally {
+      // 清理
+      document.body.removeChild(input)
     }
-    input.click()
   }
   
-  onMounted(() => {
-    setTimeout(() => {
-      startScanH5()
-    }, 500)
-  })
-  
-  onUnmounted(() => {
-    if (html5QrCode) {
-      html5QrCode.stop().catch(() => {})
-    }
-  })
-  // #endif
+  // 触发文件选择
+  input.click()
+}
+
+// 页面销毁时停止扫描
+onUnmounted(() => {
+  stopScanH5()
+  isScanSuccess = false
+})
+
+// 页面挂载后启动扫描
+onMounted(() => {
+  // 延迟启动，确保DOM完全渲染
+  setTimeout(() => {
+    startScanH5()
+  }, 500)
+})
+// #endif
 </script>
 
 <style lang="scss" scoped>
-  .scan-page {
+.scan-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  z-index: 999;
+}
+
+/* #ifdef H5 */
+.h5-scan-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding-top: 120rpx;
+  box-sizing: border-box;
+  
+  .qr-reader {
+    width: 600rpx;
+    height: 600rpx;
+    overflow: hidden;
+    border-radius: 24rpx;
+    margin-bottom: 60rpx;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.7);
     position: relative;
-    width: 100%;
-    height: 100vh;
-    background-color: #000000;
+    
   }
   
-  /* #ifdef H5 */
-  .h5-scan-container {
+  
+  .tip-text {
+    font-size: 28rpx;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    margin-bottom: 48rpx;
+    letter-spacing: 2rpx;
+  }
+  
+  .album-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 24rpx 80rpx;
+    border-radius: 80rpx;
+    border: 1rpx solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    margin-bottom: 32rpx;
+    transition: all 0.3s ease;
+    
+    .album-btn-text {
+      color: #ffffff;
+      font-size: 32rpx;
+      font-weight: 500;
+    }
+
+  }
+  
+  .back-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 20rpx 60rpx;
+    border-radius: 60rpx;
+    border: 1rpx solid rgba(255, 255, 255, 0.2);
+    
+    .back-btn-text {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 28rpx;
+    }
+
+  }
+}
+/* #endif */
+
+/* #ifdef MP-WEIXIN || APP */
+.other-scan-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  
+  .scan-tip {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
-    height: 100%;
-    padding-top: 120rpx;
     
-    .qr-reader {
-      width: 600rpx;
-      height: 600rpx;
-      overflow: hidden;
-      border-radius: 24rpx;
-      margin-bottom: 32rpx;
+    .tip-icon {
+      font-size: 120rpx;
     }
     
     .tip-text {
-      font-size: 28rpx;
-      color: rgba(255, 255, 255, 0.7);
-      text-align: center;
-      margin-bottom: 32rpx;
-    }
-    
-    .album-btn {
-      background-color: rgba(255, 255, 255, 0.2);
-      padding: 20rpx 60rpx;
-      border-radius: 60rpx;
-      border: 1rpx solid rgba(255, 255, 255, 0.3);
-      
-      .album-btn-text {
-        color: #ffffff;
-        font-size: 28rpx;
-      }
-      
-      &:active {
-        opacity: 0.7;
-      }
+      font-size: 32rpx;
+      color: #ffffff;
     }
   }
-  /* #endif */
+}
+/* #endif */
 </style>

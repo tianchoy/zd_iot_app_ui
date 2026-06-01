@@ -189,9 +189,8 @@ onLoad((options) => {
 	.container{
 		display: flex;
 		flex-direction: column;
-		gap: 40rpx;
 		background-color: #f4f7fb;
-		min-height: 100vh;
+		min-height: 1000rpx;
 		padding-bottom: 40rpx;
 		
 		.card-box{
@@ -202,7 +201,6 @@ onLoad((options) => {
 			border:1rpx solid #e7edf5;
 			border-radius: 24rpx;
 			padding: 24rpx;
-			gap: 20rpx;
 			
 			.search-value{
 				display: flex;
@@ -218,7 +216,6 @@ onLoad((options) => {
 					background: transparent;
 					color: #0f172a;
 					font-size: 30rpx;
-					outline: none;
 				}
 				.scan-btn{
 					border-left: 1px solid #eef2f7;
@@ -237,21 +234,18 @@ onLoad((options) => {
 					flex-direction: row;
 					align-items: flex-start;
 					justify-content: space-between;
-					gap: 10px;
 					
 					.card-item-title{
 						font-size: 32rpx;
 						font-weight: 800;
 						color: #0f172a;
 						line-height: 1.25;
-						word-break: break-all;
 					}
 					.card-item-content{
 						margin-top: 5px;
 						font-size: 12px;
 						color: #94a3b8;
 						line-height: 1.45;
-						word-break: break-all;
 					}
 
 					.status-tag {
@@ -262,27 +256,26 @@ onLoad((options) => {
 					.status-completed {
 						background: #ecfdf5;
 						color: #059669;
-						border-color:1rpx solid #a7f3d0;
+						border: 1rpx solid #a7f3d0;
 					}
 					
 					.status-pending {
 						background: #fff7ed;
 						color: #ea580c;
-						border-color:1rpx solid #fdba74;
+						border: 1rpx solid #fdba74;
 					}
 					
 					.status-refunded {
 						background: #fef2f2;
 						color: #dc2626;
-						border-color:1rpx solid #fecaca;
+						border: 1rpx solid #fecaca;
 					}
 				}
 				.item-package{
 					margin: 20rpx 0;
 					display: flex;
 					flex-direction: row;
-					align-items: baseline;
-					gap: 20rpx;
+					align-items: center;
 					min-width: 0;
 					
 					.package-label{
@@ -302,12 +295,14 @@ onLoad((options) => {
 					}
 				}
 				.card-metrics{
-					display:grid;
-					grid-template-columns: repeat(2, 1fr);
-					gap: 20rpx;
+					display: flex;
+					flex-direction: row;
+					flex-wrap: wrap;
 					margin: 20rpx 0;
 					
 					.metric-box{
+						width: 48%;
+						box-sizing: border-box;
 						background: #f8fbff;
 						border: 1rpx solid #e8eef7;
 						border-radius: 25rpx;
@@ -325,7 +320,6 @@ onLoad((options) => {
 							font-weight: 800;
 							color: #0f172a;
 							line-height: 1.4;
-							word-break: break-all;
 						}
 					}
 				}
@@ -334,13 +328,11 @@ onLoad((options) => {
 					flex-direction: row;
 					align-items: center;
 					justify-content: space-between;
-					gap: 20rpx;
 					
 					.card-cycle-text{
 						display: flex;
 						flex-direction: row;
 						align-items: center;
-						gap: 10rpx;
 						
 						.cycle-label{
 							font-size: 25rpx;
@@ -355,11 +347,7 @@ onLoad((options) => {
 					}
 				}
 			}
-			.card-item:last-child{
-				border-bottom: none;
-				margin-bottom: 0;
-				padding-bottom: 0;
-			}
+
 		}
 		
 		.empty-state {

@@ -34,9 +34,6 @@ $time-axis-track: 48rpx;
 	box-sizing: border-box;
 }
 
-.m-time-axis-item:last-child {
-	margin-bottom: 0;
-}
 
 .m-time-axis-item__row {
 	display: flex;

@@ -107,7 +107,7 @@
 	}
 
 	.m-bp__safearea {
-		padding-bottom: env(safe-area-inset-bottom);
+		padding-bottom: 0;
 	}
 
 	.m-popup-radius {

@@ -58,7 +58,6 @@
 .container{
 	display: flex;
 	flex-direction: column;
-	gap: 40rpx;
 	background-color: #f4f7fb;
 	.card-info{
 		display: flex;
@@ -113,16 +112,13 @@
 			flex-direction: row;
 			align-items: center;
 			justify-content: space-between;
-			gap: 10px;
 			padding: 24rpx;
 			border-bottom: 1px solid #e7edf5;
 			.order-label{
 				font-weight: bold;
 			}
 		}
-		.item:last-child{
-			border-bottom: none;
-		}
+
 	}
 }
 </style>

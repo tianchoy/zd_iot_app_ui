@@ -1,1 +1,0 @@
-<text wx:if="{{a}}" style="{{d + ';' + e + ';' + (virtualHostStyle || '')}}" id="{{c}}" change:eS="{{uV.sS}}" eS="{{$eS[c]}}" change:eA="{{uV.sA}}" eA="{{$eA[c]}}" class="{{['m-amount-inwords', 'data-v-e5032bdf', f]}}" hidden="{{virtualHostHidden || false}}">{{b}}</text><wxs src="/common/uniView.wxs" module="uV"/>

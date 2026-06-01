@@ -8,22 +8,6 @@ function tokenKey() {
 function userInfoKey() {
   return uni_modules_mUnix_components_mTools_ProjectConfig.getHostProjectConfig().storage.userInfo;
 }
-class AnyRecord extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {};
-      },
-      name: "AnyRecord"
-    };
-  }
-  constructor(options, metadata = AnyRecord.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    delete this.__props__;
-  }
-}
 class StorageApi extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -71,21 +55,21 @@ function storageSet(key, value = null) {
   try {
     common_vendor.index.setStorageSync(key, value);
   } catch (e) {
-    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Storage.uts:45", "storage set error", e);
+    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Storage.uts:41", "storage set error", e);
   }
 }
 function storageRemove(key) {
   try {
     common_vendor.index.removeStorageSync(key);
   } catch (e) {
-    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Storage.uts:53", "storage remove error", e);
+    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Storage.uts:49", "storage remove error", e);
   }
 }
 function storageClear() {
   try {
     common_vendor.index.clearStorageSync();
   } catch (e) {
-    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Storage.uts:61", "storage clear error", e);
+    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Storage.uts:57", "storage clear error", e);
   }
 }
 const storage = new StorageApi({
@@ -113,7 +97,7 @@ const storage = new StorageApi({
   getUserInfo() {
     return storageGet(userInfoKey());
   },
-  setUserInfo(info) {
+  setUserInfo(info = null) {
     storageSet(userInfoKey(), info);
     uni_modules_mUnix_components_mTools_AuthNotifier.notifyAuthChange();
   },

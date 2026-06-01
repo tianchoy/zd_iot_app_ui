@@ -5676,24 +5676,6 @@ function createVueApp(rootComponent, rootProps = null) {
   };
   return app;
 }
-function useCssVars(getter) {
-  const instance = getCurrentInstance();
-  if (!instance) {
-    warn(`useCssVars is called without current active component instance.`);
-    return;
-  }
-  initCssVarsRender(instance, getter);
-}
-function initCssVarsRender(instance, getter) {
-  instance.ctx.__cssVars = () => {
-    const vars = getter(instance.proxy);
-    const cssVars = {};
-    for (const key in vars) {
-      cssVars[`--${key}`] = vars[key];
-    }
-    return cssVars;
-  };
-}
 function injectLifecycleHook(name, hook, publicThis, instance) {
   if (isFunction(hook)) {
     injectHook(name, hook.bind(publicThis), instance);
@@ -6542,34 +6524,6 @@ function vFor(source, renderItem) {
   }
   return ret;
 }
-function renderSlot(name, props = {}, key) {
-  const instance = getCurrentInstance();
-  const { parent, isMounted, ctx: { $scope } } = instance;
-  const vueIds = ($scope.properties || $scope.props).uI;
-  if (!vueIds) {
-    return;
-  }
-  if (!parent && !isMounted) {
-    onMounted(() => {
-      renderSlot(name, props, key);
-    }, instance);
-    return;
-  }
-  const invoker = findScopedSlotInvoker(vueIds, instance);
-  if (invoker) {
-    invoker(name, props, key);
-  }
-}
-function findScopedSlotInvoker(vueId, instance) {
-  let parent = instance.parent;
-  while (parent) {
-    const invokers = parent.$ssi;
-    if (invokers && invokers[vueId]) {
-      return invokers[vueId];
-    }
-    parent = parent.parent;
-  }
-}
 function setRef(ref2, id, opts = {}) {
   const { $templateRefs } = getCurrentInstance();
   $templateRefs.push({ i: id, r: ref2, k: opts.k, f: opts.f });
@@ -6691,7 +6645,6 @@ function parseVirtualHostClass(className) {
 }
 const o = (value, key) => vOn(value, key);
 const f = (source, renderItem) => vFor(source, renderItem);
-const r = (name, props, key) => renderSlot(name, props, key);
 const s = (value) => stringifyStyle(value);
 const e = (target, ...sources) => extend(target, ...sources);
 const n = (value) => normalizeClass(value);
@@ -8794,7 +8747,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.3.229";
   const port = "8090";
-  const id = "mp-weixin_6eKaIS";
+  const id = "mp-weixin_dXPpP9";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -9909,27 +9862,6 @@ function __awaiter(thisArg, _arguments, P, generator) {
     step((generator = generator.apply(thisArg, _arguments || [])).next());
   });
 }
-function __read(o2, n2) {
-  var m = typeof Symbol === "function" && o2[Symbol.iterator];
-  if (!m)
-    return o2;
-  var i = m.call(o2), r2, ar = [], e2;
-  try {
-    while ((n2 === void 0 || n2-- > 0) && !(r2 = i.next()).done)
-      ar.push(r2.value);
-  } catch (error) {
-    e2 = { error };
-  } finally {
-    try {
-      if (r2 && !r2.done && (m = i["return"]))
-        m.call(i);
-    } finally {
-      if (e2)
-        throw e2.error;
-    }
-  }
-  return ar;
-}
 typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
   var e2 = new Error(message);
   return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
@@ -9962,7 +9894,6 @@ const onAppShow = onShow;
 exports.UTS = UTS;
 exports.UTSJSONObject = UTSJSONObject;
 exports.__awaiter = __awaiter;
-exports.__read = __read;
 exports._export_sfc = _export_sfc;
 exports.computed = computed;
 exports.createSSRApp = createSSRApp;
@@ -9981,7 +9912,6 @@ exports.onMounted = onMounted;
 exports.onUnmounted = onUnmounted;
 exports.p = p;
 exports.pvhc = pvhc;
-exports.r = r;
 exports.ref = ref;
 exports.resolveComponent = resolveComponent;
 exports.s = s;
@@ -9989,6 +9919,4 @@ exports.sei = sei;
 exports.sr = sr;
 exports.t = t;
 exports.unref = unref;
-exports.useCssVars = useCssVars;
-exports.wx$1 = wx$1;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/vendor.js.map

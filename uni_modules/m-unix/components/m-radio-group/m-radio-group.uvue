@@ -73,9 +73,6 @@ export default {
 	align-items: stretch;
 }
 
-.m-radio-group > .m-radio:not(:first-child) {
-	margin-top: 28rpx;
-}
 
 /* 横向子项间距由 m-radio 根节点内联 margin 实现 */
 .m-radio-group--row {
@@ -86,7 +83,4 @@ export default {
 	box-sizing: border-box;
 }
 
-.m-radio-group.m-radio-group--row > .m-radio:not(:first-child) {
-	margin-top: 0;
-}
 </style>

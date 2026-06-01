@@ -13,10 +13,6 @@ function userInfoKey(): string {
 	return getHostProjectConfig().storage.userInfo
 }
 
-type AnyRecord = {
-	[key: string]: any
-}
-
 type StorageApi = {
 	get: (key: string) => any | null
 	set: (key: string, value: any) => void
@@ -25,7 +21,7 @@ type StorageApi = {
 	getToken: () => string
 	setToken: (token: string) => void
 	getUserInfo: () => any | null
-	setUserInfo: (info: AnyRecord) => void
+	setUserInfo: (info: any) => void
 	clearAuth: () => void
 }
 
@@ -42,7 +38,7 @@ function storageSet(key: string, value: any): void {
 	try {
 		uni.setStorageSync(key, value)
 	} catch (e) {
-		__f__('error','at uni_modules/m-unix/components/m-tools/Storage.uts:45','storage set error', e)
+		__f__('error','at uni_modules/m-unix/components/m-tools/Storage.uts:41','storage set error', e)
 	}
 }
 
@@ -50,7 +46,7 @@ function storageRemove(key: string): void {
 	try {
 		uni.removeStorageSync(key)
 	} catch (e) {
-		__f__('error','at uni_modules/m-unix/components/m-tools/Storage.uts:53','storage remove error', e)
+		__f__('error','at uni_modules/m-unix/components/m-tools/Storage.uts:49','storage remove error', e)
 	}
 }
 
@@ -58,7 +54,7 @@ function storageClear(): void {
 	try {
 		uni.clearStorageSync()
 	} catch (e) {
-		__f__('error','at uni_modules/m-unix/components/m-tools/Storage.uts:61','storage clear error', e)
+		__f__('error','at uni_modules/m-unix/components/m-tools/Storage.uts:57','storage clear error', e)
 	}
 }
 
@@ -94,7 +90,7 @@ export const storage: StorageApi = {
 		return storageGet(userInfoKey())
 	},
 
-	setUserInfo(info: AnyRecord): void {
+	setUserInfo(info: any): void {
 		storageSet(userInfoKey(), info)
 		notifyAuthChange()
 	},

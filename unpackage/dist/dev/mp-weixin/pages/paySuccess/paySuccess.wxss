@@ -76,9 +76,6 @@ page .info-row.data-v-4b5f1e90 {
   padding: 24rpx 0;
   border-bottom: 1rpx solid #f0f0f0;
 }
-page .info-row .info-row.data-v-4b5f1e90:last-child {
-  border-bottom: none;
-}
 page .info-row .label.data-v-4b5f1e90 {
   font-size: 24rpx;
   color: #64748b;
@@ -91,7 +88,6 @@ page .info-row .value.data-v-4b5f1e90 {
   font-weight: bold;
   text-align: right;
   flex: 1;
-  word-break: break-all;
 }
 page .info-row .amount.data-v-4b5f1e90 {
   font-weight: bold;
@@ -100,7 +96,6 @@ page .info-row .amount.data-v-4b5f1e90 {
 page .button-section.data-v-4b5f1e90 {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
 }
 page .button-section .action-btn.data-v-4b5f1e90 {
   width: 100%;

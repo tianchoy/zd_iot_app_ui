@@ -13,10 +13,6 @@ function userInfoKey(): string {
 	return getHostProjectConfig().storage.userInfo
 }
 
-type AnyRecord = {
-	[key: string]: any
-}
-
 type StorageApi = {
 	get: (key: string) => any | null
 	set: (key: string, value: any) => void
@@ -25,7 +21,7 @@ type StorageApi = {
 	getToken: () => string
 	setToken: (token: string) => void
 	getUserInfo: () => any | null
-	setUserInfo: (info: AnyRecord) => void
+	setUserInfo: (info: any) => void
 	clearAuth: () => void
 }
 
@@ -94,7 +90,7 @@ export const storage: StorageApi = {
 		return storageGet(userInfoKey())
 	},
 
-	setUserInfo(info: AnyRecord): void {
+	setUserInfo(info: any): void {
 		storageSet(userInfoKey(), info)
 		notifyAuthChange()
 	},

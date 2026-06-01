@@ -212,7 +212,7 @@
 	}
 
 	.m-dialog__btn {
-		display: block;
+		display: flex;
 		flex: 1;
 		font-weight: 700;
 		text-decoration: none;
@@ -221,14 +221,7 @@
 		text-align: center;
 	}
 
-	.m-dialog__btn:active {
-		background-color: #ECECEC
-	}
 
-	.m-dialog__btn:first-child::after {
-		width: 0;
-		border-left: 0;
-	}
 
 	.m-dialog__btn::after {
 		content: " ";

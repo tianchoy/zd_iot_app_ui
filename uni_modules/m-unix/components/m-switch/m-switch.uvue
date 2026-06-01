@@ -167,7 +167,7 @@ export default {
 
 <style scoped lang="scss">
 .m-switch {
-	display: inline-flex;
+	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;

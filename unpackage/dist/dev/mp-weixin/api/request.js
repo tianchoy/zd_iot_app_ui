@@ -1,14 +1,66 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-require("../uni_modules/m-unix/index.js");
-const common_config = require("../common/config.js");
 const uni_modules_mUnix_components_mTools_Request = require("../uni_modules/m-unix/components/m-tools/Request.js");
-const defaultConfig = {
-  showLoading: true,
-  loadingText: "加载中...",
-  showError: true,
-  needAuth: true
-};
+const common_config = require("../common/config.js");
+class ApiResponse extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$(T) {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          data: { type: "Unknown", optional: false },
+          message: { type: String, optional: false },
+          timestamp: { type: Number, optional: true }
+        };
+      },
+      name: "ApiResponse"
+    };
+  }
+  constructor(options, metadata = ApiResponse.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.data = this.__props__.data;
+    this.message = this.__props__.message;
+    this.timestamp = this.__props__.timestamp;
+    delete this.__props__;
+  }
+}
+class RequestConfig extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          showLoading: { type: Boolean, optional: true },
+          loadingText: { type: String, optional: true },
+          showError: { type: Boolean, optional: true },
+          needAuth: { type: Boolean, optional: true }
+        };
+      },
+      name: "RequestConfig"
+    };
+  }
+  constructor(options, metadata = RequestConfig.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.showLoading = this.__props__.showLoading;
+    this.loadingText = this.__props__.loadingText;
+    this.showError = this.__props__.showError;
+    this.needAuth = this.__props__.needAuth;
+    delete this.__props__;
+  }
+}
+const defaultConfig = new common_vendor.UTSJSONObject(
+  {
+    showLoading: true,
+    loadingText: "加载中...",
+    showError: true,
+    needAuth: false
+  }
+  // 加载状态
+);
 let loadingCount = 0;
 let loadingTimer = null;
 function showLoading(text) {
@@ -36,7 +88,6 @@ function request(url, method, data = null, requestConfig = null) {
     if (reqConfig.needAuth) {
       const token = common_config.getToken();
       if (!token) {
-        common_vendor.index.navigateTo({ url: "/pages/login/login" });
         return Promise.reject(new Error("未登录"));
       }
     }
@@ -100,18 +151,22 @@ function request(url, method, data = null, requestConfig = null) {
     }
   });
 }
+function get(url, params = null, config = null) {
+  return request(url, "GET", params, config);
+}
+function post(url, data = null, config = null) {
+  return request(url, "POST", data, config);
+}
+function put(url, data = null, config = null) {
+  return request(url, "PUT", data, config);
+}
+function del(url, data = null, config = null) {
+  return request(url, "DELETE", data, config);
+}
 new common_vendor.UTSJSONObject({
-  get(url, params = null, config = null) {
-    return request(url, "GET", params, config);
-  },
-  post(url, data = null, config = null) {
-    return request(url, "POST", data, config);
-  },
-  put(url, data = null, config = null) {
-    return request(url, "PUT", data, config);
-  },
-  delete(url, data = null, config = null) {
-    return request(url, "DELETE", data, config);
-  }
+  get,
+  post,
+  put,
+  delete: del
 });
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/request.js.map

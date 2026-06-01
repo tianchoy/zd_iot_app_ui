@@ -34,5 +34,4 @@ export type StoreMemberVo = {
 	nickname?: string;
 	phone?: string;
 	avatar?: string;
-	[key: string]: any;
 }

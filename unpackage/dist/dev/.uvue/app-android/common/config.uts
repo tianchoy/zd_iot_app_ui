@@ -1,0 +1,94 @@
+// common/config.ts
+export type AuthApiPaths = {
+    login: string;
+    logout: string;
+    refreshToken: string;
+};
+// ApiPaths 只引用已定义的 interface
+export type ApiPaths = {
+    auth: AuthApiPaths;
+};
+// 其他配置类型
+export type ConfigInfo = {
+    name: string;
+    versionCode: number;
+    versionName: string;
+    appId?: string;
+    logo?: string;
+    desc?: string;
+};
+export type StorageKeys = {
+    token: string;
+    refreshToken: string;
+};
+export type ProjectConfig = {
+    baseUrl: string;
+    timeout: number;
+    env: string;
+    api: ApiPaths;
+    storage: StorageKeys;
+    configInfo: ConfigInfo;
+    loginPagePath?: string;
+    loginRequiredPaths?: string[];
+};
+// ============ 配置值 ============
+// 环境配置
+const ENV = 'prod'; // local | dev | prod
+const API_CONFIG = {
+    local: {
+        baseUrl: 'http://localhost:3000/api',
+        timeout: 30000
+    },
+    dev: {
+        baseUrl: 'https://dev-api.yourdomain.com/api',
+        timeout: 30000
+    },
+    prod: {
+        baseUrl: 'https://api.yourdomain.com/api',
+        timeout: 30000
+    }
+} as UTSJSONObject;
+const currentConfig = API_CONFIG["prod"];
+// 导出配置对象
+export const config: ProjectConfig = {
+    baseUrl: 'https://api.yourdomain.com/api',
+    timeout: 30000,
+    env: ENV,
+    api: {
+        auth: {
+            login: '/auth/login',
+            logout: '/auth/logout',
+            refreshToken: '/auth/refresh'
+        } as AuthApiPaths,
+    } as ApiPaths,
+    storage: {
+        token: 'access_token',
+        refreshToken: 'refresh_token',
+    } as StorageKeys,
+    configInfo: {
+        name: '我的应用',
+        versionCode: 1,
+        versionName: '1.0.0',
+        appId: 'your-app-id'
+    } as ConfigInfo,
+    loginPagePath: '',
+    loginRequiredPaths: []
+};
+export function getToken(): string {
+    const token = uni.getStorageSync(config.storage.token);
+    if (token == null) {
+        return '';
+    }
+    return token as string;
+}
+export function setToken(token: string, refreshToken?: string) {
+    uni.setStorageSync(config.storage.token, token);
+    if (isTruthy(refreshToken)) {
+        uni.setStorageSync(config.storage.refreshToken, refreshToken);
+    }
+}
+export function clearToken() {
+    uni.removeStorageSync(config.storage.token);
+    uni.removeStorageSync(config.storage.refreshToken);
+}
+//# sourceMappingURL=config.uts.map

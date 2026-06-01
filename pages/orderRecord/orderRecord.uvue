@@ -22,7 +22,7 @@
 					<text class="status" :class="getStatusClass(order.status)">{{ order.status }}</text>
 				</view>
 				<view class="order-time">
-					<text class="time">{{ order.time }}</text>
+					<text class="time order-time-text">{{ order.time }}</text>
 				</view>
 			</view>
 		</view>
@@ -96,18 +96,18 @@
 	// 提示文字
 	.tip-text {
 		margin-bottom: 24rpx;
-		
-		text {
-			font-size: 26rpx;
-			color: #9ca3af;
-		}
+	}
+
+	.tip-text-value {
+		font-size: 26rpx;
+		color: #9ca3af;
 	}
 	
 	// 当前卡号区域
 	.card-number-section {
 		display: flex;
 		flex-direction: column;
-		align-items: baseline;
+		align-items: flex-start;
 		margin: 32rpx 0;
 		padding-bottom: 20rpx;
 		border-bottom: 2rpx solid #e5e7eb;
@@ -141,17 +141,14 @@
 		flex-direction: column;
 		padding: 20rpx 0;
 		border-bottom: 2rpx solid #f0f0f0;
-		
-		&:last-child {
-			border-bottom: none;
-		}
+
 	}
 	
 	.order-header {
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
-		align-items: baseline;
+		align-items: flex-start;
 		margin-bottom: 10rpx;
 		
 		.package-name {

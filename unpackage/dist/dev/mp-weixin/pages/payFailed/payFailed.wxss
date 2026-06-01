@@ -26,7 +26,7 @@
 /* 透明度 */
 /* 文章场景相关 */
 page .container.data-v-95bda543 {
-  min-height: 100vh;
+  min-height: 1000rpx;
   padding: 40rpx 32rpx;
   display: flex;
   flex-direction: column;
@@ -81,9 +81,6 @@ page .info-row.data-v-95bda543 {
   padding: 24rpx 0;
   border-bottom: 1rpx solid #f0f0f0;
 }
-page .info-row.data-v-95bda543:last-child {
-  border-bottom: none;
-}
 page .info-row .label.data-v-95bda543 {
   font-size: 24rpx;
   color: #64748b;
@@ -96,7 +93,6 @@ page .info-row .value.data-v-95bda543 {
   font-weight: bold;
   text-align: right;
   flex: 1;
-  word-break: break-all;
 }
 page .info-row .amount.data-v-95bda543 {
   font-weight: bold;
@@ -113,7 +109,6 @@ page .info-row.fail-reason .fail-reason-text.data-v-95bda543 {
 page .button-section.data-v-95bda543 {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
 }
 page .button-section .action-btn.data-v-95bda543 {
   width: 100%;

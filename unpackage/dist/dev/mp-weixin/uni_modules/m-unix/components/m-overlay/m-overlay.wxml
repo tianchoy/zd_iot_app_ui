@@ -1,1 +1,0 @@
-<view class="{{['m-overlay', 'data-v-71b2926a', b && 'm-overlay--visible', c]}}" style="{{d + ';' + e + ';' + (virtualHostStyle || '')}}" bindtap="{{f}}" id="{{a}}" change:eS="{{uV.sS}}" eS="{{$eS[a]}}" change:eA="{{uV.sA}}" eA="{{$eA[a]}}" hidden="{{virtualHostHidden || false}}"></view><wxs src="/common/uniView.wxs" module="uV"/>

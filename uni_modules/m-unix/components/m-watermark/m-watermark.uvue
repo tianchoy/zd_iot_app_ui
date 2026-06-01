@@ -318,6 +318,6 @@ export default {
 }
 
 .m-watermark__canvas {
-	display: block;
+	display: flex;
 }
 </style>

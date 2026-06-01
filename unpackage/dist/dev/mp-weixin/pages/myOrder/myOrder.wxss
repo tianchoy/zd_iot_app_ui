@@ -27,7 +27,7 @@
 /* 文章场景相关 */
 page .container.data-v-87fe8731 {
   background-color: #f4f7fb;
-  min-height: 100vh;
+  min-height: 1000rpx;
   display: flex;
   flex-direction: column;
 }
@@ -53,7 +53,6 @@ page .container .card-box .search-value .search-input.data-v-87fe8731 {
   background: transparent;
   color: #0f172a;
   font-size: 30rpx;
-  outline: none;
 }
 page .container .card-box .search-value .scan-btn.data-v-87fe8731 {
   border-left: 1px solid #eef2f7;
@@ -61,7 +60,7 @@ page .container .card-box .search-value .scan-btn.data-v-87fe8731 {
 page .container .order-list.data-v-87fe8731 {
   flex: 1;
   padding: 24rpx 24rpx 40rpx 24rpx;
-  height: calc(100vh - 280rpx);
+  min-height: 700rpx;
 }
 page .container .order-list .empty-state.data-v-87fe8731 {
   display: flex;
@@ -126,9 +125,6 @@ page .container .order-list .orders-container .order-card .order-details .detail
   align-items: center;
   margin-bottom: 16rpx;
 }
-page .container .order-list .orders-container .order-card .order-details .detail-row.data-v-87fe8731:last-child {
-  margin-bottom: 0;
-}
 page .container .order-list .orders-container .order-card .order-details .detail-row .detail-label.data-v-87fe8731 {
   width: 100rpx;
   font-size: 26rpx;
@@ -139,7 +135,6 @@ page .container .order-list .orders-container .order-card .order-details .detail
   flex: 1;
   font-size: 26rpx;
   color: #374151;
-  word-break: break-all;
 }
 page .container .order-list .orders-container .order-card .order-footer.data-v-87fe8731 {
   display: flex;

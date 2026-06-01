@@ -108,27 +108,37 @@
 			getWidth() {
 				//medium 184*40 / small 120 40/ mini 58*32
 				let width = this.width;
-				// console.log(this.btnSize)
-				if (this.btnSize) {
-					width = {
-						'medium': '368rpx',
-						'small': '240rpx',
-						'mini': '116rpx',
-						'tiny': '112rpx'
-					} [this.btnSize] || this.width
+				const bs = this.btnSize as string
+				if (bs.length > 0) {
+					if (bs === 'medium') {
+						width = '368rpx'
+					} else if (bs === 'small') {
+						width = '240rpx'
+					} else if (bs === 'mini') {
+						width = '116rpx'
+					} else if (bs === 'tiny') {
+						width = '112rpx'
+					}
 				}
 				return width
 			},
 			getHeight() {
 				//medium 184*40 / small 120 40/ mini 58*32
-				let height = this.height  || '96rpx';
-				if (this.btnSize) {
-					height = {
-						'medium': '80rpx',
-						'small': '80rpx',
-						'mini': '64rpx',
-						'tiny': '48rpx'
-					} [this.btnSize] || '96rpx'
+				let height = this.height
+				if (height.length === 0) {
+					height = '96rpx'
+				}
+				const bs = this.btnSize as string
+				if (bs.length > 0) {
+					if (bs === 'medium') {
+						height = '80rpx'
+					} else if (bs === 'small') {
+						height = '80rpx'
+					} else if (bs === 'mini') {
+						height = '64rpx'
+					} else if (bs === 'tiny') {
+						height = '48rpx'
+					}
 				}
 				return height
 			},
@@ -195,15 +205,15 @@
 		getColorByType(type:string, isText?:boolean, plain?:boolean) {
 			// 默认主题颜色
 			let color:any = ''
-			const colors = {__$originalPosition: new UTSSourceMapPosition("colors", "uni_modules/m-unix/components/m-button/m-button.uvue", 242, 10),
+			const colors = {__$originalPosition: new UTSSourceMapPosition("colors", "uni_modules/m-unix/components/m-button/m-button.uvue", 252, 10),
 				'primary': '#5677fc',
-				'white': '#fff',
+				'white': '#dbe5f0',
 				'danger': '#EB0909',
 				'warning': '#ff7900',
 				'green': '#07c160',
 				'blue': '#007aff',
 				'gray': '#bfbfbf',
-				'black': '#333333',
+				'black': '#334155',
 				'brown': '#ac9157',
 				'gray-primary': '#f2f2f2',
 				'gray-danger': '#f2f2f2',
@@ -217,7 +227,7 @@
 							color = colors[tp]
 						}
 					} else if (type === 'white') {
-						color = '#333'
+						color = '#334155'
 					} else {
 						if (plain) {
 							color = colors[type]
@@ -362,6 +372,6 @@ const _component_m_loading = resolveEasyComponent("m-loading",_easycom_m_loading
   ], 6 /* CLASS, STYLE */)
 }
 export type MButtonComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesMUnixComponentsMButtonMButtonStyles = [_uM([["m-button__wrap", _pS(_uM([["position", "relative"], ["overflow", "visible"], ["boxSizing", "border-box"]]))], ["m-button__hover", _pS(_uM([["content:active::after", "\"\""], ["position:active::after", "absolute"], ["width:active::after", "100%"], ["height:active::after", "100%"], ["left:active::after", 0], ["top:active::after", 0], ["backgroundColor:active::after", "rgba(0,0,0,0.15)"], ["borderTopLeftRadius:active::after", "6rpx"], ["borderTopRightRadius:active::after", "6rpx"], ["borderBottomRightRadius:active::after", "6rpx"], ["borderBottomLeftRadius:active::after", "6rpx"], ["pointerEvents:active::after", "none"]]))], ["m-btn", _pS(_uM([["width", "100%"], ["position", "relative"], ["!borderTopWidth", 0], ["!borderRightWidth", 0], ["!borderBottomWidth", 0], ["!borderLeftWidth", 0], ["!borderTopStyle", "none"], ["!borderRightStyle", "none"], ["!borderBottomStyle", "none"], ["!borderLeftStyle", "none"], ["!borderTopColor", "#000000"], ["!borderRightColor", "#000000"], ["!borderBottomColor", "#000000"], ["!borderLeftColor", "#000000"], ["boxSizing", "border-box"], ["borderTopLeftRadius", "6rpx"], ["borderTopRightRadius", "6rpx"], ["borderBottomRightRadius", "6rpx"], ["borderBottomLeftRadius", "6rpx"], ["paddingLeft", 0], ["paddingRight", 0], ["overflow", "visible"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["borderTopWidth::after", 0], ["borderRightWidth::after", 0], ["borderBottomWidth::after", 0], ["borderLeftWidth::after", 0], ["borderTopStyle::after", "none"], ["borderRightStyle::after", "none"], ["borderBottomStyle::after", "none"], ["borderLeftStyle::after", "none"], ["borderTopColor::after", "#000000"], ["borderRightColor::after", "#000000"], ["borderBottomColor::after", "#000000"], ["borderLeftColor::after", "#000000"]]))], ["m-btn__inner", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["width", "100%"], ["gap", "12rpx"]]))], ["m-btn--loading", _pS(_uM([["pointerEvents", "none"]]))], ["m-btn__flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["m-button__border", _pS(_uM([["position", "absolute"], ["left", 0], ["top", 0], ["right", 0], ["bottom", 0], ["width", "100%"], ["height", "100%"], ["boxSizing", "border-box"], ["borderTopLeftRadius", "6rpx"], ["borderTopRightRadius", "6rpx"], ["borderBottomRightRadius", "6rpx"], ["borderBottomLeftRadius", "6rpx"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "rgba(0,0,0,0)"], ["borderRightColor", "rgba(0,0,0,0)"], ["borderBottomColor", "rgba(0,0,0,0)"], ["borderLeftColor", "rgba(0,0,0,0)"], ["pointerEvents", "none"]]))], ["m-text-bold", _pS(_uM([["fontWeight", "bold"]]))], ["m-dark-disabled", _pS(_uM([["!opacity", 0.6], ["!color", "#fafbfc"]]))], ["m-dark-disabled-outline", _pS(_uM([["!opacity", 0.5]]))], ["m-gray-disabled", _pS(_uM([["!backgroundImage", "none"], ["!backgroundColor", "#f3f3f3"], ["!color", "#919191"], ["boxShadow", "none"]]))], ["m-fillet", _pS(_uM([["!borderTopLeftRadius", "220rpx"], ["!borderTopRightRadius", "220rpx"], ["!borderBottomRightRadius", "220rpx"], ["!borderBottomLeftRadius", "220rpx"], ["!borderTopLeftRadius::after", "220rpx"], ["!borderTopRightRadius::after", "220rpx"], ["!borderBottomRightRadius::after", "220rpx"], ["!borderBottomLeftRadius::after", "220rpx"]]))], ["m-outline-fillet", _pS(_uM([["!borderTopLeftRadius", "220rpx"], ["!borderTopRightRadius", "220rpx"], ["!borderBottomRightRadius", "220rpx"], ["!borderBottomLeftRadius", "220rpx"], ["!borderTopLeftRadius::after", "220rpx"], ["!borderTopRightRadius::after", "220rpx"], ["!borderBottomRightRadius::after", "220rpx"], ["!borderBottomLeftRadius::after", "220rpx"]]))], ["m-rightAngle", _pS(_uM([["!borderTopLeftRadius", 0], ["!borderTopRightRadius", 0], ["!borderBottomRightRadius", 0], ["!borderBottomLeftRadius", 0], ["!borderTopLeftRadius::after", 0], ["!borderTopRightRadius::after", 0], ["!borderBottomRightRadius::after", 0], ["!borderBottomLeftRadius::after", 0]]))], ["m-outline-rightAngle", _pS(_uM([["!borderTopLeftRadius", 0], ["!borderTopRightRadius", 0], ["!borderBottomRightRadius", 0], ["!borderBottomLeftRadius", 0], ["!borderTopLeftRadius::after", 0], ["!borderTopRightRadius::after", 0], ["!borderBottomRightRadius::after", 0], ["!borderBottomLeftRadius::after", 0]]))], ["m-btn__link", _pS(_uM([["!borderTopWidth::after", 0], ["!borderRightWidth::after", 0], ["!borderBottomWidth::after", 0], ["!borderLeftWidth::after", 0], ["!borderTopStyle::after", "none"], ["!borderRightStyle::after", "none"], ["!borderBottomStyle::after", "none"], ["!borderLeftStyle::after", "none"], ["!borderTopColor::after", "#000000"], ["!borderRightColor::after", "#000000"], ["!borderBottomColor::after", "#000000"], ["!borderLeftColor::after", "#000000"]]))]])]
+const GenUniModulesMUnixComponentsMButtonMButtonStyles = [_uM([["m-button__wrap", _pS(_uM([["position", "relative"], ["overflow", "visible"], ["boxSizing", "border-box"]]))], ["m-btn", _pS(_uM([["width", "100%"], ["position", "relative"], ["!borderTopWidth", 0], ["!borderRightWidth", 0], ["!borderBottomWidth", 0], ["!borderLeftWidth", 0], ["!borderTopStyle", "none"], ["!borderRightStyle", "none"], ["!borderBottomStyle", "none"], ["!borderLeftStyle", "none"], ["!borderTopColor", "#000000"], ["!borderRightColor", "#000000"], ["!borderBottomColor", "#000000"], ["!borderLeftColor", "#000000"], ["boxSizing", "border-box"], ["borderTopLeftRadius", "6rpx"], ["borderTopRightRadius", "6rpx"], ["borderBottomRightRadius", "6rpx"], ["borderBottomLeftRadius", "6rpx"], ["paddingLeft", 0], ["paddingRight", 0], ["overflow", "visible"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["borderTopWidth::after", 0], ["borderRightWidth::after", 0], ["borderBottomWidth::after", 0], ["borderLeftWidth::after", 0], ["borderTopStyle::after", "none"], ["borderRightStyle::after", "none"], ["borderBottomStyle::after", "none"], ["borderLeftStyle::after", "none"], ["borderTopColor::after", "#000000"], ["borderRightColor::after", "#000000"], ["borderBottomColor::after", "#000000"], ["borderLeftColor::after", "#000000"]]))], ["m-btn__inner", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["width", "100%"]]))], ["m-btn--loading", _pS(_uM([["pointerEvents", "none"]]))], ["m-btn__flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["m-button__border", _pS(_uM([["position", "absolute"], ["left", 0], ["top", 0], ["right", 0], ["bottom", 0], ["width", "100%"], ["height", "100%"], ["boxSizing", "border-box"], ["borderTopLeftRadius", "6rpx"], ["borderTopRightRadius", "6rpx"], ["borderBottomRightRadius", "6rpx"], ["borderBottomLeftRadius", "6rpx"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "rgba(0,0,0,0)"], ["borderRightColor", "rgba(0,0,0,0)"], ["borderBottomColor", "rgba(0,0,0,0)"], ["borderLeftColor", "rgba(0,0,0,0)"], ["pointerEvents", "none"]]))], ["m-text-bold", _pS(_uM([["fontWeight", "bold"]]))], ["m-dark-disabled", _pS(_uM([["!opacity", 0.6], ["!color", "#fafbfc"]]))], ["m-dark-disabled-outline", _pS(_uM([["!opacity", 0.5]]))], ["m-gray-disabled", _pS(_uM([["!backgroundImage", "none"], ["!backgroundColor", "#f3f3f3"], ["!color", "#919191"], ["boxShadow", "none"]]))], ["m-fillet", _pS(_uM([["!borderTopLeftRadius", "220rpx"], ["!borderTopRightRadius", "220rpx"], ["!borderBottomRightRadius", "220rpx"], ["!borderBottomLeftRadius", "220rpx"], ["!borderTopLeftRadius::after", "220rpx"], ["!borderTopRightRadius::after", "220rpx"], ["!borderBottomRightRadius::after", "220rpx"], ["!borderBottomLeftRadius::after", "220rpx"]]))], ["m-outline-fillet", _pS(_uM([["!borderTopLeftRadius", "220rpx"], ["!borderTopRightRadius", "220rpx"], ["!borderBottomRightRadius", "220rpx"], ["!borderBottomLeftRadius", "220rpx"], ["!borderTopLeftRadius::after", "220rpx"], ["!borderTopRightRadius::after", "220rpx"], ["!borderBottomRightRadius::after", "220rpx"], ["!borderBottomLeftRadius::after", "220rpx"]]))], ["m-rightAngle", _pS(_uM([["!borderTopLeftRadius", 0], ["!borderTopRightRadius", 0], ["!borderBottomRightRadius", 0], ["!borderBottomLeftRadius", 0], ["!borderTopLeftRadius::after", 0], ["!borderTopRightRadius::after", 0], ["!borderBottomRightRadius::after", 0], ["!borderBottomLeftRadius::after", 0]]))], ["m-outline-rightAngle", _pS(_uM([["!borderTopLeftRadius", 0], ["!borderTopRightRadius", 0], ["!borderBottomRightRadius", 0], ["!borderBottomLeftRadius", 0], ["!borderTopLeftRadius::after", 0], ["!borderTopRightRadius::after", 0], ["!borderBottomRightRadius::after", 0], ["!borderBottomLeftRadius::after", 0]]))], ["m-btn__link", _pS(_uM([["!borderTopWidth::after", 0], ["!borderRightWidth::after", 0], ["!borderBottomWidth::after", 0], ["!borderLeftWidth::after", 0], ["!borderTopStyle::after", "none"], ["!borderRightStyle::after", "none"], ["!borderBottomStyle::after", "none"], ["!borderLeftStyle::after", "none"], ["!borderTopColor::after", "#000000"], ["!borderRightColor::after", "#000000"], ["!borderBottomColor::after", "#000000"], ["!borderLeftColor::after", "#000000"]]))]])]
 
 import _easycom_m_loading from '@/uni_modules/m-unix/components/m-loading/m-loading.uvue'

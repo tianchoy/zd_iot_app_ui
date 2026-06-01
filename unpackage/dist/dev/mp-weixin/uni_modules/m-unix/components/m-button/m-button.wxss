@@ -29,17 +29,6 @@
   overflow: visible;
   box-sizing: border-box;
 }
-.m-button__hover.data-v-bb5b2fb2:active::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-  background-color: rgba(0, 0, 0, 0.15);
-  border-radius: 6rpx;
-  pointer-events: none;
-}
 
 /* button start*/
 .m-btn.data-v-bb5b2fb2 {
@@ -63,7 +52,6 @@
   justify-content: center;
   width: 100%;
   /* 子项间距：避免使用 * + *（微信小程序 WXSS 不支持通用选择器 *） */
-  gap: 12rpx;
 }
 .m-btn--loading.data-v-bb5b2fb2 {
   pointer-events: none;

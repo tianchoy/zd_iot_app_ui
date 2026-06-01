@@ -20,6 +20,46 @@ const _easycom_m_segmented_control = () => "../../uni_modules/m-unix/components/
 if (!Math) {
   (_easycom_topNavBar + _easycom_m_tag + _easycom_m_div + _easycom_m_button + _easycom_m_tabs + _easycom_m_icon + _easycom_m_segmented_control)();
 }
+class CardDetailTabItem extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: String, optional: false }
+        };
+      },
+      name: "CardDetailTabItem"
+    };
+  }
+  constructor(options, metadata = CardDetailTabItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    delete this.__props__;
+  }
+}
+class CardDetailTabEvent extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          index: { type: Number, optional: false },
+          item: { type: CardDetailTabItem, optional: false }
+        };
+      },
+      name: "CardDetailTabEvent"
+    };
+  }
+  constructor(options, metadata = CardDetailTabEvent.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.index = this.__props__.index;
+    this.item = this.__props__.item;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "cardDetail",
   setup(__props) {
@@ -35,14 +75,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const pkgTabs = common_vendor.ref(["全部", "在用套餐", "待生效", "已失效"]);
     const current = common_vendor.ref(0);
     const handleClick = (e) => {
-      current.value = e.index;
+      var _a;
+      current.value = (_a = e.getNumber("index")) !== null && _a !== void 0 ? _a : 0;
     };
-    const changeTab = (e = null) => {
+    const changeTab = (e) => {
       active.value = e.index;
       activeName.value = e.item.name;
     };
     const showMore = () => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:287", pkgMore.value);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:296", pkgMore.value);
       pkgMore.value = !pkgMore.value;
     };
     const goBack = () => {
@@ -51,8 +92,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:298", options.card_number);
-      card_number.value = options.card_number;
+      var _a;
+      const cardNumber = (_a = options.getString("card_number")) !== null && _a !== void 0 ? _a : "";
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:308", cardNumber);
+      card_number.value = cardNumber;
     });
     return (_ctx, _cache) => {
       "raw js";

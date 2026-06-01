@@ -230,7 +230,7 @@
 <style lang="scss" scoped>
 	.container {
 		background-color: #f4f7fb;
-		min-height: 100vh;
+		min-height: 1000rpx;
 		display: flex;
 		flex-direction: column;
 		
@@ -256,7 +256,6 @@
 					background: transparent;
 					color: #0f172a;
 					font-size: 30rpx;
-					outline: none;
 				}
 				
 				.scan-btn {
@@ -268,7 +267,7 @@
 		.order-list {
 			flex: 1;
 			padding: 24rpx 24rpx 40rpx 24rpx;
-			height: calc(100vh - 280rpx);
+			min-height: 700rpx;
 			
 			.empty-state {
 				display: flex;
@@ -342,10 +341,7 @@
 							flex-direction: row;
 							align-items: center;
 							margin-bottom: 16rpx;
-							
-							&:last-child {
-								margin-bottom: 0;
-							}
+
 							
 							.detail-label {
 								width: 100rpx;
@@ -358,7 +354,6 @@
 								flex: 1;
 								font-size: 26rpx;
 								color: #374151;
-								word-break: break-all;
 							}
 						}
 					}

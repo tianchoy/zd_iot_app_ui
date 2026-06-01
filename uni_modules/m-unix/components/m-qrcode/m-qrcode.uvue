@@ -255,7 +255,7 @@ export default {
 }
 
 .m-qrcode__img {
-	display: block;
+	display: flex;
 }
 
 .m-qrcode__logo {

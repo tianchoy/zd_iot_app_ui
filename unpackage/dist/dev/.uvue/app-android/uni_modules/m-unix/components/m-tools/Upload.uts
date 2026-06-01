@@ -3,9 +3,6 @@
  */
 import { getHostProjectConfig } from './ProjectConfig.uts';
 import { storage } from './Storage.uts';
-export type AnyRecord = {
-    [key: string]: any;
-};
 export type UploadApiResponse<T = any> = {
     code: number;
     msg: string;
@@ -17,11 +14,11 @@ export type UploadFileOptions = {
     filePath: string;
     /** 表单字段名，需与后端一致 */
     name?: string;
-    formData?: AnyRecord;
+    formData?: UTSJSONObject;
     /** 覆盖 baseUrl（默认使用 getHostProjectConfig().baseUrl） */
     baseUrl?: string;
     withToken?: boolean;
-    header?: AnyRecord;
+    header?: UTSJSONObject;
     showLoading?: boolean;
     loadingText?: string;
     showError?: boolean;
@@ -103,7 +100,7 @@ export function uploadFileRequest<T = any>(options: UploadFileOptions): Promise<
     const formData = options.formData;
     const baseUrl = options.baseUrl;
     const withToken = options.withToken != null ? options.withToken! : true;
-    const header = options.header != null ? options.header! : {} as AnyRecord;
+    const header = options.header != null ? options.header! : {} as UTSJSONObject;
     const showLoading = options.showLoading != null ? options.showLoading! : false;
     const loadingText = options.loadingText != null ? options.loadingText! : '上传中...';
     const showError = options.showError != null ? options.showError! : true;
@@ -112,12 +109,7 @@ export function uploadFileRequest<T = any>(options: UploadFileOptions): Promise<
     if (showLoading) {
         uni.showLoading({ title: loadingText, mask: true });
     }
-    const reqHeader: AnyRecord = {};
-    const keys = Object.keys(header);
-    for (let i = 0; i < keys.length; i++) {
-        const k = keys[i];
-        reqHeader[k] = header[k];
-    }
+    const reqHeader: UTSJSONObject = header;
     if (withToken) {
         const token = storage.getToken();
         if (token !== '') {

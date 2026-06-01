@@ -261,6 +261,15 @@
 </template>
 
 <script setup lang="uts">
+	type CardDetailTabItem = {
+		name: string
+	}
+
+	type CardDetailTabEvent = {
+		index: number
+		item: CardDetailTabItem
+	}
+
 	const card_number = ref('')
 	const active = ref(0)
 	const activeName = ref('基本信息')
@@ -275,10 +284,10 @@
 
 	const current = ref(0)
 	const handleClick = (e: UTSJSONObject) => {
-		current.value = e.index
+		current.value = e.getNumber('index') ?? 0
 	}
 
-	const changeTab = (e: TabItem) => {
+	const changeTab = (e: CardDetailTabEvent) => {
 		active.value = e.index
 		activeName.value = e.item.name
 	}
@@ -295,8 +304,9 @@
 		}
 
 	onLoad((options) => {
-		console.log(options.card_number)
-        card_number.value = options.card_number
+		const cardNumber = options.getString('card_number') ?? ''
+		console.log(cardNumber)
+		card_number.value = cardNumber
 	})
 </script>
 
@@ -323,28 +333,24 @@
 				flex-direction: row;
 				align-items: flex-start;
 				justify-content: space-between;
-				gap: 10px;
 				.card-item-title{
 					font-size: 32rpx;
 					font-weight: 800;
 					color: #0f172a;
 					line-height: 1.25;
-					word-break: break-all;
 				}
 				.card-item-content{
 					margin-top: 5px;
 					font-size: 12px;
 					color: #94a3b8;
 					line-height: 1.45;
-					word-break: break-all;
 				}
 			}
 			.item-package{
 				margin: 20rpx 0;
 				display: flex;
 				flex-direction: row;
-				align-items: baseline;
-				gap: 20rpx;
+				align-items: center;
 				min-width: 0;
 				.package-label{
 					font-size: 12px;
@@ -363,11 +369,13 @@
 				}
 			}
 			.card-metrics{
-				display:grid;
-				grid-template-columns: repeat(2, 1fr);
-				gap: 20rpx;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
 				margin: 20rpx 0;
 				.metric-box{
+					width: 48%;
+					box-sizing: border-box;
 					background: #f8fbff;
 					border: 1rpx solid #e8eef7;
 					border-radius: 25rpx;
@@ -384,7 +392,6 @@
 						font-weight: 800;
 						color: #0f172a;
 						line-height: 1.4;
-						word-break: break-all;
 					}
 				}
 			}
@@ -393,7 +400,6 @@
 				flex-direction: row;
 				align-items: center;
 				justify-content: space-between;
-				gap: 20rpx;
 				.cycle-label{
 					font-size: 25rpx;
 					color: #64748b;
@@ -481,9 +487,7 @@
 						}
 					}
 				}
-				.pkg-item:last-child{
-					margin-bottom: 0;
-				}
+
 
 				.pkg-date{
 					margin: 20rpx 0;
@@ -528,7 +532,6 @@
 						font-weight: 800;
 						color: #0f172a;
 						line-height: 1.4;
-						word-break: break-all;
 					}
 				}
 			}
@@ -539,7 +542,6 @@
 					border: 1rpx solid #e7edf5;
 					border-radius: 18rpx;
 					padding: 20rpx;
-					cursor: pointer;
 					margin-top:20rpx;
 					.item-head{
 						display: flex;

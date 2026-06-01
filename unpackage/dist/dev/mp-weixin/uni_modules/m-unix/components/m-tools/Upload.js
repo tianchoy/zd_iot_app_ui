@@ -2,22 +2,6 @@
 const common_vendor = require("../../../../common/vendor.js");
 const uni_modules_mUnix_components_mTools_ProjectConfig = require("./ProjectConfig.js");
 const uni_modules_mUnix_components_mTools_Storage = require("./Storage.js");
-class AnyRecord extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {};
-      },
-      name: "AnyRecord"
-    };
-  }
-  constructor(options, metadata = AnyRecord.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    delete this.__props__;
-  }
-}
 class UploadApiResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$(T) {
     return {
@@ -50,10 +34,10 @@ class UploadFileOptions extends common_vendor.UTS.UTSType {
           url: { type: String, optional: false },
           filePath: { type: String, optional: false },
           name: { type: String, optional: true },
-          formData: { type: AnyRecord, optional: true },
+          formData: { type: "Unknown", optional: true },
           baseUrl: { type: String, optional: true },
           withToken: { type: Boolean, optional: true },
-          header: { type: AnyRecord, optional: true },
+          header: { type: "Unknown", optional: true },
           showLoading: { type: Boolean, optional: true },
           loadingText: { type: String, optional: true },
           showError: { type: Boolean, optional: true },
@@ -94,51 +78,6 @@ function buildUploadFullUrl(path, baseOverride = null) {
   const sep = path.startsWith("/") ? "" : "/";
   return base + sep + path;
 }
-function pickUploadUrl(data = null) {
-  if (data == null) {
-    return "";
-  }
-  if (typeof data === "string") {
-    const s = data;
-    return s !== "" ? s : "";
-  }
-  const o = data;
-  const tryKeys = ["url", "fileUrl", "path", "src"];
-  for (let i = 0; i < tryKeys.length; i++) {
-    const k = tryKeys[i];
-    const v = o[k];
-    if (typeof v === "string") {
-      const vs = v;
-      if (vs !== "") {
-        return vs;
-      }
-    }
-  }
-  return "";
-}
-function compressImagePath(src, quality) {
-  return new Promise((resolve) => {
-    if (quality >= 100 || quality <= 0) {
-      resolve(src);
-      return null;
-    }
-    common_vendor.index.compressImage({
-      src,
-      quality,
-      success: (r) => {
-        const p = r.tempFilePath;
-        if (p != null && p !== "") {
-          resolve(p);
-        } else {
-          resolve(src);
-        }
-      },
-      fail: () => {
-        resolve(src);
-      }
-    });
-  });
-}
 function uploadFileRequest(options) {
   const url = options.url;
   const filePath = options.filePath;
@@ -146,7 +85,7 @@ function uploadFileRequest(options) {
   const formData = options.formData;
   const baseUrl = options.baseUrl;
   const withToken = options.withToken != null ? options.withToken : true;
-  const header = options.header != null ? options.header : new AnyRecord({});
+  const header = options.header != null ? options.header : new common_vendor.UTSJSONObject({});
   const showLoading = options.showLoading != null ? options.showLoading : false;
   const loadingText = options.loadingText != null ? options.loadingText : "上传中...";
   const showError = options.showError != null ? options.showError : true;
@@ -155,12 +94,7 @@ function uploadFileRequest(options) {
   if (showLoading) {
     common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: loadingText, mask: true }));
   }
-  const reqHeader = new common_vendor.UTSJSONObject({});
-  const keys = Object.keys(header);
-  for (let i = 0; i < keys.length; i++) {
-    const k = keys[i];
-    reqHeader[k] = header[k];
-  }
+  const reqHeader = header;
   if (withToken) {
     const token = uni_modules_mUnix_components_mTools_Storage.storage.getToken();
     if (token !== "") {
@@ -230,8 +164,5 @@ function uploadFileRequest(options) {
     });
   });
 }
-exports.UploadFileOptions = UploadFileOptions;
-exports.compressImagePath = compressImagePath;
-exports.pickUploadUrl = pickUploadUrl;
 exports.uploadFileRequest = uploadFileRequest;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/m-unix/components/m-tools/Upload.js.map

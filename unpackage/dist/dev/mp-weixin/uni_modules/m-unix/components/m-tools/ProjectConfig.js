@@ -230,11 +230,11 @@ function mergeStorage(base, p = null) {
   if (p == null) {
     return out;
   }
-  const pt = p["token"];
+  const pt = p.token;
   if (pt != null && ("" + pt).length > 0) {
     out.token = "" + pt;
   }
-  const pu = p["userInfo"];
+  const pu = p.userInfo;
   if (pu != null && ("" + pu).length > 0) {
     out.userInfo = "" + pu;
   }
@@ -250,39 +250,39 @@ function mergeApi(base, p = null) {
   if (p == null) {
     return out;
   }
-  const pl = p["login"];
+  const pl = p.login;
   if (pl != null && typeof pl === "object") {
     const a = pl;
-    const t1 = a["tokenLogin"];
+    const t1 = a.tokenLogin;
     if (t1 != null) {
       out.login.tokenLogin = "" + t1;
     }
-    const t2 = a["codeGetOpenIdLogin"];
+    const t2 = a.codeGetOpenIdLogin;
     if (t2 != null) {
       out.login.codeGetOpenIdLogin = "" + t2;
     }
-    const t3 = a["codeGetPhoneRegisterOrLogin"];
+    const t3 = a.codeGetPhoneRegisterOrLogin;
     if (t3 != null) {
       out.login.codeGetPhoneRegisterOrLogin = "" + t3;
     }
   }
-  const pu = p["update"];
+  const pu = p.update;
   if (pu != null && typeof pu === "object") {
     const u = pu;
-    const c = u["checkUpdate"];
+    const c = u.checkUpdate;
     if (c != null) {
       out.update.checkUpdate = "" + c;
     }
   }
-  const pupload = p["upload"];
+  const pupload = p.upload;
   if (pupload != null && typeof pupload === "object") {
     const up = pupload;
-    const im = up["image"];
+    const im = up.image;
     if (im != null) {
       out.upload.image = "" + im;
     }
   }
-  const pq = p["qrCodeImageApiBase"];
+  const pq = p.qrCodeImageApiBase;
   if (pq != null) {
     out.qrCodeImageApiBase = "" + pq;
   }
@@ -304,42 +304,42 @@ function mergeConfigInfo(base, p = null) {
     return out;
   }
   const o = p;
-  const n = o["name"];
+  const n = o.name;
   if (n != null) {
     out.name = "" + n;
   }
-  const l = o["logo"];
+  const l = o.logo;
   if (l != null) {
     out.logo = "" + l;
   }
-  const d = o["desc"];
+  const d = o.desc;
   if (d != null) {
     out.desc = "" + d;
   }
-  const vc = o["versionCode"];
+  const vc = o.versionCode;
   if (vc != null) {
     const num = parseInt("" + vc, 10);
     if (!isNaN(num)) {
       out.versionCode = num;
     }
   }
-  const vn = o["versionName"];
+  const vn = o.versionName;
   if (vn != null) {
     out.versionName = "" + vn;
   }
-  const ad = o["appDownloadUrl"];
+  const ad = o.appDownloadUrl;
   if (ad != null) {
     out.appDownloadUrl = "" + ad;
   }
-  const ada = o["appDownloadUrlAndroid"];
+  const ada = o.appDownloadUrlAndroid;
   if (ada != null) {
     out.appDownloadUrlAndroid = "" + ada;
   }
-  const ua = o["userAgreementArticleId"];
+  const ua = o.userAgreementArticleId;
   if (ua != null) {
     out.userAgreementArticleId = "" + ua;
   }
-  const pp = o["privacyPolicyArticleId"];
+  const pp = o.privacyPolicyArticleId;
   if (pp != null) {
     out.privacyPolicyArticleId = "" + pp;
   }
@@ -357,10 +357,18 @@ function mergeHostPatch(patch = null) {
     loginRequiredPaths: [],
     loginPagePath: base.loginPagePath,
     api: new HostApiConfig({
-      login: new HostApiLoginConfig(Object.assign({ tokenLogin: null, codeGetOpenIdLogin: null, codeGetPhoneRegisterOrLogin: null }, base.login)),
-      update: new HostApiUpdateConfig(Object.assign({ checkUpdate: null }, base.update)),
-      upload: new HostApiUploadConfig(Object.assign({ image: null }, base.upload)),
-      qrCodeImageApiBase: base.qrCodeImageApiBase
+      login: new HostApiLoginConfig({
+        tokenLogin: base.api.login.tokenLogin,
+        codeGetOpenIdLogin: base.api.login.codeGetOpenIdLogin,
+        codeGetPhoneRegisterOrLogin: base.api.login.codeGetPhoneRegisterOrLogin
+      }),
+      update: new HostApiUpdateConfig({
+        checkUpdate: base.api.update.checkUpdate
+      }),
+      upload: new HostApiUploadConfig({
+        image: base.api.upload.image
+      }),
+      qrCodeImageApiBase: base.api.qrCodeImageApiBase
     }),
     configInfo: new HostConfigInfo({
       appDownloadUrl: null,
@@ -379,28 +387,28 @@ function mergeHostPatch(patch = null) {
     return out;
   }
   const p = patch;
-  const e = p["env"];
+  const e = p.env;
   if (e != null) {
     out.env = "" + e;
   }
-  const lb = p["localBaseUrl"];
+  const lb = p.localBaseUrl;
   if (lb != null) {
     out.localBaseUrl = "" + lb;
   }
-  const db = p["devBaseUrl"];
+  const db = p.devBaseUrl;
   if (db != null) {
     out.devBaseUrl = "" + db;
   }
-  const pb = p["prodBaseUrl"];
+  const pb = p.prodBaseUrl;
   if (pb != null) {
     out.prodBaseUrl = "" + pb;
   }
-  const bu = p["baseUrl"];
+  const bu = p.baseUrl;
   if (bu != null) {
     out.baseUrl = "" + bu;
   }
-  out.storage = mergeStorage(base.storage, p["storage"]);
-  const paths = p["loginRequiredPaths"];
+  out.storage = mergeStorage(base.storage, p.storage);
+  const paths = p.loginRequiredPaths;
   if (paths != null && common_vendor.UTS.isInstanceOf(paths, Array)) {
     const arr = [];
     const pa = paths;
@@ -409,13 +417,13 @@ function mergeHostPatch(patch = null) {
     }
     out.loginRequiredPaths = arr;
   }
-  const lp = p["loginPagePath"];
+  const lp = p.loginPagePath;
   if (lp != null && ("" + lp).length > 0) {
     out.loginPagePath = "" + lp;
   }
-  out.api = mergeApi(base.api, p["api"]);
-  out.configInfo = mergeConfigInfo(base.configInfo, p["configInfo"]);
-  const mui = p["mUi"];
+  out.api = mergeApi(base.api, p.api);
+  out.configInfo = mergeConfigInfo(base.configInfo, p.configInfo);
+  const mui = p.mUi;
   if (mui != null) {
     out.mUi = mui;
   }
@@ -425,10 +433,11 @@ function injectMUnixHostProjectConfig(hostConfig = null) {
   _hostOverride = mergeHostPatch(hostConfig);
 }
 function getHostProjectConfig() {
-  if (_hostOverride != null) {
-    return _hostOverride;
+  const hostOverride = _hostOverride;
+  if (hostOverride != null) {
+    return hostOverride;
   }
-  return mergeHostPatch(null);
+  return BUILTIN_DEFAULT;
 }
 exports.getHostProjectConfig = getHostProjectConfig;
 exports.injectMUnixHostProjectConfig = injectMUnixHostProjectConfig;

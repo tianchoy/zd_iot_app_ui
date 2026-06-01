@@ -417,7 +417,7 @@ export default {
 }
 
 .m-picture-cropper__tip {
-	display: block;
+	display: flex;
 	font-size: 24rpx;
 	color: #888888;
 	line-height: 1.5;

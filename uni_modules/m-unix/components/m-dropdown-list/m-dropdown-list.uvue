@@ -229,7 +229,7 @@ export default {
 
 .m-dropdown-list__anchor {
 	position: relative;
-	max-width: 100%;
+	max-width: 750rpx;
 	flex-shrink: 0;
 	box-sizing: border-box;
 }

@@ -69,10 +69,31 @@ function checkNumber(number) {
   const regexCard = /^(^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}(\d|X|x)?$)$/;
   return regexCard.test(number);
 }
+class MoneyUnitValue extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          num: { type: String, optional: false },
+          unit: { type: String, optional: false }
+        };
+      },
+      name: "MoneyUnitValue"
+    };
+  }
+  constructor(options, metadata = MoneyUnitValue.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.num = this.__props__.num;
+    this.unit = this.__props__.unit;
+    delete this.__props__;
+  }
+}
 function changeMoney(num) {
   const n = Number(num);
   if (n <= 1)
-    return { num: String(n), unit: "元" };
+    return new MoneyUnitValue({ num: String(n), unit: "元" });
   const units = ["元", "万", "亿", "万亿"];
   let curNum = n;
   let curUnit = units[0];
@@ -82,7 +103,7 @@ function changeMoney(num) {
       break;
     curNum = curNum / 1e4;
   }
-  return { num: Number(curNum).toFixed(2), unit: curUnit };
+  return new MoneyUnitValue({ num: Number(curNum).toFixed(2), unit: curUnit });
 }
 function strNumSize(tempNum) {
   const s = tempNum.toString();
@@ -149,108 +170,6 @@ function toCssLength(value) {
     return n + "rpx";
   }
   return s;
-}
-function copyByExecCommand(data) {
-  const g = globalThis;
-  const doc = g.document;
-  if (doc == null) {
-    return false;
-  }
-  try {
-    const ta = doc.createElement("textarea");
-    ta.value = data;
-    ta.style.position = "fixed";
-    ta.style.left = "0";
-    ta.style.top = "0";
-    ta.style.width = "1px";
-    ta.style.height = "1px";
-    ta.style.padding = "0";
-    ta.style.margin = "0";
-    ta.style.border = "none";
-    ta.style.opacity = "0.01";
-    ta.setAttribute("aria-hidden", "true");
-    const body = doc.body;
-    if (body == null) {
-      return false;
-    }
-    body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    const len = data.length;
-    if (typeof ta.setSelectionRange === "function") {
-      ta.setSelectionRange(0, len);
-    }
-    const ok = doc.execCommand("copy");
-    body.removeChild(ta);
-    return ok;
-  } catch (e) {
-    return false;
-  }
-}
-function copyToClipboardUni(data, callback = null) {
-  common_vendor.index.setClipboardData({
-    data,
-    showToast: false,
-    success: () => {
-      setTimeout(() => {
-        common_vendor.index.showToast({ title: "复制成功", icon: "success" });
-      }, 50);
-      if (callback != null) {
-        callback(true);
-      }
-    },
-    fail: () => {
-      if (copyByExecCommand(data)) {
-        setTimeout(() => {
-          common_vendor.index.showToast({ title: "复制成功", icon: "success" });
-        }, 50);
-        if (callback != null) {
-          callback(true);
-        }
-      } else {
-        common_vendor.index.showToast({ title: "复制失败", icon: "none" });
-        if (callback != null) {
-          callback(false);
-        }
-      }
-    }
-  });
-}
-function copyToClipboard(data, callback = null) {
-  if (data == null || data.length === 0) {
-    if (callback != null) {
-      callback(false);
-    }
-    return null;
-  }
-  const g = globalThis;
-  const doc = g.document;
-  if (doc != null) {
-    if (copyByExecCommand(data)) {
-      setTimeout(() => {
-        common_vendor.index.showToast({ title: "复制成功", icon: "success" });
-      }, 50);
-      if (callback != null) {
-        callback(true);
-      }
-      return null;
-    }
-  }
-  const nav = g.navigator;
-  if (nav != null && nav.clipboard != null && typeof nav.clipboard.writeText === "function") {
-    nav.clipboard.writeText(data).then(() => {
-      setTimeout(() => {
-        common_vendor.index.showToast({ title: "复制成功", icon: "success" });
-      }, 50);
-      if (callback != null) {
-        callback(true);
-      }
-    }).catch(() => {
-      copyToClipboardUni(data, callback);
-    });
-    return null;
-  }
-  copyToClipboardUni(data, callback);
 }
 function parseCssNumber(value) {
   if (typeof value === "number") {
@@ -328,7 +247,7 @@ const getReqUrl = () => {
     production: mConfigInfo().production
   });
   return envConfig["development"] || (() => {
-    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:416", `未知环境: ${"development"}`);
+    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:421", `未知环境: ${"development"}`);
     return "";
   })();
 };
@@ -338,7 +257,7 @@ const showLoading = (title = null, mask = true) => {
     title: title || "请稍候..."
   }));
 };
-const tools = new common_vendor.UTSJSONObject({
+new common_vendor.UTSJSONObject({
   configInfo: mConfigInfo,
   getReqUrl,
   msg: mToastMsg,
@@ -467,10 +386,10 @@ const tools = new common_vendor.UTSJSONObject({
       common_vendor.index.navigateTo({
         url: "/pages/me/login"
       });
-      return common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:575", "登录失效");
+      return common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:580", "登录失效");
     }
     if (!url)
-      return common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:577", "跳转路径不能为空");
+      return common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:582", "跳转路径不能为空");
     const query = Object.keys(params).map((k) => {
       return `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`;
     }).join("&");
@@ -492,7 +411,7 @@ const tools = new common_vendor.UTSJSONObject({
     }
   },
   back(delta = 1) {
-    common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:604", "Back");
+    common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:609", "Back");
     common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta, animationType: "slide-out-left" }));
   },
   upx2px(upx, def = null) {
@@ -504,22 +423,22 @@ const tools = new common_vendor.UTSJSONObject({
   runType: () => {
     switch (common_vendor.index.getDeviceInfo().platform) {
       case "android":
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:616", "运行Android上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:621", "运行Android上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.Android;
       case "ios":
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:619", "运行iOS上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:624", "运行iOS上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.IOS;
       case "harmonyos":
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:622", "运行鸿蒙系统上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:627", "运行鸿蒙系统上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.HarmonyOs;
       case "mac":
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:625", "运行mac上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:630", "运行mac上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.IOS;
       case "windows":
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:628", "运行Windows上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:633", "运行Windows上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.Windows;
       default:
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:631", "运行在开发者工具上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:636", "运行在开发者工具上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.WxAppl;
     }
   },
@@ -775,7 +694,11 @@ const tools = new common_vendor.UTSJSONObject({
           common_vendor.index.hideLoading();
           let d = null;
           try {
-            d = common_vendor.UTS.JSON.parse(res.data.replace(/\ufeff/g, "") || "{}");
+            let responseText = res.data.replace(/\ufeff/g, "");
+            if (responseText.length === 0) {
+              responseText = "{}";
+            }
+            d = common_vendor.UTS.JSON.parse(responseText);
           } catch (e) {
             reject(e);
             mToastMsg("上传响应解析失败");
@@ -828,8 +751,6 @@ const tools = new common_vendor.UTSJSONObject({
   /** 响应式登录态 */
   useAuth: uni_modules_mUnix_components_mTools_useAuth.useAuth
 });
-exports.copyToClipboard = copyToClipboard;
 exports.parseCssNumber = parseCssNumber;
 exports.toCssLength = toCssLength;
-exports.tools = tools;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/m-unix/components/m-tools/Ut.js.map

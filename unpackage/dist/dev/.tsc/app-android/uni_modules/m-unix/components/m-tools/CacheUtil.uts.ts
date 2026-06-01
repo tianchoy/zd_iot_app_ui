@@ -39,7 +39,7 @@ class CacheUtil {
    * @param key 缓存键
    * @param validator 数据校验函数（可选）
    */
-  static get<T>(key: string, validator?: (data: unknown) => data is T): T | null {
+  static get<T>(key: string, validator?: (data: unknown) => boolean): T | null {
     const cacheKey = CACHE_PREFIX + key
     try {
       const cached = uni.getStorageSync(cacheKey)

@@ -25,6 +25,6 @@
 /* 透明度 */
 /* 文章场景相关 */
 .m-icon {
-  display: inline-block;
+  display: flex;
   line-height: 1;
 }

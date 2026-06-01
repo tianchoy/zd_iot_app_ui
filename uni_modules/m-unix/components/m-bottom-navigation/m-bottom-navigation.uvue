@@ -340,9 +340,6 @@ export default {
 	border-bottom-color: #f0f0f0;
 }
 
-.m-bottom-navigation__sub-item:last-child {
-	border-bottom-width: 0;
-}
 
 .m-bottom-navigation__sub-text {
 	font-size: 28rpx;

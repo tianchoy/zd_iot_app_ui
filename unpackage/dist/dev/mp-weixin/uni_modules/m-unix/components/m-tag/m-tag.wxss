@@ -25,7 +25,7 @@
 /* 透明度 */
 /* 文章场景相关 */
 .m-tag.data-v-30d99be6 {
-  display: inline-flex;
+  display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -117,9 +117,9 @@
   opacity: 0.5;
 }
 .m-tag .m-tag__text.data-v-30d99be6 {
-  line-height: inherit;
-  font-size: inherit;
-  color: inherit;
+  line-height: 1;
+  font-size: 24rpx;
+  color: #606266;
 }
 .m-tag .m-tag__close.data-v-30d99be6 {
   margin-left: 8rpx;

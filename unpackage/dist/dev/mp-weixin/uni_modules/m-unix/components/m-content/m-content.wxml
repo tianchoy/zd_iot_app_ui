@@ -1,1 +1,0 @@
-<view class="{{['m-wing__blank', 'data-v-39837eb6', b, c, d]}}" style="{{e + ';' + f + ';' + (virtualHostStyle || '')}}" bindtap="{{g}}" id="{{a}}" change:eS="{{uV.sS}}" eS="{{$eS[a]}}" change:eA="{{uV.sA}}" eA="{{$eA[a]}}" hidden="{{virtualHostHidden || false}}"><slot></slot></view><wxs src="/common/uniView.wxs" module="uV"/>

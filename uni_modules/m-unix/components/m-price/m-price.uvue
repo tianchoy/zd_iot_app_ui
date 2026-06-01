@@ -99,10 +99,10 @@ export default {
 
 <style scoped lang="scss">
 .m-price {
-	display: inline-flex;
+	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
-	align-items: baseline;
+	align-items: center;
 }
 
 .m-price__symbol {

@@ -101,7 +101,7 @@ export default {
 .m-keyboard__panel {
 	position: relative;
 	background-color: #ebedf0;
-	padding-bottom: env(safe-area-inset-bottom);
+	padding-bottom: 0;
 }
 
 .m-keyboard__panel--radius {

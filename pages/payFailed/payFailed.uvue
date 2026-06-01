@@ -101,7 +101,7 @@
 
 <style lang="scss" scoped>
 	.container {
-		min-height: 100vh;
+		min-height: 1000rpx;
 		padding: 40rpx 32rpx;
 		display: flex;
 		flex-direction: column;
@@ -165,10 +165,7 @@
 		align-items: center;
 		padding: 24rpx 0;
 		border-bottom: 1rpx solid #f0f0f0;
-		
-		&:last-child {
-			border-bottom: none;
-		}
+
 		
 		.label {
 			font-size: 24rpx;
@@ -183,7 +180,6 @@
 			font-weight: bold;
 			text-align: right;
 			flex: 1;
-			word-break: break-all;
 		}
 
 		.amount {
@@ -206,7 +202,6 @@
 	.button-section {
 		display: flex;
 		flex-direction: column;
-		gap: 24rpx;
 		
 		.action-btn {
 			width: 100%;

@@ -33,14 +33,14 @@ page .container.data-v-a151b594 {
 page .tip-text.data-v-a151b594 {
   margin-bottom: 24rpx;
 }
-page .tip-text text.data-v-a151b594 {
+page .tip-text-value.data-v-a151b594 {
   font-size: 26rpx;
   color: #9ca3af;
 }
 page .card-number-section.data-v-a151b594 {
   display: flex;
   flex-direction: column;
-  align-items: baseline;
+  align-items: flex-start;
   margin: 32rpx 0;
   padding-bottom: 20rpx;
   border-bottom: 2rpx solid #e5e7eb;
@@ -70,14 +70,11 @@ page .order-item.data-v-a151b594 {
   padding: 20rpx 0;
   border-bottom: 2rpx solid #f0f0f0;
 }
-page .order-item.data-v-a151b594:last-child {
-  border-bottom: none;
-}
 page .order-header.data-v-a151b594 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: flex-start;
   margin-bottom: 10rpx;
 }
 page .order-header .package-name.data-v-a151b594 {
