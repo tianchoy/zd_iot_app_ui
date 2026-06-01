@@ -607,19 +607,15 @@ new common_vendor.UTSJSONObject({
   httpPost: (url, params) => {
     return new Promise((resolve, reject) => {
       let isTimeout = false;
-      let requestTask = null;
       common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "加载中", mask: true }));
       const timeoutId = setTimeout(() => {
         isTimeout = true;
-        if (requestTask != null) {
-          requestTask.abort();
-        }
         common_vendor.index.hideLoading();
         mToastMsg("请求超时，请重试");
         reject(new Error("Request timeout"));
       }, 5e3);
       const finalUrl = `${getReqUrl()}${url}`;
-      requestTask = common_vendor.index.request({
+      common_vendor.index.request({
         url: finalUrl,
         method: "POST",
         header: new common_vendor.UTSJSONObject({
@@ -669,7 +665,6 @@ new common_vendor.UTSJSONObject({
           reject(err);
         },
         complete: () => {
-          requestTask = null;
         }
       });
     });
@@ -680,7 +675,7 @@ new common_vendor.UTSJSONObject({
    * @param {object} filePath 附件路径
    */
   uploadFile: (url, filePath) => {
-    showLoading();
+    showLoading(null, null);
     return new Promise((resolve, reject) => {
       common_vendor.index.uploadFile({
         url: getReqUrl() + url,
@@ -707,11 +702,13 @@ new common_vendor.UTSJSONObject({
             reject(new Error("empty upload response"));
             return null;
           }
-          if (d.code == 200) {
-            let fileObj = d.data;
+          const resp = d;
+          if (resp.code == 200) {
+            let fileObj = resp.data;
             resolve(fileObj);
           } else {
-            mToastMsg(res.msg);
+            mToastMsg(resp.msg != null && resp.msg.length > 0 ? resp.msg : "上传失败");
+            reject(new Error(resp.msg != null ? resp.msg : "上传失败"));
           }
         },
         fail: function(res) {
@@ -725,30 +722,70 @@ new common_vendor.UTSJSONObject({
   /** 存储工具 */
   storage: uni_modules_mUnix_components_mTools_Storage.storage,
   /** 认证工具 */
-  isLoggedIn: uni_modules_mUnix_components_mTools_Auth.isLoggedIn,
-  checkLogin: uni_modules_mUnix_components_mTools_Auth.checkLogin,
-  needLogin: uni_modules_mUnix_components_mTools_Auth.needLogin,
+  isLoggedIn: () => {
+    return uni_modules_mUnix_components_mTools_Auth.isLoggedIn();
+  },
+  checkLogin: (toPath = null) => {
+    return uni_modules_mUnix_components_mTools_Auth.checkLogin(toPath);
+  },
+  needLogin: (path) => {
+    return uni_modules_mUnix_components_mTools_Auth.needLogin(path);
+  },
   /** 请求工具 */
-  request: uni_modules_mUnix_components_mTools_Request.request,
+  request: (options) => {
+    return uni_modules_mUnix_components_mTools_Request.request(options);
+  },
   http: uni_modules_mUnix_components_mTools_Request.http,
   /** 通用工具 */
-  jumpTo,
-  checkPhone,
-  get,
-  set,
-  jslog,
-  apiStart,
-  apiStop,
-  isEmpty,
-  checkNumber,
-  changeMoney,
-  timestampToDate,
-  getTodayStartTimestamp,
-  validateEmail,
-  maskPhoneNumber,
-  generateOrderNumber,
+  jumpTo: (url, type = null) => {
+    return jumpTo(url, type == null ? "to" : type);
+  },
+  checkPhone: (phone) => {
+    return checkPhone(phone);
+  },
+  get: (key) => {
+    return get(key);
+  },
+  set: (key, value = null) => {
+    return set(key, value);
+  },
+  jslog: (title, obj = null) => {
+    return jslog(title, obj);
+  },
+  apiStart: () => {
+    return apiStart();
+  },
+  apiStop: () => {
+    return apiStop();
+  },
+  isEmpty: (content = null) => {
+    return isEmpty(content);
+  },
+  checkNumber: (number) => {
+    return checkNumber(number);
+  },
+  changeMoney: (num) => {
+    return changeMoney(num);
+  },
+  timestampToDate: (timestamp) => {
+    return timestampToDate(timestamp);
+  },
+  getTodayStartTimestamp: () => {
+    return getTodayStartTimestamp();
+  },
+  validateEmail: (email) => {
+    return validateEmail(email);
+  },
+  maskPhoneNumber: (phoneNumber = null) => {
+    return maskPhoneNumber(phoneNumber);
+  },
+  generateOrderNumber: () => {
+    return generateOrderNumber();
+  },
   /** 响应式登录态 */
-  useAuth: uni_modules_mUnix_components_mTools_useAuth.useAuth
+  useAuth: () => {
+    return uni_modules_mUnix_components_mTools_useAuth.useAuth();
+  }
 });
 exports.parseCssNumber = parseCssNumber;
 exports.toCssLength = toCssLength;

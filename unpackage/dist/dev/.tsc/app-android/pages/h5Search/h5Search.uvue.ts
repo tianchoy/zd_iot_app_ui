@@ -17,7 +17,7 @@ const _cache = __ins.renderCache;
 	// 国家/地区相关
 	const showCountryPopup = ref<boolean>(false)
 	const selectedCountry = ref<string>('')
-	const searchSelectRef = ref<any>(null)
+	const searchSelectRef = ref(null)
 	
 	// 国家/地区选项列表
 	const countryOptions = ref([
@@ -36,10 +36,16 @@ const _cache = __ins.renderCache;
 	])
 	
 	// 显示选中的国家/地区标签
-	const selectedCountryLabel = computed(() => {
+	const selectedCountryLabel = computed<string>(() : string => {
 		if (!selectedCountry.value) return ''
-		const item = countryOptions.value.find(opt => opt.value === selectedCountry.value)
-		return item ? item.label : ''
+		for (let i = 0; i < countryOptions.value.length; i++) {
+			const opt = countryOptions.value[i] as UTSJSONObject
+			if (opt['value'] === selectedCountry.value) {
+				const label = opt['label']
+				return label == null ? '' : '' + label
+			}
+		}
+		return ''
 	})
 	
 	// 打开国家/地区选择弹窗
@@ -49,10 +55,10 @@ const _cache = __ins.renderCache;
 	
 	// 国家/地区选择变化
 	const onCountryChange = (value: string | number | null, item: any) => {
-		console.log('选中国家/地区:', value, item, " at pages/h5Search/h5Search.uvue:125")
+		console.log('选中国家/地区:', value, item, " at pages/h5Search/h5Search.uvue:131")
 		showCountryPopup.value = false
 		uni.showToast({
-			title: `已选择：${item.label}`,
+			title: `已选择：${(item as UTSJSONObject)['label']}`,
 			icon: 'success'
 		})
 	}
@@ -60,9 +66,6 @@ const _cache = __ins.renderCache;
 	// 关闭弹窗时重置搜索
 	const onPopupClose = () => {
 		showCountryPopup.value = false
-		if (searchSelectRef.value) {
-			searchSelectRef.value.resetSearch()
-		}
 	}
 	
 	// 扫码
@@ -88,8 +91,8 @@ const _cache = __ins.renderCache;
 			})
 			return
 		}
-		console.log('查询卡号:', cardNumber.value, " at pages/h5Search/h5Search.uvue:164")
-		console.log('国家/地区:', selectedCountryLabel.value, " at pages/h5Search/h5Search.uvue:165")
+		console.log('查询卡号:', cardNumber.value, " at pages/h5Search/h5Search.uvue:167")
+		console.log('国家/地区:', selectedCountryLabel.value, " at pages/h5Search/h5Search.uvue:168")
 		uni.showToast({
 			title: '查询中...',
 			icon: 'loading'

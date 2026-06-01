@@ -7,7 +7,7 @@ import { R, StoreMemberVo } from '@/uni_modules/m-unix/components/m-tools/utype/
 import { RunType, HttpStatus } from '@/uni_modules/m-unix/components/m-tools/uenum/SysEnum.uts'
 import { storage } from '@/uni_modules/m-unix/components/m-tools/Storage.uts'
 import { isLoggedIn, checkLogin, needLogin } from '@/uni_modules/m-unix/components/m-tools/Auth.uts'
-import { http, request } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
+import { http, request, type ApiResponse, type RequestOptions } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
 import { useAuth } from '@/uni_modules/m-unix/components/m-tools/useAuth.uts'
 import {
 	getMUiConfig,
@@ -383,12 +383,12 @@ const mToastMsg = (text: string) => {
 	})
 }
 
-function parseApiEnvelope<T>(raw: any): R<T> | null {
+function parseApiEnvelope<T>(raw: any): R<any> | null {
 	if (raw == null) {
 		return null
 	}
 	if (typeof raw === 'object') {
-		return raw as R<T>
+		return raw as R<any>
 	}
 	if (typeof raw === 'string') {
 		const s = trimCompat(raw as string)
@@ -396,7 +396,7 @@ function parseApiEnvelope<T>(raw: any): R<T> | null {
 			return null
 		}
 		try {
-			return JSON.parse(s) as R<T>
+			return JSON.parse(s) as R<any>
 		} catch (e) {
 			const preview = s.length > 80 ? s.substring(0, 80) + '…' : s
 			throw new Error('接口返回非JSON：' + preview)
@@ -818,10 +818,10 @@ const tools = {
 	 * @param {object} url 接口地址
 	 * @param {object} params 报文
 	 */
-	httpPost: <T>(url : string, params : object) : Promise<T> => {
+	httpPost: (url : string, params : object) : Promise<any> => {
 		return new Promise((resolve, reject) => {
 			let isTimeout = false;
-			let requestTask : any = null;
+			let requestTask : any | null = null;
 
 			// 显示加载状态（与 GET 一致）
 			uni.showLoading({ title: '加载中', mask: true });
@@ -829,9 +829,6 @@ const tools = {
 			// 超时处理逻辑（5秒超时机制）
 			const timeoutId = setTimeout(() => {
 				isTimeout = true;
-				if (requestTask != null) {
-					requestTask.abort()
-				}
 				uni.hideLoading();
 				mToastMsg("请求超时，请重试");
 				reject(new Error('Request timeout'));
@@ -904,8 +901,8 @@ const tools = {
 	 * @param {object} url 接口地址
 	 * @param {object} filePath 附件路径
 	 */
-	uploadFile: <T>(url : string, filePath : string) => {
-		showLoading()
+	uploadFile: (url : string, filePath : string) : Promise<any> => {
+		showLoading(null, null)
 		return new Promise((resolve, reject) => {
 			const uploadTask : UploadTask = uni.uploadFile({
 				url: getReqUrl() + url,
@@ -916,13 +913,13 @@ const tools = {
 				},
 				success: function (res) {
 					uni.hideLoading()
-					let d : R<T> | null = null
+					let d : R<any> | null = null
 					try {
 						let responseText = res.data.replace(/\ufeff/g, "")
 							if (responseText.length === 0) {
 								responseText = "{}"
 							}
-							d = JSON.parse(responseText) as R<T>
+							d = JSON.parse(responseText) as R<any>
 					} catch (e) {
 						reject(e)
 						mToastMsg("上传响应解析失败");
@@ -932,11 +929,13 @@ const tools = {
 						reject(new Error('empty upload response'))
 						return
 					}
-					if (d.code == 200) {
-						let fileObj = d.data;
+					const resp = d as R<any>
+					if (resp.code == 200) {
+						let fileObj = resp.data;
 						resolve(fileObj)
 					} else {
-						mToastMsg(res.msg);
+						mToastMsg(resp.msg != null && resp.msg.length > 0 ? resp.msg : '上传失败');
+						reject(new Error(resp.msg != null ? resp.msg : '上传失败'))
 					}
 				},
 				fail: function (res) {
@@ -953,33 +952,33 @@ const tools = {
 	storage: storage,
 
 	/** 认证工具 */
-	isLoggedIn: isLoggedIn,
-	checkLogin: checkLogin,
-	needLogin: needLogin,
+	isLoggedIn: () : boolean => isLoggedIn(),
+	checkLogin: (toPath ?: string) : boolean => checkLogin(toPath),
+	needLogin: (path : string) : boolean => needLogin(path),
 
 	/** 请求工具 */
-	request: request,
+	request: (options : RequestOptions) : Promise<ApiResponse<any>> => request<any>(options),
 	http: http,
 
 	/** 通用工具 */
-	jumpTo: jumpTo,
-	checkPhone: checkPhone,
-	get: get,
-	set: set,
-	jslog: jslog,
-	apiStart: apiStart,
-	apiStop: apiStop,
-	isEmpty: isEmpty,
-	checkNumber: checkNumber,
-	changeMoney: changeMoney,
-	timestampToDate: timestampToDate,
-	getTodayStartTimestamp: getTodayStartTimestamp,
-	validateEmail: validateEmail,
-	maskPhoneNumber: maskPhoneNumber,
-	generateOrderNumber: generateOrderNumber,
+	jumpTo: (url : string, type ?: string) : void => jumpTo(url, type == null ? 'to' : type),
+	checkPhone: (phone : string) : boolean => checkPhone(phone),
+	get: (key : string) : any | null => get(key),
+	set: (key : string, value : any) : void => set(key, value),
+	jslog: (title : string, obj : any) : void => jslog(title, obj),
+	apiStart: () : void => apiStart(),
+	apiStop: () : void => apiStop(),
+	isEmpty: (content : string | null | undefined) : boolean => isEmpty(content),
+	checkNumber: (number : string) : boolean => checkNumber(number),
+	changeMoney: (num : number) : MoneyUnitValue => changeMoney(num),
+	timestampToDate: (timestamp : number) : string => timestampToDate(timestamp),
+	getTodayStartTimestamp: () : number => getTodayStartTimestamp(),
+	validateEmail: (email : string) : boolean => validateEmail(email),
+	maskPhoneNumber: (phoneNumber : string | null | undefined) : string => maskPhoneNumber(phoneNumber),
+	generateOrderNumber: () : string => generateOrderNumber(),
 
 	/** 响应式登录态 */
-	useAuth: useAuth,
+	useAuth: () => useAuth(),
 }
 
 export default tools

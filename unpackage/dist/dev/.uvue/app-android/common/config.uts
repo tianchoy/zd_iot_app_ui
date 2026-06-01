@@ -34,7 +34,7 @@ export type ProjectConfig = {
 // ============ 配置值 ============
 // 环境配置
 const ENV = 'prod'; // local | dev | prod
-const API_CONFIG = {
+const API_CONFIG: UTSJSONObject = {
     local: {
         baseUrl: 'http://localhost:3000/api',
         timeout: 30000
@@ -44,15 +44,15 @@ const API_CONFIG = {
         timeout: 30000
     },
     prod: {
-        baseUrl: 'https://api.yourdomain.com/api',
+        baseUrl: 'https://cmpapp.zdiot.cn/prod-api',
         timeout: 30000
     }
-} as UTSJSONObject;
-const currentConfig = API_CONFIG["prod"];
+};
+const currentConfig = API_CONFIG['prod'] as UTSJSONObject;
 // 导出配置对象
 export const config: ProjectConfig = {
-    baseUrl: 'https://api.yourdomain.com/api',
-    timeout: 30000,
+    baseUrl: currentConfig['baseUrl'] as string,
+    timeout: currentConfig['timeout'] as number,
     env: ENV,
     api: {
         auth: {

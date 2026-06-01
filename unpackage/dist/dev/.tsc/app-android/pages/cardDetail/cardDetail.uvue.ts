@@ -49,7 +49,11 @@ const _cache = __ins.renderCache;
 		pkgMore.value = !pkgMore.value
 	}
 
-		const goBack = () => {
+	const cardDetail = (cardNumber: string) => {
+		card_number.value = cardNumber
+	}
+
+	const goBack = () => {
 			uni.navigateBack({
 				delta: 1
 			})
@@ -57,7 +61,7 @@ const _cache = __ins.renderCache;
 
 	onLoad((options) => {
 		const cardNumber = options.getString('card_number') ?? ''
-		console.log(cardNumber, " at pages/cardDetail/cardDetail.uvue:308")
+		console.log(cardNumber, " at pages/cardDetail/cardDetail.uvue:312")
 		card_number.value = cardNumber
 	})
 
@@ -84,7 +88,7 @@ const _component_m_segmented_control = resolveEasyComponent("m-segmented-control
       _cE("view", _uM({ class: "card-box" }), [
         _cE("view", _uM({
           class: "card-item",
-          onClick: () => {_ctx.cardDetail('1064916585160')}
+          onClick: () => {cardDetail('1064916585160')}
         }), [
           _cE("view", _uM({ class: "item-head" }), [
             _cE("view", _uM({ class: "item-head-label" }), [

@@ -119,7 +119,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.3.229"
     val port: String = "8090"
-    val id: String = "app-android_LByBOS"
+    val id: String = "app-android_ZFimVr"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -207,9 +207,16 @@ open class ProjectConfig (
     }
 }
 val ENV = "prod"
-val API_CONFIG: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("API_CONFIG", "common/config.uts", 37, 7), "local" to _uO("baseUrl" to "http://localhost:3000/api", "timeout" to 30000), "dev" to _uO("baseUrl" to "https://dev-api.yourdomain.com/api", "timeout" to 30000), "prod" to _uO("baseUrl" to "https://api.yourdomain.com/api", "timeout" to 30000))
-val currentConfig = API_CONFIG["prod"]
-val config = ProjectConfig(baseUrl = "https://api.yourdomain.com/api", timeout = 30000, env = ENV, api = ApiPaths(auth = AuthApiPaths(login = "/auth/login", logout = "/auth/logout", refreshToken = "/auth/refresh")), storage = StorageKeys(token = "access_token", refreshToken = "refresh_token"), configInfo = ConfigInfo(name = "我的应用", versionCode = 1, versionName = "1.0.0", appId = "your-app-id"), loginPagePath = "", loginRequiredPaths = _uA())
+val API_CONFIG: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("API_CONFIG", "common/config.uts", 37, 7), "local" to _uO("baseUrl" to "http://localhost:3000/api", "timeout" to 30000), "dev" to _uO("baseUrl" to "https://dev-api.yourdomain.com/api", "timeout" to 30000), "prod" to _uO("baseUrl" to "https://cmpapp.zdiot.cn/prod-api", "timeout" to 30000))
+val currentConfig = API_CONFIG["prod"] as UTSJSONObject
+val config = ProjectConfig(baseUrl = currentConfig["baseUrl"] as String, timeout = currentConfig["timeout"] as Number, env = ENV, api = ApiPaths(auth = AuthApiPaths(login = "/auth/login", logout = "/auth/logout", refreshToken = "/auth/refresh")), storage = StorageKeys(token = "access_token", refreshToken = "refresh_token"), configInfo = ConfigInfo(name = "我的应用", versionCode = 1, versionName = "1.0.0", appId = "your-app-id"), loginPagePath = "", loginRequiredPaths = _uA())
+fun getToken(): String {
+    val token = uni_getStorageSync(config.storage.token)
+    if (token == null) {
+        return ""
+    }
+    return token as String
+}
 open class HostStorageConfig (
     @JsonNotNull
     open var token: String,
@@ -581,605 +588,6 @@ val GenAppClass = CreateVueAppComponent(GenApp::class.java, fun(): VueComponentO
     return GenApp(instance)
 }
 )
-val authTrigger = ref(0)
-fun notifyAuthChange(): Unit {
-    authTrigger.value++
-}
-fun tokenKey(): String {
-    return getHostProjectConfig().storage.token
-}
-fun userInfoKey(): String {
-    return getHostProjectConfig().storage.userInfo
-}
-open class StorageApi (
-    open var get: (key: String) -> Any?,
-    open var set: (key: String, value: Any) -> Unit,
-    open var remove: (key: String) -> Unit,
-    open var clear: () -> Unit,
-    open var getToken: () -> String,
-    open var setToken: (token: String) -> Unit,
-    open var getUserInfo: () -> Any?,
-    open var setUserInfo: (info: Any) -> Unit,
-    open var clearAuth: () -> Unit,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("StorageApi", "uni_modules/m-unix/components/m-tools/Storage.uts", 13, 6)
-    }
-}
-fun storageGet(key: String): Any? {
-    try {
-        val kVal = uni_getStorageSync(key) as Any
-        return kVal
-    }
-     catch (e: Throwable) {
-        return null
-    }
-}
-fun storageSet(key: String, value: Any): Unit {
-    try {
-        uni_setStorageSync(key, value)
-    }
-     catch (e: Throwable) {
-        console.error("storage set error", e, " at uni_modules/m-unix/components/m-tools/Storage.uts:41")
-    }
-}
-fun storageRemove(key: String): Unit {
-    try {
-        uni_removeStorageSync(key)
-    }
-     catch (e: Throwable) {
-        console.error("storage remove error", e, " at uni_modules/m-unix/components/m-tools/Storage.uts:49")
-    }
-}
-fun storageClear(): Unit {
-    try {
-        uni_clearStorageSync()
-    }
-     catch (e: Throwable) {
-        console.error("storage clear error", e, " at uni_modules/m-unix/components/m-tools/Storage.uts:57")
-    }
-}
-val storage = StorageApi(get = fun(key: String): Any? {
-    return storageGet(key)
-}
-, set = fun(key: String, value: Any): Unit {
-    storageSet(key, value)
-}
-, remove = fun(key: String): Unit {
-    storageRemove(key)
-}
-, clear = fun(): Unit {
-    storageClear()
-}
-, getToken = fun(): String {
-    val token = storageGet(tokenKey())
-    return if (token != null) {
-        (token as String)
-    } else {
-        ""
-    }
-}
-, setToken = fun(token: String): Unit {
-    storageSet(tokenKey(), token)
-    notifyAuthChange()
-}
-, getUserInfo = fun(): Any? {
-    return storageGet(userInfoKey())
-}
-, setUserInfo = fun(info: Any): Unit {
-    storageSet(userInfoKey(), info)
-    notifyAuthChange()
-}
-, clearAuth = fun(): Unit {
-    storageRemove(tokenKey())
-    storageRemove(userInfoKey())
-    notifyAuthChange()
-}
-)
-open class UploadApiResponse<T> (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: T,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UploadApiResponse", "uni_modules/m-unix/components/m-tools/Upload.uts", 6, 13)
-    }
-}
-open class UploadFileOptions__1 (
-    @JsonNotNull
-    open var url: String,
-    @JsonNotNull
-    open var filePath: String,
-    open var name: String? = null,
-    open var formData: UTSJSONObject? = null,
-    open var baseUrl: String? = null,
-    open var withToken: Boolean? = null,
-    open var header: UTSJSONObject? = null,
-    open var showLoading: Boolean? = null,
-    open var loadingText: String? = null,
-    open var showError: Boolean? = null,
-    open var successCodes: UTSArray<Number>? = null,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("UploadFileOptions", "uni_modules/m-unix/components/m-tools/Upload.uts", 11, 13)
-    }
-}
-fun resolveUploadBase(override: String?): String {
-    if (override != null && override !== "") {
-        return override
-    }
-    return getHostProjectConfig().baseUrl
-}
-fun buildUploadFullUrl(path: String, baseOverride: String?): String {
-    if (path.startsWith("http://") || path.startsWith("https://")) {
-        return path
-    }
-    val base = resolveUploadBase(baseOverride)
-    val sep = if (path.startsWith("/")) {
-        ""
-    } else {
-        "/"
-    }
-    return base + sep + path
-}
-fun <T> uploadFileRequest(options: UploadFileOptions__1): UTSPromise<UploadApiResponse<T>> {
-    val url = options.url
-    val filePath = options.filePath
-    val name = if (options.name != null && options.name !== "") {
-        options.name!!
-    } else {
-        "file"
-    }
-    val formData = options.formData
-    val baseUrl = options.baseUrl
-    val withToken = if (options.withToken != null) {
-        options.withToken!!
-    } else {
-        true
-    }
-    val header = if (options.header != null) {
-        options.header!!
-    } else {
-        _uO()
-    }
-    val showLoading = if (options.showLoading != null) {
-        options.showLoading!!
-    } else {
-        false
-    }
-    val loadingText = if (options.loadingText != null) {
-        options.loadingText!!
-    } else {
-        "上传中..."
-    }
-    val showError = if (options.showError != null) {
-        options.showError!!
-    } else {
-        true
-    }
-    val successCodes = if (options.successCodes != null) {
-        options.successCodes!!
-    } else {
-        _uA(
-            0,
-            200
-        )
-    }
-    val fullUrl = buildUploadFullUrl(url, baseUrl)
-    if (showLoading) {
-        uni_showLoading(ShowLoadingOptions(title = loadingText, mask = true))
-    }
-    val reqHeader: UTSJSONObject = header
-    if (withToken) {
-        val token = storage.getToken()
-        if (token !== "") {
-            reqHeader["Authorization"] = token
-        }
-    }
-    return UTSPromise(fun(resolve, reject){
-        val fd = if (formData != null) {
-            formData
-        } else {
-            _uO()
-        }
-        uni_uploadFile(UploadFileOptions(url = fullUrl, filePath = filePath, name = name, formData = fd as UTSJSONObject, header = reqHeader as UTSJSONObject, success = fun(res){
-            if (showLoading) {
-                uni_hideLoading(null)
-            }
-            var parsed: UploadApiResponse<T>
-            try {
-                val raw = ((res.data as String) ?: "").replace(UTSRegExp("\\ufeff", "g"), "")
-                val json = if (raw !== "") {
-                    raw
-                } else {
-                    "{}"
-                }
-                parsed = UTSAndroid.consoleDebugError(JSON.parse(json), " at uni_modules/m-unix/components/m-tools/Upload.uts:135") as UploadApiResponse<T>
-            }
-             catch (e: Throwable) {
-                if (showError) {
-                    uni_showToast(ShowToastOptions(title = "上传响应解析失败", icon = "none"))
-                }
-                reject(UploadApiResponse(code = -1, msg = "parse error", data = null))
-                return
-            }
-            val code = parsed.code
-            var ok = false
-            run {
-                var j: Number = 0
-                while(j < successCodes.length){
-                    if (successCodes[j] === code) {
-                        ok = true
-                        break
-                    }
-                    j++
-                }
-            }
-            if (ok) {
-                resolve(parsed)
-                return
-            }
-            val m = parsed.msg
-            if (showError && m != null && m !== "") {
-                uni_showToast(ShowToastOptions(title = m, icon = "none"))
-            }
-            reject(parsed)
-        }
-        , fail = fun(err){
-            if (showLoading) {
-                uni_hideLoading(null)
-            }
-            if (showError) {
-                uni_showToast(ShowToastOptions(title = "上传失败", icon = "none"))
-            }
-            reject(UploadApiResponse(code = -1, msg = "network", data = err))
-        }
-        ))
-    }
-    )
-}
-typealias HttpMethod = String
-open class ApiResponse<T> (
-    @JsonNotNull
-    open var code: Number,
-    @JsonNotNull
-    open var msg: String,
-    @JsonNotNull
-    open var data: T,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ApiResponse", "uni_modules/m-unix/components/m-tools/Request.uts", 12, 13)
-    }
-}
-open class RequestOptions__1 (
-    @JsonNotNull
-    open var url: String,
-    open var method: HttpMethod? = null,
-    open var data: UTSJSONObject? = null,
-    open var header: UTSJSONObject? = null,
-    open var baseUrl: String? = null,
-    open var timeout: Number? = null,
-    open var withToken: Boolean? = null,
-    open var showError: Boolean? = null,
-    open var showLoading: Boolean? = null,
-    open var loadingText: String? = null,
-    open var redirectOnUnauthorized: Boolean? = null,
-    open var loginPage: String? = null,
-    open var successCodes: UTSArray<Number>? = null,
-    open var unauthorizedCodes: UTSArray<Number>? = null,
-    open var onErrorCode: ((response: ApiResponse<Any>) -> Unit)? = null,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("RequestOptions", "uni_modules/m-unix/components/m-tools/Request.uts", 18, 13)
-    }
-}
-val DEFAULT_TIMEOUT: Number = 30000
-val DEFAULT_SUCCESS_CODES: UTSArray<Number> = _uA(
-    0,
-    200
-)
-val DEFAULT_UNAUTHORIZED_CODES: UTSArray<Number> = _uA(
-    401,
-    403
-)
-val DEFAULT_LOGIN_PAGE = "/pages_Me/login/login"
-fun buildUrl(url: String, baseUrl: String): String {
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-        return url
-    }
-    return baseUrl + (if (url.startsWith("/")) {
-        ""
-    } else {
-        "/"
-    }
-    ) + url
-}
-fun buildQueryString(data: UTSJSONObject): String {
-    val parts: UTSArray<String> = _uA()
-    for(key in resolveUTSKeyIterator(data)){
-        val value = data.getString(key)
-        if (value != null && value.length > 0) {
-            parts.push(key + "=" + UTSAndroid.consoleDebugError(encodeURIComponent(value), " at uni_modules/m-unix/components/m-tools/Request.uts:79"))
-        }
-    }
-    return if (parts.length > 0) {
-        "?" + parts.join("&")
-    } else {
-        ""
-    }
-}
-fun showLoadingModal(text: String): Unit {
-    uni_showLoading(ShowLoadingOptions(title = text, mask = true))
-}
-fun hideLoadingModal(): Unit {
-    uni_hideLoading(null)
-}
-fun showErrorToast(msg: String): Unit {
-    uni_showToast(ShowToastOptions(title = if (msg != "") {
-        msg
-    } else {
-        "请求失败"
-    }
-    , icon = "none"))
-}
-fun navigateToLogin(loginPage: String): Unit {
-    storage.clearAuth()
-    uni_showToast(ShowToastOptions(title = "请先登录", icon = "none"))
-    setTimeout(fun(){
-        uni_navigateTo(NavigateToOptions(url = loginPage))
-        return
-    }
-    , 1200)
-}
-fun createRequestOptions(url: String, method: HttpMethod, data: UTSJSONObject?, options: RequestOptions__1?): RequestOptions__1 {
-    val out = RequestOptions__1(url = url, method = method, data = data)
-    if (options == null) {
-        return out
-    }
-    if (options.header != null) {
-        out.header = options.header
-    }
-    if (options.baseUrl != null) {
-        out.baseUrl = options.baseUrl
-    }
-    if (options.timeout != null) {
-        out.timeout = options.timeout
-    }
-    if (options.withToken != null) {
-        out.withToken = options.withToken
-    }
-    if (options.showError != null) {
-        out.showError = options.showError
-    }
-    if (options.showLoading != null) {
-        out.showLoading = options.showLoading
-    }
-    if (options.loadingText != null) {
-        out.loadingText = options.loadingText
-    }
-    if (options.redirectOnUnauthorized != null) {
-        out.redirectOnUnauthorized = options.redirectOnUnauthorized
-    }
-    if (options.loginPage != null) {
-        out.loginPage = options.loginPage
-    }
-    if (options.successCodes != null) {
-        out.successCodes = options.successCodes
-    }
-    if (options.unauthorizedCodes != null) {
-        out.unauthorizedCodes = options.unauthorizedCodes
-    }
-    if (options.onErrorCode != null) {
-        out.onErrorCode = options.onErrorCode
-    }
-    return out
-}
-fun copyRequestOptions(options: RequestOptions__1): RequestOptions__1 {
-    return createRequestOptions(options.url, options.method ?: "GET", options.data, options)
-}
-fun <T> request(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
-    val url = options.url
-    val _options_method = options.method
-    val method = if (_options_method == null) {
-        "GET"
-    } else {
-        _options_method
-    }
-    val data = options.data
-    val header = options.header
-    val baseUrl = options.baseUrl
-    val _options_timeout = options.timeout
-    val timeout = if (_options_timeout == null) {
-        DEFAULT_TIMEOUT
-    } else {
-        _options_timeout
-    }
-    val _options_withToken = options.withToken
-    val withToken = if (_options_withToken == null) {
-        true
-    } else {
-        _options_withToken
-    }
-    val _options_showError = options.showError
-    val showError = if (_options_showError == null) {
-        true
-    } else {
-        _options_showError
-    }
-    val _options_showLoading = options.showLoading
-    val showLoading = if (_options_showLoading == null) {
-        false
-    } else {
-        _options_showLoading
-    }
-    val loadingText = options.loadingText
-    val _options_redirectOnUnauthorized = options.redirectOnUnauthorized
-    val redirectOnUnauthorized = if (_options_redirectOnUnauthorized == null) {
-        true
-    } else {
-        _options_redirectOnUnauthorized
-    }
-    val loginPage = options.loginPage
-    val successCodes = options.successCodes
-    val unauthorizedCodes = options.unauthorizedCodes
-    val onErrorCode = options.onErrorCode
-    if (showLoading) {
-        showLoadingModal(loadingText ?: "加载中...")
-    }
-    val base = baseUrl ?: getHostProjectConfig().baseUrl
-    var fullUrl = buildUrl(url, base)
-    var requestData = data
-    if (method === "GET" && data != null) {
-        fullUrl += buildQueryString(data)
-        requestData = _uO()
-    }
-    val reqHeader: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("reqHeader", "uni_modules/m-unix/components/m-tools/Request.uts", 183, 11), "Content-Type" to "application/json")
-    if (withToken) {
-        val token = storage.getToken()
-        if (token != "") {
-            reqHeader["Authorization"] = token
-        }
-    }
-    val finalSuccessCodes = successCodes ?: DEFAULT_SUCCESS_CODES
-    val finalUnauthorizedCodes = unauthorizedCodes ?: DEFAULT_UNAUTHORIZED_CODES
-    val hpLogin = getHostProjectConfig().loginPagePath
-    val finalLoginPage = loginPage ?: (if (hpLogin.length > 0) {
-        hpLogin
-    } else {
-        DEFAULT_LOGIN_PAGE
-    }
-    )
-    return UTSPromise(fun(resolve, reject){
-        uni_request<Any>(RequestOptions(url = fullUrl, method = method, data = requestData, header = reqHeader as UTSJSONObject, timeout = timeout, success = fun(res){
-            if (showLoading) {
-                hideLoadingModal()
-            }
-            val result = res.data as ApiResponse<T>
-            val code = result.code
-            val msg = result.msg
-            val resData = result.data
-            if (finalSuccessCodes.indexOf(code) >= 0) {
-                resolve(result)
-                return
-            }
-            if (finalUnauthorizedCodes.indexOf(code) >= 0) {
-                if (redirectOnUnauthorized) {
-                    navigateToLogin(finalLoginPage)
-                }
-                reject(result)
-                return
-            }
-            if (onErrorCode != null) {
-                onErrorCode(result as ApiResponse<Any>)
-            }
-            if (showError) {
-                showErrorToast(msg)
-            }
-            reject(result)
-        }
-        , fail = fun(err){
-            if (showLoading) {
-                hideLoadingModal()
-            }
-            if (showError) {
-                showErrorToast("网络异常，请检查网络连接")
-            }
-            reject(ApiResponse(code = -1, msg = "网络异常", data = null))
-        }
-        ))
-    }
-    )
-}
-fun <T> get(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return request<T>(createRequestOptions(url, "GET", data, options))
-}
-fun <T> post(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return request<T>(createRequestOptions(url, "POST", data, options))
-}
-fun <T> put(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return request<T>(createRequestOptions(url, "PUT", data, options))
-}
-fun <T> del(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return request<T>(createRequestOptions(url, "DELETE", data, options))
-}
-fun <T> publicRequest(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
-    val requestOptions = copyRequestOptions(options)
-    requestOptions.withToken = false
-    requestOptions.redirectOnUnauthorized = false
-    return request<T>(requestOptions)
-}
-fun <T> silentRequest(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
-    val requestOptions = copyRequestOptions(options)
-    requestOptions.showError = false
-    requestOptions.redirectOnUnauthorized = false
-    return request<T>(requestOptions)
-}
-fun <T> loadingRequest(options: RequestOptions__1, loadingText: String?): UTSPromise<ApiResponse<T>> {
-    val requestOptions = copyRequestOptions(options)
-    requestOptions.showLoading = true
-    requestOptions.loadingText = if (isTruthy(loadingText)) {
-        loadingText
-    } else {
-        "加载中..."
-    }
-    return request<T>(requestOptions)
-}
-val http: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("http", "uni_modules/m-unix/components/m-tools/Request.uts", 306, 14), "get" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
-    return get<Any>(url, data, options)
-}
-, "post" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
-    return post<Any>(url, data, options)
-}
-, "put" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
-    return put<Any>(url, data, options)
-}
-, "delete" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
-    return del<Any>(url, data, options)
-}
-, "public" to fun(options: RequestOptions__1): UTSPromise<ApiResponse<Any>> {
-    return publicRequest<Any>(options)
-}
-, "silent" to fun(options: RequestOptions__1): UTSPromise<ApiResponse<Any>> {
-    return silentRequest<Any>(options)
-}
-, "loading" to fun(options: RequestOptions__1, loadingText: String?): UTSPromise<ApiResponse<Any>> {
-    return loadingRequest<Any>(options, loadingText)
-}
-, "upload" to fun(options: UploadFileOptions__1): UTSPromise<UploadApiResponse<Any>> {
-    return uploadFileRequest<Any>(options)
-}
-)
-open class LoginParams (
-    @JsonNotNull
-    open var phone: String,
-    @JsonNotNull
-    open var password: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("LoginParams", "api/http.uts", 5, 13)
-    }
-}
-open class LoginData (
-    @JsonNotNull
-    open var token: String,
-    @JsonNotNull
-    open var refreshToken: String,
-    @JsonNotNull
-    open var userId: Number,
-    @JsonNotNull
-    open var nickname: String,
-) : UTSObject(), IUTSSourceMap {
-    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("LoginData", "api/http.uts", 9, 13)
-    }
-}
-val login = fun(params: LoginParams): UTSPromise<ApiResponse<LoginData>> {
-    val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "api/http.uts", 17, 11), "phone" to params.phone, "password" to params.password)
-    return post<LoginData>("/user/login", data, null)
-}
 fun getIconChar(name: String): String {
     if (name === "print") {
         return "\ue6bd"
@@ -1824,6 +1232,101 @@ open class LoginObject : IUTSSourceMap {
         return this.getMemberInfo() != null
     }
 }
+val authTrigger = ref(0)
+fun notifyAuthChange(): Unit {
+    authTrigger.value++
+}
+fun tokenKey(): String {
+    return getHostProjectConfig().storage.token
+}
+fun userInfoKey(): String {
+    return getHostProjectConfig().storage.userInfo
+}
+open class StorageApi (
+    open var get: (key: String) -> Any?,
+    open var set: (key: String, value: Any) -> Unit,
+    open var remove: (key: String) -> Unit,
+    open var clear: () -> Unit,
+    open var getToken: () -> String,
+    open var setToken: (token: String) -> Unit,
+    open var getUserInfo: () -> Any?,
+    open var setUserInfo: (info: Any) -> Unit,
+    open var clearAuth: () -> Unit,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("StorageApi", "uni_modules/m-unix/components/m-tools/Storage.uts", 13, 6)
+    }
+}
+fun storageGet(key: String): Any? {
+    try {
+        val kVal = uni_getStorageSync(key) as Any
+        return kVal
+    }
+     catch (e: Throwable) {
+        return null
+    }
+}
+fun storageSet(key: String, value: Any): Unit {
+    try {
+        uni_setStorageSync(key, value)
+    }
+     catch (e: Throwable) {
+        console.error("storage set error", e, " at uni_modules/m-unix/components/m-tools/Storage.uts:41")
+    }
+}
+fun storageRemove(key: String): Unit {
+    try {
+        uni_removeStorageSync(key)
+    }
+     catch (e: Throwable) {
+        console.error("storage remove error", e, " at uni_modules/m-unix/components/m-tools/Storage.uts:49")
+    }
+}
+fun storageClear(): Unit {
+    try {
+        uni_clearStorageSync()
+    }
+     catch (e: Throwable) {
+        console.error("storage clear error", e, " at uni_modules/m-unix/components/m-tools/Storage.uts:57")
+    }
+}
+val storage = StorageApi(get = fun(key: String): Any? {
+    return storageGet(key)
+}
+, set = fun(key: String, value: Any): Unit {
+    storageSet(key, value)
+}
+, remove = fun(key: String): Unit {
+    storageRemove(key)
+}
+, clear = fun(): Unit {
+    storageClear()
+}
+, getToken = fun(): String {
+    val token = storageGet(tokenKey())
+    return if (token != null) {
+        (token as String)
+    } else {
+        ""
+    }
+}
+, setToken = fun(token: String): Unit {
+    storageSet(tokenKey(), token)
+    notifyAuthChange()
+}
+, getUserInfo = fun(): Any? {
+    return storageGet(userInfoKey())
+}
+, setUserInfo = fun(info: Any): Unit {
+    storageSet(userInfoKey(), info)
+    notifyAuthChange()
+}
+, clearAuth = fun(): Unit {
+    storageRemove(tokenKey())
+    storageRemove(userInfoKey())
+    notifyAuthChange()
+}
+)
 fun isLoggedIn(): Boolean {
     return storage.getToken() != ""
 }
@@ -1852,6 +1355,482 @@ fun needLogin(path: String): Boolean {
     }
     )
 }
+open class UploadApiResponse<T> (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: T,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("UploadApiResponse", "uni_modules/m-unix/components/m-tools/Upload.uts", 6, 13)
+    }
+}
+open class UploadFileOptions__1 (
+    @JsonNotNull
+    open var url: String,
+    @JsonNotNull
+    open var filePath: String,
+    open var name: String? = null,
+    open var formData: UTSJSONObject? = null,
+    open var baseUrl: String? = null,
+    open var withToken: Boolean? = null,
+    open var header: UTSJSONObject? = null,
+    open var showLoading: Boolean? = null,
+    open var loadingText: String? = null,
+    open var showError: Boolean? = null,
+    open var successCodes: UTSArray<Number>? = null,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("UploadFileOptions", "uni_modules/m-unix/components/m-tools/Upload.uts", 11, 13)
+    }
+}
+fun resolveUploadBase(override: String?): String {
+    if (override != null && override !== "") {
+        return override
+    }
+    return getHostProjectConfig().baseUrl
+}
+fun buildUploadFullUrl(path: String, baseOverride: String?): String {
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+        return path
+    }
+    val base = resolveUploadBase(baseOverride)
+    val sep = if (path.startsWith("/")) {
+        ""
+    } else {
+        "/"
+    }
+    return base + sep + path
+}
+fun <T> uploadFileRequest(options: UploadFileOptions__1): UTSPromise<UploadApiResponse<T>> {
+    val url = options.url
+    val filePath = options.filePath
+    val name = if (options.name != null && options.name !== "") {
+        options.name!!
+    } else {
+        "file"
+    }
+    val formData = options.formData
+    val baseUrl = options.baseUrl
+    val withToken = if (options.withToken != null) {
+        options.withToken!!
+    } else {
+        true
+    }
+    val header = if (options.header != null) {
+        options.header!!
+    } else {
+        _uO()
+    }
+    val showLoading = if (options.showLoading != null) {
+        options.showLoading!!
+    } else {
+        false
+    }
+    val loadingText = if (options.loadingText != null) {
+        options.loadingText!!
+    } else {
+        "上传中..."
+    }
+    val showError = if (options.showError != null) {
+        options.showError!!
+    } else {
+        true
+    }
+    val successCodes = if (options.successCodes != null) {
+        options.successCodes!!
+    } else {
+        _uA(
+            0,
+            200
+        )
+    }
+    val fullUrl = buildUploadFullUrl(url, baseUrl)
+    if (showLoading) {
+        uni_showLoading(ShowLoadingOptions(title = loadingText, mask = true))
+    }
+    val reqHeader: UTSJSONObject = header
+    if (withToken) {
+        val token = storage.getToken()
+        if (token !== "") {
+            reqHeader["Authorization"] = token
+        }
+    }
+    return UTSPromise(fun(resolve, reject){
+        val fd = if (formData != null) {
+            formData
+        } else {
+            _uO()
+        }
+        uni_uploadFile(UploadFileOptions(url = fullUrl, filePath = filePath, name = name, formData = fd as UTSJSONObject, header = reqHeader as UTSJSONObject, success = fun(res){
+            if (showLoading) {
+                uni_hideLoading(null)
+            }
+            var parsed: UploadApiResponse<T>
+            try {
+                val raw = ((res.data as String) ?: "").replace(UTSRegExp("\\ufeff", "g"), "")
+                val json = if (raw !== "") {
+                    raw
+                } else {
+                    "{}"
+                }
+                parsed = UTSAndroid.consoleDebugError(JSON.parse(json), " at uni_modules/m-unix/components/m-tools/Upload.uts:135") as UploadApiResponse<T>
+            }
+             catch (e: Throwable) {
+                if (showError) {
+                    uni_showToast(ShowToastOptions(title = "上传响应解析失败", icon = "none"))
+                }
+                reject(UploadApiResponse(code = -1, msg = "parse error", data = null))
+                return
+            }
+            val code = parsed.code
+            var ok = false
+            run {
+                var j: Number = 0
+                while(j < successCodes.length){
+                    if (successCodes[j] === code) {
+                        ok = true
+                        break
+                    }
+                    j++
+                }
+            }
+            if (ok) {
+                resolve(parsed)
+                return
+            }
+            val m = parsed.msg
+            if (showError && m != null && m !== "") {
+                uni_showToast(ShowToastOptions(title = m, icon = "none"))
+            }
+            reject(parsed)
+        }
+        , fail = fun(err){
+            if (showLoading) {
+                uni_hideLoading(null)
+            }
+            if (showError) {
+                uni_showToast(ShowToastOptions(title = "上传失败", icon = "none"))
+            }
+            reject(UploadApiResponse(code = -1, msg = "network", data = err))
+        }
+        ))
+    }
+    )
+}
+typealias HttpMethod = String
+open class ApiResponse<T> (
+    @JsonNotNull
+    open var code: Number,
+    @JsonNotNull
+    open var msg: String,
+    @JsonNotNull
+    open var data: T,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("ApiResponse", "uni_modules/m-unix/components/m-tools/Request.uts", 13, 13)
+    }
+}
+open class RequestOptions__1 (
+    @JsonNotNull
+    open var url: String,
+    open var method: HttpMethod? = null,
+    open var data: UTSJSONObject? = null,
+    open var header: UTSJSONObject? = null,
+    open var baseUrl: String? = null,
+    open var timeout: Number? = null,
+    open var withToken: Boolean? = null,
+    open var showError: Boolean? = null,
+    open var showLoading: Boolean? = null,
+    open var loadingText: String? = null,
+    open var redirectOnUnauthorized: Boolean? = null,
+    open var loginPage: String? = null,
+    open var successCodes: UTSArray<Number>? = null,
+    open var unauthorizedCodes: UTSArray<Number>? = null,
+    open var onErrorCode: ((response: ApiResponse<Any>) -> Unit)? = null,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("RequestOptions", "uni_modules/m-unix/components/m-tools/Request.uts", 19, 13)
+    }
+}
+val DEFAULT_TIMEOUT: Number = 30000
+val DEFAULT_SUCCESS_CODES: UTSArray<Number> = _uA(
+    0,
+    200
+)
+val DEFAULT_UNAUTHORIZED_CODES: UTSArray<Number> = _uA(
+    401,
+    403
+)
+val DEFAULT_LOGIN_PAGE = "/pages_Me/login/login"
+fun buildUrl(url: String, baseUrl: String): String {
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+        return url
+    }
+    return baseUrl + (if (url.startsWith("/")) {
+        ""
+    } else {
+        "/"
+    }
+    ) + url
+}
+fun buildQueryString(data: UTSJSONObject): String {
+    val parts: UTSArray<String> = _uA()
+    for(key in resolveUTSKeyIterator(data)){
+        val value = data.getString(key)
+        if (value != null && value.length > 0) {
+            parts.push(key + "=" + UTSAndroid.consoleDebugError(encodeURIComponent(value), " at uni_modules/m-unix/components/m-tools/Request.uts:80"))
+        }
+    }
+    return if (parts.length > 0) {
+        "?" + parts.join("&")
+    } else {
+        ""
+    }
+}
+fun showLoadingModal(text: String): Unit {
+    uni_showLoading(ShowLoadingOptions(title = text, mask = true))
+}
+fun hideLoadingModal(): Unit {
+    uni_hideLoading(null)
+}
+fun showErrorToast(msg: String): Unit {
+    uni_showToast(ShowToastOptions(title = if (msg != "") {
+        msg
+    } else {
+        "请求失败"
+    }
+    , icon = "none"))
+}
+fun navigateToLogin(loginPage: String): Unit {
+    storage.clearAuth()
+    uni_showToast(ShowToastOptions(title = "请先登录", icon = "none"))
+    setTimeout(fun(){
+        uni_navigateTo(NavigateToOptions(url = loginPage))
+        return
+    }
+    , 1200)
+}
+fun createRequestOptions(url: String, method: HttpMethod, data: UTSJSONObject?, options: RequestOptions__1?): RequestOptions__1 {
+    val out = RequestOptions__1(url = url, method = method, data = data)
+    if (options == null) {
+        return out
+    }
+    if (options.header != null) {
+        out.header = options.header
+    }
+    if (options.baseUrl != null) {
+        out.baseUrl = options.baseUrl
+    }
+    if (options.timeout != null) {
+        out.timeout = options.timeout
+    }
+    if (options.withToken != null) {
+        out.withToken = options.withToken
+    }
+    if (options.showError != null) {
+        out.showError = options.showError
+    }
+    if (options.showLoading != null) {
+        out.showLoading = options.showLoading
+    }
+    if (options.loadingText != null) {
+        out.loadingText = options.loadingText
+    }
+    if (options.redirectOnUnauthorized != null) {
+        out.redirectOnUnauthorized = options.redirectOnUnauthorized
+    }
+    if (options.loginPage != null) {
+        out.loginPage = options.loginPage
+    }
+    if (options.successCodes != null) {
+        out.successCodes = options.successCodes
+    }
+    if (options.unauthorizedCodes != null) {
+        out.unauthorizedCodes = options.unauthorizedCodes
+    }
+    if (options.onErrorCode != null) {
+        out.onErrorCode = options.onErrorCode
+    }
+    return out
+}
+fun copyRequestOptions(options: RequestOptions__1): RequestOptions__1 {
+    return createRequestOptions(options.url, options.method ?: "GET", options.data, options)
+}
+fun <T> request(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
+    val url = options.url
+    val _options_method = options.method
+    val method = if (_options_method == null) {
+        "GET"
+    } else {
+        _options_method
+    }
+    val data = options.data
+    val header = options.header
+    val baseUrl = options.baseUrl
+    val _options_timeout = options.timeout
+    val timeout = if (_options_timeout == null) {
+        DEFAULT_TIMEOUT
+    } else {
+        _options_timeout
+    }
+    val _options_withToken = options.withToken
+    val withToken = if (_options_withToken == null) {
+        false
+    } else {
+        _options_withToken
+    }
+    val _options_showError = options.showError
+    val showError = if (_options_showError == null) {
+        true
+    } else {
+        _options_showError
+    }
+    val _options_showLoading = options.showLoading
+    val showLoading = if (_options_showLoading == null) {
+        false
+    } else {
+        _options_showLoading
+    }
+    val loadingText = options.loadingText
+    val _options_redirectOnUnauthorized = options.redirectOnUnauthorized
+    val redirectOnUnauthorized = if (_options_redirectOnUnauthorized == null) {
+        true
+    } else {
+        _options_redirectOnUnauthorized
+    }
+    val loginPage = options.loginPage
+    val successCodes = options.successCodes
+    val unauthorizedCodes = options.unauthorizedCodes
+    val onErrorCode = options.onErrorCode
+    if (showLoading) {
+        showLoadingModal(loadingText ?: "加载中...")
+    }
+    val base = baseUrl ?: getHostProjectConfig().baseUrl
+    var fullUrl = buildUrl(url, base)
+    var requestData = data
+    if (method === "GET" && data != null) {
+        fullUrl += buildQueryString(data)
+        requestData = _uO()
+    }
+    val reqHeader: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("reqHeader", "uni_modules/m-unix/components/m-tools/Request.uts", 184, 11), "Content-Type" to "application/json")
+    if (withToken) {
+        val token = getToken()
+        if (token != "") {
+            reqHeader["token"] = token
+        }
+    }
+    val finalSuccessCodes = successCodes ?: DEFAULT_SUCCESS_CODES
+    val finalUnauthorizedCodes = unauthorizedCodes ?: DEFAULT_UNAUTHORIZED_CODES
+    val hpLogin = getHostProjectConfig().loginPagePath
+    val finalLoginPage = loginPage ?: (if (hpLogin.length > 0) {
+        hpLogin
+    } else {
+        DEFAULT_LOGIN_PAGE
+    }
+    )
+    return UTSPromise(fun(resolve, reject){
+        uni_request<Any>(RequestOptions(url = fullUrl, method = method, data = requestData, header = reqHeader as UTSJSONObject, timeout = timeout, success = fun(res){
+            if (showLoading) {
+                hideLoadingModal()
+            }
+            val result = res.data as ApiResponse<T>
+            val code = result.code
+            val msg = result.msg
+            val resData = result.data
+            if (finalSuccessCodes.indexOf(code) >= 0) {
+                resolve(result)
+                return
+            }
+            if (finalUnauthorizedCodes.indexOf(code) >= 0) {
+                if (redirectOnUnauthorized) {
+                    navigateToLogin(finalLoginPage)
+                }
+                reject(result)
+                return
+            }
+            if (onErrorCode != null) {
+                onErrorCode(result as ApiResponse<Any>)
+            }
+            if (showError) {
+                showErrorToast(msg)
+            }
+            reject(result)
+        }
+        , fail = fun(err){
+            if (showLoading) {
+                hideLoadingModal()
+            }
+            if (showError) {
+                showErrorToast("网络异常，请检查网络连接")
+            }
+            reject(ApiResponse(code = -1, msg = "网络异常", data = null))
+        }
+        ))
+    }
+    )
+}
+fun <T> get(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
+    return request<T>(createRequestOptions(url, "GET", data, options))
+}
+fun <T> post(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
+    return request<T>(createRequestOptions(url, "POST", data, options))
+}
+fun <T> put(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
+    return request<T>(createRequestOptions(url, "PUT", data, options))
+}
+fun <T> del(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
+    return request<T>(createRequestOptions(url, "DELETE", data, options))
+}
+fun <T> publicRequest(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
+    val requestOptions = copyRequestOptions(options)
+    requestOptions.withToken = false
+    requestOptions.redirectOnUnauthorized = false
+    return request<T>(requestOptions)
+}
+fun <T> silentRequest(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
+    val requestOptions = copyRequestOptions(options)
+    requestOptions.showError = false
+    requestOptions.redirectOnUnauthorized = false
+    return request<T>(requestOptions)
+}
+fun <T> loadingRequest(options: RequestOptions__1, loadingText: String?): UTSPromise<ApiResponse<T>> {
+    val requestOptions = copyRequestOptions(options)
+    requestOptions.showLoading = true
+    requestOptions.loadingText = if (isTruthy(loadingText)) {
+        loadingText
+    } else {
+        "加载中..."
+    }
+    return request<T>(requestOptions)
+}
+val http: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("http", "uni_modules/m-unix/components/m-tools/Request.uts", 307, 14), "get" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
+    return get<Any>(url, data, options)
+}
+, "post" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
+    return post<Any>(url, data, options)
+}
+, "put" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
+    return put<Any>(url, data, options)
+}
+, "delete" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
+    return del<Any>(url, data, options)
+}
+, "public" to fun(options: RequestOptions__1): UTSPromise<ApiResponse<Any>> {
+    return publicRequest<Any>(options)
+}
+, "silent" to fun(options: RequestOptions__1): UTSPromise<ApiResponse<Any>> {
+    return silentRequest<Any>(options)
+}
+, "loading" to fun(options: RequestOptions__1, loadingText: String?): UTSPromise<ApiResponse<Any>> {
+    return loadingRequest<Any>(options, loadingText)
+}
+, "upload" to fun(options: UploadFileOptions__1): UTSPromise<UploadApiResponse<Any>> {
+    return uploadFileRequest<Any>(options)
+}
+)
 fun useAuth(): UTSJSONObject {
     val hasLogin = computed(fun(): Boolean {
         authTrigger.value
@@ -2171,12 +2150,12 @@ val mToastMsg = fun(text: String){
     }
     , icon = "none", duration = 2000))
 }
-fun <T> parseApiEnvelope(raw: Any): R<T>? {
+fun <T> parseApiEnvelope(raw: Any): R<Any>? {
     if (raw == null) {
         return null
     }
     if (UTSAndroid.`typeof`(raw) === "object") {
-        return raw as R<T>
+        return raw as R<Any>
     }
     if (UTSAndroid.`typeof`(raw) === "string") {
         val s = trimCompat(raw as String)
@@ -2184,7 +2163,7 @@ fun <T> parseApiEnvelope(raw: Any): R<T>? {
             return null
         }
         try {
-            return UTSAndroid.consoleDebugError(JSON.parse(s), " at uni_modules/m-unix/components/m-tools/Ut.uts:367") as R<T>
+            return UTSAndroid.consoleDebugError(JSON.parse(s), " at uni_modules/m-unix/components/m-tools/Ut.uts:367") as R<Any>
         }
          catch (e: Throwable) {
             val preview = if (s.length > 80) {
@@ -2584,16 +2563,13 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
     }
     )
 }
-, "httpPost" to fun<T>(url: String, params: Any): UTSPromise<T> {
+, "httpPost" to fun(url: String, params: Any): UTSPromise<Any> {
     return UTSPromise(fun(resolve, reject){
         var isTimeout = false
-        var requestTask: Any = null
+        var requestTask: Any? = null
         uni_showLoading(ShowLoadingOptions(title = "加载中", mask = true))
         val timeoutId = setTimeout(fun(){
             isTimeout = true
-            if (requestTask != null) {
-                requestTask.abort()
-            }
             uni_hideLoading(null)
             mToastMsg("请求超时，请重试")
             reject(UTSError("Request timeout"))
@@ -2657,24 +2633,24 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
             reject(err)
         }
         , complete = fun(_){
-            requestTask = null
+            null
         }
         ))
     }
     )
 }
-, "uploadFile" to fun<T>(url: String, filePath: String): UTSPromise<*> {
-    showLoading()
+, "uploadFile" to fun(url: String, filePath: String): UTSPromise<Any> {
+    showLoading(null, null)
     return UTSPromise(fun(resolve, reject){
         val uploadTask: UploadTask = uni_uploadFile(UploadFileOptions(url = getReqUrl() + url, filePath = filePath, name = "imageFile", header = _uO("Authorization" to LoginObject().getToken()), success = fun(res) {
             uni_hideLoading(null)
-            var d: R<T>? = null
+            var d: R<Any>? = null
             try {
                 var responseText = res.data.replace(UTSRegExp("\\ufeff", "g"), "")
                 if (responseText.length === 0) {
                     responseText = "{}"
                 }
-                d = UTSAndroid.consoleDebugError(JSON.parse(responseText), " at uni_modules/m-unix/components/m-tools/Ut.uts:864") as R<T>
+                d = UTSAndroid.consoleDebugError(JSON.parse(responseText), " at uni_modules/m-unix/components/m-tools/Ut.uts:861") as R<Any>
             }
              catch (e: Throwable) {
                 reject(e)
@@ -2685,11 +2661,23 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
                 reject(UTSError("empty upload response"))
                 return
             }
-            if (d.code == 200) {
-                var fileObj = d.data
+            val resp = d as R<Any>
+            if (resp.code == 200) {
+                var fileObj = resp.data
                 resolve(fileObj)
             } else {
-                mToastMsg(res.msg)
+                mToastMsg(if (resp.msg != null && resp.msg.length > 0) {
+                    resp.msg
+                } else {
+                    "上传失败"
+                }
+                )
+                reject(UTSError(if (resp.msg != null) {
+                    resp.msg
+                } else {
+                    "上传失败"
+                }
+                ))
             }
         }
         , fail = fun(res) {
@@ -2700,7 +2688,72 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
     }
     )
 }
-, "storage" to storage, "isLoggedIn" to isLoggedIn, "checkLogin" to checkLogin, "needLogin" to needLogin, "request" to request, "http" to http, "jumpTo" to jumpTo, "checkPhone" to checkPhone, "get" to get__1, "set" to set, "jslog" to jslog, "apiStart" to apiStart, "apiStop" to apiStop, "isEmpty" to isEmpty, "checkNumber" to checkNumber, "changeMoney" to changeMoney, "timestampToDate" to timestampToDate, "getTodayStartTimestamp" to getTodayStartTimestamp, "validateEmail" to validateEmail, "maskPhoneNumber" to maskPhoneNumber, "generateOrderNumber" to generateOrderNumber, "useAuth" to useAuth)
+, "storage" to storage, "isLoggedIn" to fun(): Boolean {
+    return isLoggedIn()
+}
+, "checkLogin" to fun(toPath: String?): Boolean {
+    return checkLogin(toPath)
+}
+, "needLogin" to fun(path: String): Boolean {
+    return needLogin(path)
+}
+, "request" to fun(options: RequestOptions__1): UTSPromise<ApiResponse<Any>> {
+    return request<Any>(options)
+}
+, "http" to http, "jumpTo" to fun(url: String, type: String?): Unit {
+    return jumpTo(url, if (type == null) {
+        "to"
+    } else {
+        type
+    }
+    )
+}
+, "checkPhone" to fun(phone: String): Boolean {
+    return checkPhone(phone)
+}
+, "get" to fun(key: String): Any? {
+    return get__1(key)
+}
+, "set" to fun(key: String, value: Any): Unit {
+    return set(key, value)
+}
+, "jslog" to fun(title: String, obj: Any): Unit {
+    return jslog(title, obj)
+}
+, "apiStart" to fun(): Unit {
+    return apiStart()
+}
+, "apiStop" to fun(): Unit {
+    return apiStop()
+}
+, "isEmpty" to fun(content: Any?): Boolean {
+    return isEmpty(content)
+}
+, "checkNumber" to fun(number: String): Boolean {
+    return checkNumber(number)
+}
+, "changeMoney" to fun(num: Number): MoneyUnitValue {
+    return changeMoney(num)
+}
+, "timestampToDate" to fun(timestamp: Number): String {
+    return timestampToDate(timestamp)
+}
+, "getTodayStartTimestamp" to fun(): Number {
+    return getTodayStartTimestamp()
+}
+, "validateEmail" to fun(email: String): Boolean {
+    return validateEmail(email)
+}
+, "maskPhoneNumber" to fun(phoneNumber: Any?): String {
+    return maskPhoneNumber(phoneNumber)
+}
+, "generateOrderNumber" to fun(): String {
+    return generateOrderNumber()
+}
+, "useAuth" to fun(): UTSJSONObject {
+    return useAuth()
+}
+)
 val GenUniModulesMUnixComponentsMLoadingMLoadingClass = CreateVueComponent(GenUniModulesMUnixComponentsMLoadingMLoading::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMLoadingMLoading.name, inheritAttrs = GenUniModulesMUnixComponentsMLoadingMLoading.inheritAttrs, inject = GenUniModulesMUnixComponentsMLoadingMLoading.inject, props = GenUniModulesMUnixComponentsMLoadingMLoading.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMLoadingMLoading.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMLoadingMLoading.emits, components = GenUniModulesMUnixComponentsMLoadingMLoading.components, styles = GenUniModulesMUnixComponentsMLoadingMLoading.styles)
 }
@@ -2747,6 +2800,23 @@ val GenComponentsCustomServiceCustomServiceClass = CreateVueComponent(GenCompone
     return GenComponentsCustomServiceCustomService(instance)
 }
 )
+open class LoginData (
+    @JsonNotNull
+    open var token: String,
+    @JsonNotNull
+    open var refreshToken: String,
+    @JsonNotNull
+    open var userId: Number,
+    @JsonNotNull
+    open var nickname: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("LoginData", "api/http.uts", 9, 13)
+    }
+}
+val card_detail = fun(id: String, countryCode: String): UTSPromise<ApiResponse<LoginData>> {
+    return http.get("/app/card/info/" + id + "/" + countryCode) as UTSPromise<ApiResponse<LoginData>>
+}
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesIndexIndex.inheritAttrs, inject = GenPagesIndexIndex.inject, props = GenPagesIndexIndex.props, propsNeedCastKeys = GenPagesIndexIndex.propsNeedCastKeys, emits = GenPagesIndexIndex.emits, components = GenPagesIndexIndex.components, styles = GenPagesIndexIndex.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesIndexIndex.setup(props as GenPagesIndexIndex)
@@ -2764,18 +2834,6 @@ val GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControlClass = Create
     return GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl(instance)
 }
 )
-interface CardItem {
-    var id: Number
-    var cardNumber: String
-    var iccid: String
-    var tag: String
-    var status: String
-    var currentPackage: String
-    var expireDate: String
-    var usedTraffic: String
-    var totalTraffic: String
-    var currentCycle: String
-}
 val GenPagesCardCardClass = CreateVueComponent(GenPagesCardCard::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesCardCard.inheritAttrs, inject = GenPagesCardCard.inject, props = GenPagesCardCard.props, propsNeedCastKeys = GenPagesCardCard.propsNeedCastKeys, emits = GenPagesCardCard.emits, components = GenPagesCardCard.components, styles = GenPagesCardCard.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesCardCard.setup(props as GenPagesCardCard)
@@ -2931,6 +2989,160 @@ val GenComponentsPaymentClass = CreateVueComponent(GenComponentsPayment::class.j
     return GenComponentsPayment(instance)
 }
 )
+open class TabItem__1 (
+    @JsonNotNull
+    open var name: String,
+) : UTSReactiveObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("TabItem", "pages/recharge/recharge.uvue", 140, 7)
+    }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return TabItem__1ReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class TabItem__1ReactiveObject : TabItem__1, IUTSReactive<TabItem__1> {
+    override var __v_raw: TabItem__1
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: TabItem__1, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(name = __v_raw.name) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): TabItem__1ReactiveObject {
+        return TabItem__1ReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var name: String
+        get() {
+            return _tRG(__v_raw, "name", __v_raw.name, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("name")) {
+                return
+            }
+            val oldValue = __v_raw.name
+            __v_raw.name = value
+            _tRS(__v_raw, "name", oldValue, value)
+        }
+}
+open class PackageItem (
+    @JsonNotNull
+    open var name: String,
+    @JsonNotNull
+    open var tag: String,
+    @JsonNotNull
+    open var data: String,
+    @JsonNotNull
+    open var validity: String,
+    @JsonNotNull
+    open var price: Number,
+    @JsonNotNull
+    open var originalPrice: Number,
+) : UTSReactiveObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("PackageItem", "pages/recharge/recharge.uvue", 145, 7)
+    }
+    override fun __v_create(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): UTSReactiveObject {
+        return PackageItemReactiveObject(this, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+}
+class PackageItemReactiveObject : PackageItem, IUTSReactive<PackageItem> {
+    override var __v_raw: PackageItem
+    override var __v_isReadonly: Boolean
+    override var __v_isShallow: Boolean
+    override var __v_skip: Boolean
+    constructor(__v_raw: PackageItem, __v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean) : super(name = __v_raw.name, tag = __v_raw.tag, data = __v_raw.data, validity = __v_raw.validity, price = __v_raw.price, originalPrice = __v_raw.originalPrice) {
+        this.__v_raw = __v_raw
+        this.__v_isReadonly = __v_isReadonly
+        this.__v_isShallow = __v_isShallow
+        this.__v_skip = __v_skip
+    }
+    override fun __v_clone(__v_isReadonly: Boolean, __v_isShallow: Boolean, __v_skip: Boolean): PackageItemReactiveObject {
+        return PackageItemReactiveObject(this.__v_raw, __v_isReadonly, __v_isShallow, __v_skip)
+    }
+    override var name: String
+        get() {
+            return _tRG(__v_raw, "name", __v_raw.name, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("name")) {
+                return
+            }
+            val oldValue = __v_raw.name
+            __v_raw.name = value
+            _tRS(__v_raw, "name", oldValue, value)
+        }
+    override var tag: String
+        get() {
+            return _tRG(__v_raw, "tag", __v_raw.tag, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("tag")) {
+                return
+            }
+            val oldValue = __v_raw.tag
+            __v_raw.tag = value
+            _tRS(__v_raw, "tag", oldValue, value)
+        }
+    override var data: String
+        get() {
+            return _tRG(__v_raw, "data", __v_raw.data, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("data")) {
+                return
+            }
+            val oldValue = __v_raw.data
+            __v_raw.data = value
+            _tRS(__v_raw, "data", oldValue, value)
+        }
+    override var validity: String
+        get() {
+            return _tRG(__v_raw, "validity", __v_raw.validity, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("validity")) {
+                return
+            }
+            val oldValue = __v_raw.validity
+            __v_raw.validity = value
+            _tRS(__v_raw, "validity", oldValue, value)
+        }
+    override var price: Number
+        get() {
+            return _tRG(__v_raw, "price", __v_raw.price, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("price")) {
+                return
+            }
+            val oldValue = __v_raw.price
+            __v_raw.price = value
+            _tRS(__v_raw, "price", oldValue, value)
+        }
+    override var originalPrice: Number
+        get() {
+            return _tRG(__v_raw, "originalPrice", __v_raw.originalPrice, __v_isReadonly, __v_isShallow)
+        }
+        set(value) {
+            if (!__v_canSet("originalPrice")) {
+                return
+            }
+            val oldValue = __v_raw.originalPrice
+            __v_raw.originalPrice = value
+            _tRS(__v_raw, "originalPrice", oldValue, value)
+        }
+}
+open class ChangeTabEvent (
+    @JsonNotNull
+    open var index: Number,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("ChangeTabEvent", "pages/recharge/recharge.uvue", 155, 7)
+    }
+}
 val GenPagesRechargeRechargeClass = CreateVueComponent(GenPagesRechargeRecharge::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesRechargeRecharge.inheritAttrs, inject = GenPagesRechargeRecharge.inject, props = GenPagesRechargeRecharge.props, propsNeedCastKeys = GenPagesRechargeRecharge.propsNeedCastKeys, emits = GenPagesRechargeRecharge.emits, components = GenPagesRechargeRecharge.components, styles = GenPagesRechargeRecharge.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesRechargeRecharge.setup(props as GenPagesRechargeRecharge)
@@ -2962,15 +3174,6 @@ val GenPagesPayFailedPayFailedClass = CreateVueComponent(GenPagesPayFailedPayFai
 }
 )
 typealias OrderStatus = String
-interface Order {
-    var packageName: String
-    var status: Exclude<OrderStatus, String>
-    var orderNo: String
-    var cardNo: String
-    var iccid: String
-    var time: String
-    var amount: Number
-}
 val GenPagesMyOrderMyOrderClass = CreateVueComponent(GenPagesMyOrderMyOrder::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesMyOrderMyOrder.inheritAttrs, inject = GenPagesMyOrderMyOrder.inject, props = GenPagesMyOrderMyOrder.props, propsNeedCastKeys = GenPagesMyOrderMyOrder.propsNeedCastKeys, emits = GenPagesMyOrderMyOrder.emits, components = GenPagesMyOrderMyOrder.components, styles = GenPagesMyOrderMyOrder.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesMyOrderMyOrder.setup(props as GenPagesMyOrderMyOrder)
@@ -3032,14 +3235,6 @@ val GenPagesOrderRecordOrderRecordClass = CreateVueComponent(GenPagesOrderRecord
 }
 )
 typealias PackageStatus = String
-interface PackageItem {
-    var name: String
-    var status: Exclude<PackageStatus, String>
-    var effectiveTime: String
-    var totalTraffic: String
-    var remainingTraffic: String
-    var expireDate: String
-}
 val GenPagesMyPkgMyPkgClass = CreateVueComponent(GenPagesMyPkgMyPkg::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesMyPkgMyPkg.inheritAttrs, inject = GenPagesMyPkgMyPkg.inject, props = GenPagesMyPkgMyPkg.props, propsNeedCastKeys = GenPagesMyPkgMyPkg.propsNeedCastKeys, emits = GenPagesMyPkgMyPkg.emits, components = GenPagesMyPkgMyPkg.components, styles = GenPagesMyPkgMyPkg.styles, setup = fun(props: ComponentPublicInstance): Any? {
         return GenPagesMyPkgMyPkg.setup(props as GenPagesMyPkgMyPkg)

@@ -138,7 +138,7 @@
 	}
 
 	// 确认支付
-	const handleConfirmPayment = (e) => {
+	const handleConfirmPayment = (e: any) => {
 		console.log(e);
 		// 处理确认逻辑
 		showPopup.value = false;

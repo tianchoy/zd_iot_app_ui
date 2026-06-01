@@ -1,7 +1,7 @@
 // api/http.uts
 
-import { get, post, put, del, http, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
-import { config, setToken, clearToken } from '@/common/config'
+import { http, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
+import { getToken, setToken, clearToken } from '@/common/config'
 
 // 定义类型
 export type LoginParams = {
@@ -17,10 +17,6 @@ export type LoginData = {
 }
 
 // 显式指定泛型类型和返回类型
-export const login = (params: LoginParams): Promise<ApiResponse<LoginData>> => {
-  const data: UTSJSONObject = {
-    'phone': params.phone,
-    'password': params.password
-  }
-  return post<LoginData>('/user/login', data,null)
+export const card_detail = (id: string, countryCode: string): Promise<ApiResponse<LoginData>> => {
+  return http.get('/app/card/info/' + id + '/' + countryCode) as Promise<ApiResponse<LoginData>>
 }

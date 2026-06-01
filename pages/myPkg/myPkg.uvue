@@ -25,29 +25,29 @@
 			>
 				<!-- 套餐头部 -->
 				<view class="package-header">
-					<text class="package-name">{{ item.name }}</text>
-					<text class="status-tag" :class="getStatusClass(item.status)">{{ item.status }}</text>
+					<text class="package-name">{{ getPackageText(item, 'name') }}</text>
+					<text class="status-tag" :class="getStatusClass(getPackageText(item, 'status'))">{{ getPackageText(item, 'status') }}</text>
 				</view>
 				
 				<!-- 生效时间 -->
 				<view class="effective-time">
 					<text class="time-label">生效时间：</text>
-					<text class="time-value">{{ item.effectiveTime }}</text>
+					<text class="time-value">{{ getPackageText(item, 'effectiveTime') }}</text>
 				</view>
 				
 				<!-- 套餐数据指标 -->
 				<view class="package-metrics">
 					<view class="metric-item">
 						<text class="metric-label">流量</text>
-						<text class="metric-value">{{ item.totalTraffic }}</text>
+						<text class="metric-value">{{ getPackageText(item, 'totalTraffic') }}</text>
 					</view>
 					<view class="metric-item">
 						<text class="metric-label">剩余</text>
-						<text class="metric-value">{{ item.remainingTraffic }}</text>
+						<text class="metric-value">{{ getPackageText(item, 'remainingTraffic') }}</text>
 					</view>
 					<view class="metric-item">
 						<text class="metric-label">到期</text>
-						<text class="metric-value">{{ item.expireDate }}</text>
+						<text class="metric-value">{{ getPackageText(item, 'expireDate') }}</text>
 					</view>
 				</view>
 			</view>
@@ -61,11 +61,12 @@
 	
 	// 套餐状态类型
 	type PackageStatus = '全部' | '在用套餐' | '待生效' | '已失效'
-	
+	type PackageItemStatus = '在用套餐' | '待生效' | '已失效'
+
 	// 套餐数据结构
 	interface PackageItem {
 		name: string
-		status: Exclude<PackageStatus, '全部'>
+		status: PackageItemStatus
 		effectiveTime: string
 		totalTraffic: string
 		remainingTraffic: string
@@ -77,7 +78,7 @@
 	const current = ref<number>(0)
 	
 	// 套餐数据
-	const packageList = ref<PackageItem[]>([
+	const packageList = ref<any[]>([
 		{
 			name: '车联网月包20G',
 			status: '在用套餐',
@@ -112,13 +113,18 @@
 		}
 	])
 	
+	const getPackageText = (item: any, key: string): string => {
+		const value = (item as UTSJSONObject)[key]
+		return value == null ? '' : '' + value
+	}
+
 	// 根据 Tab 筛选套餐
-	const filteredPackages = computed(() => {
+	const filteredPackages = computed<any[]>(() : any[] => {
 		const currentStatus = pkgTabs.value[current.value]
 		if (currentStatus === '全部') {
 			return packageList.value
 		}
-		return packageList.value.filter(item => item.status === currentStatus)
+		return packageList.value.filter((item: any) : boolean => getPackageText(item, 'status') === currentStatus)
 	})
 	
 	// Tab 切换处理

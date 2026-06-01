@@ -42,7 +42,7 @@ open class GenPagesOrderDetailOrderDetail : BasePage {
             val handleCancelPayment = fun(){
                 showPopup.value = false
             }
-            val handleConfirmPayment = fun(e){
+            val handleConfirmPayment = fun(e: Any){
                 console.log(e, " at pages/orderDetail/orderDetail.uvue:142")
                 showPopup.value = false
             }

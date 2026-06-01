@@ -297,7 +297,11 @@
 		pkgMore.value = !pkgMore.value
 	}
 
-		const goBack = () => {
+	const cardDetail = (cardNumber: string) => {
+		card_number.value = cardNumber
+	}
+
+	const goBack = () => {
 			uni.navigateBack({
 				delta: 1
 			})

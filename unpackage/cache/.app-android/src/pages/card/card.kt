@@ -27,29 +27,26 @@ open class GenPagesCardCard : BasePage {
                 "异常"
             ))
             val current = ref(0)
-            val allCardList = ref(_uA<CardItem>(CardItem(id = 1, cardNumber = "1064916585160", iccid = "89860421123456789012", tag = "主卡", status = "在用", currentPackage = "车联网月包20G", expireDate = "2026-04-30", usedTraffic = "11.34GB", totalTraffic = "20GB", currentCycle = "第1期 / 共12期"), CardItem(id = 2, cardNumber = "1064916585161", iccid = "89860421123456789013", tag = "副卡", status = "在用", currentPackage = "车联网月包10G", expireDate = "2026-05-15", usedTraffic = "5.21GB", totalTraffic = "10GB", currentCycle = "第2期 / 共6期"), CardItem(id = 3, cardNumber = "1064916585162", iccid = "89860421123456789014", tag = "测试卡", status = "异常", currentPackage = "测试套餐1G", expireDate = "2026-03-31", usedTraffic = "1GB", totalTraffic = "1GB", currentCycle = "第1期 / 共1期"), CardItem(id = 4, cardNumber = "1064916585163", iccid = "89860421123456789015", tag = "备用卡", status = "在用", currentPackage = "工业设备月包5G", expireDate = "2026-06-30", usedTraffic = "2.15GB", totalTraffic = "5GB", currentCycle = "第1期 / 共3期"), CardItem(id = 5, cardNumber = "1064916585164", iccid = "89860421123456789016", tag = "体验卡", status = "停机", currentPackage = "体验套餐500M", expireDate = "2026-02-28", usedTraffic = "500MB", totalTraffic = "500MB", currentCycle = "第1期 / 共1期")))
-            val filteredCardList = computed(fun(): UTSArray<{
-                var id: Number
-                var cardNumber: String
-                var iccid: String
-                var tag: String
-                var status: String
-                var currentPackage: String
-                var expireDate: String
-                var usedTraffic: String
-                var totalTraffic: String
-                var currentCycle: String
-            }> {
+            val allCardList = ref(_uA<Any>(_uO("id" to 1, "cardNumber" to "1064916585160", "iccid" to "89860421123456789012", "tag" to "主卡", "status" to "在用", "currentPackage" to "车联网月包20G", "expireDate" to "2026-04-30", "usedTraffic" to "11.34GB", "totalTraffic" to "20GB", "currentCycle" to "第1期 / 共12期"), _uO("id" to 2, "cardNumber" to "1064916585161", "iccid" to "89860421123456789013", "tag" to "副卡", "status" to "在用", "currentPackage" to "车联网月包10G", "expireDate" to "2026-05-15", "usedTraffic" to "5.21GB", "totalTraffic" to "10GB", "currentCycle" to "第2期 / 共6期"), _uO("id" to 3, "cardNumber" to "1064916585162", "iccid" to "89860421123456789014", "tag" to "测试卡", "status" to "异常", "currentPackage" to "测试套餐1G", "expireDate" to "2026-03-31", "usedTraffic" to "1GB", "totalTraffic" to "1GB", "currentCycle" to "第1期 / 共1期"), _uO("id" to 4, "cardNumber" to "1064916585163", "iccid" to "89860421123456789015", "tag" to "备用卡", "status" to "在用", "currentPackage" to "工业设备月包5G", "expireDate" to "2026-06-30", "usedTraffic" to "2.15GB", "totalTraffic" to "5GB", "currentCycle" to "第1期 / 共3期"), _uO("id" to 5, "cardNumber" to "1064916585164", "iccid" to "89860421123456789016", "tag" to "体验卡", "status" to "停机", "currentPackage" to "体验套餐500M", "expireDate" to "2026-02-28", "usedTraffic" to "500MB", "totalTraffic" to "500MB", "currentCycle" to "第1期 / 共1期")))
+            val filteredCardList = computed<UTSArray<Any>>(fun(): UTSArray<Any> {
                 val currentStatus = tabs.value[current.value]
                 if (currentStatus === "全部") {
                     return allCardList.value
                 }
-                return allCardList.value.filter(fun(card): Boolean {
-                    return card.status === currentStatus
+                return allCardList.value.filter(fun(card: Any): Boolean {
+                    return (card as UTSJSONObject)["status"] === currentStatus
                 }
                 )
             }
             )
+            val getCardText = fun(card: Any, key: String): String {
+                val value = (card as UTSJSONObject)[key]
+                return if (value == null) {
+                    ""
+                } else {
+                    "" + value
+                }
+            }
             val getStatusClass = fun(status: String): String {
                 when (status) {
                     "在用" -> 
@@ -63,15 +60,16 @@ open class GenPagesCardCard : BasePage {
                 }
             }
             val handleClick = fun(e: UTSJSONObject){
-                console.log(e["index"], " at pages/card/card.uvue:174")
+                console.log(e["index"], " at pages/card/card.uvue:179")
                 if (e["index"] != null) {
-                    current.value = e["index"]
+                    current.value = e["index"] as Number
                 }
             }
             onLoad(fun(options){
-                console.log(options, " at pages/card/card.uvue:181")
-                if (isTruthy(options["type"])) {
-                    current.value = Number(options["type"])
+                console.log(options, " at pages/card/card.uvue:186")
+                val type = options["type"]
+                if (type != null) {
+                    current.value = parseInt("" + type)
                 }
             }
             )
@@ -118,33 +116,33 @@ open class GenPagesCardCard : BasePage {
                                     return _cE("view", _uM("class" to "card-item", "key" to index), _uA(
                                         _cE("view", _uM("class" to "item-head"), _uA(
                                             _cE("view", _uM("class" to "item-head-label"), _uA(
-                                                _cE("text", _uM("class" to "card-item-title"), _tD(card.cardNumber), 1),
-                                                _cE("text", _uM("class" to "card-item-content"), "ICCID: " + _tD(card.iccid), 1)
+                                                _cE("text", _uM("class" to "card-item-title"), _tD(getCardText(card, "cardNumber")), 1),
+                                                _cE("text", _uM("class" to "card-item-content"), "ICCID: " + _tD(getCardText(card, "iccid")), 1)
                                             )),
                                             _cE("text", _uM("class" to _nC(_uA(
                                                 "status-tag",
-                                                getStatusClass(card.status)
-                                            ))), _tD(card.status), 3)
+                                                getStatusClass(getCardText(card, "status"))
+                                            ))), _tD(getCardText(card, "status")), 3)
                                         )),
                                         _cE("view", _uM("class" to "item-package"), _uA(
                                             _cE("text", _uM("class" to "package-label"), "当前套餐:"),
-                                            _cE("text", _uM("class" to "package-value"), _tD(card.currentPackage), 1)
+                                            _cE("text", _uM("class" to "package-value"), _tD(getCardText(card, "currentPackage")), 1)
                                         )),
                                         _cV(_component_m_div, _uM("backgroundColor" to "#f1f5f9", "textClass" to "divider")),
                                         _cE("view", _uM("class" to "card-metrics"), _uA(
                                             _cE("view", _uM("class" to "metric-box mr-24"), _uA(
                                                 _cE("view", _uM("class" to "metric-label"), "到期时间"),
-                                                _cE("view", _uM("class" to "metric-value"), _tD(card.expireDate), 1)
+                                                _cE("view", _uM("class" to "metric-value"), _tD(getCardText(card, "expireDate")), 1)
                                             )),
                                             _cE("view", _uM("class" to "metric-box"), _uA(
                                                 _cE("view", _uM("class" to "metric-label"), "本月流量"),
-                                                _cE("view", _uM("class" to "metric-value"), _tD(card.usedTraffic) + " / " + _tD(card.totalTraffic), 1)
+                                                _cE("view", _uM("class" to "metric-value"), _tD(getCardText(card, "usedTraffic")) + " / " + _tD(getCardText(card, "totalTraffic")), 1)
                                             ))
                                         )),
                                         _cE("view", _uM("class" to "card-bottom"), _uA(
                                             _cE("view", _uM("class" to "card-cycle-text"), _uA(
                                                 _cE("text", _uM("class" to "cycle-label"), "当前周期："),
-                                                _cE("text", _uM("class" to "cycle-value"), _tD(card.currentCycle), 1)
+                                                _cE("text", _uM("class" to "cycle-value"), _tD(getCardText(card, "currentCycle")), 1)
                                             )),
                                             _cV(_component_m_button, _uM("type" to "primary", "width" to "200rpx", "btnSize" to "mini", "size" to "25rpx", "shape" to "circle"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
                                                 return _uA(

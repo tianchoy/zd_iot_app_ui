@@ -24,7 +24,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const title = common_vendor.ref("Hello");
     common_vendor.ref(false);
-    const card_number = common_vendor.ref("");
+    const card_number = common_vendor.ref("1064916585160");
     const goRecharge = () => {
       common_vendor.index.__f__("log", "at pages/index/index.uvue:87", "去充值");
       common_vendor.index.navigateTo({
@@ -63,18 +63,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/card/card?type=" + type
       });
     };
+    const getLogin = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        yield api_http.card_detail(card_number.value, "CHN");
+      });
+    };
     common_vendor.onMounted(() => {
       common_vendor.index.$on("scanResult", onScanResult);
       getLogin();
     });
-    const getLogin = () => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        yield api_http.login(new api_http.LoginParams({
-          phone: "13800000000",
-          password: "123456"
-        }));
-      });
-    };
     common_vendor.onUnmounted(() => {
       common_vendor.index.$off("scanResult", onScanResult);
     });

@@ -23,7 +23,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const tabs = common_vendor.ref(["全部", "在用", "异常"]);
     const current = common_vendor.ref(0);
     const allCardList = common_vendor.ref([
-      {
+      new common_vendor.UTSJSONObject({
         id: 1,
         cardNumber: "1064916585160",
         iccid: "89860421123456789012",
@@ -34,8 +34,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         usedTraffic: "11.34GB",
         totalTraffic: "20GB",
         currentCycle: "第1期 / 共12期"
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         id: 2,
         cardNumber: "1064916585161",
         iccid: "89860421123456789013",
@@ -46,8 +46,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         usedTraffic: "5.21GB",
         totalTraffic: "10GB",
         currentCycle: "第2期 / 共6期"
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         id: 3,
         cardNumber: "1064916585162",
         iccid: "89860421123456789014",
@@ -58,8 +58,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         usedTraffic: "1GB",
         totalTraffic: "1GB",
         currentCycle: "第1期 / 共1期"
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         id: 4,
         cardNumber: "1064916585163",
         iccid: "89860421123456789015",
@@ -70,8 +70,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         usedTraffic: "2.15GB",
         totalTraffic: "5GB",
         currentCycle: "第1期 / 共3期"
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         id: 5,
         cardNumber: "1064916585164",
         iccid: "89860421123456789016",
@@ -82,17 +82,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         usedTraffic: "500MB",
         totalTraffic: "500MB",
         currentCycle: "第1期 / 共1期"
-      }
+      })
     ]);
     const filteredCardList = common_vendor.computed(() => {
       const currentStatus = tabs.value[current.value];
       if (currentStatus === "全部") {
         return allCardList.value;
       }
-      return allCardList.value.filter((card) => {
-        return card.status === currentStatus;
+      return allCardList.value.filter((card = null) => {
+        return card["status"] === currentStatus;
       });
     });
+    const getCardText = (card = null, key) => {
+      const value = card[key];
+      return value == null ? "" : "" + value;
+    };
     const getStatusClass = (status) => {
       switch (status) {
         case "在用":
@@ -106,15 +110,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:174", e.index);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:179", e.index);
       if (e.index != null) {
         current.value = e.index;
       }
     };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:181", options);
-      if (options.type) {
-        current.value = Number(options.type);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:186", options);
+      const type = options["type"];
+      if (type != null) {
+        current.value = parseInt("" + type);
       }
     });
     return (_ctx, _cache) => {
@@ -162,16 +167,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         i: common_vendor.f(filteredCardList.value, (card, index, i0) => {
           return {
-            a: common_vendor.t(card.cardNumber),
-            b: common_vendor.t(card.iccid),
-            c: common_vendor.t(card.status),
-            d: common_vendor.n(getStatusClass(card.status)),
-            e: common_vendor.t(card.currentPackage),
+            a: common_vendor.t(getCardText(card, "cardNumber")),
+            b: common_vendor.t(getCardText(card, "iccid")),
+            c: common_vendor.t(getCardText(card, "status")),
+            d: common_vendor.n(getStatusClass(getCardText(card, "status"))),
+            e: common_vendor.t(getCardText(card, "currentPackage")),
             f: "a89086b7-5-" + i0,
-            g: common_vendor.t(card.expireDate),
-            h: common_vendor.t(card.usedTraffic),
-            i: common_vendor.t(card.totalTraffic),
-            j: common_vendor.t(card.currentCycle),
+            g: common_vendor.t(getCardText(card, "expireDate")),
+            h: common_vendor.t(getCardText(card, "usedTraffic")),
+            i: common_vendor.t(getCardText(card, "totalTraffic")),
+            j: common_vendor.t(getCardText(card, "currentCycle")),
             k: "a89086b7-6-" + i0,
             l: index
           };

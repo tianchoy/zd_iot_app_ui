@@ -16,46 +16,50 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const pkgTabs = common_vendor.ref(["全部", "在用套餐", "待生效", "已失效"]);
     const current = common_vendor.ref(0);
     const packageList = common_vendor.ref([
-      {
+      new common_vendor.UTSJSONObject({
         name: "车联网月包20G",
         status: "在用套餐",
         effectiveTime: "2026-04-01",
         totalTraffic: "20GB",
         remainingTraffic: "8.66GB",
         expireDate: "2026-04-30"
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         name: "车联网月包10G",
         status: "待生效",
         effectiveTime: "待生效",
         totalTraffic: "10GB",
         remainingTraffic: "10GB",
         expireDate: "2026-05-30"
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         name: "工业设备月包5G",
         status: "待生效",
         effectiveTime: "待生效",
         totalTraffic: "5GB",
         remainingTraffic: "5GB",
         expireDate: "2026-06-30"
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         name: "测试套餐1G",
         status: "已失效",
         effectiveTime: "2026-03-01",
         totalTraffic: "1GB",
         remainingTraffic: "0",
         expireDate: "2026-03-31"
-      }
+      })
     ]);
+    const getPackageText = (item = null, key) => {
+      const value = item[key];
+      return value == null ? "" : "" + value;
+    };
     const filteredPackages = common_vendor.computed(() => {
       const currentStatus = pkgTabs.value[current.value];
       if (currentStatus === "全部") {
         return packageList.value;
       }
-      return packageList.value.filter((item) => {
-        return item.status === currentStatus;
+      return packageList.value.filter((item = null) => {
+        return getPackageText(item, "status") === currentStatus;
       });
     });
     const handleClick = (e) => {
@@ -106,13 +110,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, filteredPackages.value.length === 0 ? {} : {}, {
         f: common_vendor.f(filteredPackages.value, (item, index, i0) => {
           return {
-            a: common_vendor.t(item.name),
-            b: common_vendor.t(item.status),
-            c: common_vendor.n(getStatusClass(item.status)),
-            d: common_vendor.t(item.effectiveTime),
-            e: common_vendor.t(item.totalTraffic),
-            f: common_vendor.t(item.remainingTraffic),
-            g: common_vendor.t(item.expireDate),
+            a: common_vendor.t(getPackageText(item, "name")),
+            b: common_vendor.t(getPackageText(item, "status")),
+            c: common_vendor.n(getStatusClass(getPackageText(item, "status"))),
+            d: common_vendor.t(getPackageText(item, "effectiveTime")),
+            e: common_vendor.t(getPackageText(item, "totalTraffic")),
+            f: common_vendor.t(getPackageText(item, "remainingTraffic")),
+            g: common_vendor.t(getPackageText(item, "expireDate")),
             h: index
           };
         }),

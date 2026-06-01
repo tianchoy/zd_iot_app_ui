@@ -90,7 +90,7 @@
 	// 国家/地区相关
 	const showCountryPopup = ref<boolean>(false)
 	const selectedCountry = ref<string>('')
-	const searchSelectRef = ref<any>(null)
+	const searchSelectRef = ref(null)
 	
 	// 国家/地区选项列表
 	const countryOptions = ref([
@@ -109,10 +109,16 @@
 	])
 	
 	// 显示选中的国家/地区标签
-	const selectedCountryLabel = computed(() => {
+	const selectedCountryLabel = computed<string>(() : string => {
 		if (!selectedCountry.value) return ''
-		const item = countryOptions.value.find(opt => opt.value === selectedCountry.value)
-		return item ? item.label : ''
+		for (let i = 0; i < countryOptions.value.length; i++) {
+			const opt = countryOptions.value[i] as UTSJSONObject
+			if (opt['value'] === selectedCountry.value) {
+				const label = opt['label']
+				return label == null ? '' : '' + label
+			}
+		}
+		return ''
 	})
 	
 	// 打开国家/地区选择弹窗
@@ -125,7 +131,7 @@
 		console.log('选中国家/地区:', value, item)
 		showCountryPopup.value = false
 		uni.showToast({
-			title: `已选择：${item.label}`,
+			title: `已选择：${(item as UTSJSONObject)['label']}`,
 			icon: 'success'
 		})
 	}
@@ -133,9 +139,6 @@
 	// 关闭弹窗时重置搜索
 	const onPopupClose = () => {
 		showCountryPopup.value = false
-		if (searchSelectRef.value) {
-			searchSelectRef.value.resetSearch()
-		}
 	}
 	
 	// 扫码

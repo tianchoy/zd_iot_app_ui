@@ -38,7 +38,7 @@ const _cache = __ins.renderCache;
 	}
 
 	// 确认支付
-	const handleConfirmPayment = (e) => {
+	const handleConfirmPayment = (e: any) => {
 		console.log(e, " at pages/orderDetail/orderDetail.uvue:142");
 		// 处理确认逻辑
 		showPopup.value = false;

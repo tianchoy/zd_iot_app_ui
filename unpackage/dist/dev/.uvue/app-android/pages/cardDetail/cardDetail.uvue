@@ -42,6 +42,9 @@ const __sfc__ = defineComponent({
             console.log(pkgMore.value, " at pages/cardDetail/cardDetail.uvue:296");
             pkgMore.value = !pkgMore.value;
         };
+        const cardDetail = (cardNumber: string) => {
+            card_number.value = cardNumber;
+        };
         const goBack = () => {
             uni.navigateBack({
                 delta: 1
@@ -49,7 +52,7 @@ const __sfc__ = defineComponent({
         };
         onLoad((options) => {
             const cardNumber = options.getString('card_number') ?? '';
-            console.log(cardNumber, " at pages/cardDetail/cardDetail.uvue:308");
+            console.log(cardNumber, " at pages/cardDetail/cardDetail.uvue:312");
             card_number.value = cardNumber;
         });
         return (): any | null => {
@@ -73,7 +76,7 @@ const __sfc__ = defineComponent({
                     _cE("view", _uM({ class: "card-box" }), [
                         _cE("view", _uM({
                             class: "card-item",
-                            onClick: () => { _ctx.cardDetail('1064916585160'); }
+                            onClick: () => { cardDetail('1064916585160'); }
                         }), [
                             _cE("view", _uM({ class: "item-head" }), [
                                 _cE("view", _uM({ class: "item-head-label" }), [

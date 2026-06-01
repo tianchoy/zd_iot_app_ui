@@ -5,7 +5,7 @@ import _easycom_m_tag from '@/uni_modules/m-unix/components/m-tag/m-tag.uvue'
 import _easycom_m_div from '@/uni_modules/m-unix/components/m-div/m-div.uvue'
 import _easycom_customService from '@/components/customService/customService.uvue'
 import { ref, onMounted, onUnmounted } from 'vue'
-	import { login } from '@/api/http.uts'
+	import { card_detail } from '@/api/http.uts'
 	
 	
 const __sfc__ = defineComponent({
@@ -17,7 +17,7 @@ const _cache = __ins.renderCache;
 
 	const title = ref('Hello')
 	const show = ref(false)
-	const card_number = ref('')
+	const card_number = ref('1064916585160')
 
 	const goRecharge = () => {
 		console.log('去充值', " at pages/index/index.uvue:87")
@@ -66,18 +66,15 @@ const _cache = __ins.renderCache;
 		})
 	}
 	
+	const getLogin = async () => {
+		const res = await card_detail(card_number.value, 'CHN')
+	}
+
 	onMounted(() => {
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
 		getLogin()
 	})
-
-	const getLogin = async () => {
-		const res = await login({
-			phone: '13800000000',
-			password: '123456'
-		})
-	}
 	
 	onUnmounted(() => {
 		// 移除事件监听

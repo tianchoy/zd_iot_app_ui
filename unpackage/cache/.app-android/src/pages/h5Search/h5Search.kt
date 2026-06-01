@@ -27,7 +27,7 @@ open class GenPagesH5SearchH5Search : BasePage {
             val cardNumber = ref<String>("1064916585160")
             val showCountryPopup = ref<Boolean>(false)
             val selectedCountry = ref<String>("")
-            val searchSelectRef = ref<Any>(null)
+            val searchSelectRef = ref(null)
             val countryOptions = ref(_uA(
                 _uO("value" to "1", "label" to "中国"),
                 _uO("value" to "2", "label" to "美国"),
@@ -42,34 +42,38 @@ open class GenPagesH5SearchH5Search : BasePage {
                 _uO("value" to "11", "label" to "马来西亚"),
                 _uO("value" to "12", "label" to "泰国")
             ))
-            val selectedCountryLabel = computed(fun(): String {
+            val selectedCountryLabel = computed<String>(fun(): String {
                 if (!(selectedCountry.value != "")) {
                     return ""
                 }
-                val item = countryOptions.value.find(fun(opt): Boolean {
-                    return opt.value === selectedCountry.value
+                run {
+                    var i: Number = 0
+                    while(i < countryOptions.value.length){
+                        val opt = countryOptions.value[i] as UTSJSONObject
+                        if (opt["value"] === selectedCountry.value) {
+                            val label = opt["label"]
+                            return if (label == null) {
+                                ""
+                            } else {
+                                "" + label
+                            }
+                        }
+                        i++
+                    }
                 }
-                )
-                return if (isTruthy(item)) {
-                    item.label
-                } else {
-                    ""
-                }
+                return ""
             }
             )
             val openSelectCountry = fun(){
                 showCountryPopup.value = true
             }
             val onCountryChange = fun(value: Any?, item: Any){
-                console.log("选中国家/地区:", value, item, " at pages/h5Search/h5Search.uvue:125")
+                console.log("选中国家/地区:", value, item, " at pages/h5Search/h5Search.uvue:131")
                 showCountryPopup.value = false
-                uni_showToast(ShowToastOptions(title = "已选择：" + item.label, icon = "success"))
+                uni_showToast(ShowToastOptions(title = "已选择：" + (item as UTSJSONObject)["label"], icon = "success"))
             }
             val onPopupClose = fun(){
                 showCountryPopup.value = false
-                if (isTruthy(searchSelectRef.value)) {
-                    searchSelectRef.value.resetSearch()
-                }
             }
             val handleScan = fun(){
                 uni_navigateTo(NavigateToOptions(url = "/pages/scanCode/scanCode"))
@@ -83,8 +87,8 @@ open class GenPagesH5SearchH5Search : BasePage {
                     uni_showToast(ShowToastOptions(title = "请选择国家/地区", icon = "none"))
                     return
                 }
-                console.log("查询卡号:", cardNumber.value, " at pages/h5Search/h5Search.uvue:164")
-                console.log("国家/地区:", selectedCountryLabel.value, " at pages/h5Search/h5Search.uvue:165")
+                console.log("查询卡号:", cardNumber.value, " at pages/h5Search/h5Search.uvue:167")
+                console.log("国家/地区:", selectedCountryLabel.value, " at pages/h5Search/h5Search.uvue:168")
                 uni_showToast(ShowToastOptions(title = "查询中...", icon = "loading"))
             }
             val onScanResult = fun(data: UTSJSONObject){

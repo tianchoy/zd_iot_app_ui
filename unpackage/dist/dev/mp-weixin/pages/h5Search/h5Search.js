@@ -37,27 +37,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const selectedCountryLabel = common_vendor.computed(() => {
       if (!selectedCountry.value)
         return "";
-      const item = common_vendor.UTS.arrayFind(countryOptions.value, (opt) => {
-        return opt.value === selectedCountry.value;
-      });
-      return item ? item.label : "";
+      for (let i = 0; i < countryOptions.value.length; i++) {
+        const opt = countryOptions.value[i];
+        if (opt["value"] === selectedCountry.value) {
+          const label = opt["label"];
+          return label == null ? "" : "" + label;
+        }
+      }
+      return "";
     });
     const openSelectCountry = () => {
       showCountryPopup.value = true;
     };
     const onCountryChange = (value = null, item = null) => {
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:125", "选中国家/地区:", value, item);
+      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:131", "选中国家/地区:", value, item);
       showCountryPopup.value = false;
       common_vendor.index.showToast({
-        title: `已选择：${item.label}`,
+        title: `已选择：${item["label"]}`,
         icon: "success"
       });
     };
     const onPopupClose = () => {
       showCountryPopup.value = false;
-      if (searchSelectRef.value) {
-        searchSelectRef.value.resetSearch();
-      }
     };
     const handleScan = () => {
       common_vendor.index.navigateTo({
@@ -79,8 +80,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:164", "查询卡号:", cardNumber.value);
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:165", "国家/地区:", selectedCountryLabel.value);
+      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:167", "查询卡号:", cardNumber.value);
+      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:168", "国家/地区:", selectedCountryLabel.value);
       common_vendor.index.showToast({
         title: "查询中...",
         icon: "loading"

@@ -26,6 +26,14 @@ open class GenPagesOrderRecordOrderRecord : BasePage {
                 _uO("packageName" to "车联网月包10G", "amount" to 50, "orderNo" to "0202604280002", "status" to "待支付", "time" to "2026-04-28 11:20:12"),
                 _uO("packageName" to "测试套餐1G", "amount" to 10, "orderNo" to "0202603010001", "status" to "已退款", "time" to "2026-03-01 08:10:00")
             ))
+            val getOrderText = fun(order: Any, key: String): String {
+                val value = (order as UTSJSONObject)[key]
+                return if (value == null) {
+                    ""
+                } else {
+                    "" + value
+                }
+            }
             val getStatusClass = fun(status: String): String {
                 when (status) {
                     "已完成" -> 
@@ -54,18 +62,18 @@ open class GenPagesOrderRecordOrderRecord : BasePage {
                             _cE(Fragment, null, RenderHelpers.renderList(orderList.value, fun(order, index, __index, _cached): Any {
                                 return _cE("view", _uM("key" to index, "class" to "order-item"), _uA(
                                     _cE("view", _uM("class" to "order-header"), _uA(
-                                        _cE("text", _uM("class" to "package-name"), _tD(order.packageName), 1),
-                                        _cE("text", _uM("class" to "price"), "￥" + _tD(order.amount), 1)
+                                        _cE("text", _uM("class" to "package-name"), _tD(getOrderText(order, "packageName")), 1),
+                                        _cE("text", _uM("class" to "price"), "￥" + _tD(getOrderText(order, "amount")), 1)
                                     )),
                                     _cE("view", _uM("class" to "order-info"), _uA(
-                                        _cE("text", _uM("class" to "order-no"), "订单号：" + _tD(order.orderNo), 1),
+                                        _cE("text", _uM("class" to "order-no"), "订单号：" + _tD(getOrderText(order, "orderNo")), 1),
                                         _cE("text", _uM("class" to _nC(_uA(
                                             "status",
-                                            getStatusClass(order.status)
-                                        ))), _tD(order.status), 3)
+                                            getStatusClass(getOrderText(order, "status"))
+                                        ))), _tD(getOrderText(order, "status")), 3)
                                     )),
                                     _cE("view", _uM("class" to "order-time"), _uA(
-                                        _cE("text", _uM("class" to "time order-time-text"), _tD(order.time), 1)
+                                        _cE("text", _uM("class" to "time order-time-text"), _tD(getOrderText(order, "time")), 1)
                                     ))
                                 ))
                             }

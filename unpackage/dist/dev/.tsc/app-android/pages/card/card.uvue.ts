@@ -33,7 +33,7 @@ const tabs = ref(['全部', '在用', '异常'])
 const current = ref(0)
 
 // 卡片数据类型
-const allCardList = ref<CardItem[]>([
+const allCardList = ref<any[]>([
 	{
 		id: 1,
 		cardNumber: '1064916585160',
@@ -97,13 +97,18 @@ const allCardList = ref<CardItem[]>([
 ])
 
 // 根据选中的 tab 过滤卡片列表
-const filteredCardList = computed(() => {
+const filteredCardList = computed<any[]>(() : any[] => {
 	const currentStatus = tabs.value[current.value]
 	if (currentStatus === '全部') {
 		return allCardList.value
 	}
-	return allCardList.value.filter(card => card.status === currentStatus)
+	return allCardList.value.filter((card: any) : boolean => (card as UTSJSONObject)['status'] === currentStatus)
 })
+
+const getCardText = (card: any, key: string): string => {
+	const value = (card as UTSJSONObject)[key]
+	return value == null ? '' : '' + value
+}
 
 // 获取状态样式类
 const getStatusClass = (status: string): string => {
@@ -120,16 +125,17 @@ const getStatusClass = (status: string): string => {
 }
 
 const handleClick = (e: UTSJSONObject) => {
-	console.log(e.index, " at pages/card/card.uvue:174")
+	console.log(e.index, " at pages/card/card.uvue:179")
 	if(e.index != null){
-		current.value = e.index
+		current.value = e.index as number
 	}
 }
 
 onLoad((options) => {
-	console.log(options, " at pages/card/card.uvue:181")
-	if(options.type){
-		current.value = Number(options.type)
+	console.log(options, " at pages/card/card.uvue:186")
+	const type = options['type']
+	if(type != null){
+		current.value = parseInt('' + type)
 	}
 })
 
@@ -198,16 +204,16 @@ const _component_m_div = resolveEasyComponent("m-div",_easycom_m_div)
             }), [
               _cE("view", _uM({ class: "item-head" }), [
                 _cE("view", _uM({ class: "item-head-label" }), [
-                  _cE("text", _uM({ class: "card-item-title" }), _tD(card.cardNumber), 1 /* TEXT */),
-                  _cE("text", _uM({ class: "card-item-content" }), "ICCID: " + _tD(card.iccid), 1 /* TEXT */)
+                  _cE("text", _uM({ class: "card-item-title" }), _tD(getCardText(card, 'cardNumber')), 1 /* TEXT */),
+                  _cE("text", _uM({ class: "card-item-content" }), "ICCID: " + _tD(getCardText(card, 'iccid')), 1 /* TEXT */)
                 ]),
                 _cE("text", _uM({
-                  class: _nC(["status-tag", getStatusClass(card.status)])
-                }), _tD(card.status), 3 /* TEXT, CLASS */)
+                  class: _nC(["status-tag", getStatusClass(getCardText(card, 'status'))])
+                }), _tD(getCardText(card, 'status')), 3 /* TEXT, CLASS */)
               ]),
               _cE("view", _uM({ class: "item-package" }), [
                 _cE("text", _uM({ class: "package-label" }), "当前套餐:"),
-                _cE("text", _uM({ class: "package-value" }), _tD(card.currentPackage), 1 /* TEXT */)
+                _cE("text", _uM({ class: "package-value" }), _tD(getCardText(card, 'currentPackage')), 1 /* TEXT */)
               ]),
               _cV(_component_m_div, _uM({
                 backgroundColor: "#f1f5f9",
@@ -216,17 +222,17 @@ const _component_m_div = resolveEasyComponent("m-div",_easycom_m_div)
               _cE("view", _uM({ class: "card-metrics" }), [
                 _cE("view", _uM({ class: "metric-box mr-24" }), [
                   _cE("view", _uM({ class: "metric-label" }), "到期时间"),
-                  _cE("view", _uM({ class: "metric-value" }), _tD(card.expireDate), 1 /* TEXT */)
+                  _cE("view", _uM({ class: "metric-value" }), _tD(getCardText(card, 'expireDate')), 1 /* TEXT */)
                 ]),
                 _cE("view", _uM({ class: "metric-box" }), [
                   _cE("view", _uM({ class: "metric-label" }), "本月流量"),
-                  _cE("view", _uM({ class: "metric-value" }), _tD(card.usedTraffic) + " / " + _tD(card.totalTraffic), 1 /* TEXT */)
+                  _cE("view", _uM({ class: "metric-value" }), _tD(getCardText(card, 'usedTraffic')) + " / " + _tD(getCardText(card, 'totalTraffic')), 1 /* TEXT */)
                 ])
               ]),
               _cE("view", _uM({ class: "card-bottom" }), [
                 _cE("view", _uM({ class: "card-cycle-text" }), [
                   _cE("text", _uM({ class: "cycle-label" }), "当前周期："),
-                  _cE("text", _uM({ class: "cycle-value" }), _tD(card.currentCycle), 1 /* TEXT */)
+                  _cE("text", _uM({ class: "cycle-value" }), _tD(getCardText(card, 'currentCycle')), 1 /* TEXT */)
                 ]),
                 _cV(_component_m_button, _uM({
                   type: "primary",

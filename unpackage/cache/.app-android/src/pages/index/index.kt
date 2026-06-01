@@ -27,7 +27,7 @@ open class GenPagesIndexIndex : BasePage {
             val _cache = __ins.renderCache
             val title = ref("Hello")
             val show = ref(false)
-            val card_number = ref("")
+            val card_number = ref("1064916585160")
             val goRecharge = fun(){
                 console.log("去充值", " at pages/index/index.uvue:87")
                 uni_navigateTo(NavigateToOptions(url = "/pages/recharge/recharge"))
@@ -53,16 +53,16 @@ open class GenPagesIndexIndex : BasePage {
                 console.log(type, " at pages/index/index.uvue:127")
                 uni_reLaunch(ReLaunchOptions(url = "/pages/card/card?type=" + type))
             }
+            val getLogin = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        val res = await(card_detail(card_number.value, "CHN"))
+                })
+            }
             onMounted(fun(){
                 uni__on("scanResult", onScanResult)
                 getLogin()
             }
             )
-            val getLogin = fun(): UTSPromise<Unit> {
-                return wrapUTSPromise(suspend {
-                        val res = await(login(LoginParams(phone = "13800000000", password = "123456")))
-                })
-            }
             onUnmounted(fun(){
                 uni__off("scanResult", onScanResult)
             }

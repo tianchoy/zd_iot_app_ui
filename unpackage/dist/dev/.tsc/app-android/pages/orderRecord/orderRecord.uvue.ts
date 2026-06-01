@@ -33,6 +33,11 @@ const _cache = __ins.renderCache;
 			time: '2026-03-01 08:10:00'
 		}
 	])
+
+	const getOrderText = (order: any, key: string): string => {
+		const value = (order as UTSJSONObject)[key]
+		return value == null ? '' : '' + value
+	}
 	
 	// 返回充值页面
 	const goBackRecharge = () => {
@@ -86,17 +91,17 @@ const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar
             class: "order-item"
           }), [
             _cE("view", _uM({ class: "order-header" }), [
-              _cE("text", _uM({ class: "package-name" }), _tD(order.packageName), 1 /* TEXT */),
-              _cE("text", _uM({ class: "price" }), "￥" + _tD(order.amount), 1 /* TEXT */)
+              _cE("text", _uM({ class: "package-name" }), _tD(getOrderText(order, 'packageName')), 1 /* TEXT */),
+              _cE("text", _uM({ class: "price" }), "￥" + _tD(getOrderText(order, 'amount')), 1 /* TEXT */)
             ]),
             _cE("view", _uM({ class: "order-info" }), [
-              _cE("text", _uM({ class: "order-no" }), "订单号：" + _tD(order.orderNo), 1 /* TEXT */),
+              _cE("text", _uM({ class: "order-no" }), "订单号：" + _tD(getOrderText(order, 'orderNo')), 1 /* TEXT */),
               _cE("text", _uM({
-                class: _nC(["status", getStatusClass(order.status)])
-              }), _tD(order.status), 3 /* TEXT, CLASS */)
+                class: _nC(["status", getStatusClass(getOrderText(order, 'status'))])
+              }), _tD(getOrderText(order, 'status')), 3 /* TEXT, CLASS */)
             ]),
             _cE("view", _uM({ class: "order-time" }), [
-              _cE("text", _uM({ class: "time order-time-text" }), _tD(order.time), 1 /* TEXT */)
+              _cE("text", _uM({ class: "time order-time-text" }), _tD(getOrderText(order, 'time')), 1 /* TEXT */)
             ])
           ])
         }), 128 /* KEYED_FRAGMENT */)

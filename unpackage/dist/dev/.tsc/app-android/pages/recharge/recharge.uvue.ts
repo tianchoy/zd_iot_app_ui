@@ -7,7 +7,27 @@ import _easycom_m_sticky_bottom from '@/uni_modules/m-unix/components/m-sticky-b
 import { ref, computed } from 'vue';
 	import LinearProgress from '@/components/progress.uvue';
 	import Payment from '@/components/payment.uvue';
-		
+	
+	// Tab 项类型
+	type TabItem = { __$originalPosition?: UTSSourceMapPosition<"TabItem", "pages/recharge/recharge.uvue", 140, 7>;
+		name: string;
+	};
+	
+	// 套餐包/加油包项类型
+	type PackageItem = { __$originalPosition?: UTSSourceMapPosition<"PackageItem", "pages/recharge/recharge.uvue", 145, 7>;
+		name: string;
+		tag: string;
+		data: string;
+		validity: string;
+		price: number;
+		originalPrice: number;
+	};
+	
+	// changeTab 函数的参数类型
+	type ChangeTabEvent = { __$originalPosition?: UTSSourceMapPosition<"ChangeTabEvent", "pages/recharge/recharge.uvue", 155, 7>;
+		index: number;
+	};
+	
 	
 const __sfc__ = defineComponent({
   __name: 'recharge',
@@ -16,11 +36,11 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const showPopup = ref(false);
-	const progress1 = ref(80);
-
-	const active = ref(0);
-	const tabs = ref([
+	const showPopup = ref<boolean>(false);
+	const progress1 = ref<number>(80);
+	
+	const active = ref<number>(0);
+	const tabs = ref<Array<TabItem>>([
 		{
 			name: '套餐包'
 		},
@@ -28,9 +48,9 @@ const _cache = __ins.renderCache;
 			name: '加油包',
 		}
 	]);
-
+	
 	// 套餐包列表数据
-	const packageList = ref([
+	const packageList = ref<Array<PackageItem>>([
 		{
 			name: '车联网月包20G',
 			tag: '推荐',
@@ -56,9 +76,9 @@ const _cache = __ins.renderCache;
 			originalPrice: 0
 		}
 	]);
-
+	
 	// 加油包列表数据
-	const refillList = ref([
+	const refillList = ref<Array<PackageItem>>([
 		{
 			name: '加油包5G',
 			tag: '推荐',
@@ -84,61 +104,64 @@ const _cache = __ins.renderCache;
 			originalPrice: 80
 		}
 	]);
-
+	
 	// 选中的套餐包索引
-	const selectedPackageIndex = ref(0);
+	const selectedPackageIndex = ref<number>(0);
 	// 选中的加油包索引
-	const selectedRefillIndex = ref(0);
-
-	const currentPrice = computed((): number => {
+	const selectedRefillIndex = ref<number>(0);
+	
+	const currentPrice = computed<number>((): number => {
 		if (active.value === 0) {
-			return packageList.value[selectedPackageIndex.value]?.price ?? 0;
+			const item = packageList.value[selectedPackageIndex.value];
+			return item ? item.price : 0;
 		} else {
-			return refillList.value[selectedRefillIndex.value]?.price ?? 0;
+			const item = refillList.value[selectedRefillIndex.value];
+			return item ? item.price : 0;
 		}
 	});
-
-	const changeTab = (e: any) => {
+	
+	const changeTab = (e: ChangeTabEvent) => {
 		active.value = e.index;
 	}
-
+	
 	const selectPackage = (index: number) => {
 		selectedPackageIndex.value = index;
 	}
-
+	
 	const selectRefill = (index: number) => {
 		selectedRefillIndex.value = index;
 	}
+	
 	// 选择支付方式
 	const choosePayment = () => {
 		showPopup.value = true;
 	}
-
+	
 	// 取消支付
 	const handleCancelPayment = () => {
 		showPopup.value = false;
 	}
-
+	
 	// 确认支付
-	const handleConfirmPayment = (e) => {
-		console.log(e, " at pages/recharge/recharge.uvue:244");
+	const handleConfirmPayment = (e: any) => {
+		console.log(e, " at pages/recharge/recharge.uvue:267");
 		// 处理确认逻辑
 		showPopup.value = false;
 	}
-
+	
 	const goBack = () => {
 		uni.navigateBack({
 			delta: 1
 		})
 	}
-
+	
 	// 跳转我的套餐
 	const toMyPackage = () => {
 		uni.navigateTo({
 			url: '/pages/myPkg/myPkg'
 		})
 	}
-
+	
 	// 跳转订单记录
 	const toOrderRecord = () => {
 		uni.navigateTo({
@@ -368,4 +391,4 @@ const _component_m_sticky_bottom = resolveEasyComponent("m-sticky-bottom",_easyc
 
 })
 export default __sfc__
-const GenPagesRechargeRechargeStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"]]))], ["card-info", _uM([[".container ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"]])]])], ["card-title", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["title", _uM([[".container .card-info .card-title ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["card-number", _uM([[".container .card-info ", _uM([["color", "#475569"], ["marginTop", "24rpx"]])]])], ["info-list", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["info-item", _uM([[".container .card-info .info-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0]])]])], ["label", _uM([[".container .card-info .info-list .info-item ", _uM([["color", "#64748b"], ["marginRight", "20rpx"]])]])], ["value", _uM([[".container .card-info .info-list .info-item ", _uM([["fontWeight", "bold"], ["whiteSpace", "pre-wrap"], ["lineHeight", 1.5]])]])], ["flow-box", _uM([[".container .card-info ", _uM([["marginTop", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["flow-label", _uM([[".container .card-info .flow-box ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginBottom", "12rpx"]])]])], ["card-bottom", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["marginTop", "24rpx"]])]])], ["pkg-box", _uM([[".container ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginTop", "24rpx"], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"]])]])], ["pkg-content", _uM([[".container ", _uM([["marginTop", "20rpx"]])]])], ["pkg-card", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "28rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "20rpx"], ["transitionProperty", "all"], ["transitionDuration", "0.2s"], ["transitionTimingFunction", "ease"]])]])], ["pkg-info", _uM([[".container .pkg-card ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["pkg-name", _uM([[".container .pkg-card .pkg-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginBottom", "12rpx"], ["flexWrap", "wrap"]])]])], ["pkg-title", _uM([[".container .pkg-card .pkg-info .pkg-name ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#1e293b"]])]])], ["pkg-tag", _uM([[".container .pkg-card .pkg-info .pkg-name ", _uM([["backgroundImage", "linear-gradient(135deg, #ff9a3c, #ff6b3c)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#ffffff"], ["fontSize", "20rpx"], ["paddingTop", "4rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["marginLeft", "12rpx"]])]])], ["pkg-desc", _uM([[".container .pkg-card .pkg-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["pkg-icon", _uM([[".container .pkg-card .pkg-info .pkg-desc ", _uM([["display", "flex"], ["alignItems", "center"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8fafc"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["color", "#475569"], ["fontSize", "20rpx"], ["fontWeight", 700], ["marginRight", "20rpx"]])]])], ["pkg-price", _uM([[".container .pkg-card ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-end"]])]])], ["price-wrapper", _uM([[".container .pkg-card .pkg-price ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["price-symbol", _uM([[".container .pkg-card .pkg-price .price-wrapper ", _uM([["fontSize", "24rpx"], ["color", "#ef4444"], ["fontWeight", "bold"]])]])], ["price-number", _uM([[".container .pkg-card .pkg-price .price-wrapper ", _uM([["fontSize", "40rpx"], ["color", "#ef4444"], ["fontWeight", "bold"]])]])], ["price-original", _uM([[".container .pkg-card .pkg-price ", _uM([["fontSize", "22rpx"], ["color", "#94a3b8"], ["marginTop", "4rpx"]])]])], ["pkg-card-selected", _uM([[".container ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#3b82f6"], ["borderRightColor", "#3b82f6"], ["borderBottomColor", "#3b82f6"], ["borderLeftColor", "#3b82f6"], ["backgroundImage", "none"], ["backgroundColor", "#f8fafc"], ["boxShadow", "0 4rpx 12rpx rgba(59, 130, 246, 0.08)"]])]])], ["bottom-box", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"]]))], ["price-box", _uM([[".bottom-box ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["price-label", _uM([[".bottom-box .price-box ", _uM([["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["price-value", _uM([[".bottom-box .price-box ", _uM([["fontWeight", "bold"], ["color", "#ef4444"], ["fontSize", "40rpx"]])]])], ["@TRANSITION", _uM([["pkg-card", _uM([["property", "all"], ["duration", "0.2s"], ["timingFunction", "ease"]])]])]])]
+const GenPagesRechargeRechargeStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"]]))], ["card-info", _uM([[".container ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"]])]])], ["card-title", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["title", _uM([[".container .card-info .card-title ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["card-number", _uM([[".container .card-info ", _uM([["color", "#475569"], ["marginTop", "24rpx"]])]])], ["info-list", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["info-item", _uM([[".container .card-info .info-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0]])]])], ["label", _uM([[".container .card-info .info-list .info-item ", _uM([["color", "#64748b"], ["marginRight", "20rpx"]])]])], ["value", _uM([[".container .card-info .info-list .info-item ", _uM([["fontWeight", "bold"], ["whiteSpace", "pre-wrap"], ["lineHeight", 1.5]])]])], ["flow-box", _uM([[".container .card-info ", _uM([["marginTop", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["flow-label", _uM([[".container .card-info .flow-box ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginBottom", "12rpx"]])]])], ["card-bottom", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["marginTop", "24rpx"]])]])], ["pkg-box", _uM([[".container ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginTop", "24rpx"], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"]])]])], ["pkg-content", _uM([[".container ", _uM([["marginTop", "20rpx"]])]])], ["pkg-card", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "28rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "20rpx"], ["transitionProperty", "all"], ["transitionDuration", "0.2s"], ["transitionTimingFunction", "ease"]])]])], ["pkg-info", _uM([[".container .pkg-card ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["pkg-name", _uM([[".container .pkg-card .pkg-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginBottom", "12rpx"], ["flexWrap", "wrap"]])]])], ["pkg-title", _uM([[".container .pkg-card .pkg-info .pkg-name ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#1e293b"]])]])], ["pkg-tag", _uM([[".container .pkg-card .pkg-info .pkg-name ", _uM([["backgroundImage", "linear-gradient(135deg, #ff9a3c, #ff6b3c)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#ffffff"], ["fontSize", "20rpx"], ["paddingTop", "4rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["marginLeft", "12rpx"]])]])], ["pkg-desc", _uM([[".container .pkg-card .pkg-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["pkg-icon", _uM([[".container .pkg-card .pkg-info .pkg-desc ", _uM([["display", "flex"], ["alignItems", "center"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8fafc"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["color", "#475569"], ["fontSize", "20rpx"], ["fontWeight", 700], ["marginRight", "20rpx"]])]])], ["pkg-price", _uM([[".container .pkg-card ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-end"]])]])], ["price-wrapper", _uM([[".container .pkg-card .pkg-price ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["price-symbol", _uM([[".container .pkg-card .pkg-price .price-wrapper ", _uM([["fontSize", "24rpx"], ["color", "#ef4444"], ["fontWeight", "bold"]])]])], ["price-number", _uM([[".container .pkg-card .pkg-price .price-wrapper ", _uM([["fontSize", "40rpx"], ["color", "#ef4444"], ["fontWeight", "bold"]])]])], ["price-original", _uM([[".container .pkg-card .pkg-price ", _uM([["fontSize", "22rpx"], ["color", "#94a3b8"], ["marginTop", "4rpx"]])]])], ["pkg-card-selected", _uM([[".container ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#3b82f6"], ["borderRightColor", "#3b82f6"], ["borderBottomColor", "#3b82f6"], ["borderLeftColor", "#3b82f6"], ["backgroundImage", "none"], ["backgroundColor", "#f8fafc"], ["boxShadow", "0 4rpx 12rpx rgba(59, 130, 246, 0.08)"]])]])], ["bottom-box", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0]]))], ["price-box", _uM([[".bottom-box ", _uM([["display", "flex"], ["flexDirection", "column"], ["marginLeft", "24rpx"]])]])], ["price-label", _uM([[".bottom-box .price-box ", _uM([["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["price-value", _uM([[".bottom-box .price-box ", _uM([["fontWeight", "bold"], ["color", "#ef4444"], ["fontSize", "40rpx"]])]])], ["@TRANSITION", _uM([["pkg-card", _uM([["property", "all"], ["duration", "0.2s"], ["timingFunction", "ease"]])]])]])]

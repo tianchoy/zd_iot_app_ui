@@ -39,29 +39,29 @@
 					>
 						<!-- 订单头部：套餐名称和状态 -->
 						<view class="order-header">
-							<text class="package-name">{{ order.packageName }}</text>
-							<text class="status-tag" :class="getStatusClass(order.status)">{{ order.status }}</text>
+							<text class="package-name">{{ getOrderText(order, 'packageName') }}</text>
+							<text class="status-tag" :class="getStatusClass(getOrderText(order, 'status'))">{{ getOrderText(order, 'status') }}</text>
 						</view>
 						
 						<!-- 订单详情 -->
 						<view class="order-details">
 							<view class="detail-row">
 								<text class="detail-label">订单号</text>
-								<text class="detail-value">{{ order.orderNo }}</text>
+								<text class="detail-value">{{ getOrderText(order, 'orderNo') }}</text>
 							</view>
 							<view class="detail-row">
 								<text class="detail-label">卡号</text>
-								<text class="detail-value">{{ order.cardNo }}</text>
+								<text class="detail-value">{{ getOrderText(order, 'cardNo') }}</text>
 							</view>
 							<view class="detail-row">
 								<text class="detail-label">ICCID</text>
-								<text class="detail-value">{{ order.iccid }}</text>
+								<text class="detail-value">{{ getOrderText(order, 'iccid') }}</text>
 							</view>
 							<view class="detail-row">
-								<text class="detail-value">{{ order.time }}</text>
+								<text class="detail-value">{{ getOrderText(order, 'time') }}</text>
 								<view class="order-footer">
-									<text class="price">¥{{ order.amount }}</text>
-									<text v-if="order.status === '待支付'" class="pay-btn" @click="handlePay(order)">去支付</text>
+									<text class="price">¥{{ getOrderText(order, 'amount') }}</text>
+									<text v-if="getOrderText(order, 'status') === '待支付'" class="pay-btn" @click="handlePay(order)">去支付</text>
 								</view>
 							</view>
 						</view>
@@ -78,11 +78,12 @@
 	
 	// 订单状态类型
 	type OrderStatus = '全部' | '待支付' | '已完成' | '已退款' | '已取消'
-	
+	type OrderItemStatus = '待支付' | '已完成' | '已退款' | '已取消'
+
 	// 订单数据结构
 	interface Order {
 		packageName: string
-		status: Exclude<OrderStatus, '全部'>
+		status: OrderItemStatus
 		orderNo: string
 		cardNo: string
 		iccid: string
@@ -96,7 +97,7 @@
 	const card_number = ref<string>('')
 	
 	// 订单数据（根据图片内容）
-	const orders = ref<Order[]>([
+	const orders = ref<any[]>([
 		{
 			packageName: '车联网月包20G',
 			status: '已完成',
@@ -144,24 +145,29 @@
 		}
 	])
 	
+	const getOrderText = (order: any, key: string): string => {
+		const value = (order as UTSJSONObject)[key]
+		return value == null ? '' : '' + value
+	}
+
 	// 根据搜索词和Tab状态过滤订单
-	const filteredOrders = computed(() => {
+	const filteredOrders = computed<any[]>(() : any[] => {
 		let result = orders.value
-		
+
 		// 按Tab筛选
 		const currentStatus = tabs.value[current.value]
 		if (currentStatus !== '全部') {
-			result = result.filter(order => order.status === currentStatus)
+			result = result.filter((order: any) : boolean => getOrderText(order, 'status') === currentStatus)
 		}
-		
+
 		// 按搜索词筛选（ICCID或卡号）
 		if (card_number.value.trim().length > 0) {
 			const keyword = card_number.value.trim()
-			result = result.filter(order => 
-				order.iccid.includes(keyword) || order.cardNo.includes(keyword)
+			result = result.filter((order: any) : boolean =>
+				getOrderText(order, 'iccid').includes(keyword) || getOrderText(order, 'cardNo').includes(keyword)
 			)
 		}
-		
+
 		return result
 	})
 	
@@ -201,26 +207,27 @@
 	}
 	
 	// 去支付
-	const handlePay = (order: Order) => {
-		console.log('去支付:', order.orderNo)
+	const handlePay = (order: any) => {
+		const orderNo = getOrderText(order, 'orderNo')
+		console.log('去支付:', orderNo)
 		// #ifdef MP-WEIXIN
 		// 微信小程序支付逻辑
 		uni.showToast({
-			title: `支付订单 ${order.orderNo}`,
+			title: `支付订单 ${orderNo}`,
 			icon: 'none'
 		})
 		// #endif
 		// #ifdef APP
 		// App支付逻辑
 		uni.showToast({
-			title: `支付订单 ${order.orderNo}`,
+			title: `支付订单 ${orderNo}`,
 			icon: 'none'
 		})
 		// #endif
 		// #ifdef H5
 		// H5支付逻辑
 		uni.showToast({
-			title: `支付订单 ${order.orderNo}`,
+			title: `支付订单 ${orderNo}`,
 			icon: 'none'
 		})
 		// #endif

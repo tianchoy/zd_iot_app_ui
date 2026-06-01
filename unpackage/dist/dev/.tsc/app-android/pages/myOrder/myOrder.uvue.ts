@@ -6,11 +6,12 @@ import { ref, computed } from 'vue'
 	
 	// 订单状态类型
 	type OrderStatus = '全部' | '待支付' | '已完成' | '已退款' | '已取消'
-	
+	type OrderItemStatus = '待支付' | '已完成' | '已退款' | '已取消'
+
 	// 订单数据结构
 	interface Order {
 		packageName: string
-		status: Exclude<OrderStatus, '全部'>
+		status: OrderItemStatus
 		orderNo: string
 		cardNo: string
 		iccid: string
@@ -32,7 +33,7 @@ const _cache = __ins.renderCache;
 	const card_number = ref<string>('')
 	
 	// 订单数据（根据图片内容）
-	const orders = ref<Order[]>([
+	const orders = ref<any[]>([
 		{
 			packageName: '车联网月包20G',
 			status: '已完成',
@@ -80,24 +81,29 @@ const _cache = __ins.renderCache;
 		}
 	])
 	
+	const getOrderText = (order: any, key: string): string => {
+		const value = (order as UTSJSONObject)[key]
+		return value == null ? '' : '' + value
+	}
+
 	// 根据搜索词和Tab状态过滤订单
-	const filteredOrders = computed(() => {
+	const filteredOrders = computed<any[]>(() : any[] => {
 		let result = orders.value
-		
+
 		// 按Tab筛选
 		const currentStatus = tabs.value[current.value]
 		if (currentStatus !== '全部') {
-			result = result.filter(order => order.status === currentStatus)
+			result = result.filter((order: any) : boolean => getOrderText(order, 'status') === currentStatus)
 		}
-		
+
 		// 按搜索词筛选（ICCID或卡号）
 		if (card_number.value.trim().length > 0) {
 			const keyword = card_number.value.trim()
-			result = result.filter(order => 
-				order.iccid.includes(keyword) || order.cardNo.includes(keyword)
+			result = result.filter((order: any) : boolean =>
+				getOrderText(order, 'iccid').includes(keyword) || getOrderText(order, 'cardNo').includes(keyword)
 			)
 		}
-		
+
 		return result
 	})
 	
@@ -110,7 +116,7 @@ const _cache = __ins.renderCache;
 	// 处理搜索
 	const handleSearch = () => {
 		// 搜索逻辑已通过computed实现，此处可添加额外逻辑如埋点等
-		console.log('搜索关键词:', card_number.value, " at pages/myOrder/myOrder.uvue:177")
+		console.log('搜索关键词:', card_number.value, " at pages/myOrder/myOrder.uvue:183")
 	}
 	
 	// 获取状态样式类
@@ -137,8 +143,9 @@ const _cache = __ins.renderCache;
 	}
 	
 	// 去支付
-	const handlePay = (order: Order) => {
-		console.log('去支付:', order.orderNo, " at pages/myOrder/myOrder.uvue:205")
+	const handlePay = (order: any) => {
+		const orderNo = getOrderText(order, 'orderNo')
+		console.log('去支付:', orderNo, " at pages/myOrder/myOrder.uvue:212")
 
 
 
@@ -149,7 +156,7 @@ const _cache = __ins.renderCache;
 
 		// App支付逻辑
 		uni.showToast({
-			title: `支付订单 ${order.orderNo}`,
+			title: `支付订单 ${orderNo}`,
 			icon: 'none'
 		})
 
@@ -241,29 +248,29 @@ const _component_m_segmented_control = resolveEasyComponent("m-segmented-control
                   class: "order-card"
                 }), [
                   _cE("view", _uM({ class: "order-header" }), [
-                    _cE("text", _uM({ class: "package-name" }), _tD(order.packageName), 1 /* TEXT */),
+                    _cE("text", _uM({ class: "package-name" }), _tD(getOrderText(order, 'packageName')), 1 /* TEXT */),
                     _cE("text", _uM({
-                      class: _nC(["status-tag", getStatusClass(order.status)])
-                    }), _tD(order.status), 3 /* TEXT, CLASS */)
+                      class: _nC(["status-tag", getStatusClass(getOrderText(order, 'status'))])
+                    }), _tD(getOrderText(order, 'status')), 3 /* TEXT, CLASS */)
                   ]),
                   _cE("view", _uM({ class: "order-details" }), [
                     _cE("view", _uM({ class: "detail-row" }), [
                       _cE("text", _uM({ class: "detail-label" }), "订单号"),
-                      _cE("text", _uM({ class: "detail-value" }), _tD(order.orderNo), 1 /* TEXT */)
+                      _cE("text", _uM({ class: "detail-value" }), _tD(getOrderText(order, 'orderNo')), 1 /* TEXT */)
                     ]),
                     _cE("view", _uM({ class: "detail-row" }), [
                       _cE("text", _uM({ class: "detail-label" }), "卡号"),
-                      _cE("text", _uM({ class: "detail-value" }), _tD(order.cardNo), 1 /* TEXT */)
+                      _cE("text", _uM({ class: "detail-value" }), _tD(getOrderText(order, 'cardNo')), 1 /* TEXT */)
                     ]),
                     _cE("view", _uM({ class: "detail-row" }), [
                       _cE("text", _uM({ class: "detail-label" }), "ICCID"),
-                      _cE("text", _uM({ class: "detail-value" }), _tD(order.iccid), 1 /* TEXT */)
+                      _cE("text", _uM({ class: "detail-value" }), _tD(getOrderText(order, 'iccid')), 1 /* TEXT */)
                     ]),
                     _cE("view", _uM({ class: "detail-row" }), [
-                      _cE("text", _uM({ class: "detail-value" }), _tD(order.time), 1 /* TEXT */),
+                      _cE("text", _uM({ class: "detail-value" }), _tD(getOrderText(order, 'time')), 1 /* TEXT */),
                       _cE("view", _uM({ class: "order-footer" }), [
-                        _cE("text", _uM({ class: "price" }), "¥" + _tD(order.amount), 1 /* TEXT */),
-                        order.status === '待支付'
+                        _cE("text", _uM({ class: "price" }), "¥" + _tD(getOrderText(order, 'amount')), 1 /* TEXT */),
+                        getOrderText(order, 'status') === '待支付'
                           ? _cE("text", _uM({
                               key: 0,
                               class: "pay-btn",

@@ -5,6 +5,7 @@
 import { getHostProjectConfig } from './ProjectConfig.uts';
 import { storage } from './Storage.uts';
 import { uploadFileRequest, type UploadApiResponse, type UploadFileOptions } from './Upload.uts';
+import { config, getToken, setToken, clearToken } from '@/common/config';
 // ========== 类型定义 ==========
 /** 请求方法类型 */
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -165,7 +166,7 @@ function copyRequestOptions(options: RequestOptions): RequestOptions {
  * 统一请求方法
  */
 export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T>> {
-    const { url, method = 'GET', data, header, baseUrl, timeout = DEFAULT_TIMEOUT, withToken = true, showError = true, showLoading = false, loadingText, redirectOnUnauthorized = true, loginPage, successCodes, unauthorizedCodes, onErrorCode } = options;
+    const { url, method = 'GET', data, header, baseUrl, timeout = DEFAULT_TIMEOUT, withToken = false, showError = true, showLoading = false, loadingText, redirectOnUnauthorized = true, loginPage, successCodes, unauthorizedCodes, onErrorCode } = options;
     // 显示加载提示
     if (showLoading) {
         showLoadingModal(loadingText ?? '加载中...');
@@ -185,9 +186,9 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
     };
     // 添加 Token
     if (withToken) {
-        const token = storage.getToken();
+        const token = getToken();
         if (token != '') {
-            reqHeader['Authorization'] = token;
+            reqHeader['token'] = token;
         }
     }
     // 确保这些值不为 null
@@ -340,10 +341,6 @@ export const http = {
 // ========== 默认导出 ==========
 export default {
     request,
-    get,
-    post,
-    put,
-    delete: del,
     public: publicRequest,
     silent: silentRequest,
     loading: loadingRequest,

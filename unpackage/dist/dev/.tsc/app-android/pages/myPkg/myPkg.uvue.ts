@@ -4,11 +4,12 @@ import { ref, computed } from 'vue'
 	
 	// 套餐状态类型
 	type PackageStatus = '全部' | '在用套餐' | '待生效' | '已失效'
-	
+	type PackageItemStatus = '在用套餐' | '待生效' | '已失效'
+
 	// 套餐数据结构
 	interface PackageItem {
 		name: string
-		status: Exclude<PackageStatus, '全部'>
+		status: PackageItemStatus
 		effectiveTime: string
 		totalTraffic: string
 		remainingTraffic: string
@@ -28,7 +29,7 @@ const _cache = __ins.renderCache;
 	const current = ref<number>(0)
 	
 	// 套餐数据
-	const packageList = ref<PackageItem[]>([
+	const packageList = ref<any[]>([
 		{
 			name: '车联网月包20G',
 			status: '在用套餐',
@@ -63,13 +64,18 @@ const _cache = __ins.renderCache;
 		}
 	])
 	
+	const getPackageText = (item: any, key: string): string => {
+		const value = (item as UTSJSONObject)[key]
+		return value == null ? '' : '' + value
+	}
+
 	// 根据 Tab 筛选套餐
-	const filteredPackages = computed(() => {
+	const filteredPackages = computed<any[]>(() : any[] => {
 		const currentStatus = pkgTabs.value[current.value]
 		if (currentStatus === '全部') {
 			return packageList.value
 		}
-		return packageList.value.filter(item => item.status === currentStatus)
+		return packageList.value.filter((item: any) : boolean => getPackageText(item, 'status') === currentStatus)
 	})
 	
 	// Tab 切换处理
@@ -145,27 +151,27 @@ const _component_m_segmented_control = resolveEasyComponent("m-segmented-control
               class: "package-card"
             }), [
               _cE("view", _uM({ class: "package-header" }), [
-                _cE("text", _uM({ class: "package-name" }), _tD(item.name), 1 /* TEXT */),
+                _cE("text", _uM({ class: "package-name" }), _tD(getPackageText(item, 'name')), 1 /* TEXT */),
                 _cE("text", _uM({
-                  class: _nC(["status-tag", getStatusClass(item.status)])
-                }), _tD(item.status), 3 /* TEXT, CLASS */)
+                  class: _nC(["status-tag", getStatusClass(getPackageText(item, 'status'))])
+                }), _tD(getPackageText(item, 'status')), 3 /* TEXT, CLASS */)
               ]),
               _cE("view", _uM({ class: "effective-time" }), [
                 _cE("text", _uM({ class: "time-label" }), "生效时间："),
-                _cE("text", _uM({ class: "time-value" }), _tD(item.effectiveTime), 1 /* TEXT */)
+                _cE("text", _uM({ class: "time-value" }), _tD(getPackageText(item, 'effectiveTime')), 1 /* TEXT */)
               ]),
               _cE("view", _uM({ class: "package-metrics" }), [
                 _cE("view", _uM({ class: "metric-item" }), [
                   _cE("text", _uM({ class: "metric-label" }), "流量"),
-                  _cE("text", _uM({ class: "metric-value" }), _tD(item.totalTraffic), 1 /* TEXT */)
+                  _cE("text", _uM({ class: "metric-value" }), _tD(getPackageText(item, 'totalTraffic')), 1 /* TEXT */)
                 ]),
                 _cE("view", _uM({ class: "metric-item" }), [
                   _cE("text", _uM({ class: "metric-label" }), "剩余"),
-                  _cE("text", _uM({ class: "metric-value" }), _tD(item.remainingTraffic), 1 /* TEXT */)
+                  _cE("text", _uM({ class: "metric-value" }), _tD(getPackageText(item, 'remainingTraffic')), 1 /* TEXT */)
                 ]),
                 _cE("view", _uM({ class: "metric-item" }), [
                   _cE("text", _uM({ class: "metric-label" }), "到期"),
-                  _cE("text", _uM({ class: "metric-value" }), _tD(item.expireDate), 1 /* TEXT */)
+                  _cE("text", _uM({ class: "metric-value" }), _tD(getPackageText(item, 'expireDate')), 1 /* TEXT */)
                 ])
               ])
             ])

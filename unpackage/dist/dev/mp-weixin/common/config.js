@@ -136,14 +136,14 @@ const API_CONFIG = new common_vendor.UTSJSONObject({
     timeout: 3e4
   }),
   prod: new common_vendor.UTSJSONObject({
-    baseUrl: "https://api.yourdomain.com/api",
+    baseUrl: "https://cmpapp.zdiot.cn/prod-api",
     timeout: 3e4
   })
 });
-API_CONFIG.prod;
+const currentConfig = API_CONFIG["prod"];
 const config = new ProjectConfig({
-  baseUrl: "https://api.yourdomain.com/api",
-  timeout: 3e4,
+  baseUrl: currentConfig["baseUrl"],
+  timeout: currentConfig["timeout"],
   env: ENV,
   api: new ApiPaths({
     auth: new AuthApiPaths({
@@ -167,5 +167,13 @@ const config = new ProjectConfig({
   loginPagePath: "",
   loginRequiredPaths: []
 });
+function getToken() {
+  const token = common_vendor.index.getStorageSync(config.storage.token);
+  if (token == null) {
+    return "";
+  }
+  return token;
+}
 exports.config = config;
+exports.getToken = getToken;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/config.js.map

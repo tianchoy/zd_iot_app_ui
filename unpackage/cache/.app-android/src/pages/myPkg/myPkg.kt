@@ -23,21 +23,22 @@ open class GenPagesMyPkgMyPkg : BasePage {
             val _cache = __ins.renderCache
             val pkgTabs = ref(_uA<PackageStatus>("全部", "在用套餐", "待生效", "已失效"))
             val current = ref<Number>(0)
-            val packageList = ref(_uA<PackageItem>(PackageItem(name = "车联网月包20G", status = "在用套餐", effectiveTime = "2026-04-01", totalTraffic = "20GB", remainingTraffic = "8.66GB", expireDate = "2026-04-30"), PackageItem(name = "车联网月包10G", status = "待生效", effectiveTime = "待生效", totalTraffic = "10GB", remainingTraffic = "10GB", expireDate = "2026-05-30"), PackageItem(name = "工业设备月包5G", status = "待生效", effectiveTime = "待生效", totalTraffic = "5GB", remainingTraffic = "5GB", expireDate = "2026-06-30"), PackageItem(name = "测试套餐1G", status = "已失效", effectiveTime = "2026-03-01", totalTraffic = "1GB", remainingTraffic = "0", expireDate = "2026-03-31")))
-            val filteredPackages = computed(fun(): UTSArray<{
-                var name: String
-                var status: String
-                var effectiveTime: String
-                var totalTraffic: String
-                var remainingTraffic: String
-                var expireDate: String
-            }> {
+            val packageList = ref(_uA<Any>(_uO("name" to "车联网月包20G", "status" to "在用套餐", "effectiveTime" to "2026-04-01", "totalTraffic" to "20GB", "remainingTraffic" to "8.66GB", "expireDate" to "2026-04-30"), _uO("name" to "车联网月包10G", "status" to "待生效", "effectiveTime" to "待生效", "totalTraffic" to "10GB", "remainingTraffic" to "10GB", "expireDate" to "2026-05-30"), _uO("name" to "工业设备月包5G", "status" to "待生效", "effectiveTime" to "待生效", "totalTraffic" to "5GB", "remainingTraffic" to "5GB", "expireDate" to "2026-06-30"), _uO("name" to "测试套餐1G", "status" to "已失效", "effectiveTime" to "2026-03-01", "totalTraffic" to "1GB", "remainingTraffic" to "0", "expireDate" to "2026-03-31")))
+            val getPackageText = fun(item: Any, key: String): String {
+                val value = (item as UTSJSONObject)[key]
+                return if (value == null) {
+                    ""
+                } else {
+                    "" + value
+                }
+            }
+            val filteredPackages = computed<UTSArray<Any>>(fun(): UTSArray<Any> {
                 val currentStatus = pkgTabs.value[current.value]
                 if (currentStatus === "全部") {
                     return packageList.value
                 }
-                return packageList.value.filter(fun(item): Boolean {
-                    return item.status === currentStatus
+                return packageList.value.filter(fun(item: Any): Boolean {
+                    return getPackageText(item, "status") === currentStatus
                 }
                 )
             }
@@ -87,28 +88,28 @@ open class GenPagesMyPkgMyPkg : BasePage {
                                 _cE(Fragment, null, RenderHelpers.renderList(filteredPackages.value, fun(item, index, __index, _cached): Any {
                                     return _cE("view", _uM("key" to index, "class" to "package-card"), _uA(
                                         _cE("view", _uM("class" to "package-header"), _uA(
-                                            _cE("text", _uM("class" to "package-name"), _tD(item.name), 1),
+                                            _cE("text", _uM("class" to "package-name"), _tD(getPackageText(item, "name")), 1),
                                             _cE("text", _uM("class" to _nC(_uA(
                                                 "status-tag",
-                                                getStatusClass(item.status)
-                                            ))), _tD(item.status), 3)
+                                                getStatusClass(getPackageText(item, "status"))
+                                            ))), _tD(getPackageText(item, "status")), 3)
                                         )),
                                         _cE("view", _uM("class" to "effective-time"), _uA(
                                             _cE("text", _uM("class" to "time-label"), "生效时间："),
-                                            _cE("text", _uM("class" to "time-value"), _tD(item.effectiveTime), 1)
+                                            _cE("text", _uM("class" to "time-value"), _tD(getPackageText(item, "effectiveTime")), 1)
                                         )),
                                         _cE("view", _uM("class" to "package-metrics"), _uA(
                                             _cE("view", _uM("class" to "metric-item"), _uA(
                                                 _cE("text", _uM("class" to "metric-label"), "流量"),
-                                                _cE("text", _uM("class" to "metric-value"), _tD(item.totalTraffic), 1)
+                                                _cE("text", _uM("class" to "metric-value"), _tD(getPackageText(item, "totalTraffic")), 1)
                                             )),
                                             _cE("view", _uM("class" to "metric-item"), _uA(
                                                 _cE("text", _uM("class" to "metric-label"), "剩余"),
-                                                _cE("text", _uM("class" to "metric-value"), _tD(item.remainingTraffic), 1)
+                                                _cE("text", _uM("class" to "metric-value"), _tD(getPackageText(item, "remainingTraffic")), 1)
                                             )),
                                             _cE("view", _uM("class" to "metric-item"), _uA(
                                                 _cE("text", _uM("class" to "metric-label"), "到期"),
-                                                _cE("text", _uM("class" to "metric-value"), _tD(item.expireDate), 1)
+                                                _cE("text", _uM("class" to "metric-value"), _tD(getPackageText(item, "expireDate")), 1)
                                             ))
                                         ))
                                     ))

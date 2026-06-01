@@ -34,6 +34,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         time: "2026-03-01 08:10:00"
       })
     ]);
+    const getOrderText = (order = null, key) => {
+      const value = order[key];
+      return value == null ? "" : "" + value;
+    };
     const getStatusClass = (status) => {
       switch (status) {
         case "已完成":
@@ -64,12 +68,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         c: common_vendor.f(orderList.value, (order, index, i0) => {
           return {
-            a: common_vendor.t(order.packageName),
-            b: common_vendor.t(order.amount),
-            c: common_vendor.t(order.orderNo),
-            d: common_vendor.t(order.status),
-            e: common_vendor.n(getStatusClass(order.status)),
-            f: common_vendor.t(order.time),
+            a: common_vendor.t(getOrderText(order, "packageName")),
+            b: common_vendor.t(getOrderText(order, "amount")),
+            c: common_vendor.t(getOrderText(order, "orderNo")),
+            d: common_vendor.t(getOrderText(order, "status")),
+            e: common_vendor.n(getStatusClass(getOrderText(order, "status"))),
+            f: common_vendor.t(getOrderText(order, "time")),
             g: index
           };
         }),

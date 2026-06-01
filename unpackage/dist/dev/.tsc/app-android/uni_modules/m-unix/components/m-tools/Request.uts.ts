@@ -5,6 +5,7 @@
 import { getHostProjectConfig } from './ProjectConfig.uts'
 import { storage } from './Storage.uts'
 import { uploadFileRequest, type UploadApiResponse, type UploadFileOptions } from './Upload.uts'
+import { config, getToken,setToken, clearToken } from '@/common/config'
 
 // ========== 类型定义 ==========
 
@@ -190,7 +191,7 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 		header,
 		baseUrl,
 		timeout = DEFAULT_TIMEOUT,
-		withToken = true,
+		withToken = false,
 		showError = true,
 		showLoading = false,
 		loadingText,
@@ -224,9 +225,9 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 
 	// 添加 Token
 	if (withToken) {
-		const token = storage.getToken()
+		const token = getToken()
 		if (token != '') {
-			reqHeader['Authorization'] = token
+			reqHeader['token'] = token
 		}
 	}
 
@@ -409,10 +410,6 @@ export const http = {
 
 export default {
 	request,
-	get,
-	post,
-	put,
-	delete: del,
 	public: publicRequest,
 	silent: silentRequest,
 	loading: loadingRequest,

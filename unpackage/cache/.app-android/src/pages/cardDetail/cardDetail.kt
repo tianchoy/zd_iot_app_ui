@@ -48,12 +48,15 @@ open class GenPagesCardDetailCardDetail : BasePage {
                 console.log(pkgMore.value, " at pages/cardDetail/cardDetail.uvue:296")
                 pkgMore.value = !pkgMore.value
             }
+            val cardDetail = fun(cardNumber: String){
+                card_number.value = cardNumber
+            }
             val goBack = fun(){
                 uni_navigateBack(NavigateBackOptions(delta = 1))
             }
             onLoad(fun(options){
                 val cardNumber = options.getString("card_number") ?: ""
-                console.log(cardNumber, " at pages/cardDetail/cardDetail.uvue:308")
+                console.log(cardNumber, " at pages/cardDetail/cardDetail.uvue:312")
                 card_number.value = cardNumber
             }
             )
@@ -70,7 +73,7 @@ open class GenPagesCardDetailCardDetail : BasePage {
                     _cE("view", _uM("class" to "container"), _uA(
                         _cE("view", _uM("class" to "card-box"), _uA(
                             _cE("view", _uM("class" to "card-item", "onClick" to fun(){
-                                _ctx.cardDetail("1064916585160")
+                                cardDetail("1064916585160")
                             }
                             ), _uA(
                                 _cE("view", _uM("class" to "item-head"), _uA(

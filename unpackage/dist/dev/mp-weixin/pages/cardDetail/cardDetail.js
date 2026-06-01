@@ -86,6 +86,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:296", pkgMore.value);
       pkgMore.value = !pkgMore.value;
     };
+    const cardDetail = (cardNumber) => {
+      card_number.value = cardNumber;
+    };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
         delta: 1
@@ -94,7 +97,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onLoad((options) => {
       var _a;
       const cardNumber = (_a = options.getString("card_number")) !== null && _a !== void 0 ? _a : "";
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:308", cardNumber);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:312", cardNumber);
       card_number.value = cardNumber;
     });
     return (_ctx, _cache) => {
@@ -123,8 +126,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-2bc48812"
         }),
         e: common_vendor.o(($event) => {
-          return _ctx.cardDetail("1064916585160");
-        }, "3a"),
+          return cardDetail("1064916585160");
+        }, "4a"),
         f: common_vendor.p({
           type: "black",
           plain: true,

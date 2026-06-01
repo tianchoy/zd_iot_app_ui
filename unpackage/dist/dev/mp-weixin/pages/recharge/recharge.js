@@ -20,6 +20,73 @@ if (!Math) {
 }
 const LinearProgress = () => "../../components/progress.js";
 const Payment = () => "../../components/payment.js";
+class TabItem extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: String, optional: false }
+        };
+      },
+      name: "TabItem"
+    };
+  }
+  constructor(options, metadata = TabItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    delete this.__props__;
+  }
+}
+class PackageItem extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: String, optional: false },
+          tag: { type: String, optional: false },
+          data: { type: String, optional: false },
+          validity: { type: String, optional: false },
+          price: { type: Number, optional: false },
+          originalPrice: { type: Number, optional: false }
+        };
+      },
+      name: "PackageItem"
+    };
+  }
+  constructor(options, metadata = PackageItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    this.tag = this.__props__.tag;
+    this.data = this.__props__.data;
+    this.validity = this.__props__.validity;
+    this.price = this.__props__.price;
+    this.originalPrice = this.__props__.originalPrice;
+    delete this.__props__;
+  }
+}
+class ChangeTabEvent extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          index: { type: Number, optional: false }
+        };
+      },
+      name: "ChangeTabEvent"
+    };
+  }
+  constructor(options, metadata = ChangeTabEvent.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.index = this.__props__.index;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "recharge",
   setup(__props) {
@@ -27,15 +94,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const progress1 = common_vendor.ref(80);
     const active = common_vendor.ref(0);
     const tabs = common_vendor.ref([
-      new common_vendor.UTSJSONObject({
+      new TabItem({
         name: "套餐包"
       }),
-      new common_vendor.UTSJSONObject({
+      new TabItem({
         name: "加油包"
       })
     ]);
     const packageList = common_vendor.ref([
-      new common_vendor.UTSJSONObject({
+      new PackageItem({
         name: "车联网月包20G",
         tag: "推荐",
         data: "20GB",
@@ -43,7 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         price: 90,
         originalPrice: 100
       }),
-      new common_vendor.UTSJSONObject({
+      new PackageItem({
         name: "车联网月包10G",
         tag: "",
         data: "10GB",
@@ -51,7 +118,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         price: 50,
         originalPrice: 0
       }),
-      new common_vendor.UTSJSONObject({
+      new PackageItem({
         name: "工业设备月包5G",
         tag: "",
         data: "5GB",
@@ -61,7 +128,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       })
     ]);
     const refillList = common_vendor.ref([
-      new common_vendor.UTSJSONObject({
+      new PackageItem({
         name: "加油包5G",
         tag: "推荐",
         data: "5GB",
@@ -69,7 +136,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         price: 20,
         originalPrice: 30
       }),
-      new common_vendor.UTSJSONObject({
+      new PackageItem({
         name: "加油包10G",
         tag: "",
         data: "10GB",
@@ -77,7 +144,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         price: 35,
         originalPrice: 45
       }),
-      new common_vendor.UTSJSONObject({
+      new PackageItem({
         name: "加油包20G",
         tag: "",
         data: "20GB",
@@ -89,14 +156,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const selectedPackageIndex = common_vendor.ref(0);
     const selectedRefillIndex = common_vendor.ref(0);
     const currentPrice = common_vendor.computed(() => {
-      var _a, _b, _c, _d;
       if (active.value === 0) {
-        return (_b = (_a = packageList.value[selectedPackageIndex.value]) === null || _a === void 0 ? null : _a.price) !== null && _b !== void 0 ? _b : 0;
+        const item = packageList.value[selectedPackageIndex.value];
+        return item ? item.price : 0;
       } else {
-        return (_d = (_c = refillList.value[selectedRefillIndex.value]) === null || _c === void 0 ? null : _c.price) !== null && _d !== void 0 ? _d : 0;
+        const item = refillList.value[selectedRefillIndex.value];
+        return item ? item.price : 0;
       }
     });
-    const changeTab = (e = null) => {
+    const changeTab = (e) => {
       active.value = e.index;
     };
     const selectPackage = (index) => {
@@ -112,7 +180,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleConfirmPayment = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:244", e);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:267", e);
       showPopup.value = false;
     };
     const goBack = () => {

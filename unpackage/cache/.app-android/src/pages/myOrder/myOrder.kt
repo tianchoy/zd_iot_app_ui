@@ -25,28 +25,28 @@ open class GenPagesMyOrderMyOrder : BasePage {
             val tabs = ref(_uA<OrderStatus>("全部", "待支付", "已完成", "已退款", "已取消"))
             val current = ref<Number>(0)
             val card_number = ref<String>("")
-            val orders = ref(_uA<Order>(Order(packageName = "车联网月包20G", status = "已完成", orderNo = "O202604280001", cardNo = "1064916585160", iccid = "89860421123456789012", time = "2026-04-28 10:12:30", amount = 90), Order(packageName = "车联网月包10G", status = "待支付", orderNo = "O202604280002", cardNo = "1064916585160", iccid = "89860421123456789012", time = "2026-04-28 11:20:12", amount = 50), Order(packageName = "测试套餐1G", status = "已退款", orderNo = "O202603010001", cardNo = "1064916585160", iccid = "89860421123456789012", time = "2026-03-01 08:10:00", amount = 10), Order(packageName = "500MB加油包", status = "已完成", orderNo = "PO202605120001", cardNo = "14700002233", iccid = "8986032044208356010", time = "2026-05-12 11:02:00", amount = 19), Order(packageName = "1GB加油包", status = "已取消", orderNo = "PO202605120002", cardNo = "14700002233", iccid = "8986032044208356010", time = "2026-05-12 12:18:00", amount = 29)))
-            val filteredOrders = computed(fun(): UTSArray<{
-                var packageName: String
-                var status: String
-                var orderNo: String
-                var cardNo: String
-                var iccid: String
-                var time: String
-                var amount: Number
-            }> {
+            val orders = ref(_uA<Any>(_uO("packageName" to "车联网月包20G", "status" to "已完成", "orderNo" to "O202604280001", "cardNo" to "1064916585160", "iccid" to "89860421123456789012", "time" to "2026-04-28 10:12:30", "amount" to 90), _uO("packageName" to "车联网月包10G", "status" to "待支付", "orderNo" to "O202604280002", "cardNo" to "1064916585160", "iccid" to "89860421123456789012", "time" to "2026-04-28 11:20:12", "amount" to 50), _uO("packageName" to "测试套餐1G", "status" to "已退款", "orderNo" to "O202603010001", "cardNo" to "1064916585160", "iccid" to "89860421123456789012", "time" to "2026-03-01 08:10:00", "amount" to 10), _uO("packageName" to "500MB加油包", "status" to "已完成", "orderNo" to "PO202605120001", "cardNo" to "14700002233", "iccid" to "8986032044208356010", "time" to "2026-05-12 11:02:00", "amount" to 19), _uO("packageName" to "1GB加油包", "status" to "已取消", "orderNo" to "PO202605120002", "cardNo" to "14700002233", "iccid" to "8986032044208356010", "time" to "2026-05-12 12:18:00", "amount" to 29)))
+            val getOrderText = fun(order: Any, key: String): String {
+                val value = (order as UTSJSONObject)[key]
+                return if (value == null) {
+                    ""
+                } else {
+                    "" + value
+                }
+            }
+            val filteredOrders = computed<UTSArray<Any>>(fun(): UTSArray<Any> {
                 var result = orders.value
                 val currentStatus = tabs.value[current.value]
                 if (currentStatus !== "全部") {
-                    result = result.filter(fun(order): Boolean {
-                        return order.status === currentStatus
+                    result = result.filter(fun(order: Any): Boolean {
+                        return getOrderText(order, "status") === currentStatus
                     }
                     )
                 }
                 if (card_number.value.trim().length > 0) {
                     val keyword = card_number.value.trim()
-                    result = result.filter(fun(order): Boolean {
-                        return order.iccid.includes(keyword) || order.cardNo.includes(keyword)
+                    result = result.filter(fun(order: Any): Boolean {
+                        return getOrderText(order, "iccid").includes(keyword) || getOrderText(order, "cardNo").includes(keyword)
                     }
                     )
                 }
@@ -58,7 +58,7 @@ open class GenPagesMyOrderMyOrder : BasePage {
                 current.value = index
             }
             val handleSearch = fun(){
-                console.log("搜索关键词:", card_number.value, " at pages/myOrder/myOrder.uvue:177")
+                console.log("搜索关键词:", card_number.value, " at pages/myOrder/myOrder.uvue:183")
             }
             val getStatusClass = fun(status: String): String {
                 when (status) {
@@ -77,9 +77,10 @@ open class GenPagesMyOrderMyOrder : BasePage {
             val handleBack = fun(){
                 uni_navigateBack(NavigateBackOptions(delta = 1))
             }
-            val handlePay = fun(order: Order){
-                console.log("去支付:", order.orderNo, " at pages/myOrder/myOrder.uvue:205")
-                uni_showToast(ShowToastOptions(title = "支付订单 " + order.orderNo, icon = "none"))
+            val handlePay = fun(order: Any){
+                val orderNo = getOrderText(order, "orderNo")
+                console.log("去支付:", orderNo, " at pages/myOrder/myOrder.uvue:212")
+                uni_showToast(ShowToastOptions(title = "支付订单 " + orderNo, icon = "none"))
             }
             return fun(): Any? {
                 val _component_topNavBar = resolveEasyComponent("topNavBar", GenComponentsTopNavBarTopNavBarClass)
@@ -126,30 +127,30 @@ open class GenPagesMyOrderMyOrder : BasePage {
                                     _cE(Fragment, null, RenderHelpers.renderList(filteredOrders.value, fun(order, index, __index, _cached): Any {
                                         return _cE("view", _uM("key" to index, "class" to "order-card"), _uA(
                                             _cE("view", _uM("class" to "order-header"), _uA(
-                                                _cE("text", _uM("class" to "package-name"), _tD(order.packageName), 1),
+                                                _cE("text", _uM("class" to "package-name"), _tD(getOrderText(order, "packageName")), 1),
                                                 _cE("text", _uM("class" to _nC(_uA(
                                                     "status-tag",
-                                                    getStatusClass(order.status)
-                                                ))), _tD(order.status), 3)
+                                                    getStatusClass(getOrderText(order, "status"))
+                                                ))), _tD(getOrderText(order, "status")), 3)
                                             )),
                                             _cE("view", _uM("class" to "order-details"), _uA(
                                                 _cE("view", _uM("class" to "detail-row"), _uA(
                                                     _cE("text", _uM("class" to "detail-label"), "订单号"),
-                                                    _cE("text", _uM("class" to "detail-value"), _tD(order.orderNo), 1)
+                                                    _cE("text", _uM("class" to "detail-value"), _tD(getOrderText(order, "orderNo")), 1)
                                                 )),
                                                 _cE("view", _uM("class" to "detail-row"), _uA(
                                                     _cE("text", _uM("class" to "detail-label"), "卡号"),
-                                                    _cE("text", _uM("class" to "detail-value"), _tD(order.cardNo), 1)
+                                                    _cE("text", _uM("class" to "detail-value"), _tD(getOrderText(order, "cardNo")), 1)
                                                 )),
                                                 _cE("view", _uM("class" to "detail-row"), _uA(
                                                     _cE("text", _uM("class" to "detail-label"), "ICCID"),
-                                                    _cE("text", _uM("class" to "detail-value"), _tD(order.iccid), 1)
+                                                    _cE("text", _uM("class" to "detail-value"), _tD(getOrderText(order, "iccid")), 1)
                                                 )),
                                                 _cE("view", _uM("class" to "detail-row"), _uA(
-                                                    _cE("text", _uM("class" to "detail-value"), _tD(order.time), 1),
+                                                    _cE("text", _uM("class" to "detail-value"), _tD(getOrderText(order, "time")), 1),
                                                     _cE("view", _uM("class" to "order-footer"), _uA(
-                                                        _cE("text", _uM("class" to "price"), "¥" + _tD(order.amount), 1),
-                                                        if (order.status === "待支付") {
+                                                        _cE("text", _uM("class" to "price"), "¥" + _tD(getOrderText(order, "amount")), 1),
+                                                        if (getOrderText(order, "status") === "待支付") {
                                                             _cE("text", _uM("key" to 0, "class" to "pay-btn", "onClick" to fun(){
                                                                 handlePay(order)
                                                             }), "去支付", 8, _uA(

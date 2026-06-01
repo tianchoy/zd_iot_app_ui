@@ -21,7 +21,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const current = common_vendor.ref(0);
     const card_number = common_vendor.ref("");
     const orders = common_vendor.ref([
-      {
+      new common_vendor.UTSJSONObject({
         packageName: "车联网月包20G",
         status: "已完成",
         orderNo: "O202604280001",
@@ -29,8 +29,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         iccid: "89860421123456789012",
         time: "2026-04-28 10:12:30",
         amount: 90
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         packageName: "车联网月包10G",
         status: "待支付",
         orderNo: "O202604280002",
@@ -38,8 +38,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         iccid: "89860421123456789012",
         time: "2026-04-28 11:20:12",
         amount: 50
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         packageName: "测试套餐1G",
         status: "已退款",
         orderNo: "O202603010001",
@@ -47,8 +47,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         iccid: "89860421123456789012",
         time: "2026-03-01 08:10:00",
         amount: 10
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         packageName: "500MB加油包",
         status: "已完成",
         orderNo: "PO202605120001",
@@ -56,8 +56,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         iccid: "8986032044208356010",
         time: "2026-05-12 11:02:00",
         amount: 19
-      },
-      {
+      }),
+      new common_vendor.UTSJSONObject({
         packageName: "1GB加油包",
         status: "已取消",
         orderNo: "PO202605120002",
@@ -65,20 +65,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         iccid: "8986032044208356010",
         time: "2026-05-12 12:18:00",
         amount: 29
-      }
+      })
     ]);
+    const getOrderText = (order = null, key) => {
+      const value = order[key];
+      return value == null ? "" : "" + value;
+    };
     const filteredOrders = common_vendor.computed(() => {
       let result = orders.value;
       const currentStatus = tabs.value[current.value];
       if (currentStatus !== "全部") {
-        result = result.filter((order) => {
-          return order.status === currentStatus;
+        result = result.filter((order = null) => {
+          return getOrderText(order, "status") === currentStatus;
         });
       }
       if (card_number.value.trim().length > 0) {
         const keyword = card_number.value.trim();
-        result = result.filter((order) => {
-          return order.iccid.includes(keyword) || order.cardNo.includes(keyword);
+        result = result.filter((order = null) => {
+          return getOrderText(order, "iccid").includes(keyword) || getOrderText(order, "cardNo").includes(keyword);
         });
       }
       return result;
@@ -88,7 +92,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       current.value = index;
     };
     const handleSearch = () => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:177", "搜索关键词:", card_number.value);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:183", "搜索关键词:", card_number.value);
     };
     const getStatusClass = (status) => {
       switch (status) {
@@ -109,10 +113,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         delta: 1
       }));
     };
-    const handlePay = (order) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:205", "去支付:", order.orderNo);
+    const handlePay = (order = null) => {
+      const orderNo = getOrderText(order, "orderNo");
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:212", "去支付:", orderNo);
       common_vendor.index.showToast({
-        title: `支付订单 ${order.orderNo}`,
+        title: `支付订单 ${orderNo}`,
         icon: "none"
       });
     };
@@ -165,16 +170,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, filteredOrders.value.length === 0 ? {} : {
         l: common_vendor.f(filteredOrders.value, (order, index, i0) => {
           return common_vendor.e({
-            a: common_vendor.t(order.packageName),
-            b: common_vendor.t(order.status),
-            c: common_vendor.n(getStatusClass(order.status)),
-            d: common_vendor.t(order.orderNo),
-            e: common_vendor.t(order.cardNo),
-            f: common_vendor.t(order.iccid),
-            g: common_vendor.t(order.time),
-            h: common_vendor.t(order.amount),
-            i: order.status === "待支付"
-          }, order.status === "待支付" ? {
+            a: common_vendor.t(getOrderText(order, "packageName")),
+            b: common_vendor.t(getOrderText(order, "status")),
+            c: common_vendor.n(getStatusClass(getOrderText(order, "status"))),
+            d: common_vendor.t(getOrderText(order, "orderNo")),
+            e: common_vendor.t(getOrderText(order, "cardNo")),
+            f: common_vendor.t(getOrderText(order, "iccid")),
+            g: common_vendor.t(getOrderText(order, "time")),
+            h: common_vendor.t(getOrderText(order, "amount")),
+            i: getOrderText(order, "status") === "待支付"
+          }, getOrderText(order, "status") === "待支付" ? {
             j: common_vendor.o(($event) => {
               return handlePay(order);
             }, index)

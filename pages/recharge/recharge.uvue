@@ -135,12 +135,32 @@
 	import { ref, computed } from 'vue';
 	import LinearProgress from '@/components/progress.uvue';
 	import Payment from '@/components/payment.uvue';
-		
-	const showPopup = ref(false);
-	const progress1 = ref(80);
-
-	const active = ref(0);
-	const tabs = ref([
+	
+	// Tab 项类型
+	type TabItem = {
+		name: string;
+	};
+	
+	// 套餐包/加油包项类型
+	type PackageItem = {
+		name: string;
+		tag: string;
+		data: string;
+		validity: string;
+		price: number;
+		originalPrice: number;
+	};
+	
+	// changeTab 函数的参数类型
+	type ChangeTabEvent = {
+		index: number;
+	};
+	
+	const showPopup = ref<boolean>(false);
+	const progress1 = ref<number>(80);
+	
+	const active = ref<number>(0);
+	const tabs = ref<Array<TabItem>>([
 		{
 			name: '套餐包'
 		},
@@ -148,9 +168,9 @@
 			name: '加油包',
 		}
 	]);
-
+	
 	// 套餐包列表数据
-	const packageList = ref([
+	const packageList = ref<Array<PackageItem>>([
 		{
 			name: '车联网月包20G',
 			tag: '推荐',
@@ -176,9 +196,9 @@
 			originalPrice: 0
 		}
 	]);
-
+	
 	// 加油包列表数据
-	const refillList = ref([
+	const refillList = ref<Array<PackageItem>>([
 		{
 			name: '加油包5G',
 			tag: '推荐',
@@ -204,61 +224,64 @@
 			originalPrice: 80
 		}
 	]);
-
+	
 	// 选中的套餐包索引
-	const selectedPackageIndex = ref(0);
+	const selectedPackageIndex = ref<number>(0);
 	// 选中的加油包索引
-	const selectedRefillIndex = ref(0);
-
-	const currentPrice = computed((): number => {
+	const selectedRefillIndex = ref<number>(0);
+	
+	const currentPrice = computed<number>((): number => {
 		if (active.value === 0) {
-			return packageList.value[selectedPackageIndex.value]?.price ?? 0;
+			const item = packageList.value[selectedPackageIndex.value];
+			return item ? item.price : 0;
 		} else {
-			return refillList.value[selectedRefillIndex.value]?.price ?? 0;
+			const item = refillList.value[selectedRefillIndex.value];
+			return item ? item.price : 0;
 		}
 	});
-
-	const changeTab = (e: any) => {
+	
+	const changeTab = (e: ChangeTabEvent) => {
 		active.value = e.index;
 	}
-
+	
 	const selectPackage = (index: number) => {
 		selectedPackageIndex.value = index;
 	}
-
+	
 	const selectRefill = (index: number) => {
 		selectedRefillIndex.value = index;
 	}
+	
 	// 选择支付方式
 	const choosePayment = () => {
 		showPopup.value = true;
 	}
-
+	
 	// 取消支付
 	const handleCancelPayment = () => {
 		showPopup.value = false;
 	}
-
+	
 	// 确认支付
-	const handleConfirmPayment = (e) => {
+	const handleConfirmPayment = (e: any) => {
 		console.log(e);
 		// 处理确认逻辑
 		showPopup.value = false;
 	}
-
+	
 	const goBack = () => {
 		uni.navigateBack({
 			delta: 1
 		})
 	}
-
+	
 	// 跳转我的套餐
 	const toMyPackage = () => {
 		uni.navigateTo({
 			url: '/pages/myPkg/myPkg'
 		})
 	}
-
+	
 	// 跳转订单记录
 	const toOrderRecord = () => {
 		uni.navigateTo({
@@ -359,7 +382,6 @@
 			padding: 28rpx 24rpx;
 			margin-bottom: 20rpx;
 			transition: all 0.2s ease;
-
 			
 			.pkg-info {
 				flex: 1;
@@ -440,9 +462,11 @@
 		align-items: center;
 		justify-content: space-between;
 		background: #ffffff;
+		padding: 20rpx 0;
 		.price-box{
 			display: flex;
 			flex-direction: column;
+			margin-left: 24rpx;
 			.price-label{
 				font-size: 24rpx;
 				color: #64748b;

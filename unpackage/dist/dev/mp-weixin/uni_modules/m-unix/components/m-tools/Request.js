@@ -3,6 +3,7 @@ const common_vendor = require("../../../../common/vendor.js");
 const uni_modules_mUnix_components_mTools_ProjectConfig = require("./ProjectConfig.js");
 const uni_modules_mUnix_components_mTools_Storage = require("./Storage.js");
 const uni_modules_mUnix_components_mTools_Upload = require("./Upload.js");
+const common_config = require("../../../../common/config.js");
 class ApiResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$(T) {
     return {
@@ -217,7 +218,7 @@ function request(options) {
     // 添加 Token
   );
   if (withToken) {
-    const token = uni_modules_mUnix_components_mTools_Storage.storage.getToken();
+    const token = common_config.getToken();
     if (token != "") {
       reqHeader["token"] = token;
     }
@@ -344,16 +345,11 @@ const http = new common_vendor.UTSJSONObject(
 );
 new common_vendor.UTSJSONObject({
   request,
-  get,
-  post,
-  put,
-  delete: del,
   public: publicRequest,
   silent: silentRequest,
   loading: loadingRequest,
   http
 });
 exports.http = http;
-exports.post = post;
 exports.request = request;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/m-unix/components/m-tools/Request.js.map
