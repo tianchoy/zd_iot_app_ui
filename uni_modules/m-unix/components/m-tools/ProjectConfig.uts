@@ -103,21 +103,42 @@ const BUILTIN_DEFAULT: MUnixHostProjectConfig = {
 
 let _hostOverride: MUnixHostProjectConfig | null = null
 
+function readValue(source: any | null, key: string): any | null {
+	if (source == null) {
+		return null
+	}
+	const obj = source as UTSJSONObject
+	return obj[key]
+}
+
+function readString(source: any | null, key: string): string | null {
+	const value = readValue(source, key)
+	if (value == null) {
+		return null
+	}
+	return '' + value
+}
+
+function readObject(source: any | null, key: string): any | null {
+	const value = readValue(source, key)
+	if (value != null && typeof value === 'object') {
+		return value
+	}
+	return null
+}
+
 function mergeStorage(base: HostStorageConfig, p: any | null): HostStorageConfig {
 	const out: HostStorageConfig = {
 		token: base.token,
 		userInfo: base.userInfo,
 	}
-	if (p == null) {
-		return out
+	const pt = readString(p, 'token')
+	if (pt != null && pt.length > 0) {
+		out.token = pt
 	}
-	const pt = p.token
-	if (pt != null && ('' + pt).length > 0) {
-		out.token = '' + pt
-	}
-	const pu = p.userInfo
-	if (pu != null && ('' + pu).length > 0) {
-		out.userInfo = '' + pu
+	const pu = readString(p, 'userInfo')
+	if (pu != null && pu.length > 0) {
+		out.userInfo = pu
 	}
 	return out
 }
@@ -129,44 +150,45 @@ function mergeApi(base: HostApiConfig, p: any | null): HostApiConfig {
 		upload: { ...base.upload },
 		qrCodeImageApiBase: base.qrCodeImageApiBase,
 	}
-	if (p == null) {
-		return out
-	}
-	const pl = p.login
-	if (pl != null && typeof pl === 'object') {
-		const a = pl as any
-		const t1 = a.tokenLogin
+	const loginConfig = readObject(p, 'login')
+	if (loginConfig != null) {
+		const t1 = readString(loginConfig, 'tokenLogin')
 		if (t1 != null) {
-			out.login.tokenLogin = '' + t1
+			out.login.tokenLogin = t1
 		}
-		const t2 = a.codeGetOpenIdLogin
+		const t2 = readString(loginConfig, 'codeGetOpenIdLogin')
 		if (t2 != null) {
-			out.login.codeGetOpenIdLogin = '' + t2
+			out.login.codeGetOpenIdLogin = t2
 		}
-		const t3 = a.codeGetPhoneRegisterOrLogin
+		const t3 = readString(loginConfig, 'codeGetPhoneRegisterOrLogin')
 		if (t3 != null) {
-			out.login.codeGetPhoneRegisterOrLogin = '' + t3
+			out.login.codeGetPhoneRegisterOrLogin = t3
 		}
 	}
-	const pu = p.update
-	if (pu != null && typeof pu === 'object') {
-		const u = pu as any
-		const c = u.checkUpdate
+	const authConfig = readObject(p, 'auth')
+	if (authConfig != null) {
+		const authLogin = readString(authConfig, 'login')
+		if (authLogin != null && authLogin.length > 0) {
+			out.login.tokenLogin = authLogin
+		}
+	}
+	const updateConfig = readObject(p, 'update')
+	if (updateConfig != null) {
+		const c = readString(updateConfig, 'checkUpdate')
 		if (c != null) {
-			out.update.checkUpdate = '' + c
+			out.update.checkUpdate = c
 		}
 	}
-	const pupload = p.upload
-	if (pupload != null && typeof pupload === 'object') {
-		const up = pupload as any
-		const im = up.image
+	const uploadConfig = readObject(p, 'upload')
+	if (uploadConfig != null) {
+		const im = readString(uploadConfig, 'image')
 		if (im != null) {
-			out.upload.image = '' + im
+			out.upload.image = im
 		}
 	}
-	const pq = p.qrCodeImageApiBase
+	const pq = readString(p, 'qrCodeImageApiBase')
 	if (pq != null) {
-		out.qrCodeImageApiBase = '' + pq
+		out.qrCodeImageApiBase = pq
 	}
 	return out
 }
@@ -179,48 +201,44 @@ function mergeConfigInfo(base: HostConfigInfo, p: any | null): HostConfigInfo {
 		versionCode: base.versionCode,
 		versionName: base.versionName,
 	}
-	if (p == null) {
-		return out
-	}
-	const o = p as any
-	const n = o.name
+	const n = readString(p, 'name')
 	if (n != null) {
-		out.name = '' + n
+		out.name = n
 	}
-	const l = o.logo
+	const l = readString(p, 'logo')
 	if (l != null) {
-		out.logo = '' + l
+		out.logo = l
 	}
-	const d = o.desc
+	const d = readString(p, 'desc')
 	if (d != null) {
-		out.desc = '' + d
+		out.desc = d
 	}
-	const vc = o.versionCode
+	const vc = readString(p, 'versionCode')
 	if (vc != null) {
-		const num = parseInt('' + vc, 10)
+		const num = parseInt(vc, 10)
 		if (!isNaN(num)) {
 			out.versionCode = num
 		}
 	}
-	const vn = o.versionName
+	const vn = readString(p, 'versionName')
 	if (vn != null) {
-		out.versionName = '' + vn
+		out.versionName = vn
 	}
-	const ad = o.appDownloadUrl
+	const ad = readString(p, 'appDownloadUrl')
 	if (ad != null) {
-		out.appDownloadUrl = '' + ad
+		out.appDownloadUrl = ad
 	}
-	const ada = o.appDownloadUrlAndroid
+	const ada = readString(p, 'appDownloadUrlAndroid')
 	if (ada != null) {
-		out.appDownloadUrlAndroid = '' + ada
+		out.appDownloadUrlAndroid = ada
 	}
-	const ua = o.userAgreementArticleId
+	const ua = readString(p, 'userAgreementArticleId')
 	if (ua != null) {
-		out.userAgreementArticleId = '' + ua
+		out.userAgreementArticleId = ua
 	}
-	const pp = o.privacyPolicyArticleId
+	const pp = readString(p, 'privacyPolicyArticleId')
 	if (pp != null) {
-		out.privacyPolicyArticleId = '' + pp
+		out.privacyPolicyArticleId = pp
 	}
 	return out
 }
@@ -262,29 +280,28 @@ function mergeHostPatch(patch: any): MUnixHostProjectConfig {
 	if (patch == null) {
 		return out
 	}
-	const p = patch as any
-	const e = p.env
+	const e = readString(patch, 'env')
 	if (e != null) {
-		out.env = '' + e
+		out.env = e
 	}
-	const lb = p.localBaseUrl
+	const lb = readString(patch, 'localBaseUrl')
 	if (lb != null) {
-		out.localBaseUrl = '' + lb
+		out.localBaseUrl = lb
 	}
-	const db = p.devBaseUrl
+	const db = readString(patch, 'devBaseUrl')
 	if (db != null) {
-		out.devBaseUrl = '' + db
+		out.devBaseUrl = db
 	}
-	const pb = p.prodBaseUrl
+	const pb = readString(patch, 'prodBaseUrl')
 	if (pb != null) {
-		out.prodBaseUrl = '' + pb
+		out.prodBaseUrl = pb
 	}
-	const bu = p.baseUrl
+	const bu = readString(patch, 'baseUrl')
 	if (bu != null) {
-		out.baseUrl = '' + bu
+		out.baseUrl = bu
 	}
-	out.storage = mergeStorage(base.storage, p.storage)
-	const paths = p.loginRequiredPaths
+	out.storage = mergeStorage(base.storage, readObject(patch, 'storage'))
+	const paths = readValue(patch, 'loginRequiredPaths')
 	if (paths != null && paths instanceof Array) {
 		const arr: string[] = []
 		const pa = paths as any[]
@@ -293,13 +310,13 @@ function mergeHostPatch(patch: any): MUnixHostProjectConfig {
 		}
 		out.loginRequiredPaths = arr
 	}
-	const lp = p.loginPagePath
-	if (lp != null && ('' + lp).length > 0) {
-		out.loginPagePath = '' + lp
+	const lp = readString(patch, 'loginPagePath')
+	if (lp != null && lp.length > 0) {
+		out.loginPagePath = lp
 	}
-	out.api = mergeApi(base.api, p.api)
-	out.configInfo = mergeConfigInfo(base.configInfo, p.configInfo)
-	const mui = p.mUi
+	out.api = mergeApi(base.api, readObject(patch, 'api'))
+	out.configInfo = mergeConfigInfo(base.configInfo, readObject(patch, 'configInfo'))
+	const mui = readValue(patch, 'mUi')
 	if (mui != null) {
 		out.mUi = mui
 	}

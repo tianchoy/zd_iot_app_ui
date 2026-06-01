@@ -18,6 +18,14 @@ import {
 	M_UI_BUILTIN_PLACEHOLDER_ARTICLE,
 } from '@/uni_modules/m-unix/config.uts'
 
+function stringify(value: any): string {
+	return '' + value
+}
+
+function trimCompat(value: string): string {
+	return value.replace(/^\s+|\s+$/g, '')
+}
+
 export {
 	getMUiConfig,
 	setMUiConfig,
@@ -103,9 +111,9 @@ export function apiStop() {
 
 /** 判空 */
 export function isEmpty(content: string | null | undefined): boolean {
-	if (content == null || content == undefined) return true
+	if (content == null) return true
 	const s = content as string
-	return typeof s === 'string' && s.trim() == ''
+	return trimCompat(s) == ''
 }
 
 /** 身份证验证 */
@@ -121,8 +129,8 @@ export type MoneyUnitValue = {
 
 /** 数值转单位（元/万/亿） */
 export function changeMoney(num: number): MoneyUnitValue {
-	const n = Number(num)
-	if (n <= 1) return { num: String(n), unit: '元' }
+	const n = num
+	if (n <= 1) return { num: stringify(n), unit: '元' }
 	const units = ['元', '万', '亿', '万亿']
 	let curNum = n
 	let curUnit = units[0]
@@ -131,7 +139,7 @@ export function changeMoney(num: number): MoneyUnitValue {
 		if (strNumSize(curNum) < 5) break
 		curNum = curNum / 10000
 	}
-	return { num: Number(curNum).toFixed(2), unit: curUnit }
+	return { num: curNum.toFixed(2), unit: curUnit }
 }
 function strNumSize(tempNum: number): number {
 	const s = tempNum.toString()
@@ -164,8 +172,10 @@ export function validateEmail(email: string): boolean {
 
 /** 手机号脱敏 */
 export function maskPhoneNumber(phoneNumber: string | null | undefined): string {
-	if (phoneNumber == null || phoneNumber == undefined) return ''
-	return phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
+	if (phoneNumber == null) return ''
+	const phone = phoneNumber as string
+	if (phone.length != 11) return phone
+	return phone.substring(0, 3) + '****' + phone.substring(7, 11)
 }
 
 /** 生成订单号 */
@@ -190,7 +200,7 @@ export function toCssLength(value: number | string): string {
 	if (typeof value === 'number') {
 		return value + 'rpx'
 	}
-	const s = (value as string).trim()
+	const s = trimCompat(value as string)
 	if (s.length === 0) {
 		return '0rpx'
 	}
@@ -333,7 +343,7 @@ export function parseCssNumber(value: number | string): number {
 	if (typeof value === 'number') {
 		return value
 	}
-	const s = (value as string).trim()
+	const s = trimCompat(value as string)
 	if (s.length === 0) {
 		return 0
 	}
@@ -381,7 +391,7 @@ function parseApiEnvelope<T>(raw: any): R<T> | null {
 		return raw as R<T>
 	}
 	if (typeof raw === 'string') {
-		const s = raw.trim()
+		const s = trimCompat(raw as string)
 		if (s.length === 0) {
 			return null
 		}
@@ -398,7 +408,7 @@ function parseApiEnvelope<T>(raw: any): R<T> | null {
 function httpStatusError(statusCode: number, resData: any): Error {
 	let detail = ''
 	if (typeof resData === 'string') {
-		const s = resData.trim()
+		const s = trimCompat(resData as string)
 		if (s.length > 0) {
 			detail = s.length > 160 ? s.substring(0, 160) + '…' : s
 		}
@@ -410,23 +420,23 @@ function httpStatusError(statusCode: number, resData: any): Error {
 	return new Error(base)
 }
 
-const getReqUrl = () => {
-	const envConfig = {
-		development: mConfigInfo().development,
-		production: mConfigInfo().production,
+const getReqUrl = (): string => {
+	const env = process.env.NODE_ENV
+	const config = mConfigInfo()
+	if (env == 'production') {
+		return config.production as string
 	}
-	return (
-		envConfig[process.env.NODE_ENV] ||
-		(() => {
-			console.error(`未知环境: ${process.env.NODE_ENV}`)
-			return ''
-		})()
-	)
+	if (env == 'development') {
+		return config.development as string
+	}
+	console.error(`未知环境: ${env}`)
+	return ''
 }
 
-const showLoading = (title?: string, mask = true) => {
+const showLoading = (title?: string, mask?: boolean) => {
+	const useMask = mask == null ? true : mask
 	uni.showLoading({
-		mask: mask,
+		mask: useMask,
 		title: title || '请稍候...',
 	})
 }
@@ -459,7 +469,8 @@ const tools = {
 	 * 获取ref对象
 	 */
 	getRef(than : any, name : string) {
-		let toastRef = than.$refs[name] as any;
+		let refs = (than as UTSJSONObject)['$refs'] as UTSJSONObject;
+		let toastRef = refs[name] as any;
 		return toastRef;
 	},
 	/**
@@ -467,12 +478,11 @@ const tools = {
 	 * this.$m.showTips(this,"toast","一般消息提示~")
 	 */
 	showTips(than : any, name : string, msg : string) {
-		let toastRef = than.$refs[name] as any;
-		let options = {
-			msg: msg,
+		uni.showToast({
+			title: msg,
+			icon: 'none',
 			duration: 2000
-		};
-		toastRef.showTips(options);
+		})
 	},
 	/**
 	 * 提示消息
@@ -496,7 +506,8 @@ const tools = {
 	 * @param {Object} confirmColor 取消按钮的文字颜色
 	 * @param {Object} confirmText 确定按钮的文字
 	 */
-	modal: (title : string, content : string, showCancel : boolean, callback ?: any, confirmColor ?: string, confirmText ?: string) => {
+	modal: (title : string, content : string, showCancel : boolean, callback ?: (success: boolean) => void, confirmColor ?: string, confirmText ?: string) => {
+		const cb = callback
 		uni.showModal({
 			title: title || '提示',
 			content: content,
@@ -506,9 +517,13 @@ const tools = {
 			confirmText: confirmText || "确定",
 			success(res) {
 				if (res.confirm) {
-					callback && callback(true)
+					if (cb != null) {
+						cb(true)
+					}
 				} else {
-					callback && callback(false)
+					if (cb != null) {
+						cb(false)
+					}
 				}
 			}
 		})
@@ -563,17 +578,17 @@ const tools = {
 	 * isLogin：是否登录验证 默认不验证
 	 * target： 打开方式 默认 新窗口打开
 	 */
-	href(url : string, paramsOrVerify ?: HrefParams, isLogin : boolean = false, target : string = "_blank") {
+	href(url : string, paramsOrVerify ?: HrefParams, isLogin ?: boolean, target ?: string) : void {
+		let needVerify = isLogin == null ? false : isLogin
+		let openTarget = target == null ? "_blank" : target
 		// 参数类型处理
-		let params : object = {};
+		let query = ''
 		if (typeof paramsOrVerify === 'boolean') {
-			isLogin = paramsOrVerify;
+			needVerify = paramsOrVerify;
 		} else if (typeof paramsOrVerify === 'string') {
-			target = paramsOrVerify;
-		} else if (paramsOrVerify) {
-			params = paramsOrVerify;
+			openTarget = paramsOrVerify;
 		}
-		if (isLogin && !new LoginObject().isLogin()) {
+		if (needVerify && !new LoginObject().isLogin()) {
 			uni.navigateTo({
 				url: '/pages/me/login'
 			})
@@ -581,33 +596,26 @@ const tools = {
 		}
 		if (!url) return console.error('跳转路径不能为空');
 
-		// 处理参数（自动编码）
-		const query = Object.keys(params).map(k =>
-			`${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`
-		).join('&');
+		const endUrl = url + (query.length > 0 ? `?${query}` : '');
 
-		const endUrl = url + (query ? `?${query}` : '');
-
-		// 自动选择跳转方式
-		try {
-			if (url.startsWith('/pages/tab/')) { // 假设Tab页路径包含 /tab/
-				uni.switchTab({ url: endUrl });
-			} else if (getCurrentPages().length >= 9) {
-				uni.redirectTo({ url: endUrl });
-			} else {
-				if (target === '_self') {
-					uni.redirectTo({url: endUrl});
-				} else {
-					uni.navigateTo({ url: endUrl,animationType:"slide-in-right"});
-				}
-			}
-		} catch (e) {
-			uni.showToast({ title: '跳转失败', icon: 'none' });
+		if (url.startsWith('/pages/tab/')) {
+			uni.switchTab({ url: endUrl })
+			return
 		}
+		if (getCurrentPages().length >= 9) {
+			uni.redirectTo({ url: endUrl })
+			return
+		}
+		if (openTarget === '_self') {
+			uni.redirectTo({ url: endUrl })
+			return
+		}
+		uni.navigateTo({ url: endUrl, animationType: "slide-in-right" })
 	},
-	back(delta = 1) {
+	back(delta ?: number) {
+		const backDelta = delta == null ? 1 : delta
 		console.log("Back")
-		uni.navigateBack({ delta,animationType:"slide-out-left" });
+		uni.navigateBack({ delta: backDelta, animationType: "slide-out-left" });
 	},
 	upx2px(upx : number, def ?: number) {
 		return upx * 2
@@ -673,38 +681,35 @@ const tools = {
 	 * @param {Object} fdate 时间
 	 * 日期格式化
 	 */
-	formatDate: function (formatStr : string, fdate : string) {
+	formatDate: function (formatStr : string, fdate : string) : string {
 		if (fdate) {
 			if (~fdate.indexOf('.')) {
 				fdate = fdate.substring(0, fdate.indexOf('.'));
 			}
 			fdate = fdate.toString().replace('T', ' ').replace(/\-/g, '/');
-			var fTime, fStr = 'ymdhis';
+			let fStr = 'ymdhis';
 			if (!formatStr)
 				formatStr = "y-m-d h:i:s";
-			if (fdate)
-				fTime = new Date(fdate);
-			else
-				fTime = new Date();
-			var month = fTime.getMonth() + 1;
-			var day = fTime.getDate();
-			var hours = fTime.getHours();
-			var minu = fTime.getMinutes();
-			var second = fTime.getSeconds();
-			month = month < 10 ? '0' + month : month;
-			day = day < 10 ? '0' + day : day;
-			hours = hours < 10 ? ('0' + hours) : hours;
-			minu = minu < 10 ? '0' + minu : minu;
-			second = second < 10 ? '0' + second : second;
-			var formatArr = [
+			let fTime = new Date(fdate);
+			let month = fTime.getMonth() + 1;
+			let day = fTime.getDate();
+			let hours = fTime.getHours();
+			let minu = fTime.getMinutes();
+			let second = fTime.getSeconds();
+			let monthStr = month < 10 ? '0' + month : month.toString();
+			let dayStr = day < 10 ? '0' + day : day.toString();
+			let hoursStr = hours < 10 ? '0' + hours : hours.toString();
+			let minuStr = minu < 10 ? '0' + minu : minu.toString();
+			let secondStr = second < 10 ? '0' + second : second.toString();
+			let formatArr = [
 				fTime.getFullYear().toString(),
-				month.toString(),
-				day.toString(),
-				hours.toString(),
-				minu.toString(),
-				second.toString()
+				monthStr,
+				dayStr,
+				hoursStr,
+				minuStr,
+				secondStr
 			]
-			for (var i = 0; i < formatArr.length; i++) {
+			for (let i = 0; i < formatArr.length; i++) {
 				formatStr = formatStr.replace(fStr.charAt(i), formatArr[i]);
 			}
 			return formatStr;
@@ -726,10 +731,10 @@ const tools = {
 	 * @param {object} url 接口地址
 	 * @param {object} params 报文
 	 */
-	httpGet: <T>(url : string, params : any, showMgs ?: boolean) : Promise<T> => {
+	httpGet: (url : string, params : any, showMgs ?: boolean) : Promise<any> => {
 		return new Promise((resolve, reject) => {
 			let isTimeout = false;
-			let requestTask : any = null;
+			let requestTask : any | null = null;
 
 			// 显示加载状态
 			uni.showLoading({ title: '加载中', mask: true });
@@ -737,19 +742,14 @@ const tools = {
 			// 处理超时逻辑
 			const timeoutId = setTimeout(() => {
 				isTimeout = true;
-				if (requestTask != null) {
-					requestTask.abort()
-				}
 				uni.hideLoading();
 				mToastMsg("请求超时，请重试");
 				reject(new Error('Request timeout'));
 			}, 5000);
 
 			// 构建查询字符串
-			const queryString = Object.keys(params)
-				.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-				.join('&');
-			const finalUrl = `${getReqUrl()}${url}${url.includes('?') ? '&' : '?'}${queryString}`;
+			const queryString = ''
+			const finalUrl = `${getReqUrl()}${url}${queryString.length > 0 ? (url.includes('?') ? '&' : '?') + queryString : ''}`;
 
 			requestTask = uni.request({
 				url: finalUrl,
@@ -763,37 +763,38 @@ const tools = {
 					clearTimeout(timeoutId);
 					uni.hideLoading();
 
-					if (res.statusCode === HttpStatus.SUCCESS) {
-						let response : R<T> | null = null
+					if (res.statusCode === 200) {
+						let response : R<any> | null = null
 						try {
-							response = parseApiEnvelope<T>(res.data)
+							response = parseApiEnvelope<any>(res.data as any)
 						} catch (e) {
-							const m = e instanceof Error ? e.message : String(e)
+							const m = e instanceof Error ? e.message : '' + e
 							reject(new Error(m))
 							return
 						}
 						if (!response) {
-							resolve(null as T)
+							reject(new Error('响应为空'))
 							return
 						}
+						const resp = response as R<any>
 
 						// 处理权限问题
-						if (response.code === 403) {
-							reject(new Error(response.msg != null && response.msg.length > 0 ? response.msg : '请重新登录'));
+						if (resp.code === 403) {
+							reject(new Error(resp.msg != null && resp.msg.length > 0 ? resp.msg : '请重新登录'));
 							return
 						}
 
 						// 处理业务成功状态
-						if (response.code === HttpStatus.SUCCESS) {
-							resolve(response.data);
+						if (resp.code === 200) {
+							resolve(resp.data);
 						} else {
 							if (showMgs) {
-								mToastMsg(response.msg != null && response.msg.length > 0 ? response.msg : '请求处理失败');
+								mToastMsg(resp.msg != null && resp.msg.length > 0 ? resp.msg : '请求处理失败');
 							}
-							reject(new Error(response.msg != null ? response.msg : '请求处理失败'));
+							reject(new Error(resp.msg != null ? resp.msg : '请求处理失败'));
 						}
 					} else {
-						reject(httpStatusError(res.statusCode, res.data));
+						reject(httpStatusError(res.statusCode, res.data as any));
 					}
 				},
 				fail: (err) => {
@@ -853,33 +854,34 @@ const tools = {
 					clearTimeout(timeoutId);
 					uni.hideLoading();
 
-					if (res.statusCode === HttpStatus.SUCCESS) {
-						let response : R<T> | null = null
+					if (res.statusCode === 200) {
+						let response : R<any> | null = null
 						try {
-							response = parseApiEnvelope<T>(res.data)
+							response = parseApiEnvelope<any>(res.data as any)
 						} catch (e) {
-							const m = e instanceof Error ? e.message : String(e)
+							const m = e instanceof Error ? e.message : '' + e
 							reject(new Error(m))
 							return
 						}
 						if (!response) {
-							resolve(null as T)
+							reject(new Error('响应为空'))
+							return
+						}
+						const resp = response as R<any>
+
+						if (resp.code === 403) {
+							reject(new Error(resp.msg != null && resp.msg.length > 0 ? resp.msg : '请重新登录'));
 							return
 						}
 
-						if (response.code === 403) {
-							reject(new Error(response.msg != null && response.msg.length > 0 ? response.msg : '请重新登录'));
-							return
-						}
-
-						if (response.code === HttpStatus.SUCCESS) {
-							resolve(response.data);
+						if (resp.code === 200) {
+							resolve(resp.data);
 						} else {
-							mToastMsg(response.msg != null && response.msg.length > 0 ? response.msg : '请求处理失败');
-							reject(new Error(response.msg != null ? response.msg : '请求处理失败'));
+							mToastMsg(resp.msg != null && resp.msg.length > 0 ? resp.msg : '请求处理失败');
+							reject(new Error(resp.msg != null ? resp.msg : '请求处理失败'));
 						}
 					} else {
-						reject(httpStatusError(res.statusCode, res.data));
+						reject(httpStatusError(res.statusCode, res.data as any));
 					}
 				},
 				fail: (err) => {

@@ -167,18 +167,5 @@ const config = new ProjectConfig({
   loginPagePath: "",
   loginRequiredPaths: []
 });
-function getToken() {
-  const token = common_vendor.index.getStorageSync(config.storage.token);
-  if (token == null) {
-    return "";
-  }
-  return token;
-}
-function clearToken() {
-  common_vendor.index.removeStorageSync(config.storage.token);
-  common_vendor.index.removeStorageSync(config.storage.refreshToken);
-}
-exports.clearToken = clearToken;
 exports.config = config;
-exports.getToken = getToken;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/config.js.map

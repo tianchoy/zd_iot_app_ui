@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-require("./request.js");
+const uni_modules_mUnix_components_mTools_Request = require("../uni_modules/m-unix/components/m-tools/Request.js");
 require("../common/config.js");
 class LoginParams extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -48,4 +48,13 @@ class LoginData extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+const login = (params) => {
+  const data = new common_vendor.UTSJSONObject({
+    "phone": params.phone,
+    "password": params.password
+  });
+  return uni_modules_mUnix_components_mTools_Request.post("/user/login", data, null);
+};
+exports.LoginParams = LoginParams;
+exports.login = login;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

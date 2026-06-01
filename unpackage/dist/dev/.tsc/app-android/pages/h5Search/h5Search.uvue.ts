@@ -101,9 +101,10 @@ const _cache = __ins.renderCache;
 	}
 	
 	// 监听扫码结果
-	const onScanResult = (data: any) => {
-		if (data && data.result) {
-			cardNumber.value = data.result
+	const onScanResult = (data: UTSJSONObject) => {
+		const result = data.getString('result') ?? ''
+		if (result.length > 0) {
+			cardNumber.value = result
 			uni.showToast({
 				title: '扫码成功',
 				icon: 'success'

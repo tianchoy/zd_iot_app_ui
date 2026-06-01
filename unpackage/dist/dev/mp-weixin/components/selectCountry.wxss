@@ -93,7 +93,6 @@
   font-size: 28rpx;
   color: #333333;
   line-height: 1.4;
-  word-break: break-all;
 }
 .option-item .check-icon.data-v-0594d1ce {
   width: 48rpx;

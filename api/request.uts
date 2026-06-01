@@ -25,6 +25,31 @@ const defaultConfig: RequestConfig = {
   needAuth: false
 }
 
+function resolveRequestConfig(requestConfig?: RequestConfig): RequestConfig {
+  const out: RequestConfig = {
+    showLoading: defaultConfig.showLoading,
+    loadingText: defaultConfig.loadingText,
+    showError: defaultConfig.showError,
+    needAuth: defaultConfig.needAuth
+  }
+  if (requestConfig == null) {
+    return out
+  }
+  if (requestConfig.showLoading != null) {
+    out.showLoading = requestConfig.showLoading
+  }
+  if (requestConfig.loadingText != null) {
+    out.loadingText = requestConfig.loadingText
+  }
+  if (requestConfig.showError != null) {
+    out.showError = requestConfig.showError
+  }
+  if (requestConfig.needAuth != null) {
+    out.needAuth = requestConfig.needAuth
+  }
+  return out
+}
+
 // 加载状态
 let loadingCount = 0
 let loadingTimer: number | null = null
@@ -42,8 +67,9 @@ function hideLoading() {
   loadingCount--
   if (loadingCount <= 0) {
     loadingCount = 0
-    if (loadingTimer !== null) {
-      clearTimeout(loadingTimer)
+    const timer = loadingTimer
+    if (timer !== null) {
+      clearTimeout(timer)
       loadingTimer = null
     }
     uni.hideLoading()
@@ -57,7 +83,7 @@ async function request<T = any>(
   data?: any,
   requestConfig?: RequestConfig
 ): Promise<ApiResponse<T>> {
-  const reqConfig = { ...defaultConfig, ...requestConfig }
+  const reqConfig = resolveRequestConfig(requestConfig)
   
   // 检查登录
   if (reqConfig.needAuth) {
@@ -70,12 +96,12 @@ async function request<T = any>(
   
   // 显示 loading
   if (reqConfig.showLoading) {
-    showLoading(reqConfig.loadingText || '加载中...')
+    showLoading(reqConfig.loadingText != null ? reqConfig.loadingText! : '加载中...')
   }
   
   try {
     // 构建请求头
-    const header: Record<string, string> = {
+    const header: UTSJSONObject = {
       'Content-Type': 'application/json'
     }
     

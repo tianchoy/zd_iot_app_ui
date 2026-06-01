@@ -105,7 +105,7 @@ function trimStr(s = null) {
   if (s == null) {
     return "";
   }
-  return s.trim();
+  return "" + s;
 }
 function pickChain(a, b, c, defaultVal) {
   const x = trimStr(a);

@@ -9,6 +9,12 @@ const uni_modules_mUnix_components_mTools_Auth = require("./Auth.js");
 const uni_modules_mUnix_components_mTools_Request = require("./Request.js");
 const uni_modules_mUnix_components_mTools_useAuth = require("./useAuth.js");
 const uni_modules_mUnix_config = require("../../config.js");
+function stringify(value = null) {
+  return "" + value;
+}
+function trimCompat(value) {
+  return value.replace(/^\s+|\s+$/g, "");
+}
 const tabBarPaths = [
   "/pages/components/components",
   "/pages/tools/tools",
@@ -45,13 +51,13 @@ function set(key, value = null) {
   try {
     common_vendor.index.setStorageSync(key, value);
   } catch (e) {
-    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:84", "ut set error", e);
+    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:92", "ut set error", e);
   }
 }
 function jslog(title, obj = null) {
   if (title == "" || obj == null)
     return null;
-  common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:91", "【打印】:" + title + "=>", common_vendor.UTS.JSON.stringify(obj));
+  common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:99", "【打印】:" + title + "=>", common_vendor.UTS.JSON.stringify(obj));
 }
 function apiStart() {
   common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "加载中..." }));
@@ -60,10 +66,10 @@ function apiStop() {
   common_vendor.index.hideLoading();
 }
 function isEmpty(content = null) {
-  if (content == null || content == void 0)
+  if (content == null)
     return true;
   const s = content;
-  return typeof s === "string" && s.trim() == "";
+  return trimCompat(s) == "";
 }
 function checkNumber(number) {
   const regexCard = /^(^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}(\d|X|x)?$)$/;
@@ -91,9 +97,9 @@ class MoneyUnitValue extends common_vendor.UTS.UTSType {
   }
 }
 function changeMoney(num) {
-  const n = Number(num);
+  const n = num;
   if (n <= 1)
-    return new MoneyUnitValue({ num: String(n), unit: "元" });
+    return new MoneyUnitValue({ num: stringify(n), unit: "元" });
   const units = ["元", "万", "亿", "万亿"];
   let curNum = n;
   let curUnit = units[0];
@@ -103,7 +109,7 @@ function changeMoney(num) {
       break;
     curNum = curNum / 1e4;
   }
-  return new MoneyUnitValue({ num: Number(curNum).toFixed(2), unit: curUnit });
+  return new MoneyUnitValue({ num: curNum.toFixed(2), unit: curUnit });
 }
 function strNumSize(tempNum) {
   const s = tempNum.toString();
@@ -128,9 +134,12 @@ function validateEmail(email) {
   return emailRegex.test(email);
 }
 function maskPhoneNumber(phoneNumber = null) {
-  if (phoneNumber == null || phoneNumber == void 0)
+  if (phoneNumber == null)
     return "";
-  return phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2");
+  const phone = phoneNumber;
+  if (phone.length != 11)
+    return phone;
+  return phone.substring(0, 3) + "****" + phone.substring(7, 11);
 }
 function generateOrderNumber() {
   const date = /* @__PURE__ */ new Date();
@@ -148,7 +157,7 @@ function toCssLength(value) {
   if (typeof value === "number") {
     return value + "rpx";
   }
-  const s = value.trim();
+  const s = trimCompat(value);
   if (s.length === 0) {
     return "0rpx";
   }
@@ -175,7 +184,7 @@ function parseCssNumber(value) {
   if (typeof value === "number") {
     return value;
   }
-  const s = value.trim();
+  const s = trimCompat(value);
   if (s.length === 0) {
     return 0;
   }
@@ -214,7 +223,7 @@ function parseApiEnvelope(raw = null) {
     return raw;
   }
   if (typeof raw === "string") {
-    const s = raw.trim();
+    const s = trimCompat(raw);
     if (s.length === 0) {
       return null;
     }
@@ -230,7 +239,7 @@ function parseApiEnvelope(raw = null) {
 function httpStatusError(statusCode, resData = null) {
   let detail = "";
   if (typeof resData === "string") {
-    const s = resData.trim();
+    const s = trimCompat(resData);
     if (s.length > 0) {
       detail = s.length > 160 ? s.substring(0, 160) + "…" : s;
     }
@@ -242,18 +251,15 @@ function httpStatusError(statusCode, resData = null) {
   return new Error(base);
 }
 const getReqUrl = () => {
-  const envConfig = new common_vendor.UTSJSONObject({
-    development: mConfigInfo().development,
-    production: mConfigInfo().production
-  });
-  return envConfig["development"] || (() => {
-    common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:421", `未知环境: ${"development"}`);
-    return "";
-  })();
+  const config = mConfigInfo();
+  {
+    return config.development;
+  }
 };
-const showLoading = (title = null, mask = true) => {
+const showLoading = (title = null, mask = null) => {
+  const useMask = mask == null ? true : mask;
   common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
-    mask,
+    mask: useMask,
     title: title || "请稍候..."
   }));
 };
@@ -285,7 +291,8 @@ new common_vendor.UTSJSONObject({
    * 获取ref对象
    */
   getRef(than = null, name) {
-    let toastRef = than.$refs[name];
+    let refs = than["$refs"];
+    let toastRef = refs[name];
     return toastRef;
   },
   /**
@@ -293,12 +300,11 @@ new common_vendor.UTSJSONObject({
    * this.$m.showTips(this,"toast","一般消息提示~")
    */
   showTips(than = null, name, msg2) {
-    let toastRef = than.$refs[name];
-    let options = new common_vendor.UTSJSONObject({
-      msg: msg2,
+    common_vendor.index.showToast({
+      title: msg2,
+      icon: "none",
       duration: 2e3
     });
-    toastRef.showTips(options);
   },
   /**
    * 提示消息
@@ -323,6 +329,7 @@ new common_vendor.UTSJSONObject({
    * @param {Object} confirmText 确定按钮的文字
    */
   modal: (title, content, showCancel, callback = null, confirmColor = null, confirmText = null) => {
+    const cb = callback;
     common_vendor.index.showModal(new common_vendor.UTSJSONObject({
       title: title || "提示",
       content,
@@ -332,9 +339,13 @@ new common_vendor.UTSJSONObject({
       confirmText: confirmText || "确定",
       success(res) {
         if (res.confirm) {
-          callback && callback(true);
+          if (cb != null) {
+            cb(true);
+          }
         } else {
-          callback && callback(false);
+          if (cb != null) {
+            cb(false);
+          }
         }
       }
     }));
@@ -373,46 +384,42 @@ new common_vendor.UTSJSONObject({
    * isLogin：是否登录验证 默认不验证
    * target： 打开方式 默认 新窗口打开
    */
-  href(url, paramsOrVerify = null, isLogin = false, target = "_blank") {
-    let params = {};
+  href(url, paramsOrVerify = null, isLogin = null, target = null) {
+    let needVerify = isLogin == null ? false : isLogin;
+    let openTarget = target == null ? "_blank" : target;
+    let query = "";
     if (typeof paramsOrVerify === "boolean") {
-      isLogin = paramsOrVerify;
+      needVerify = paramsOrVerify;
     } else if (typeof paramsOrVerify === "string") {
-      target = paramsOrVerify;
-    } else if (paramsOrVerify) {
-      params = paramsOrVerify;
+      openTarget = paramsOrVerify;
     }
-    if (isLogin && !new uni_modules_mUnix_components_mTools_LoginObject.LoginObject().isLogin()) {
+    if (needVerify && !new uni_modules_mUnix_components_mTools_LoginObject.LoginObject().isLogin()) {
       common_vendor.index.navigateTo({
         url: "/pages/me/login"
       });
-      return common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:580", "登录失效");
+      return common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:595", "登录失效");
     }
     if (!url)
-      return common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:582", "跳转路径不能为空");
-    const query = Object.keys(params).map((k) => {
-      return `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`;
-    }).join("&");
-    const endUrl = url + (query ? `?${query}` : "");
-    try {
-      if (url.startsWith("/pages/tab/")) {
-        common_vendor.index.switchTab({ url: endUrl });
-      } else if (getCurrentPages().length >= 9) {
-        common_vendor.index.redirectTo({ url: endUrl });
-      } else {
-        if (target === "_self") {
-          common_vendor.index.redirectTo({ url: endUrl });
-        } else {
-          common_vendor.index.navigateTo({ url: endUrl, animationType: "slide-in-right" });
-        }
-      }
-    } catch (e) {
-      common_vendor.index.showToast({ title: "跳转失败", icon: "none" });
+      return common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/Ut.uts:597", "跳转路径不能为空");
+    const endUrl = url + (query.length > 0 ? `?${query}` : "");
+    if (url.startsWith("/pages/tab/")) {
+      common_vendor.index.switchTab({ url: endUrl });
+      return null;
     }
+    if (getCurrentPages().length >= 9) {
+      common_vendor.index.redirectTo({ url: endUrl });
+      return null;
+    }
+    if (openTarget === "_self") {
+      common_vendor.index.redirectTo({ url: endUrl });
+      return null;
+    }
+    common_vendor.index.navigateTo({ url: endUrl, animationType: "slide-in-right" });
   },
-  back(delta = 1) {
-    common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:609", "Back");
-    common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta, animationType: "slide-out-left" }));
+  back(delta = null) {
+    const backDelta = delta == null ? 1 : delta;
+    common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:617", "Back");
+    common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({ delta: backDelta, animationType: "slide-out-left" }));
   },
   upx2px(upx, def = null) {
     return upx * 2;
@@ -423,22 +430,22 @@ new common_vendor.UTSJSONObject({
   runType: () => {
     switch (common_vendor.index.getDeviceInfo().platform) {
       case "android":
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:621", "运行Android上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:629", "运行Android上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.Android;
       case "ios":
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:624", "运行iOS上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:632", "运行iOS上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.IOS;
       case "harmonyos":
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:627", "运行鸿蒙系统上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:635", "运行鸿蒙系统上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.HarmonyOs;
       case "mac":
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:630", "运行mac上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:638", "运行mac上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.IOS;
       case "windows":
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:633", "运行Windows上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:641", "运行Windows上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.Windows;
       default:
-        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:636", "运行在开发者工具上");
+        common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Ut.uts:644", "运行在开发者工具上");
         return uni_modules_mUnix_components_mTools_uenum_SysEnum.RunType.WxAppl;
     }
   },
@@ -483,32 +490,29 @@ new common_vendor.UTSJSONObject({
         fdate = fdate.substring(0, fdate.indexOf("."));
       }
       fdate = fdate.toString().replace("T", " ").replace(/\-/g, "/");
-      var fTime = null, fStr = "ymdhis";
+      let fStr = "ymdhis";
       if (!formatStr)
         formatStr = "y-m-d h:i:s";
-      if (fdate)
-        fTime = new Date(fdate);
-      else
-        fTime = /* @__PURE__ */ new Date();
-      var month = fTime.getMonth() + 1;
-      var day = fTime.getDate();
-      var hours = fTime.getHours();
-      var minu = fTime.getMinutes();
-      var second = fTime.getSeconds();
-      month = month < 10 ? "0" + month : month;
-      day = day < 10 ? "0" + day : day;
-      hours = hours < 10 ? "0" + hours : hours;
-      minu = minu < 10 ? "0" + minu : minu;
-      second = second < 10 ? "0" + second : second;
-      var formatArr = [
+      let fTime = new Date(fdate);
+      let month = fTime.getMonth() + 1;
+      let day = fTime.getDate();
+      let hours = fTime.getHours();
+      let minu = fTime.getMinutes();
+      let second = fTime.getSeconds();
+      let monthStr = month < 10 ? "0" + month : month.toString();
+      let dayStr = day < 10 ? "0" + day : day.toString();
+      let hoursStr = hours < 10 ? "0" + hours : hours.toString();
+      let minuStr = minu < 10 ? "0" + minu : minu.toString();
+      let secondStr = second < 10 ? "0" + second : second.toString();
+      let formatArr = [
         fTime.getFullYear().toString(),
-        month.toString(),
-        day.toString(),
-        hours.toString(),
-        minu.toString(),
-        second.toString()
+        monthStr,
+        dayStr,
+        hoursStr,
+        minuStr,
+        secondStr
       ];
-      for (var i = 0; i < formatArr.length; i++) {
+      for (let i = 0; i < formatArr.length; i++) {
         formatStr = formatStr.replace(fStr.charAt(i), formatArr[i]);
       }
       return formatStr;
@@ -532,22 +536,16 @@ new common_vendor.UTSJSONObject({
   httpGet: (url, params = null, showMgs = null) => {
     return new Promise((resolve, reject) => {
       let isTimeout = false;
-      let requestTask = null;
       common_vendor.index.showLoading(new common_vendor.UTSJSONObject({ title: "加载中", mask: true }));
       const timeoutId = setTimeout(() => {
         isTimeout = true;
-        if (requestTask != null) {
-          requestTask.abort();
-        }
         common_vendor.index.hideLoading();
         mToastMsg("请求超时，请重试");
         reject(new Error("Request timeout"));
       }, 5e3);
-      const queryString = Object.keys(params).map((key) => {
-        return `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`;
-      }).join("&");
-      const finalUrl = `${getReqUrl()}${url}${url.includes("?") ? "&" : "?"}${queryString}`;
-      requestTask = common_vendor.index.request({
+      const queryString = "";
+      const finalUrl = `${getReqUrl()}${url}${queryString.length > 0 ? (url.includes("?") ? "&" : "?") + queryString : ""}`;
+      common_vendor.index.request({
         url: finalUrl,
         header: new common_vendor.UTSJSONObject({
           "Authorization": new uni_modules_mUnix_components_mTools_LoginObject.LoginObject().getToken()
@@ -558,30 +556,31 @@ new common_vendor.UTSJSONObject({
         success: (res) => {
           clearTimeout(timeoutId);
           common_vendor.index.hideLoading();
-          if (res.statusCode === uni_modules_mUnix_components_mTools_uenum_SysEnum.HttpStatus.SUCCESS) {
+          if (res.statusCode === 200) {
             let response = null;
             try {
               response = parseApiEnvelope(res.data);
             } catch (e) {
-              const m = common_vendor.UTS.isInstanceOf(e, Error) ? e.message : String(e);
+              const m = common_vendor.UTS.isInstanceOf(e, Error) ? e.message : "" + e;
               reject(new Error(m));
               return null;
             }
             if (!response) {
-              resolve(null);
+              reject(new Error("响应为空"));
               return null;
             }
-            if (response.code === 403) {
-              reject(new Error(response.msg != null && response.msg.length > 0 ? response.msg : "请重新登录"));
+            const resp = response;
+            if (resp.code === 403) {
+              reject(new Error(resp.msg != null && resp.msg.length > 0 ? resp.msg : "请重新登录"));
               return null;
             }
-            if (response.code === uni_modules_mUnix_components_mTools_uenum_SysEnum.HttpStatus.SUCCESS) {
-              resolve(response.data);
+            if (resp.code === 200) {
+              resolve(resp.data);
             } else {
               if (showMgs) {
-                mToastMsg(response.msg != null && response.msg.length > 0 ? response.msg : "请求处理失败");
+                mToastMsg(resp.msg != null && resp.msg.length > 0 ? resp.msg : "请求处理失败");
               }
-              reject(new Error(response.msg != null ? response.msg : "请求处理失败"));
+              reject(new Error(resp.msg != null ? resp.msg : "请求处理失败"));
             }
           } else {
             reject(httpStatusError(res.statusCode, res.data));
@@ -596,7 +595,6 @@ new common_vendor.UTSJSONObject({
           reject(err);
         },
         complete: () => {
-          requestTask = null;
         }
       });
     });
@@ -634,28 +632,29 @@ new common_vendor.UTSJSONObject({
         success: (res) => {
           clearTimeout(timeoutId);
           common_vendor.index.hideLoading();
-          if (res.statusCode === uni_modules_mUnix_components_mTools_uenum_SysEnum.HttpStatus.SUCCESS) {
+          if (res.statusCode === 200) {
             let response = null;
             try {
               response = parseApiEnvelope(res.data);
             } catch (e) {
-              const m = common_vendor.UTS.isInstanceOf(e, Error) ? e.message : String(e);
+              const m = common_vendor.UTS.isInstanceOf(e, Error) ? e.message : "" + e;
               reject(new Error(m));
               return null;
             }
             if (!response) {
-              resolve(null);
+              reject(new Error("响应为空"));
               return null;
             }
-            if (response.code === 403) {
-              reject(new Error(response.msg != null && response.msg.length > 0 ? response.msg : "请重新登录"));
+            const resp = response;
+            if (resp.code === 403) {
+              reject(new Error(resp.msg != null && resp.msg.length > 0 ? resp.msg : "请重新登录"));
               return null;
             }
-            if (response.code === uni_modules_mUnix_components_mTools_uenum_SysEnum.HttpStatus.SUCCESS) {
-              resolve(response.data);
+            if (resp.code === 200) {
+              resolve(resp.data);
             } else {
-              mToastMsg(response.msg != null && response.msg.length > 0 ? response.msg : "请求处理失败");
-              reject(new Error(response.msg != null ? response.msg : "请求处理失败"));
+              mToastMsg(resp.msg != null && resp.msg.length > 0 ? resp.msg : "请求处理失败");
+              reject(new Error(resp.msg != null ? resp.msg : "请求处理失败"));
             }
           } else {
             reject(httpStatusError(res.statusCode, res.data));

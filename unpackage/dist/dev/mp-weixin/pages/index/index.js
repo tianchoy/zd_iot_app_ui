@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-require("../../api/http.js");
+const api_http = require("../../api/http.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
@@ -46,10 +46,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       common_vendor.index.__f__("log", "at pages/index/index.uvue:107", "查询卡号:", card_number.value);
     };
-    const onScanResult = (data = null) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:113", "收到扫码结果:", data);
-      if (data && data.result) {
-        card_number.value = data.result;
+    const onScanResult = (data) => {
+      var _a;
+      const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
+      if (result.length > 0) {
+        card_number.value = result;
         common_vendor.index.showToast({
           title: "扫码成功",
           icon: "success"
@@ -57,14 +58,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const cardType = (type) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:128", type);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:127", type);
       common_vendor.index.reLaunch({
         url: "/pages/card/card?type=" + type
       });
     };
     common_vendor.onMounted(() => {
       common_vendor.index.$on("scanResult", onScanResult);
+      getLogin();
     });
+    const getLogin = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        yield api_http.login(new api_http.LoginParams({
+          phone: "13800000000",
+          password: "123456"
+        }));
+      });
+    };
     common_vendor.onUnmounted(() => {
       common_vendor.index.$off("scanResult", onScanResult);
     });

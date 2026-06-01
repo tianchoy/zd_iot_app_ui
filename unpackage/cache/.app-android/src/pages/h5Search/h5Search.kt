@@ -87,9 +87,10 @@ open class GenPagesH5SearchH5Search : BasePage {
                 console.log("国家/地区:", selectedCountryLabel.value, " at pages/h5Search/h5Search.uvue:165")
                 uni_showToast(ShowToastOptions(title = "查询中...", icon = "loading"))
             }
-            val onScanResult = fun(data: Any){
-                if (isTruthy(data) && isTruthy(data.result)) {
-                    cardNumber.value = data.result
+            val onScanResult = fun(data: UTSJSONObject){
+                val result = data.getString("result") ?: ""
+                if (result.length > 0) {
+                    cardNumber.value = result
                     uni_showToast(ShowToastOptions(title = "扫码成功", icon = "success"))
                 }
             }

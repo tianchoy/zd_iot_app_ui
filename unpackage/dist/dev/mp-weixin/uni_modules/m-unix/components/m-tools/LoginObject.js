@@ -23,14 +23,14 @@ class LoginObject {
    * 设置登录对象
    */
   setMemberInfo(m) {
-    uni_modules_mUnix_components_mTools_CacheUtil.CacheUtil.set(uni_modules_mUnix_components_mTools_uenum_SysEnum.StorageEnum.MEMBER_INFO_KEY, m);
+    uni_modules_mUnix_components_mTools_CacheUtil.CacheUtil.set(uni_modules_mUnix_components_mTools_uenum_SysEnum.StorageEnum.MEMBER_INFO_KEY.toString(), m);
   }
   /**
    * 获取登录对象
    */
   getMemberInfo() {
     try {
-      return uni_modules_mUnix_components_mTools_CacheUtil.CacheUtil.get(uni_modules_mUnix_components_mTools_uenum_SysEnum.StorageEnum.MEMBER_INFO_KEY);
+      return uni_modules_mUnix_components_mTools_CacheUtil.CacheUtil.get(uni_modules_mUnix_components_mTools_uenum_SysEnum.StorageEnum.MEMBER_INFO_KEY.toString());
     } catch (e) {
       common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/LoginObject.uts:36", "get token error,`{}`", e);
       return null;
@@ -46,7 +46,7 @@ class LoginObject {
    * 退出
    */
   logout() {
-    uni_modules_mUnix_components_mTools_CacheUtil.CacheUtil.remove(uni_modules_mUnix_components_mTools_uenum_SysEnum.StorageEnum.MEMBER_INFO_KEY);
+    uni_modules_mUnix_components_mTools_CacheUtil.CacheUtil.remove(uni_modules_mUnix_components_mTools_uenum_SysEnum.StorageEnum.MEMBER_INFO_KEY.toString());
   }
   /**
    * 是否登录

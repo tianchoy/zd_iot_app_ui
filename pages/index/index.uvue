@@ -109,11 +109,10 @@
 	}
 	
 	// 接收扫码结果
-	const onScanResult = (data: any) => {
-		console.log('收到扫码结果:', data)
-		if (data && data.result) {
-			// 直接将结果赋值给 card_number
-			card_number.value = data.result
+	const onScanResult = (data: UTSJSONObject) => {
+		const result = data.getString('result') ?? ''
+		if (result.length > 0) {
+			card_number.value = result
 			uni.showToast({
 				title: '扫码成功',
 				icon: 'success'
@@ -134,7 +133,7 @@
 	onMounted(() => {
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
-		// getLogin()
+		getLogin()
 	})
 
 	const getLogin = async () => {

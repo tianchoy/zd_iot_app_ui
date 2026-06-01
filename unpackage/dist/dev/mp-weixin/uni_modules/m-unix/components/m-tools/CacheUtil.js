@@ -34,15 +34,16 @@ class CacheUtil {
   static set(key, data, expire = null) {
     try {
       const cacheKey = CACHE_PREFIX + key;
+      const expireAt = expire != null ? Date.now() + expire * 1e3 : null;
       const meta = new CacheMeta({
         data,
         timestamp: Date.now(),
-        expire: expire ? Date.now() + expire * 1e3 : void 0
+        expire: expireAt
       });
       common_vendor.index.setStorageSync(cacheKey, common_vendor.UTS.JSON.stringify(meta));
       return true;
     } catch (e) {
-      common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/CacheUtil.uts:32", `[CacheUtil] 设置缓存失败 ${key}`, e);
+      common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/CacheUtil.uts:33", `[CacheUtil] 设置缓存失败 ${key}`, e);
       return false;
     }
   }
@@ -55,20 +56,20 @@ class CacheUtil {
     const cacheKey = CACHE_PREFIX + key;
     try {
       const cached = common_vendor.index.getStorageSync(cacheKey);
-      if (!cached)
+      if (cached == null || cached == "")
         return null;
       const meta = common_vendor.UTS.JSON.parse(cached);
-      if (meta.expire && Date.now() > meta.expire) {
+      if (meta.expire != null && Date.now() > meta.expire) {
         this.remove(key);
         return null;
       }
-      if (validator && !validator(meta.data)) {
-        common_vendor.index.__f__("warn", "at uni_modules/m-unix/components/m-tools/CacheUtil.uts:58", `[CacheUtil] 数据校验未通过 ${key}`);
+      if (validator != null && !validator(meta.data)) {
+        common_vendor.index.__f__("warn", "at uni_modules/m-unix/components/m-tools/CacheUtil.uts:57", `[CacheUtil] 数据校验未通过 ${key}`);
         return null;
       }
       return meta.data;
     } catch (e) {
-      common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/CacheUtil.uts:64", `[CacheUtil] 获取缓存失败 ${key}`, e);
+      common_vendor.index.__f__("error", "at uni_modules/m-unix/components/m-tools/CacheUtil.uts:63", `[CacheUtil] 获取缓存失败 ${key}`, e);
       return null;
     }
   }

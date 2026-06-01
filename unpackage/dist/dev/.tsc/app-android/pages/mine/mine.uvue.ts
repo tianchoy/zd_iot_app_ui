@@ -38,7 +38,7 @@ const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
       showCapsule: false
     })),
     _cE("view", _uM({ class: "container" }), [
-      _cE("view", _uM({ class: "card-info" }), [
+      _cE("view", _uM({ class: "card-info mb-24" }), [
         _cE("text", _uM({ class: "persion-name" }), "Hi," + _tD(unref(title)), 1 /* TEXT */),
         _cE("view", _uM({ class: "persion-card" }), [
           _cE("view", _uM({

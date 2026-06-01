@@ -119,7 +119,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.3.229"
     val port: String = "8090"
-    val id: String = "app-android_VhHiIc"
+    val id: String = "app-android_LByBOS"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -210,17 +210,6 @@ val ENV = "prod"
 val API_CONFIG: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("API_CONFIG", "common/config.uts", 37, 7), "local" to _uO("baseUrl" to "http://localhost:3000/api", "timeout" to 30000), "dev" to _uO("baseUrl" to "https://dev-api.yourdomain.com/api", "timeout" to 30000), "prod" to _uO("baseUrl" to "https://api.yourdomain.com/api", "timeout" to 30000))
 val currentConfig = API_CONFIG["prod"]
 val config = ProjectConfig(baseUrl = "https://api.yourdomain.com/api", timeout = 30000, env = ENV, api = ApiPaths(auth = AuthApiPaths(login = "/auth/login", logout = "/auth/logout", refreshToken = "/auth/refresh")), storage = StorageKeys(token = "access_token", refreshToken = "refresh_token"), configInfo = ConfigInfo(name = "我的应用", versionCode = 1, versionName = "1.0.0", appId = "your-app-id"), loginPagePath = "", loginRequiredPaths = _uA())
-fun getToken(): String {
-    val token = uni_getStorageSync(config.storage.token)
-    if (token == null) {
-        return ""
-    }
-    return token as String
-}
-fun clearToken() {
-    uni_removeStorageSync(config.storage.token)
-    uni_removeStorageSync(config.storage.refreshToken)
-}
 open class HostStorageConfig (
     @JsonNotNull
     open var token: String,
@@ -323,108 +312,123 @@ open class MUnixHostProjectConfig (
 val LOGO_BUILTIN = "/uni_modules/m-unix/static/m-app-logo.png"
 val BUILTIN_DEFAULT = MUnixHostProjectConfig(env = "local", localBaseUrl = "", devBaseUrl = "", prodBaseUrl = "", baseUrl = "", storage = HostStorageConfig(token = "token", userInfo = "userInfo"), loginRequiredPaths = _uA(), loginPagePath = "/pages_Me/login/login", api = HostApiConfig(login = HostApiLoginConfig(tokenLogin = "", codeGetOpenIdLogin = "", codeGetPhoneRegisterOrLogin = ""), update = HostApiUpdateConfig(checkUpdate = ""), upload = HostApiUploadConfig(image = ""), qrCodeImageApiBase = ""), configInfo = HostConfigInfo(name = "mUnix", logo = LOGO_BUILTIN, desc = "", versionCode = 0, versionName = "0.0.0"), mUi = null)
 var _hostOverride: MUnixHostProjectConfig? = null
+fun readValue(source: Any?, key: String): Any? {
+    if (source == null) {
+        return null
+    }
+    val obj = source as UTSJSONObject
+    return obj[key]
+}
+fun readString(source: Any?, key: String): String? {
+    val value = readValue(source, key)
+    if (value == null) {
+        return null
+    }
+    return "" + value
+}
+fun readObject(source: Any?, key: String): Any? {
+    val value = readValue(source, key)
+    if (value != null && UTSAndroid.`typeof`(value) === "object") {
+        return value
+    }
+    return null
+}
 fun mergeStorage(base: HostStorageConfig, p: Any?): HostStorageConfig {
     val out = HostStorageConfig(token = base.token, userInfo = base.userInfo)
-    if (p == null) {
-        return out
+    val pt = readString(p, "token")
+    if (pt != null && pt.length > 0) {
+        out.token = pt
     }
-    val pt = p.token
-    if (pt != null && ("" + pt).length > 0) {
-        out.token = "" + pt
-    }
-    val pu = p.userInfo
-    if (pu != null && ("" + pu).length > 0) {
-        out.userInfo = "" + pu
+    val pu = readString(p, "userInfo")
+    if (pu != null && pu.length > 0) {
+        out.userInfo = pu
     }
     return out
 }
 fun mergeApi(base: HostApiConfig, p: Any?): HostApiConfig {
     val out = HostApiConfig(login = UTSJSONObject.assign<HostApiLoginConfig>(_uO(), base.login) as HostApiLoginConfig, update = UTSJSONObject.assign<HostApiUpdateConfig>(_uO(), base.update) as HostApiUpdateConfig, upload = UTSJSONObject.assign<HostApiUploadConfig>(_uO(), base.upload) as HostApiUploadConfig, qrCodeImageApiBase = base.qrCodeImageApiBase)
-    if (p == null) {
-        return out
-    }
-    val pl = p.login
-    if (pl != null && UTSAndroid.`typeof`(pl) === "object") {
-        val a = pl as Any
-        val t1 = a.tokenLogin
+    val loginConfig = readObject(p, "login")
+    if (loginConfig != null) {
+        val t1 = readString(loginConfig, "tokenLogin")
         if (t1 != null) {
-            out.login.tokenLogin = "" + t1
+            out.login.tokenLogin = t1
         }
-        val t2 = a.codeGetOpenIdLogin
+        val t2 = readString(loginConfig, "codeGetOpenIdLogin")
         if (t2 != null) {
-            out.login.codeGetOpenIdLogin = "" + t2
+            out.login.codeGetOpenIdLogin = t2
         }
-        val t3 = a.codeGetPhoneRegisterOrLogin
+        val t3 = readString(loginConfig, "codeGetPhoneRegisterOrLogin")
         if (t3 != null) {
-            out.login.codeGetPhoneRegisterOrLogin = "" + t3
+            out.login.codeGetPhoneRegisterOrLogin = t3
         }
     }
-    val pu = p.update
-    if (pu != null && UTSAndroid.`typeof`(pu) === "object") {
-        val u = pu as Any
-        val c = u.checkUpdate
+    val authConfig = readObject(p, "auth")
+    if (authConfig != null) {
+        val authLogin = readString(authConfig, "login")
+        if (authLogin != null && authLogin.length > 0) {
+            out.login.tokenLogin = authLogin
+        }
+    }
+    val updateConfig = readObject(p, "update")
+    if (updateConfig != null) {
+        val c = readString(updateConfig, "checkUpdate")
         if (c != null) {
-            out.update.checkUpdate = "" + c
+            out.update.checkUpdate = c
         }
     }
-    val pupload = p.upload
-    if (pupload != null && UTSAndroid.`typeof`(pupload) === "object") {
-        val up = pupload as Any
-        val im = up.image
+    val uploadConfig = readObject(p, "upload")
+    if (uploadConfig != null) {
+        val im = readString(uploadConfig, "image")
         if (im != null) {
-            out.upload.image = "" + im
+            out.upload.image = im
         }
     }
-    val pq = p.qrCodeImageApiBase
+    val pq = readString(p, "qrCodeImageApiBase")
     if (pq != null) {
-        out.qrCodeImageApiBase = "" + pq
+        out.qrCodeImageApiBase = pq
     }
     return out
 }
 fun mergeConfigInfo(base: HostConfigInfo, p: Any?): HostConfigInfo {
     val out = HostConfigInfo(name = base.name, logo = base.logo, desc = base.desc, versionCode = base.versionCode, versionName = base.versionName)
-    if (p == null) {
-        return out
-    }
-    val o = p as Any
-    val n = o.name
+    val n = readString(p, "name")
     if (n != null) {
-        out.name = "" + n
+        out.name = n
     }
-    val l = o.logo
+    val l = readString(p, "logo")
     if (l != null) {
-        out.logo = "" + l
+        out.logo = l
     }
-    val d = o.desc
+    val d = readString(p, "desc")
     if (d != null) {
-        out.desc = "" + d
+        out.desc = d
     }
-    val vc = o.versionCode
+    val vc = readString(p, "versionCode")
     if (vc != null) {
-        val num = parseInt("" + vc, 10)
+        val num = parseInt(vc, 10)
         if (!isNaN(num)) {
             out.versionCode = num
         }
     }
-    val vn = o.versionName
+    val vn = readString(p, "versionName")
     if (vn != null) {
-        out.versionName = "" + vn
+        out.versionName = vn
     }
-    val ad = o.appDownloadUrl
+    val ad = readString(p, "appDownloadUrl")
     if (ad != null) {
-        out.appDownloadUrl = "" + ad
+        out.appDownloadUrl = ad
     }
-    val ada = o.appDownloadUrlAndroid
+    val ada = readString(p, "appDownloadUrlAndroid")
     if (ada != null) {
-        out.appDownloadUrlAndroid = "" + ada
+        out.appDownloadUrlAndroid = ada
     }
-    val ua = o.userAgreementArticleId
+    val ua = readString(p, "userAgreementArticleId")
     if (ua != null) {
-        out.userAgreementArticleId = "" + ua
+        out.userAgreementArticleId = ua
     }
-    val pp = o.privacyPolicyArticleId
+    val pp = readString(p, "privacyPolicyArticleId")
     if (pp != null) {
-        out.privacyPolicyArticleId = "" + pp
+        out.privacyPolicyArticleId = pp
     }
     return out
 }
@@ -434,29 +438,28 @@ fun mergeHostPatch(patch: Any): MUnixHostProjectConfig {
     if (patch == null) {
         return out
     }
-    val p = patch as Any
-    val e = p.env
+    val e = readString(patch, "env")
     if (e != null) {
-        out.env = "" + e
+        out.env = e
     }
-    val lb = p.localBaseUrl
+    val lb = readString(patch, "localBaseUrl")
     if (lb != null) {
-        out.localBaseUrl = "" + lb
+        out.localBaseUrl = lb
     }
-    val db = p.devBaseUrl
+    val db = readString(patch, "devBaseUrl")
     if (db != null) {
-        out.devBaseUrl = "" + db
+        out.devBaseUrl = db
     }
-    val pb = p.prodBaseUrl
+    val pb = readString(patch, "prodBaseUrl")
     if (pb != null) {
-        out.prodBaseUrl = "" + pb
+        out.prodBaseUrl = pb
     }
-    val bu = p.baseUrl
+    val bu = readString(patch, "baseUrl")
     if (bu != null) {
-        out.baseUrl = "" + bu
+        out.baseUrl = bu
     }
-    out.storage = mergeStorage(base.storage, p.storage)
-    val paths = p.loginRequiredPaths
+    out.storage = mergeStorage(base.storage, readObject(patch, "storage"))
+    val paths = readValue(patch, "loginRequiredPaths")
     if (paths != null && paths is UTSArray<*>) {
         val arr: UTSArray<String> = _uA()
         val pa = paths as UTSArray<Any>
@@ -469,13 +472,13 @@ fun mergeHostPatch(patch: Any): MUnixHostProjectConfig {
         }
         out.loginRequiredPaths = arr
     }
-    val lp = p.loginPagePath
-    if (lp != null && ("" + lp).length > 0) {
-        out.loginPagePath = "" + lp
+    val lp = readString(patch, "loginPagePath")
+    if (lp != null && lp.length > 0) {
+        out.loginPagePath = lp
     }
-    out.api = mergeApi(base.api, p.api)
-    out.configInfo = mergeConfigInfo(base.configInfo, p.configInfo)
-    val mui = p.mUi
+    out.api = mergeApi(base.api, readObject(patch, "api"))
+    out.configInfo = mergeConfigInfo(base.configInfo, readObject(patch, "configInfo"))
+    val mui = readValue(patch, "mUi")
     if (mui != null) {
         out.mUi = mui
     }
@@ -564,7 +567,7 @@ open class GenApp : BaseApp {
             }
         val styles1: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("text-secondary" to _pS(_uM("color" to "#666666")), "text-muted" to _pS(_uM("color" to "#999999")), "text-white" to _pS(_uM("color" to "#ffffff")), "bg-primary" to _pS(_uM("backgroundColor" to "#ff0844")), "bg-white" to _pS(_uM("backgroundColor" to "#ffffff")), "bg-gray" to _pS(_uM("backgroundColor" to "#f5f5f5")), "text-xs" to _pS(_uM("fontSize" to "24rpx")), "text-sm" to _pS(_uM("fontSize" to "26rpx")), "text-base" to _pS(_uM("fontSize" to "28rpx")), "text-md" to _pS(_uM("fontSize" to "30rpx")), "text-lg" to _pS(_uM("fontSize" to "32rpx")), "text-xl" to _pS(_uM("fontSize" to "36rpx")), "text-2xl" to _pS(_uM("fontSize" to "40rpx")), "font-normal" to _pS(_uM("fontWeight" to 400)), "font-medium" to _pS(_uM("fontWeight" to 500)), "font-bold" to _pS(_uM("fontWeight" to 700)), "safe-area-top" to _pS(_uM("paddingTop" to "40rpx")), "safe-area-bottom" to _pS(_uM("paddingBottom" to "40rpx")), "m-animate" to _pS(_uM("transitionProperty" to "opacity,transform", "transitionDuration" to "300ms", "transitionTimingFunction" to "ease-out")), "m-animate-fast" to _pS(_uM("transitionDuration" to "150ms")), "m-animate-slow" to _pS(_uM("transitionDuration" to "450ms")), "m-animate-ease-in" to _pS(_uM("transitionTimingFunction" to "ease-in")), "m-animate-ease-in-out" to _pS(_uM("transitionTimingFunction" to "ease-in-out")), "m-opacity-0" to _pS(_uM("opacity" to 0)), "m-opacity-1" to _pS(_uM("opacity" to 1)), "m-fade-from" to _pS(_uM("opacity" to 0)), "m-fade-to" to _pS(_uM("opacity" to 1)), "m-slide-up-from" to _pS(_uM("opacity" to 0, "transform" to "translateY(24rpx)")), "m-slide-up-to" to _pS(_uM("opacity" to 1, "transform" to "translateY(0)")), "m-slide-up-out" to _pS(_uM("opacity" to 0, "transform" to "translateY(-24rpx)")), "m-slide-down-from" to _pS(_uM("opacity" to 0, "transform" to "translateY(-24rpx)")), "m-slide-down-to" to _pS(_uM("opacity" to 1, "transform" to "translateY(0)")), "m-slide-left-from" to _pS(_uM("opacity" to 0, "transform" to "translateX(24rpx)")), "m-slide-left-to" to _pS(_uM("opacity" to 1, "transform" to "translateX(0)")), "m-slide-right-from" to _pS(_uM("opacity" to 0, "transform" to "translateX(-24rpx)")), "m-slide-right-to" to _pS(_uM("opacity" to 1, "transform" to "translateX(0)")), "m-scale-from" to _pS(_uM("opacity" to 0, "transform" to "scale(0.92)")), "m-scale-to" to _pS(_uM("opacity" to 1, "transform" to "scale(1)")), "m-visible" to _pS(_uM("opacity" to 1)), "m-hidden" to _pS(_uM("opacity" to 0)), "m-hidden-touch" to _pS(_uM("opacity" to 0, "pointerEvents" to "none")), "m-rotate-0" to _pS(_uM("transform" to "rotate(0deg)")), "m-rotate-90" to _pS(_uM("transform" to "rotate(90deg)")), "m-rotate-180" to _pS(_uM("transform" to "rotate(180deg)")), "m-rotate-270" to _pS(_uM("transform" to "rotate(270deg)")), "iconfont" to _pS(_uM("!fontFamily" to "iconfont", "fontSize" to "32rpx", "fontStyle" to "normal", "WebkitFontSmoothing" to "antialiased", "MozOsxFontSmoothing" to "grayscale")), "uni-row" to _pS(_uM("flexDirection" to "row")), "uni-column" to _pS(_uM("flexDirection" to "column")), "@TRANSITION" to _uM("m-animate" to _uM("property" to "opacity,transform", "duration" to "300ms", "timingFunction" to "ease-out"), "m-animate-fast" to _uM("duration" to "150ms"), "m-animate-slow" to _uM("duration" to "450ms"), "m-animate-ease-in" to _uM("timingFunction" to "ease-in"), "m-animate-ease-in-out" to _uM("timingFunction" to "ease-in-out")))
+                return _uM("text-secondary" to _pS(_uM("color" to "#666666")), "text-muted" to _pS(_uM("color" to "#999999")), "text-white" to _pS(_uM("color" to "#ffffff")), "bg-primary" to _pS(_uM("backgroundColor" to "#ff0844")), "bg-white" to _pS(_uM("backgroundColor" to "#ffffff")), "bg-gray" to _pS(_uM("backgroundColor" to "#f5f5f5")), "text-xs" to _pS(_uM("fontSize" to "24rpx")), "text-sm" to _pS(_uM("fontSize" to "26rpx")), "text-base" to _pS(_uM("fontSize" to "28rpx")), "text-md" to _pS(_uM("fontSize" to "30rpx")), "text-lg" to _pS(_uM("fontSize" to "32rpx")), "text-xl" to _pS(_uM("fontSize" to "36rpx")), "text-2xl" to _pS(_uM("fontSize" to "40rpx")), "font-normal" to _pS(_uM("fontWeight" to 400)), "font-medium" to _pS(_uM("fontWeight" to 500)), "font-bold" to _pS(_uM("fontWeight" to 700)), "safe-area-top" to _pS(_uM("paddingTop" to "40rpx")), "safe-area-bottom" to _pS(_uM("paddingBottom" to "40rpx")), "m-animate" to _pS(_uM("transitionProperty" to "opacity,transform", "transitionDuration" to "300ms", "transitionTimingFunction" to "ease-out")), "m-animate-fast" to _pS(_uM("transitionDuration" to "150ms")), "m-animate-slow" to _pS(_uM("transitionDuration" to "450ms")), "m-animate-ease-in" to _pS(_uM("transitionTimingFunction" to "ease-in")), "m-animate-ease-in-out" to _pS(_uM("transitionTimingFunction" to "ease-in-out")), "m-opacity-0" to _pS(_uM("opacity" to 0)), "m-opacity-1" to _pS(_uM("opacity" to 1)), "m-fade-from" to _pS(_uM("opacity" to 0)), "m-fade-to" to _pS(_uM("opacity" to 1)), "m-slide-up-from" to _pS(_uM("opacity" to 0, "transform" to "translateY(24rpx)")), "m-slide-up-to" to _pS(_uM("opacity" to 1, "transform" to "translateY(0)")), "m-slide-up-out" to _pS(_uM("opacity" to 0, "transform" to "translateY(-24rpx)")), "m-slide-down-from" to _pS(_uM("opacity" to 0, "transform" to "translateY(-24rpx)")), "m-slide-down-to" to _pS(_uM("opacity" to 1, "transform" to "translateY(0)")), "m-slide-left-from" to _pS(_uM("opacity" to 0, "transform" to "translateX(24rpx)")), "m-slide-left-to" to _pS(_uM("opacity" to 1, "transform" to "translateX(0)")), "m-slide-right-from" to _pS(_uM("opacity" to 0, "transform" to "translateX(-24rpx)")), "m-slide-right-to" to _pS(_uM("opacity" to 1, "transform" to "translateX(0)")), "m-scale-from" to _pS(_uM("opacity" to 0, "transform" to "scale(0.92)")), "m-scale-to" to _pS(_uM("opacity" to 1, "transform" to "scale(1)")), "m-visible" to _pS(_uM("opacity" to 1)), "m-hidden" to _pS(_uM("opacity" to 0)), "m-hidden-touch" to _pS(_uM("opacity" to 0, "pointerEvents" to "none")), "m-rotate-0" to _pS(_uM("transform" to "rotate(0deg)")), "m-rotate-90" to _pS(_uM("transform" to "rotate(90deg)")), "m-rotate-180" to _pS(_uM("transform" to "rotate(180deg)")), "m-rotate-270" to _pS(_uM("transform" to "rotate(270deg)")), "iconfont" to _pS(_uM("!fontFamily" to "iconfont", "fontSize" to "32rpx", "fontStyle" to "normal", "WebkitFontSmoothing" to "antialiased", "MozOsxFontSmoothing" to "grayscale")), "uni-row" to _pS(_uM("flexDirection" to "row")), "uni-column" to _pS(_uM("flexDirection" to "column")), "mr-24" to _pS(_uM("!marginRight" to "24rpx")), "ml-24" to _pS(_uM("!marginLeft" to "24rpx")), "mb-24" to _pS(_uM("!marginBottom" to "24rpx")), "mt-24" to _pS(_uM("!marginTop" to "24rpx")), "@TRANSITION" to _uM("m-animate" to _uM("property" to "opacity,transform", "duration" to "300ms", "timingFunction" to "ease-out"), "m-animate-fast" to _uM("duration" to "150ms"), "m-animate-slow" to _uM("duration" to "450ms"), "m-animate-ease-in" to _uM("timingFunction" to "ease-in"), "m-animate-ease-in-out" to _uM("timingFunction" to "ease-in-out")))
             }
     }
 }
@@ -927,8 +930,55 @@ fun navigateToLogin(loginPage: String): Unit {
     uni_showToast(ShowToastOptions(title = "请先登录", icon = "none"))
     setTimeout(fun(){
         uni_navigateTo(NavigateToOptions(url = loginPage))
+        return
     }
     , 1200)
+}
+fun createRequestOptions(url: String, method: HttpMethod, data: UTSJSONObject?, options: RequestOptions__1?): RequestOptions__1 {
+    val out = RequestOptions__1(url = url, method = method, data = data)
+    if (options == null) {
+        return out
+    }
+    if (options.header != null) {
+        out.header = options.header
+    }
+    if (options.baseUrl != null) {
+        out.baseUrl = options.baseUrl
+    }
+    if (options.timeout != null) {
+        out.timeout = options.timeout
+    }
+    if (options.withToken != null) {
+        out.withToken = options.withToken
+    }
+    if (options.showError != null) {
+        out.showError = options.showError
+    }
+    if (options.showLoading != null) {
+        out.showLoading = options.showLoading
+    }
+    if (options.loadingText != null) {
+        out.loadingText = options.loadingText
+    }
+    if (options.redirectOnUnauthorized != null) {
+        out.redirectOnUnauthorized = options.redirectOnUnauthorized
+    }
+    if (options.loginPage != null) {
+        out.loginPage = options.loginPage
+    }
+    if (options.successCodes != null) {
+        out.successCodes = options.successCodes
+    }
+    if (options.unauthorizedCodes != null) {
+        out.unauthorizedCodes = options.unauthorizedCodes
+    }
+    if (options.onErrorCode != null) {
+        out.onErrorCode = options.onErrorCode
+    }
+    return out
+}
+fun copyRequestOptions(options: RequestOptions__1): RequestOptions__1 {
+    return createRequestOptions(options.url, options.method ?: "GET", options.data, options)
 }
 fun <T> request(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
     val url = options.url
@@ -986,7 +1036,7 @@ fun <T> request(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
         fullUrl += buildQueryString(data)
         requestData = _uO()
     }
-    val reqHeader: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("reqHeader", "uni_modules/m-unix/components/m-tools/Request.uts", 132, 11), "Content-Type" to "application/json")
+    val reqHeader: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("reqHeader", "uni_modules/m-unix/components/m-tools/Request.uts", 183, 11), "Content-Type" to "application/json")
     if (withToken) {
         val token = storage.getToken()
         if (token != "") {
@@ -1023,7 +1073,7 @@ fun <T> request(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
                 return
             }
             if (onErrorCode != null) {
-                onErrorCode(result)
+                onErrorCode(result as ApiResponse<Any>)
             }
             if (showError) {
                 showErrorToast(msg)
@@ -1044,190 +1094,92 @@ fun <T> request(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
     )
 }
 fun <T> get(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return request<T>(UTSJSONObject.assign<RequestOptions__1>(_uO("url" to url, "method" to "GET", "data" to data), options) as RequestOptions__1)
+    return request<T>(createRequestOptions(url, "GET", data, options))
 }
 fun <T> post(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return request<T>(UTSJSONObject.assign<RequestOptions__1>(_uO("url" to url, "method" to "POST", "data" to data), options) as RequestOptions__1)
+    return request<T>(createRequestOptions(url, "POST", data, options))
 }
 fun <T> put(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return request<T>(UTSJSONObject.assign<RequestOptions__1>(_uO("url" to url, "method" to "PUT", "data" to data), options) as RequestOptions__1)
+    return request<T>(createRequestOptions(url, "PUT", data, options))
 }
 fun <T> del(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return request<T>(UTSJSONObject.assign<RequestOptions__1>(_uO("url" to url, "method" to "DELETE", "data" to data), options) as RequestOptions__1)
+    return request<T>(createRequestOptions(url, "DELETE", data, options))
 }
 fun <T> publicRequest(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
-    return request<T>(UTSJSONObject.assign<RequestOptions__1>(_uO(), options, _uO("withToken" to false, "redirectOnUnauthorized" to false)) as RequestOptions__1)
+    val requestOptions = copyRequestOptions(options)
+    requestOptions.withToken = false
+    requestOptions.redirectOnUnauthorized = false
+    return request<T>(requestOptions)
 }
 fun <T> silentRequest(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
-    return request<T>(UTSJSONObject.assign<RequestOptions__1>(_uO(), options, _uO("showError" to false, "redirectOnUnauthorized" to false)) as RequestOptions__1)
+    val requestOptions = copyRequestOptions(options)
+    requestOptions.showError = false
+    requestOptions.redirectOnUnauthorized = false
+    return request<T>(requestOptions)
 }
 fun <T> loadingRequest(options: RequestOptions__1, loadingText: String?): UTSPromise<ApiResponse<T>> {
-    return request<T>(UTSJSONObject.assign<RequestOptions__1>(_uO(), options, _uO("showLoading" to true, "loadingText" to if (isTruthy(loadingText)) {
+    val requestOptions = copyRequestOptions(options)
+    requestOptions.showLoading = true
+    requestOptions.loadingText = if (isTruthy(loadingText)) {
         loadingText
     } else {
         "加载中..."
     }
-    )) as RequestOptions__1)
+    return request<T>(requestOptions)
 }
-val http: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("http", "uni_modules/m-unix/components/m-tools/Request.uts", 246, 14), "get" to fun <T>(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return get<T>(url, data, options)
+val http: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("http", "uni_modules/m-unix/components/m-tools/Request.uts", 306, 14), "get" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
+    return get<Any>(url, data, options)
 }
-, "post" to fun <T>(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return post<T>(url, data, options)
+, "post" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
+    return post<Any>(url, data, options)
 }
-, "put" to fun <T>(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return put<T>(url, data, options)
+, "put" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
+    return put<Any>(url, data, options)
 }
-, "delete" to fun <T>(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<T>> {
-    return del<T>(url, data, options)
+, "delete" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
+    return del<Any>(url, data, options)
 }
-, "public" to fun <T>(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
-    return publicRequest<T>(options)
+, "public" to fun(options: RequestOptions__1): UTSPromise<ApiResponse<Any>> {
+    return publicRequest<Any>(options)
 }
-, "silent" to fun <T>(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
-    return silentRequest<T>(options)
+, "silent" to fun(options: RequestOptions__1): UTSPromise<ApiResponse<Any>> {
+    return silentRequest<Any>(options)
 }
-, "loading" to fun <T>(options: RequestOptions__1, loadingText: String?): UTSPromise<ApiResponse<T>> {
-    return loadingRequest<T>(options, loadingText)
+, "loading" to fun(options: RequestOptions__1, loadingText: String?): UTSPromise<ApiResponse<Any>> {
+    return loadingRequest<Any>(options, loadingText)
 }
-, "upload" to fun <T>(options: Any): UTSPromise<Any> {
-    return uploadFileRequest<T>(options)
+, "upload" to fun(options: UploadFileOptions__1): UTSPromise<UploadApiResponse<Any>> {
+    return uploadFileRequest<Any>(options)
 }
 )
-open class ApiResponse__1<T> (
+open class LoginParams (
     @JsonNotNull
-    open var code: Number,
+    open var phone: String,
     @JsonNotNull
-    open var data: T,
-    @JsonNotNull
-    open var message: String,
-    open var timestamp: Number? = null,
+    open var password: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("ApiResponse", "api/request.uts", 5, 13)
+        return UTSSourceMapPosition("LoginParams", "api/http.uts", 5, 13)
     }
 }
-open class RequestConfig (
-    open var showLoading: Boolean? = null,
-    open var loadingText: String? = null,
-    open var showError: Boolean? = null,
-    open var needAuth: Boolean? = null,
+open class LoginData (
+    @JsonNotNull
+    open var token: String,
+    @JsonNotNull
+    open var refreshToken: String,
+    @JsonNotNull
+    open var userId: Number,
+    @JsonNotNull
+    open var nickname: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("RequestConfig", "api/request.uts", 11, 13)
+        return UTSSourceMapPosition("LoginData", "api/http.uts", 9, 13)
     }
 }
-val defaultConfig = RequestConfig(showLoading = true, loadingText = "加载中...", showError = true, needAuth = false)
-var loadingCount: Number = 0
-var loadingTimer: Number? = null
-fun showLoading(text: String) {
-    if (loadingCount === 0) {
-        loadingTimer = setTimeout(fun(){
-            uni_showLoading(ShowLoadingOptions(title = text, mask = true))
-        }
-        , 200)
-    }
-    loadingCount++
+val login = fun(params: LoginParams): UTSPromise<ApiResponse<LoginData>> {
+    val data: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("data", "api/http.uts", 17, 11), "phone" to params.phone, "password" to params.password)
+    return post<LoginData>("/user/login", data, null)
 }
-fun hideLoading() {
-    loadingCount--
-    if (loadingCount <= 0) {
-        loadingCount = 0
-        if (loadingTimer != null) {
-            clearTimeout(loadingTimer)
-            loadingTimer = null
-        }
-        uni_hideLoading(null)
-    }
-}
-fun <T> request__1(url: String, method: String, data: Any?, requestConfig: RequestConfig?): UTSPromise<ApiResponse__1<T>> {
-    return wrapUTSPromise(suspend w@{
-            val reqConfig = UTSJSONObject.assign<UTSJSONObject>(_uO("__\$originalPosition" to UTSSourceMapPosition("reqConfig", "api/request.uts", 48, 11)), defaultConfig, requestConfig) as UTSJSONObject
-            if (isTruthy(reqConfig["needAuth"])) {
-                val token = getToken()
-                if (!(token != "")) {
-                    return@w UTSPromise.reject(UTSError("未登录"))
-                }
-            }
-            if (isTruthy(reqConfig["showLoading"])) {
-                showLoading(if (isTruthy(reqConfig["loadingText"])) {
-                    reqConfig["loadingText"]
-                } else {
-                    "加载中..."
-                }
-                )
-            }
-            try {
-                val header = Record(`Content-Type` = "application/json")
-                if (isTruthy(reqConfig["needAuth"])) {
-                    val token = getToken()
-                    if (token != "") {
-                        header["Authorization"] = "Bearer " + token
-                    }
-                }
-                var response: Any
-                if (method === "GET") {
-                    response = await(http.get(url, data))
-                } else if (method === "POST") {
-                    response = await(http.post(url, data))
-                } else if (method === "PUT") {
-                    response = await(http.put(url, data))
-                } else {
-                    response = await(http.`delete`(url, data))
-                }
-                val result = response.data as ApiResponse__1<T>
-                if (result.code === 401) {
-                    clearToken()
-                    uni_navigateTo(NavigateToOptions(url = "/pages/index/index"))
-                    if (isTruthy(reqConfig["showError"])) {
-                        uni_showToast(ShowToastOptions(title = "登录已过期，请重新登录", icon = "none"))
-                    }
-                    return@w UTSPromise.reject(result)
-                }
-                if (result.code !== 200 && result.code !== 0) {
-                    if (isTruthy(reqConfig["showError"])) {
-                        uni_showToast(ShowToastOptions(title = if (result.message != "") {
-                            result.message
-                        } else {
-                            "请求失败"
-                        }
-                        , icon = "none"))
-                    }
-                    return@w UTSPromise.reject(result)
-                }
-                return@w result
-            }
-             catch (error: Throwable) {
-                if (isTruthy(reqConfig["showError"])) {
-                    uni_showToast(ShowToastOptions(title = if (isTruthy(error.message)) {
-                        error.message
-                    } else {
-                        "网络错误"
-                    }
-                    , icon = "none"))
-                }
-                throw error
-            }
-             finally {
-                if (isTruthy(reqConfig["showLoading"])) {
-                    hideLoading()
-                }
-            }
-    })
-}
-fun <T> get__1(url: String, params: Any?, config: RequestConfig?): UTSPromise<ApiResponse__1<T>> {
-    return request__1<T>(url, "GET", params, config)
-}
-fun <T> post__1(url: String, data: Any?, config: RequestConfig?): UTSPromise<ApiResponse__1<T>> {
-    return request__1<T>(url, "POST", data, config)
-}
-fun <T> put__1(url: String, data: Any?, config: RequestConfig?): UTSPromise<ApiResponse__1<T>> {
-    return request__1<T>(url, "PUT", data, config)
-}
-fun <T> del__1(url: String, data: Any?, config: RequestConfig?): UTSPromise<ApiResponse__1<T>> {
-    return request__1<T>(url, "DELETE", data, config)
-}
-val api: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("api", "api/request.uts", 139, 14), "get" to get__1, "post" to post__1, "put" to put__1, "delete" to del__1)
 fun getIconChar(name: String): String {
     if (name === "print") {
         return "\ue6bd"
@@ -1751,30 +1703,6 @@ open class StoreMemberVo (
         return UTSSourceMapPosition("StoreMemberVo", "uni_modules/m-unix/components/m-tools/utype/type.uts", 29, 13)
     }
 }
-enum class HttpStatus__1(override val value: Int) : UTSEnumInt {
-    SUCCESS(200),
-    CREATED(201),
-    ACCEPTED(202),
-    NO_CONTENT(204),
-    MOVED_PERM(301),
-    SEE_OTHER(303),
-    NOT_MODIFIED(304),
-    PARAM_ERROR(400),
-    UNAUTHORIZED(401),
-    FORBIDDEN(403),
-    NOT_FOUND(404),
-    BAD_METHOD(405),
-    CONFLICT(409),
-    UNSUPPORTED_TYPE(415),
-    SERVER_ERROR(500),
-    NOT_IMPLEMENTED(501),
-    BAD_GATEWAY(502),
-    GATEWAY_TIMEOUT(504),
-    UNKNOWN_ERROR(520),
-    SERVICE_ERROR(521),
-    DATABASE_ERROR(522),
-    WARN(601)
-}
 enum class RunType__1(override val value: String) : UTSEnumString {
     Android("android"),
     IOS("ios"),
@@ -1792,7 +1720,7 @@ open class CacheMeta (
     @JsonNotNull
     open var timestamp: Number,
     @JsonNotNull
-    open var data: *,
+    open var data: Any,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
         return UTSSourceMapPosition("CacheMeta", "uni_modules/m-unix/components/m-tools/CacheUtil.uts", 3, 6)
@@ -1803,43 +1731,43 @@ open class CacheUtil : IUTSSourceMap {
         return UTSSourceMapPosition("CacheUtil", "uni_modules/m-unix/components/m-tools/CacheUtil.uts", 11, 7)
     }
     companion object {
-        fun <T> set(key: String, data: T, expire: Number?): Boolean {
+        fun <T> set(key: String, data: T, expire: Number? = null): Boolean {
             try {
                 val cacheKey = CACHE_PREFIX + key
-                val meta = CacheMeta(data = data, timestamp = Date.now(), expire = if (isTruthy(expire)) {
+                val expireAt = if (expire != null) {
                     Date.now() + expire * 1000
                 } else {
-                    undefined
+                    null
                 }
-                )
+                val meta = CacheMeta(data = data as Any, timestamp = Date.now(), expire = expireAt)
                 uni_setStorageSync(cacheKey, JSON.stringify(meta))
                 return true
             }
              catch (e: Throwable) {
-                console.error("[CacheUtil] 设置缓存失败 " + key, e, " at uni_modules/m-unix/components/m-tools/CacheUtil.uts:32")
+                console.error("[CacheUtil] 设置缓存失败 " + key, e, " at uni_modules/m-unix/components/m-tools/CacheUtil.uts:33")
                 return false
             }
         }
-        fun <T> get(key: String, validator: ((data: *) -> Boolean)?): T? {
+        fun <T> get(key: String, validator: ((data: Any) -> Boolean)? = null): T? {
             val cacheKey = CACHE_PREFIX + key
             try {
                 val cached = uni_getStorageSync(cacheKey)
-                if (!isTruthy(cached)) {
+                if (cached == null || cached == "") {
                     return null
                 }
-                val meta = UTSAndroid.consoleDebugError(JSON.parse(cached), " at uni_modules/m-unix/components/m-tools/CacheUtil.uts:45") as CacheMeta
-                if (isTruthy(meta.expire) && Date.now() > meta.expire!!) {
+                val meta = UTSAndroid.consoleDebugError(JSON.parse(cached as String), " at uni_modules/m-unix/components/m-tools/CacheUtil.uts:46") as CacheMeta
+                if (meta.expire != null && Date.now() > meta.expire!!) {
                     this.remove(key)
                     return null
                 }
-                if (isTruthy(validator) && !validator(meta.data)) {
-                    console.warn("[CacheUtil] 数据校验未通过 " + key, " at uni_modules/m-unix/components/m-tools/CacheUtil.uts:58")
+                if (validator != null && !validator(meta.data)) {
+                    console.warn("[CacheUtil] 数据校验未通过 " + key, " at uni_modules/m-unix/components/m-tools/CacheUtil.uts:57")
                     return null
                 }
                 return meta.data as T
             }
              catch (e: Throwable) {
-                console.error("[CacheUtil] 获取缓存失败 " + key, e, " at uni_modules/m-unix/components/m-tools/CacheUtil.uts:64")
+                console.error("[CacheUtil] 获取缓存失败 " + key, e, " at uni_modules/m-unix/components/m-tools/CacheUtil.uts:63")
                 return null
             }
         }
@@ -1875,11 +1803,11 @@ open class LoginObject : IUTSSourceMap {
         }
     }
     open fun setMemberInfo(m: StoreMemberVo): Unit {
-        CacheUtil.set(StorageEnum__1.MEMBER_INFO_KEY, m)
+        CacheUtil.set(StorageEnum__1.MEMBER_INFO_KEY.toString(), m)
     }
     open fun getMemberInfo(): StoreMemberVo? {
         try {
-            return CacheUtil.get<StoreMemberVo>(StorageEnum__1.MEMBER_INFO_KEY)
+            return CacheUtil.get<StoreMemberVo>(StorageEnum__1.MEMBER_INFO_KEY.toString())
         }
          catch (e: Throwable) {
             console.log("get token error,`{}`", e, " at uni_modules/m-unix/components/m-tools/LoginObject.uts:36")
@@ -1890,7 +1818,7 @@ open class LoginObject : IUTSSourceMap {
         this.setMemberInfo(userInfo)
     }
     open fun logout() {
-        CacheUtil.remove(StorageEnum__1.MEMBER_INFO_KEY)
+        CacheUtil.remove(StorageEnum__1.MEMBER_INFO_KEY.toString())
     }
     open fun isLogin(): Boolean {
         return this.getMemberInfo() != null
@@ -1993,7 +1921,7 @@ fun trimStr(s: Any?): String {
     if (s == null) {
         return ""
     }
-    return s.trim()
+    return "" + s
 }
 fun pickChain(a: String, b: String, c: String, defaultVal: String): String {
     val x = trimStr(a)
@@ -2020,15 +1948,23 @@ fun getMUiConfig(): MUiConfig {
     } else {
         (MUiPartial())
     }
+     as MUiPartial
     val mu = cfg.mUi
     val f = if (mu != null) {
         (mu as MUiPartial)
     } else {
         (MUiPartial())
     }
+     as MUiPartial
     val ci = cfg.configInfo
     val api = cfg.api
-    return MUiConfig(appName = pickChain(trimStr(r["appName"]), trimStr(f["appName"]), trimStr(ci.name), M_UI_DEFAULTS.appName), apiDevelopmentBase = pickChain(trimStr(r["apiDevelopmentBase"]), trimStr(f["apiDevelopmentBase"]), trimStr(cfg.baseUrl), M_UI_DEFAULTS.apiDevelopmentBase), apiProductionBase = pickChain2(trimStr(r["apiProductionBase"]), trimStr(f["apiProductionBase"]), M_UI_DEFAULTS.apiProductionBase), agreementRoute = pickChain2(trimStr(r["agreementRoute"]), trimStr(f["agreementRoute"]), M_UI_DEFAULTS.agreementRoute), privacyRoute = pickChain2(trimStr(r["privacyRoute"]), trimStr(f["privacyRoute"]), M_UI_DEFAULTS.privacyRoute), appLogo = pickChain(trimStr(r["appLogo"]), trimStr(f["appLogo"]), trimStr(ci.logo), M_UI_DEFAULTS.appLogo), emptyDefaultIcon = pickChain2(trimStr(r["emptyDefaultIcon"]), trimStr(f["emptyDefaultIcon"]), M_UI_DEFAULTS.emptyDefaultIcon), avatarDefault = pickChain2(trimStr(r["avatarDefault"]), trimStr(f["avatarDefault"]), M_UI_DEFAULTS.avatarDefault), articlePlaceholder = pickChain2(trimStr(r["articlePlaceholder"]), trimStr(f["articlePlaceholder"]), M_UI_DEFAULTS.articlePlaceholder), demoImage = pickChain2(trimStr(r["demoImage"]), trimStr(f["demoImage"]), M_UI_DEFAULTS.demoImage), qrCodeImageApiBase = pickChain(trimStr(r["qrCodeImageApiBase"]), trimStr(f["qrCodeImageApiBase"]), trimStr(api.qrCodeImageApiBase), M_UI_DEFAULTS.qrCodeImageApiBase))
+    return MUiConfig(appName = pickChain(trimStr(r.appName), trimStr(f.appName), trimStr(ci.name), M_UI_DEFAULTS.appName), apiDevelopmentBase = pickChain(trimStr(r.apiDevelopmentBase), trimStr(f.apiDevelopmentBase), trimStr(cfg.baseUrl), M_UI_DEFAULTS.apiDevelopmentBase), apiProductionBase = pickChain2(trimStr(r.apiProductionBase), trimStr(f.apiProductionBase), M_UI_DEFAULTS.apiProductionBase), agreementRoute = pickChain2(trimStr(r.agreementRoute), trimStr(f.agreementRoute), M_UI_DEFAULTS.agreementRoute), privacyRoute = pickChain2(trimStr(r.privacyRoute), trimStr(f.privacyRoute), M_UI_DEFAULTS.privacyRoute), appLogo = pickChain(trimStr(r.appLogo), trimStr(f.appLogo), trimStr(ci.logo), M_UI_DEFAULTS.appLogo), emptyDefaultIcon = pickChain2(trimStr(r.emptyDefaultIcon), trimStr(f.emptyDefaultIcon), M_UI_DEFAULTS.emptyDefaultIcon), avatarDefault = pickChain2(trimStr(r.avatarDefault), trimStr(f.avatarDefault), M_UI_DEFAULTS.avatarDefault), articlePlaceholder = pickChain2(trimStr(r.articlePlaceholder), trimStr(f.articlePlaceholder), M_UI_DEFAULTS.articlePlaceholder), demoImage = pickChain2(trimStr(r.demoImage), trimStr(f.demoImage), M_UI_DEFAULTS.demoImage), qrCodeImageApiBase = pickChain(trimStr(r.qrCodeImageApiBase), trimStr(f.qrCodeImageApiBase), trimStr(api.qrCodeImageApiBase), M_UI_DEFAULTS.qrCodeImageApiBase))
+}
+fun stringify(value: Any): String {
+    return "" + value
+}
+fun trimCompat(value: String): String {
+    return value.replace(UTSRegExp("^\\s+|\\s+\$", "g"), "")
 }
 val tabBarPaths = _uA(
     "/pages/components/components",
@@ -2055,7 +1991,7 @@ fun checkPhone(phone: String): Boolean {
     val regexPhone = UTSRegExp("^1[3-9]\\d{9}\$", "")
     return regexPhone.test(phone)
 }
-fun get__2(key: String): Any? {
+fun get__1(key: String): Any? {
     try {
         val kVal = uni_getStorageSync(key) as Any
         return kVal
@@ -2069,14 +2005,14 @@ fun set(key: String, value: Any) {
         uni_setStorageSync(key, value)
     }
      catch (e: Throwable) {
-        console.error("ut set error", e, " at uni_modules/m-unix/components/m-tools/Ut.uts:84")
+        console.error("ut set error", e, " at uni_modules/m-unix/components/m-tools/Ut.uts:92")
     }
 }
 fun jslog(title: String, obj: Any) {
     if (title == "" || obj == null) {
         return
     }
-    console.log("【打印】:" + title + "=>", JSON.stringify(obj), " at uni_modules/m-unix/components/m-tools/Ut.uts:91")
+    console.log("【打印】:" + title + "=>", JSON.stringify(obj), " at uni_modules/m-unix/components/m-tools/Ut.uts:99")
 }
 fun apiStart() {
     uni_showLoading(ShowLoadingOptions(title = "加载中..."))
@@ -2085,11 +2021,11 @@ fun apiStop() {
     uni_hideLoading(null)
 }
 fun isEmpty(content: Any?): Boolean {
-    if (content == null || content == undefined) {
+    if (content == null) {
         return true
     }
     val s = content as String
-    return UTSAndroid.`typeof`(s) === "string" && s.trim() == ""
+    return trimCompat(s) == ""
 }
 fun checkNumber(number: String): Boolean {
     val regexCard = UTSRegExp("^(^[1-9]\\d{5}(18|19|20)\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}(\\d|X|x)?\$)\$", "")
@@ -2102,13 +2038,13 @@ open class MoneyUnitValue (
     open var unit: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("MoneyUnitValue", "uni_modules/m-unix/components/m-tools/Ut.uts", 97, 13)
+        return UTSSourceMapPosition("MoneyUnitValue", "uni_modules/m-unix/components/m-tools/Ut.uts", 103, 13)
     }
 }
 fun changeMoney(num: Number): MoneyUnitValue {
-    val n = Number(num)
+    val n = num
     if (n <= 1) {
-        return MoneyUnitValue(num = String(n), unit = "元")
+        return MoneyUnitValue(num = stringify(n), unit = "元")
     }
     val units = _uA(
         "元",
@@ -2129,7 +2065,7 @@ fun changeMoney(num: Number): MoneyUnitValue {
             i++
         }
     }
-    return MoneyUnitValue(num = Number(curNum).toFixed(2), unit = curUnit)
+    return MoneyUnitValue(num = curNum.toFixed(2), unit = curUnit)
 }
 fun strNumSize(tempNum: Number): Number {
     val s = tempNum.toString(10)
@@ -2158,10 +2094,14 @@ fun validateEmail(email: String): Boolean {
     return emailRegex.test(email)
 }
 fun maskPhoneNumber(phoneNumber: Any?): String {
-    if (phoneNumber == null || phoneNumber == undefined) {
+    if (phoneNumber == null) {
         return ""
     }
-    return phoneNumber.replace(UTSRegExp("(\\d{3})\\d{4}(\\d{4})", ""), "\$1****\$2")
+    val phone = phoneNumber as String
+    if (phone.length != 11) {
+        return phone
+    }
+    return phone.substring(0, 3) + "****" + phone.substring(7, 11)
 }
 fun generateOrderNumber(): String {
     val date = Date()
@@ -2179,7 +2119,7 @@ fun toCssLength(value: Any): String {
     if (UTSAndroid.`typeof`(value) === "number") {
         return (value as Number) + "rpx"
     }
-    val s = (value as String).trim()
+    val s = trimCompat(value as String)
     if (s.length === 0) {
         return "0rpx"
     }
@@ -2206,7 +2146,7 @@ fun parseCssNumber(value: Any): Number {
     if (UTSAndroid.`typeof`(value) === "number") {
         return value as Number
     }
-    val s = (value as String).trim()
+    val s = trimCompat(value as String)
     if (s.length === 0) {
         return 0
     }
@@ -2239,12 +2179,12 @@ fun <T> parseApiEnvelope(raw: Any): R<T>? {
         return raw as R<T>
     }
     if (UTSAndroid.`typeof`(raw) === "string") {
-        val s = (raw as String).trim()
+        val s = trimCompat(raw as String)
         if (s.length === 0) {
             return null
         }
         try {
-            return UTSAndroid.consoleDebugError(JSON.parse(s), " at uni_modules/m-unix/components/m-tools/Ut.uts:358") as R<T>
+            return UTSAndroid.consoleDebugError(JSON.parse(s), " at uni_modules/m-unix/components/m-tools/Ut.uts:367") as R<T>
         }
          catch (e: Throwable) {
             val preview = if (s.length > 80) {
@@ -2260,7 +2200,7 @@ fun <T> parseApiEnvelope(raw: Any): R<T>? {
 fun httpStatusError(statusCode: Number, resData: Any): UTSError {
     var detail = ""
     if (UTSAndroid.`typeof`(resData) === "string") {
-        val s = (resData as String).trim()
+        val s = trimCompat(resData as String)
         if (s.length > 0) {
             detail = if (s.length > 160) {
                 s.substring(0, 160) + "…"
@@ -2275,41 +2215,45 @@ fun httpStatusError(statusCode: Number, resData: Any): UTSError {
     }
     return UTSError(base)
 }
-val getReqUrl = fun(): Any {
-    val envConfig: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("envConfig", "uni_modules/m-unix/components/m-tools/Ut.uts", 382, 11), "development" to mConfigInfo()["development"], "production" to mConfigInfo()["production"])
-    return if (isTruthy(envConfig["development"])) {
-        envConfig["development"]
-    } else {
-        (fun(): String {
-            console.error("未知环境: development", " at uni_modules/m-unix/components/m-tools/Ut.uts:421")
-            return ""
-        }
-        )()
+val getReqUrl = fun(): String {
+    val env = "development"
+    val config = mConfigInfo()
+    if (env == "production") {
+        return config["production"] as String
     }
+    if (env == "development") {
+        return config["development"] as String
+    }
+    console.error("未知环境: " + env, " at uni_modules/m-unix/components/m-tools/Ut.uts:432")
+    return ""
 }
-val showLoading__1 = fun(title: String?, mask: Boolean = true){
-    uni_showLoading(ShowLoadingOptions(mask = mask, title = if (isTruthy(title)) {
+val showLoading = fun(title: String?, mask: Boolean?){
+    val useMask = if (mask == null) {
+        true
+    } else {
+        mask
+    }
+    uni_showLoading(ShowLoadingOptions(mask = useMask, title = if (isTruthy(title)) {
         title
     } else {
         "请稍候..."
     }
     ))
 }
-val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("tools", "uni_modules/m-unix/components/m-tools/Ut.uts", 397, 7), "configInfo" to mConfigInfo, "getReqUrl" to getReqUrl, "msg" to mToastMsg, "showLoading" to showLoading__1, "hideLoading" to fun(): Unit {
+val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("tools", "uni_modules/m-unix/components/m-tools/Ut.uts", 409, 7), "configInfo" to mConfigInfo, "getReqUrl" to getReqUrl, "msg" to mToastMsg, "showLoading" to showLoading, "hideLoading" to fun(): Unit {
     uni_hideLoading(null)
 }
 , "global" to fun(): UTSJSONObject {
-    val global: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("global", "uni_modules/m-unix/components/m-tools/Ut.uts", 412, 15), "primary" to "#5677fc", "danger" to "#FD7783", "warning" to "#ff7900", "success" to "#07c160", "blue" to "#007aff")
+    val global: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("global", "uni_modules/m-unix/components/m-tools/Ut.uts", 424, 15), "primary" to "#5677fc", "danger" to "#FD7783", "warning" to "#ff7900", "success" to "#07c160", "blue" to "#007aff")
     return global
 }
 , "getRef" to fun(than: Any, name: String): Any {
-    var toastRef = than.`$refs`[name] as Any
+    var refs = (than as UTSJSONObject)["\$refs"] as UTSJSONObject
+    var toastRef = refs[name] as Any
     return toastRef
 }
 , "showTips" to fun(than: Any, name: String, msg: String) {
-    var toastRef = than.`$refs`[name] as Any
-    var options: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("options", "uni_modules/m-unix/components/m-tools/Ut.uts", 434, 13), "msg" to msg, "duration" to 2000)
-    toastRef.showTips(options)
+    uni_showToast(ShowToastOptions(title = msg, icon = "none", duration = 2000))
 }
 , "toast" to fun(text: String, time: Number?, icon: Boolean?){
     uni_showToast(ShowToastOptions(title = if (text != "") {
@@ -2329,7 +2273,8 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
     }
     ))
 }
-, "modal" to fun(title: String, content: String, showCancel: Boolean, callback: Any?, confirmColor: String?, confirmText: String?){
+, "modal" to fun(title: String, content: String, showCancel: Boolean, callback: (success: Boolean) -> Unit?, confirmColor: String?, confirmText: String?){
+    val cb = callback
     uni_showModal(ShowModalOptions(title = if (title != "") {
         title
     } else {
@@ -2347,16 +2292,12 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
     }
     , success = fun(res) {
         if (res.confirm) {
-            if (isTruthy(callback)) {
-                callback(true)
-            } else {
-                callback
+            if (cb != null) {
+                cb(true)
             }
         } else {
-            if (isTruthy(callback)) {
-                callback(false)
-            } else {
-                callback
+            if (cb != null) {
+                cb(false)
             }
         }
     }
@@ -2385,54 +2326,58 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
     titleBarHeight = 44
     return statusBarHeight + titleBarHeight
 }
-, "href" to fun(url: String, paramsOrVerify: Any?, reassignedIsLogin: Boolean = false, reassignedTarget: String = "_blank"): Any {
-    var isLogin = reassignedIsLogin
-    var target = reassignedTarget
-    var params: Any = _uO()
-    if (UTSAndroid.`typeof`(paramsOrVerify) === "boolean") {
-        isLogin = paramsOrVerify as Boolean
-    } else if (UTSAndroid.`typeof`(paramsOrVerify) === "string") {
-        target = paramsOrVerify as String
-    } else if (isTruthy(paramsOrVerify)) {
-        params = paramsOrVerify
+, "href" to fun(url: String, paramsOrVerify: Any?, isLogin: Boolean?, target: String?): Unit {
+    var needVerify = if (isLogin == null) {
+        false
+    } else {
+        isLogin
     }
-    if (isLogin && !LoginObject().isLogin()) {
+    var openTarget = if (target == null) {
+        "_blank"
+    } else {
+        target
+    }
+    var query = ""
+    if (UTSAndroid.`typeof`(paramsOrVerify) === "boolean") {
+        needVerify = paramsOrVerify as Boolean
+    } else if (UTSAndroid.`typeof`(paramsOrVerify) === "string") {
+        openTarget = paramsOrVerify as String
+    }
+    if (needVerify && !LoginObject().isLogin()) {
         uni_navigateTo(NavigateToOptions(url = "/pages/me/login"))
-        return console.error("登录失效", " at uni_modules/m-unix/components/m-tools/Ut.uts:580")
+        return console.error("登录失效", " at uni_modules/m-unix/components/m-tools/Ut.uts:595")
     }
     if (!(url != "")) {
-        return console.error("跳转路径不能为空", " at uni_modules/m-unix/components/m-tools/Ut.uts:582")
+        return console.error("跳转路径不能为空", " at uni_modules/m-unix/components/m-tools/Ut.uts:597")
     }
-    val query = Object.keys(params).map(fun(k): String {
-        return "" + UTSAndroid.consoleDebugError(encodeURIComponent(k), " at uni_modules/m-unix/components/m-tools/Ut.uts:535") + "=" + UTSAndroid.consoleDebugError(encodeURIComponent(params[k]), " at uni_modules/m-unix/components/m-tools/Ut.uts:535")
-    }
-    ).join("&")
-    val endUrl = url + (if (query != "") {
+    val endUrl = url + (if (query.length > 0) {
         "?" + query
     } else {
         ""
     }
     )
-    try {
-        if (url.startsWith("/pages/tab/")) {
-            uni_switchTab(SwitchTabOptions(url = endUrl))
-        } else if (getCurrentPages().length >= 9) {
-            uni_redirectTo(RedirectToOptions(url = endUrl))
-        } else {
-            if (target === "_self") {
-                uni_redirectTo(RedirectToOptions(url = endUrl))
-            } else {
-                uni_navigateTo(NavigateToOptions(url = endUrl, animationType = "slide-in-right"))
-            }
-        }
+    if (url.startsWith("/pages/tab/")) {
+        uni_switchTab(SwitchTabOptions(url = endUrl))
+        return
     }
-     catch (e: Throwable) {
-        uni_showToast(ShowToastOptions(title = "跳转失败", icon = "none"))
+    if (getCurrentPages().length >= 9) {
+        uni_redirectTo(RedirectToOptions(url = endUrl))
+        return
     }
+    if (openTarget === "_self") {
+        uni_redirectTo(RedirectToOptions(url = endUrl))
+        return
+    }
+    uni_navigateTo(NavigateToOptions(url = endUrl, animationType = "slide-in-right"))
 }
-, "back" to fun(delta: Number = 1) {
-    console.log("Back", " at uni_modules/m-unix/components/m-tools/Ut.uts:609")
-    uni_navigateBack(NavigateBackOptions(delta = delta, animationType = "slide-out-left"))
+, "back" to fun(delta: Number?) {
+    val backDelta = if (delta == null) {
+        1
+    } else {
+        delta
+    }
+    console.log("Back", " at uni_modules/m-unix/components/m-tools/Ut.uts:617")
+    uni_navigateBack(NavigateBackOptions(delta = backDelta, animationType = "slide-out-left"))
 }
 , "upx2px" to fun(upx: Number, def: Number?): Number {
     return upx * 2
@@ -2441,32 +2386,32 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
     when (uni_getDeviceInfo(null).platform) {
         "android" -> 
             {
-                console.log("运行Android上", " at uni_modules/m-unix/components/m-tools/Ut.uts:621")
+                console.log("运行Android上", " at uni_modules/m-unix/components/m-tools/Ut.uts:629")
                 return RunType__1.Android
             }
         "ios" -> 
             {
-                console.log("运行iOS上", " at uni_modules/m-unix/components/m-tools/Ut.uts:624")
+                console.log("运行iOS上", " at uni_modules/m-unix/components/m-tools/Ut.uts:632")
                 return RunType__1.IOS
             }
         "harmonyos" -> 
             {
-                console.log("运行鸿蒙系统上", " at uni_modules/m-unix/components/m-tools/Ut.uts:627")
+                console.log("运行鸿蒙系统上", " at uni_modules/m-unix/components/m-tools/Ut.uts:635")
                 return RunType__1.HarmonyOs
             }
         "mac" -> 
             {
-                console.log("运行mac上", " at uni_modules/m-unix/components/m-tools/Ut.uts:630")
+                console.log("运行mac上", " at uni_modules/m-unix/components/m-tools/Ut.uts:638")
                 return RunType__1.IOS
             }
         "windows" -> 
             {
-                console.log("运行Windows上", " at uni_modules/m-unix/components/m-tools/Ut.uts:633")
+                console.log("运行Windows上", " at uni_modules/m-unix/components/m-tools/Ut.uts:641")
                 return RunType__1.Windows
             }
         else -> 
             {
-                console.log("运行在开发者工具上", " at uni_modules/m-unix/components/m-tools/Ut.uts:636")
+                console.log("运行在开发者工具上", " at uni_modules/m-unix/components/m-tools/Ut.uts:644")
                 return RunType__1.WxAppl
             }
     }
@@ -2495,53 +2440,48 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
             fdate = fdate.substring(0, fdate.indexOf("."))
         }
         fdate = fdate.toString().replace("T", " ").replace(UTSRegExp("\\-", "g"), "/")
-        var fTime
         var fStr = "ymdhis"
         if (!(formatStr != "")) {
             formatStr = "y-m-d h:i:s"
         }
-        if (fdate != "") {
-            fTime = Date(fdate)
-        } else {
-            fTime = Date()
-        }
+        var fTime = Date(fdate)
         var month = fTime.getMonth() + 1
         var day = fTime.getDate()
         var hours = fTime.getHours()
         var minu = fTime.getMinutes()
         var second = fTime.getSeconds()
-        month = if (month < 10) {
+        var monthStr = if (month < 10) {
             "0" + month
         } else {
-            month
+            month.toString(10)
         }
-        day = if (day < 10) {
+        var dayStr = if (day < 10) {
             "0" + day
         } else {
-            day
+            day.toString(10)
         }
-        hours = if (hours < 10) {
-            ("0" + hours)
+        var hoursStr = if (hours < 10) {
+            "0" + hours
         } else {
-            hours
+            hours.toString(10)
         }
-        minu = if (minu < 10) {
+        var minuStr = if (minu < 10) {
             "0" + minu
         } else {
-            minu
+            minu.toString(10)
         }
-        second = if (second < 10) {
+        var secondStr = if (second < 10) {
             "0" + second
         } else {
-            second
+            second.toString(10)
         }
         var formatArr = _uA(
-            fTime.getFullYear().toString(),
-            month.toString(),
-            day.toString(),
-            hours.toString(),
-            minu.toString(),
-            second.toString()
+            fTime.getFullYear().toString(10),
+            monthStr,
+            dayStr,
+            hoursStr,
+            minuStr,
+            secondStr
         )
         run {
             var i: Number = 0
@@ -2555,79 +2495,78 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
         return ""
     }
 }
-, "loadding" to false as Boolean, "loaddingTaskTime" to null as Number?, "httpGet" to fun<T>(url: String, params: Any, showMgs: Boolean?): UTSPromise<T> {
+, "loadding" to false as Boolean, "loaddingTaskTime" to null as Number?, "httpGet" to fun(url: String, params: Any, showMgs: Boolean?): UTSPromise<Any> {
     return UTSPromise(fun(resolve, reject){
         var isTimeout = false
-        var requestTask: Any = null
+        var requestTask: Any? = null
         uni_showLoading(ShowLoadingOptions(title = "加载中", mask = true))
         val timeoutId = setTimeout(fun(){
             isTimeout = true
-            if (requestTask != null) {
-                requestTask.abort()
-            }
             uni_hideLoading(null)
             mToastMsg("请求超时，请重试")
             reject(UTSError("Request timeout"))
         }
         , 5000)
-        val queryString = Object.keys(params).map(fun(key): String {
-            return "" + UTSAndroid.consoleDebugError(encodeURIComponent(key), " at uni_modules/m-unix/components/m-tools/Ut.uts:696") + "=" + UTSAndroid.consoleDebugError(encodeURIComponent(params[key]), " at uni_modules/m-unix/components/m-tools/Ut.uts:696")
-        }
-        ).join("&")
-        val finalUrl = "" + getReqUrl() + url + (if (url.includes("?")) {
-            "&"
+        val queryString = ""
+        val finalUrl = "" + getReqUrl() + url + (if (queryString.length > 0) {
+            (if (url.includes("?")) {
+                "&"
+            } else {
+                "?"
+            }) + queryString
         } else {
-            "?"
+            ""
         }
-        ) + queryString
+        )
         requestTask = uni_request<Any>(RequestOptions(url = finalUrl, header = _uO("Authorization" to LoginObject().getToken()), method = "GET", dataType = "text", success = fun(res){
             clearTimeout(timeoutId)
             uni_hideLoading(null)
-            if (res.statusCode === HttpStatus__1.SUCCESS) {
-                var response: R<T>? = null
+            if (res.statusCode === 200) {
+                var response: R<Any>? = null
                 try {
-                    response = parseApiEnvelope<T>(res.data)
+                    response = parseApiEnvelope<Any>(res.data as Any)
                 } catch (e: Throwable) {
                     val m = if (e is UTSError) {
                         (e as UTSError).message
                     } else {
-                        String(e)
+                        "" + e
                     }
                     reject(UTSError(m))
                     return
                 }
                 if (!isTruthy(response)) {
-                    resolve(null as T)
+                    reject(UTSError("响应为空"))
                     return
                 }
-                if (response.code === 403) {
-                    reject(UTSError(if (response.msg != null && response.msg.length > 0) {
-                        response.msg
+                val resp = response as R<Any>
+                if (resp.code === 403) {
+                    reject(UTSError(if (resp.msg != null && resp.msg.length > 0) {
+                        resp.msg
                     } else {
                         "请重新登录"
                     }
                     ))
                     return
                 }
-                if (response.code === HttpStatus__1.SUCCESS) {
-                    resolve(response.data)
+                if (resp.code === 200) {
+                    resolve(resp.data)
                 } else {
                     if (isTruthy(showMgs)) {
-                        mToastMsg(if (response.msg != null && response.msg.length > 0) {
-                            response.msg
+                        mToastMsg(if (resp.msg != null && resp.msg.length > 0) {
+                            resp.msg
                         } else {
                             "请求处理失败"
                         }
                         )
                     }
-                    reject(UTSError(if (response.msg != null) {
-                        response.msg
+                    reject(UTSError(if (resp.msg != null) {
+                        resp.msg
                     } else {
                         "请求处理失败"
                     }))
                 }
             } else {
-                reject(httpStatusError(res.statusCode, res.data))
+                reject(httpStatusError(res.statusCode, res.data as Any))
             }
         }
         , fail = fun(err){
@@ -2639,7 +2578,7 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
             reject(err)
         }
         , complete = fun(_){
-            requestTask = null
+            null
         }
         ))
     }
@@ -2664,48 +2603,49 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
         requestTask = uni_request<Any>(RequestOptions(url = finalUrl, method = "POST", header = _uO("Authorization" to LoginObject().getToken(), "Content-Type" to "application/json"), data = params, dataType = "text", success = fun(res){
             clearTimeout(timeoutId)
             uni_hideLoading(null)
-            if (res.statusCode === HttpStatus__1.SUCCESS) {
-                var response: R<T>? = null
+            if (res.statusCode === 200) {
+                var response: R<Any>? = null
                 try {
-                    response = parseApiEnvelope<T>(res.data)
+                    response = parseApiEnvelope<Any>(res.data as Any)
                 } catch (e: Throwable) {
                     val m = if (e is UTSError) {
                         (e as UTSError).message
                     } else {
-                        String(e)
+                        "" + e
                     }
                     reject(UTSError(m))
                     return
                 }
                 if (!isTruthy(response)) {
-                    resolve(null as T)
+                    reject(UTSError("响应为空"))
                     return
                 }
-                if (response.code === 403) {
-                    reject(UTSError(if (response.msg != null && response.msg.length > 0) {
-                        response.msg
+                val resp = response as R<Any>
+                if (resp.code === 403) {
+                    reject(UTSError(if (resp.msg != null && resp.msg.length > 0) {
+                        resp.msg
                     } else {
                         "请重新登录"
                     }
                     ))
                     return
                 }
-                if (response.code === HttpStatus__1.SUCCESS) {
-                    resolve(response.data)
+                if (resp.code === 200) {
+                    resolve(resp.data)
                 } else {
-                    mToastMsg(if (response.msg != null && response.msg.length > 0) {
-                        response.msg
+                    mToastMsg(if (resp.msg != null && resp.msg.length > 0) {
+                        resp.msg
                     } else {
                         "请求处理失败"
                     })
-                    reject(UTSError(if (response.msg != null) {
-                        response.msg
+                    reject(UTSError(if (resp.msg != null) {
+                        resp.msg
                     } else {
                         "请求处理失败"
                     }))
                 }
             } else {
-                reject(httpStatusError(res.statusCode, res.data))
+                reject(httpStatusError(res.statusCode, res.data as Any))
             }
         }
         , fail = fun(err){
@@ -2724,7 +2664,7 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
     )
 }
 , "uploadFile" to fun<T>(url: String, filePath: String): UTSPromise<*> {
-    showLoading__1()
+    showLoading()
     return UTSPromise(fun(resolve, reject){
         val uploadTask: UploadTask = uni_uploadFile(UploadFileOptions(url = getReqUrl() + url, filePath = filePath, name = "imageFile", header = _uO("Authorization" to LoginObject().getToken()), success = fun(res) {
             uni_hideLoading(null)
@@ -2734,7 +2674,7 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
                 if (responseText.length === 0) {
                     responseText = "{}"
                 }
-                d = UTSAndroid.consoleDebugError(JSON.parse(responseText), " at uni_modules/m-unix/components/m-tools/Ut.uts:862") as R<T>
+                d = UTSAndroid.consoleDebugError(JSON.parse(responseText), " at uni_modules/m-unix/components/m-tools/Ut.uts:864") as R<T>
             }
              catch (e: Throwable) {
                 reject(e)
@@ -2760,7 +2700,7 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
     }
     )
 }
-, "storage" to storage, "isLoggedIn" to isLoggedIn, "checkLogin" to checkLogin, "needLogin" to needLogin, "request" to request, "http" to http, "jumpTo" to jumpTo, "checkPhone" to checkPhone, "get" to get__2, "set" to set, "jslog" to jslog, "apiStart" to apiStart, "apiStop" to apiStop, "isEmpty" to isEmpty, "checkNumber" to checkNumber, "changeMoney" to changeMoney, "timestampToDate" to timestampToDate, "getTodayStartTimestamp" to getTodayStartTimestamp, "validateEmail" to validateEmail, "maskPhoneNumber" to maskPhoneNumber, "generateOrderNumber" to generateOrderNumber, "useAuth" to useAuth)
+, "storage" to storage, "isLoggedIn" to isLoggedIn, "checkLogin" to checkLogin, "needLogin" to needLogin, "request" to request, "http" to http, "jumpTo" to jumpTo, "checkPhone" to checkPhone, "get" to get__1, "set" to set, "jslog" to jslog, "apiStart" to apiStart, "apiStop" to apiStop, "isEmpty" to isEmpty, "checkNumber" to checkNumber, "changeMoney" to changeMoney, "timestampToDate" to timestampToDate, "getTodayStartTimestamp" to getTodayStartTimestamp, "validateEmail" to validateEmail, "maskPhoneNumber" to maskPhoneNumber, "generateOrderNumber" to generateOrderNumber, "useAuth" to useAuth)
 val GenUniModulesMUnixComponentsMLoadingMLoadingClass = CreateVueComponent(GenUniModulesMUnixComponentsMLoadingMLoading::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMLoadingMLoading.name, inheritAttrs = GenUniModulesMUnixComponentsMLoadingMLoading.inheritAttrs, inject = GenUniModulesMUnixComponentsMLoadingMLoading.inject, props = GenUniModulesMUnixComponentsMLoadingMLoading.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMLoadingMLoading.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMLoadingMLoading.emits, components = GenUniModulesMUnixComponentsMLoadingMLoading.components, styles = GenUniModulesMUnixComponentsMLoadingMLoading.styles)
 }

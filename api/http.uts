@@ -1,4 +1,6 @@
-import { api, ApiResponse } from '@/api/request'
+// api/http.uts
+
+import { get, post, put, del, http, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
 import { config, setToken, clearToken } from '@/common/config'
 
 // 定义类型
@@ -14,8 +16,11 @@ export type LoginData = {
   nickname: string
 }
 
-// 登录
-
-export const login = async (params: LoginParams) => {
-  return api.post<LoginData>(config.api.auth.login, params)
+// 显式指定泛型类型和返回类型
+export const login = (params: LoginParams): Promise<ApiResponse<LoginData>> => {
+  const data: UTSJSONObject = {
+    'phone': params.phone,
+    'password': params.password
+  }
+  return post<LoginData>('/user/login', data,null)
 }

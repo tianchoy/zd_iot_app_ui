@@ -4,7 +4,7 @@
  */
 import { getHostProjectConfig } from './ProjectConfig.uts'
 import { storage } from './Storage.uts'
-import { uploadFileRequest } from './Upload.uts'
+import { uploadFileRequest, type UploadApiResponse, type UploadFileOptions } from './Upload.uts'
 
 // ========== 类型定义 ==========
 
@@ -121,7 +121,60 @@ function navigateToLogin(loginPage: string): void {
 	uni.showToast({ title: '请先登录', icon: 'none' })
 	setTimeout(() => {
 		uni.navigateTo({ url: loginPage })
+		return
 	}, 1200)
+}
+
+function createRequestOptions(url: string, method: HttpMethod, data?: UTSJSONObject, options?: RequestOptions): RequestOptions {
+	const out: RequestOptions = {
+		url,
+		method,
+		data,
+	}
+	if (options == null) {
+		return out
+	}
+	if (options.header != null) {
+		out.header = options.header
+	}
+	if (options.baseUrl != null) {
+		out.baseUrl = options.baseUrl
+	}
+	if (options.timeout != null) {
+		out.timeout = options.timeout
+	}
+	if (options.withToken != null) {
+		out.withToken = options.withToken
+	}
+	if (options.showError != null) {
+		out.showError = options.showError
+	}
+	if (options.showLoading != null) {
+		out.showLoading = options.showLoading
+	}
+	if (options.loadingText != null) {
+		out.loadingText = options.loadingText
+	}
+	if (options.redirectOnUnauthorized != null) {
+		out.redirectOnUnauthorized = options.redirectOnUnauthorized
+	}
+	if (options.loginPage != null) {
+		out.loginPage = options.loginPage
+	}
+	if (options.successCodes != null) {
+		out.successCodes = options.successCodes
+	}
+	if (options.unauthorizedCodes != null) {
+		out.unauthorizedCodes = options.unauthorizedCodes
+	}
+	if (options.onErrorCode != null) {
+		out.onErrorCode = options.onErrorCode
+	}
+	return out
+}
+
+function copyRequestOptions(options: RequestOptions): RequestOptions {
+	return createRequestOptions(options.url, options.method ?? 'GET', options.data, options)
 }
 
 // ========== 核心请求函数 ==========
@@ -137,7 +190,7 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 		header,
 		baseUrl,
 		timeout = DEFAULT_TIMEOUT,
-		withToken = true,
+		withToken = false,
 		showError = true,
 		showLoading = false,
 		loadingText,
@@ -173,7 +226,7 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 	if (withToken) {
 		const token = storage.getToken()
 		if (token != '') {
-			reqHeader['Authorization'] = token
+			reqHeader['token'] = token
 		}
 	}
 
@@ -217,7 +270,7 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 
 				// 自定义错误码处理
 				if (onErrorCode != null) {
-					onErrorCode(result)
+					onErrorCode(result as ApiResponse<any>)
 				}
 
 				// 显示错误提示
@@ -254,92 +307,101 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
  * GET 请求
  */
 export function get<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
-	return request<T>({ url, method: 'GET', data, ...options })
+	return request<T>(createRequestOptions(url, 'GET', data, options))
 }
 
 /**
  * POST 请求
  */
 export function post<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
-	return request<T>({ url, method: 'POST', data, ...options })
+	return request<T>(createRequestOptions(url, 'POST', data, options))
 }
 
 /**
  * PUT 请求
  */
 export function put<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
-	return request<T>({ url, method: 'PUT', data, ...options })
+	return request<T>(createRequestOptions(url, 'PUT', data, options))
 }
 
 /**
  * DELETE 请求
  */
 export function del<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
-	return request<T>({ url, method: 'DELETE', data, ...options })
+	return request<T>(createRequestOptions(url, 'DELETE', data, options))
 }
 
 /**
  * 公开请求（不需要登录）
  */
 export function publicRequest<T = any>(options: RequestOptions): Promise<ApiResponse<T>> {
-	return request<T>({ ...options, withToken: false, redirectOnUnauthorized: false })
+	const requestOptions = copyRequestOptions(options)
+	requestOptions.withToken = false
+	requestOptions.redirectOnUnauthorized = false
+	return request<T>(requestOptions)
 }
 
 /**
  * 静默请求（不显示任何提示）
  */
 export function silentRequest<T = any>(options: RequestOptions): Promise<ApiResponse<T>> {
-	return request<T>({ ...options, showError: false, redirectOnUnauthorized: false })
+	const requestOptions = copyRequestOptions(options)
+	requestOptions.showError = false
+	requestOptions.redirectOnUnauthorized = false
+	return request<T>(requestOptions)
 }
 
 /**
  * 带加载提示的请求
  */
 export function loadingRequest<T = any>(options: RequestOptions, loadingText?: string): Promise<ApiResponse<T>> {
-	return request<T>({ ...options, showLoading: true, loadingText: loadingText || '加载中...' })
+	const requestOptions = copyRequestOptions(options)
+	requestOptions.showLoading = true
+	requestOptions.loadingText = loadingText || '加载中...'
+	return request<T>(requestOptions)
 }
 
 // ========== HTTP 对象（链式调用风格） ==========
 
 export const http = {
 	/** GET 请求 */
-	get<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
-		return get<T>(url, data, options)
+	get(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<any>> {
+		return get<any>(url, data, options)
 	},
 
 	/** POST 请求 */
-	post<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
-		return post<T>(url, data, options)
+	post(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<any>> {
+		return post<any>(url, data, options)
 	},
 
 	/** PUT 请求 */
-	put<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
-		return put<T>(url, data, options)
+	put(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<any>> {
+		return put<any>(url, data, options)
 	},
 
 	/** DELETE 请求 */
-	delete<T = any>(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<T>> {
-		return del<T>(url, data, options)
+	delete(url: string, data?: UTSJSONObject, options?: RequestOptions): Promise<ApiResponse<any>> {
+		return del<any>(url, data, options)
 	},
 
 	/** 公开请求（不需要登录） */
-	public<T = any>(options: RequestOptions): Promise<ApiResponse<T>> {
-		return publicRequest<T>(options)
+	public(options: RequestOptions): Promise<ApiResponse<any>> {
+		return publicRequest<any>(options)
 	},
 
 	/** 静默请求（不显示提示） */
-	silent<T = any>(options: RequestOptions): Promise<ApiResponse<T>> {
-		return silentRequest<T>(options)
+	silent(options: RequestOptions): Promise<ApiResponse<any>> {
+		return silentRequest<any>(options)
 	},
 
 	/** 带加载提示的请求 */
-	loading<T = any>(options: RequestOptions, loadingText?: string): Promise<ApiResponse<T>> {
-		return loadingRequest<T>(options, loadingText)
+	loading(options: RequestOptions, loadingText?: string): Promise<ApiResponse<any>> {
+		return loadingRequest<any>(options, loadingText)
 	},
 
 	/** multipart 上传单个文件（实现见 Upload.uts） */
-	upload<T = any>(options: any): Promise<any> {
-		return uploadFileRequest<T>(options)
+	upload(options: UploadFileOptions): Promise<UploadApiResponse<any>> {
+		return uploadFileRequest<any>(options)
 	}
 }
 

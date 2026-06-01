@@ -24,14 +24,14 @@ export class LoginObject {
 	 * 设置登录对象
 	 */
 	setMemberInfo(m : StoreMemberVo) : void {
-		CacheUtil.set(StorageEnum.MEMBER_INFO_KEY, m)
+		CacheUtil.set(StorageEnum.MEMBER_INFO_KEY.toString(), m)
 	}
 	/**
 	 * 获取登录对象
 	 */
 	getMemberInfo() : StoreMemberVo | null {
 		try {
-			return CacheUtil.get<StoreMemberVo>(StorageEnum.MEMBER_INFO_KEY);
+			return CacheUtil.get<StoreMemberVo>(StorageEnum.MEMBER_INFO_KEY.toString());
 		} catch (e) {
 			__f__('log','at uni_modules/m-unix/components/m-tools/LoginObject.uts:36',"get token error,`{}`", e)
 			return null;
@@ -47,7 +47,7 @@ export class LoginObject {
 	 * 退出
 	 */
 	logout(){
-		CacheUtil.remove(StorageEnum.MEMBER_INFO_KEY)
+		CacheUtil.remove(StorageEnum.MEMBER_INFO_KEY.toString())
 	}
 	/**
 	 * 是否登录

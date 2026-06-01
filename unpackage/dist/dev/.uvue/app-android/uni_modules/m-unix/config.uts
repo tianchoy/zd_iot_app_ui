@@ -85,7 +85,7 @@ function trimStr(s: string | null | undefined): string {
     if (s == null) {
         return '';
     }
-    return s.trim();
+    return '' + s;
 }
 /** 依次取第一个非空字符串，否则返回 defaultVal */
 function pickChain(a: string, b: string, c: string, defaultVal: string): string {
@@ -108,23 +108,23 @@ function pickChain2(a: string, b: string, defaultVal: string): string {
 }
 export function getMUiConfig(): MUiConfig {
     const cfg = getHostProjectConfig();
-    const r = mUiRuntime != null ? mUiRuntime : ({} as MUiPartial);
+    const r = (mUiRuntime != null ? mUiRuntime : ({} as MUiPartial)) as MUiPartial;
     const mu = cfg.mUi;
-    const f = mu != null ? (mu as MUiPartial) : ({} as MUiPartial);
+    const f = (mu != null ? (mu as MUiPartial) : ({} as MUiPartial)) as MUiPartial;
     const ci = cfg.configInfo;
     const api = cfg.api;
     return {
-        appName: pickChain(trimStr(r["appName"]), trimStr(f["appName"]), trimStr(ci.name), M_UI_DEFAULTS.appName),
-        apiDevelopmentBase: pickChain(trimStr(r["apiDevelopmentBase"]), trimStr(f["apiDevelopmentBase"]), trimStr(cfg.baseUrl), M_UI_DEFAULTS.apiDevelopmentBase),
-        apiProductionBase: pickChain2(trimStr(r["apiProductionBase"]), trimStr(f["apiProductionBase"]), M_UI_DEFAULTS.apiProductionBase),
-        agreementRoute: pickChain2(trimStr(r["agreementRoute"]), trimStr(f["agreementRoute"]), M_UI_DEFAULTS.agreementRoute),
-        privacyRoute: pickChain2(trimStr(r["privacyRoute"]), trimStr(f["privacyRoute"]), M_UI_DEFAULTS.privacyRoute),
-        appLogo: pickChain(trimStr(r["appLogo"]), trimStr(f["appLogo"]), trimStr(ci.logo), M_UI_DEFAULTS.appLogo),
-        emptyDefaultIcon: pickChain2(trimStr(r["emptyDefaultIcon"]), trimStr(f["emptyDefaultIcon"]), M_UI_DEFAULTS.emptyDefaultIcon),
-        avatarDefault: pickChain2(trimStr(r["avatarDefault"]), trimStr(f["avatarDefault"]), M_UI_DEFAULTS.avatarDefault),
-        articlePlaceholder: pickChain2(trimStr(r["articlePlaceholder"]), trimStr(f["articlePlaceholder"]), M_UI_DEFAULTS.articlePlaceholder),
-        demoImage: pickChain2(trimStr(r["demoImage"]), trimStr(f["demoImage"]), M_UI_DEFAULTS.demoImage),
-        qrCodeImageApiBase: pickChain(trimStr(r["qrCodeImageApiBase"]), trimStr(f["qrCodeImageApiBase"]), trimStr(api.qrCodeImageApiBase), M_UI_DEFAULTS.qrCodeImageApiBase),
+        appName: pickChain(trimStr(r.appName), trimStr(f.appName), trimStr(ci.name), M_UI_DEFAULTS.appName),
+        apiDevelopmentBase: pickChain(trimStr(r.apiDevelopmentBase), trimStr(f.apiDevelopmentBase), trimStr(cfg.baseUrl), M_UI_DEFAULTS.apiDevelopmentBase),
+        apiProductionBase: pickChain2(trimStr(r.apiProductionBase), trimStr(f.apiProductionBase), M_UI_DEFAULTS.apiProductionBase),
+        agreementRoute: pickChain2(trimStr(r.agreementRoute), trimStr(f.agreementRoute), M_UI_DEFAULTS.agreementRoute),
+        privacyRoute: pickChain2(trimStr(r.privacyRoute), trimStr(f.privacyRoute), M_UI_DEFAULTS.privacyRoute),
+        appLogo: pickChain(trimStr(r.appLogo), trimStr(f.appLogo), trimStr(ci.logo), M_UI_DEFAULTS.appLogo),
+        emptyDefaultIcon: pickChain2(trimStr(r.emptyDefaultIcon), trimStr(f.emptyDefaultIcon), M_UI_DEFAULTS.emptyDefaultIcon),
+        avatarDefault: pickChain2(trimStr(r.avatarDefault), trimStr(f.avatarDefault), M_UI_DEFAULTS.avatarDefault),
+        articlePlaceholder: pickChain2(trimStr(r.articlePlaceholder), trimStr(f.articlePlaceholder), M_UI_DEFAULTS.articlePlaceholder),
+        demoImage: pickChain2(trimStr(r.demoImage), trimStr(f.demoImage), M_UI_DEFAULTS.demoImage),
+        qrCodeImageApiBase: pickChain(trimStr(r.qrCodeImageApiBase), trimStr(f.qrCodeImageApiBase), trimStr(api.qrCodeImageApiBase), M_UI_DEFAULTS.qrCodeImageApiBase),
     } as MUiConfig;
 }
 /** 运行时覆盖（可多次调用，未传入的字段保留上次运行时值） */

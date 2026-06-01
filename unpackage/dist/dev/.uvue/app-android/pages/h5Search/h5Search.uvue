@@ -90,9 +90,10 @@ const __sfc__ = defineComponent({
             // })
         };
         // 监听扫码结果
-        const onScanResult = (data: any) => {
-            if (isTruthy(data) && isTruthy(data.result)) {
-                cardNumber.value = data.result;
+        const onScanResult = (data: UTSJSONObject) => {
+            const result = data.getString('result') ?? '';
+            if (result.length > 0) {
+                cardNumber.value = result;
                 uni.showToast({
                     title: '扫码成功',
                     icon: 'success'

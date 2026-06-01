@@ -36,7 +36,7 @@ open class GenPagesMineMine : BasePage {
                 return _cE(Fragment, null, _uA(
                     _cV(_component_topNavBar, _uM("title" to "我的", "show-back" to false, "backgroundColor" to "#f4f7fb", "textColor" to "#333", "showCapsule" to false)),
                     _cE("view", _uM("class" to "container"), _uA(
-                        _cE("view", _uM("class" to "card-info"), _uA(
+                        _cE("view", _uM("class" to "card-info mb-24"), _uA(
                             _cE("text", _uM("class" to "persion-name"), "Hi," + _tD(unref(title)), 1),
                             _cE("view", _uM("class" to "persion-card"), _uA(
                                 _cE("view", _uM("class" to "persion-card-item", "onClick" to fun(){

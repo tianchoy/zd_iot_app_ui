@@ -91,7 +91,7 @@ function trimStr(s: string | null | undefined): string {
 	if (s == null) {
 		return ''
 	}
-	return s.trim()
+	return '' + s
 }
 
 /** 依次取第一个非空字符串，否则返回 defaultVal */
@@ -117,9 +117,9 @@ function pickChain2(a: string, b: string, defaultVal: string): string {
 
 export function getMUiConfig(): MUiConfig {
 	const cfg = getHostProjectConfig()
-	const r = mUiRuntime != null ? mUiRuntime : ({} as MUiPartial)
+	const r = (mUiRuntime != null ? mUiRuntime : ({} as MUiPartial)) as MUiPartial
 	const mu = cfg.mUi
-	const f = mu != null ? (mu as MUiPartial) : ({} as MUiPartial)
+	const f = (mu != null ? (mu as MUiPartial) : ({} as MUiPartial)) as MUiPartial
 	const ci = cfg.configInfo
 	const api = cfg.api
 	return {

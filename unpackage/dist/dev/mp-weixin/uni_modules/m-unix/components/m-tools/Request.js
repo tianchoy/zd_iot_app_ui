@@ -130,12 +130,76 @@ function navigateToLogin(loginPage) {
   common_vendor.index.showToast({ title: "请先登录", icon: "none" });
   setTimeout(() => {
     common_vendor.index.navigateTo({ url: loginPage });
+    return null;
   }, 1200);
+}
+function createRequestOptions(url, method, data = null, options = null) {
+  const out = new RequestOptions({
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    withToken: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url,
+    method,
+    data
+  });
+  if (options == null) {
+    return out;
+  }
+  if (options.header != null) {
+    out.header = options.header;
+  }
+  if (options.baseUrl != null) {
+    out.baseUrl = options.baseUrl;
+  }
+  if (options.timeout != null) {
+    out.timeout = options.timeout;
+  }
+  if (options.withToken != null) {
+    out.withToken = options.withToken;
+  }
+  if (options.showError != null) {
+    out.showError = options.showError;
+  }
+  if (options.showLoading != null) {
+    out.showLoading = options.showLoading;
+  }
+  if (options.loadingText != null) {
+    out.loadingText = options.loadingText;
+  }
+  if (options.redirectOnUnauthorized != null) {
+    out.redirectOnUnauthorized = options.redirectOnUnauthorized;
+  }
+  if (options.loginPage != null) {
+    out.loginPage = options.loginPage;
+  }
+  if (options.successCodes != null) {
+    out.successCodes = options.successCodes;
+  }
+  if (options.unauthorizedCodes != null) {
+    out.unauthorizedCodes = options.unauthorizedCodes;
+  }
+  if (options.onErrorCode != null) {
+    out.onErrorCode = options.onErrorCode;
+  }
+  return out;
+}
+function copyRequestOptions(options) {
+  var _a;
+  return createRequestOptions(options.url, (_a = options.method) !== null && _a !== void 0 ? _a : "GET", options.data, options);
 }
 function request(options) {
   const url = options.url, _a = options.method, method = _a == void 0 ? "GET" : _a, data = options.data;
   options.header;
-  const baseUrl = options.baseUrl, _b = options.timeout, timeout = _b == void 0 ? DEFAULT_TIMEOUT : _b, _c = options.withToken, withToken = _c == void 0 ? true : _c, _d = options.showError, showError = _d == void 0 ? true : _d, _e = options.showLoading, showLoading = _e == void 0 ? false : _e, loadingText = options.loadingText, _f = options.redirectOnUnauthorized, redirectOnUnauthorized = _f == void 0 ? true : _f, loginPage = options.loginPage, successCodes = options.successCodes, unauthorizedCodes = options.unauthorizedCodes, onErrorCode = options.onErrorCode;
+  const baseUrl = options.baseUrl, _b = options.timeout, timeout = _b == void 0 ? DEFAULT_TIMEOUT : _b, _c = options.withToken, withToken = _c == void 0 ? false : _c, _d = options.showError, showError = _d == void 0 ? true : _d, _e = options.showLoading, showLoading = _e == void 0 ? false : _e, loadingText = options.loadingText, _f = options.redirectOnUnauthorized, redirectOnUnauthorized = _f == void 0 ? true : _f, loginPage = options.loginPage, successCodes = options.successCodes, unauthorizedCodes = options.unauthorizedCodes, onErrorCode = options.onErrorCode;
   if (showLoading) {
     showLoadingModal(loadingText !== null && loadingText !== void 0 ? loadingText : "加载中...");
   }
@@ -155,7 +219,7 @@ function request(options) {
   if (withToken) {
     const token = uni_modules_mUnix_components_mTools_Storage.storage.getToken();
     if (token != "") {
-      reqHeader["Authorization"] = token;
+      reqHeader["token"] = token;
     }
   }
   const finalSuccessCodes = successCodes !== null && successCodes !== void 0 ? successCodes : DEFAULT_SUCCESS_CODES;
@@ -212,25 +276,34 @@ function request(options) {
   });
 }
 function get(url, data = null, options = null) {
-  return request(new RequestOptions(Object.assign({ header: null, baseUrl: null, timeout: null, withToken: null, showError: null, showLoading: null, loadingText: null, redirectOnUnauthorized: null, loginPage: null, successCodes: null, unauthorizedCodes: null, onErrorCode: null, url, method: "GET", data }, options)));
+  return request(createRequestOptions(url, "GET", data, options));
 }
 function post(url, data = null, options = null) {
-  return request(new RequestOptions(Object.assign({ header: null, baseUrl: null, timeout: null, withToken: null, showError: null, showLoading: null, loadingText: null, redirectOnUnauthorized: null, loginPage: null, successCodes: null, unauthorizedCodes: null, onErrorCode: null, url, method: "POST", data }, options)));
+  return request(createRequestOptions(url, "POST", data, options));
 }
 function put(url, data = null, options = null) {
-  return request(new RequestOptions(Object.assign({ header: null, baseUrl: null, timeout: null, withToken: null, showError: null, showLoading: null, loadingText: null, redirectOnUnauthorized: null, loginPage: null, successCodes: null, unauthorizedCodes: null, onErrorCode: null, url, method: "PUT", data }, options)));
+  return request(createRequestOptions(url, "PUT", data, options));
 }
 function del(url, data = null, options = null) {
-  return request(new RequestOptions(Object.assign({ header: null, baseUrl: null, timeout: null, withToken: null, showError: null, showLoading: null, loadingText: null, redirectOnUnauthorized: null, loginPage: null, successCodes: null, unauthorizedCodes: null, onErrorCode: null, url, method: "DELETE", data }, options)));
+  return request(createRequestOptions(url, "DELETE", data, options));
 }
 function publicRequest(options) {
-  return request(new RequestOptions(Object.assign(Object.assign({ url: null, method: null, data: null, header: null, baseUrl: null, timeout: null, showError: null, showLoading: null, loadingText: null, loginPage: null, successCodes: null, unauthorizedCodes: null, onErrorCode: null }, options), { withToken: false, redirectOnUnauthorized: false })));
+  const requestOptions = copyRequestOptions(options);
+  requestOptions.withToken = false;
+  requestOptions.redirectOnUnauthorized = false;
+  return request(requestOptions);
 }
 function silentRequest(options) {
-  return request(new RequestOptions(Object.assign(Object.assign({ url: null, method: null, data: null, header: null, baseUrl: null, timeout: null, withToken: null, showLoading: null, loadingText: null, loginPage: null, successCodes: null, unauthorizedCodes: null, onErrorCode: null }, options), { showError: false, redirectOnUnauthorized: false })));
+  const requestOptions = copyRequestOptions(options);
+  requestOptions.showError = false;
+  requestOptions.redirectOnUnauthorized = false;
+  return request(requestOptions);
 }
 function loadingRequest(options, loadingText = null) {
-  return request(new RequestOptions(Object.assign(Object.assign({ url: null, method: null, data: null, header: null, baseUrl: null, timeout: null, withToken: null, showError: null, redirectOnUnauthorized: null, loginPage: null, successCodes: null, unauthorizedCodes: null, onErrorCode: null }, options), { showLoading: true, loadingText: loadingText || "加载中..." })));
+  const requestOptions = copyRequestOptions(options);
+  requestOptions.showLoading = true;
+  requestOptions.loadingText = loadingText || "加载中...";
+  return request(requestOptions);
 }
 const http = new common_vendor.UTSJSONObject(
   {
@@ -263,7 +336,7 @@ const http = new common_vendor.UTSJSONObject(
       return loadingRequest(options, loadingText);
     },
     /** multipart 上传单个文件（实现见 Upload.uts） */
-    upload(options = null) {
+    upload(options) {
       return uni_modules_mUnix_components_mTools_Upload.uploadFileRequest(options);
     }
   }
@@ -281,5 +354,6 @@ new common_vendor.UTSJSONObject({
   http
 });
 exports.http = http;
+exports.post = post;
 exports.request = request;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/m-unix/components/m-tools/Request.js.map

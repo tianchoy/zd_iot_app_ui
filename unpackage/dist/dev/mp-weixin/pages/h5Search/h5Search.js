@@ -86,9 +86,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         icon: "loading"
       });
     };
-    const onScanResult = (data = null) => {
-      if (data && data.result) {
-        cardNumber.value = data.result;
+    const onScanResult = (data) => {
+      var _a;
+      const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
+      if (result.length > 0) {
+        cardNumber.value = result;
         common_vendor.index.showToast({
           title: "扫码成功",
           icon: "success"
