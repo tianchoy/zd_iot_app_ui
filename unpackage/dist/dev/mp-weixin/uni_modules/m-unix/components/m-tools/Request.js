@@ -4,6 +4,7 @@ const uni_modules_mUnix_components_mTools_ProjectConfig = require("./ProjectConf
 const uni_modules_mUnix_components_mTools_Storage = require("./Storage.js");
 const uni_modules_mUnix_components_mTools_Upload = require("./Upload.js");
 const common_config = require("../../../../common/config.js");
+var _a;
 class ApiResponse extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$(T) {
     return {
@@ -27,6 +28,9 @@ class ApiResponse extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+const systemInfo = common_vendor.index.getSystemInfoSync();
+const DEFAULT_LANGUAGE = ((_a = systemInfo.language) !== null && _a !== void 0 ? _a : "zh_CN").replace("-", "_");
+common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Request.uts:25", "DEFAULT_LANGUAGE", DEFAULT_LANGUAGE);
 class RequestOptions extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -194,11 +198,11 @@ function createRequestOptions(url, method, data = null, options = null) {
   return out;
 }
 function copyRequestOptions(options) {
-  var _a;
-  return createRequestOptions(options.url, (_a = options.method) !== null && _a !== void 0 ? _a : "GET", options.data, options);
+  var _a2;
+  return createRequestOptions(options.url, (_a2 = options.method) !== null && _a2 !== void 0 ? _a2 : "GET", options.data, options);
 }
 function request(options) {
-  const url = options.url, _a = options.method, method = _a == void 0 ? "GET" : _a, data = options.data;
+  const url = options.url, _a2 = options.method, method = _a2 == void 0 ? "GET" : _a2, data = options.data;
   options.header;
   const baseUrl = options.baseUrl, _b = options.timeout, timeout = _b == void 0 ? DEFAULT_TIMEOUT : _b, _c = options.withToken, withToken = _c == void 0 ? false : _c, _d = options.showError, showError = _d == void 0 ? true : _d, _e = options.showLoading, showLoading = _e == void 0 ? false : _e, loadingText = options.loadingText, _f = options.redirectOnUnauthorized, redirectOnUnauthorized = _f == void 0 ? true : _f, loginPage = options.loginPage, successCodes = options.successCodes, unauthorizedCodes = options.unauthorizedCodes, onErrorCode = options.onErrorCode;
   if (showLoading) {
@@ -212,12 +216,14 @@ function request(options) {
     requestData = new common_vendor.UTSJSONObject({});
   }
   const reqHeader = new common_vendor.UTSJSONObject({
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Content-Language": DEFAULT_LANGUAGE
   });
-  common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Request.uts:226", "request", withToken);
+  common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Request.uts:233", "request", withToken);
   if (withToken) {
     const token = common_config.getToken();
-    common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Request.uts:231", "otken", token);
+    common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Request.uts:238", "otken", token);
     if (token != "") {
       reqHeader["token"] = token;
     }
@@ -349,6 +355,7 @@ new common_vendor.UTSJSONObject({
   loading: loadingRequest,
   http
 });
+exports.RequestOptions = RequestOptions;
 exports.http = http;
 exports.request = request;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/m-unix/components/m-tools/Request.js.map

@@ -9,7 +9,7 @@ class CacheMeta extends common_vendor.UTS.UTSType {
         return {
           expire: { type: Number, optional: true },
           timestamp: { type: Number, optional: false },
-          data: { type: "Unknown", optional: false }
+          data: { type: "Any", optional: false }
         };
       },
       name: "CacheMeta"

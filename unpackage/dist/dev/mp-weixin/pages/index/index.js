@@ -74,8 +74,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onMounted(() => {
-      common_vendor.index.$on("scanResult", onScanResult);
       getLogin();
+      common_vendor.index.$on("scanResult", onScanResult);
     });
     common_vendor.onUnmounted(() => {
       common_vendor.index.$off("scanResult", onScanResult);
@@ -104,20 +104,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: card_number.value,
         g: common_vendor.o(($event) => {
           return card_number.value = $event.detail.value;
-        }, "f2"),
+        }, "84"),
         h: common_vendor.p({
           name: "scanning",
           size: "40rpx",
           class: "data-v-00a60067"
         }),
-        i: common_vendor.o(scanCode, "c7"),
+        i: common_vendor.o(scanCode, "4d"),
         j: common_vendor.p({
           type: "white",
           plain: true,
           width: "90rpx",
           class: "scan-btn data-v-00a60067"
         }),
-        k: common_vendor.o(handleQuery, "3a"),
+        k: common_vendor.o(handleQuery, "be"),
         l: common_vendor.p({
           type: "primary",
           width: "120rpx",
@@ -125,7 +125,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         m: common_vendor.o(($event) => {
           return cardType(0);
-        }, "99"),
+        }, "27"),
         n: common_vendor.p({
           text: "标签",
           round: true,
@@ -139,7 +139,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textClass: "divider",
           class: "data-v-00a60067"
         }),
-        p: common_vendor.o(goRecharge, "d7"),
+        p: common_vendor.o(goRecharge, "6a"),
         q: common_vendor.p({
           type: "primary",
           width: "200rpx",
@@ -148,7 +148,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           shape: "circle",
           class: "data-v-00a60067"
         }),
-        r: common_vendor.o(handleClick, "ee"),
+        r: common_vendor.o(handleClick, "53"),
         s: common_vendor.p({
           class: "data-v-00a60067"
         }),

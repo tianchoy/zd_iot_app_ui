@@ -19,7 +19,7 @@
 			</view>
 		</view>
 		<view class="card-box mt-24 mb-24">
-			<view class="card-label">卡号查询</view>
+			<view class="card-label mb-24">卡号查询</view>
 			<view class="search-value">
 				<input
 					v-model="card_number"
@@ -78,7 +78,7 @@
 <script setup lang="uts">
 	import { ref, onMounted, onUnmounted } from 'vue'
 	import { getToken, setToken, clearToken } from '@/common/config'
-	import { card_detail } from '@/api/http.uts'
+	import { card_detail,login } from '@/api/http.uts'
 	
 	const title = ref('Hello')
 	const show = ref(false)
@@ -141,10 +141,11 @@
 		const res = await card_detail(card_number.value, 'CHN',false)
 	}
 
+
 	onMounted(() => {
+		getLogin()
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
-		getLogin()
 	})
 	
 	onUnmounted(() => {

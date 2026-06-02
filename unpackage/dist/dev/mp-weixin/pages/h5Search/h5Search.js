@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_http = require("../../api/http.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
@@ -20,20 +21,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const showCountryPopup = common_vendor.ref(false);
     const selectedCountry = common_vendor.ref("");
     const searchSelectRef = common_vendor.ref(null);
-    const countryOptions = common_vendor.ref([
-      new common_vendor.UTSJSONObject({ value: "1", label: "中国" }),
-      new common_vendor.UTSJSONObject({ value: "2", label: "美国" }),
-      new common_vendor.UTSJSONObject({ value: "3", label: "日本" }),
-      new common_vendor.UTSJSONObject({ value: "4", label: "韩国" }),
-      new common_vendor.UTSJSONObject({ value: "5", label: "英国" }),
-      new common_vendor.UTSJSONObject({ value: "6", label: "德国" }),
-      new common_vendor.UTSJSONObject({ value: "7", label: "法国" }),
-      new common_vendor.UTSJSONObject({ value: "8", label: "澳大利亚" }),
-      new common_vendor.UTSJSONObject({ value: "9", label: "加拿大" }),
-      new common_vendor.UTSJSONObject({ value: "10", label: "新加坡" }),
-      new common_vendor.UTSJSONObject({ value: "11", label: "马来西亚" }),
-      new common_vendor.UTSJSONObject({ value: "12", label: "泰国" })
-    ]);
+    const resCountry = common_vendor.ref("");
+    const countryOptions = common_vendor.ref([]);
     const selectedCountryLabel = common_vendor.computed(() => {
       if (!selectedCountry.value)
         return "";
@@ -50,12 +39,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showCountryPopup.value = true;
     };
     const onCountryChange = (value = null, item = null) => {
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:131", "选中国家/地区:", value, item);
       showCountryPopup.value = false;
-      common_vendor.index.showToast({
-        title: `已选择：${item["label"]}`,
-        icon: "success"
-      });
+      resCountry.value = value;
+      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:123", "选中国家/地区:", resCountry.value);
     };
     const onPopupClose = () => {
       showCountryPopup.value = false;
@@ -80,8 +66,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:167", "查询卡号:", cardNumber.value);
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:168", "国家/地区:", selectedCountryLabel.value);
+      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:154", "查询卡号:", cardNumber.value);
+      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:155", "国家/地区:", resCountry.value);
       common_vendor.index.showToast({
         title: "查询中...",
         icon: "loading"
@@ -98,7 +84,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
     };
+    const initCountryList = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_http.getCountryList(false);
+        common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:181", "查询国家列表:", res);
+        if (res.code == 200) {
+          countryOptions.value = res.data.map((item) => {
+            return new common_vendor.UTSJSONObject({
+              value: item["letterCode"],
+              label: item["fullName"]
+            });
+          });
+        }
+      });
+    };
     common_vendor.onMounted(() => {
+      initCountryList();
       common_vendor.index.$on("scanResult", onScanResult);
     });
     common_vendor.onUnmounted(() => {

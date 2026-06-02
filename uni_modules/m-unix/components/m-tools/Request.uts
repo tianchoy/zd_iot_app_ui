@@ -19,6 +19,11 @@ export type ApiResponse<T = any> = {
 	data: T
 }
 
+const systemInfo = uni.getSystemInfoSync()
+const DEFAULT_LANGUAGE = (systemInfo.language ?? 'zh_CN').replace('-', '_') as string
+
+console.log('DEFAULT_LANGUAGE', DEFAULT_LANGUAGE)	
+
 /** 请求配置选项 */
 export type RequestOptions = {
 	/** 请求地址（相对路径或完整URL） */
@@ -220,7 +225,9 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 
 	// 构建请求头
 	const reqHeader: UTSJSONObject = {
-		'Content-Type': 'application/json'
+		'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Content-Language': DEFAULT_LANGUAGE
 	}
 
 	console.log('request', withToken)

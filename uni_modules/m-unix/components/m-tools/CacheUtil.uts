@@ -7,7 +7,7 @@ type CacheMeta = {
   /** 数据存储时间戳 */
   timestamp: number
   /** 实际缓存数据 */
-  data: Any
+  data: any
 }
 
 class CacheUtil {
@@ -22,7 +22,7 @@ class CacheUtil {
       const cacheKey = CACHE_PREFIX + key
       const expireAt = expire != null ? Date.now() + expire * 1000 : null
       const meta: CacheMeta = {
-        data: data as Any,
+        data: data as any,
         timestamp: Date.now(),
         expire: expireAt
       }
@@ -40,7 +40,7 @@ class CacheUtil {
    * @param key 缓存键
    * @param validator 数据校验函数（可选）
    */
-  static get<T>(key: string, validator: ((data: Any) => boolean) | null = null): T | null {
+  static get<T>(key: string, validator: ((data: any) => boolean) | null = null): T | null {
     const cacheKey = CACHE_PREFIX + key
     try {
       const cached = uni.getStorageSync(cacheKey)

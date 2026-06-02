@@ -1,6 +1,6 @@
 // api/http.uts
-
-import { http, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
+import { ApiUrl } from './url'
+import { request, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
 
 
 export type LoginData = {
@@ -10,11 +10,46 @@ export type LoginData = {
   nickname: string
 }
 
-// 显式指定泛型类型和返回类型
+export type CountryData = {
+  fullName: string
+  letterCode: string
+}
+
+// 查询国家列表
+export const getCountryList = (withToken: boolean = false): Promise<ApiResponse<CountryData>> => {
+  return request({
+    url: ApiUrl.countries,
+    method: 'GET',
+    withToken
+  }) as Promise<ApiResponse<CountryData>>
+}
+
+// 查询卡详情
 export const card_detail = (id: string, countryCode: string, withToken: boolean = true): Promise<ApiResponse<LoginData>> => {
-  return http.get(
-    '/app/card/info/' + id + '/' + countryCode,
-    null,
-    { withToken }
-  ) as Promise<ApiResponse<LoginData>>
+  return request({
+    url: ApiUrl.card_detail + id + '/' + countryCode,
+    method: 'GET',
+    withToken
+  }) as Promise<ApiResponse<LoginData>>
+}
+
+// 登录
+/*
+* 登录需要这三个固定的参数
+* tenantId
+* clientId:12353d4772a25656d6d2a67d53353cc3
+* grantType:xcx
+*/
+export const login = (data: UTSJSONObject, withToken: boolean = true): Promise<ApiResponse<LoginData>> => {
+  return request({
+    url: ApiUrl.addOrder,
+    method: 'POST',
+    data:{
+      ...data,
+      tenantId: '123456',
+      clientId: '12353d4772a25656d6d2a67d53353cc3',
+      grantType: 'xcx'
+    },
+    withToken 
+  }) as Promise<ApiResponse<LoginData>>
 }
