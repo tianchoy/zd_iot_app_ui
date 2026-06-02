@@ -1,10 +1,11 @@
 <template>
-	<m-fab type="primary" size="40rpx" icon="customer-service"  :draggable="true" @click="connect_service" />
+	 <m-fab type="primary" size="40rpx" icon="customer-service" :draggable="true" @click="handleClick" />
 </template>
 
 <script setup lang="uts">
-	const connect_service = ()=>{
-		console.log('联系客服')
+	const emit = defineEmits(['connect_service']);
+	const handleClick = (e) => {
+		emit('connect_service');
 	}
 </script>
 

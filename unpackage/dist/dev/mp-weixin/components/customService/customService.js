@@ -10,15 +10,18 @@ if (!Math) {
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "customService",
-  setup(__props) {
-    const connect_service = () => {
-      common_vendor.index.__f__("log", "at components/customService/customService.uvue:7", "联系客服");
+  emits: ["connect_service"],
+  setup(__props, _a) {
+    var __emit = _a.emit;
+    const emit = __emit;
+    const handleClick = (e = null) => {
+      emit("connect_service");
     };
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
         a: common_vendor.gei(_ctx, ""),
-        b: common_vendor.o(connect_service, "2d"),
+        b: common_vendor.o(handleClick, "57"),
         c: common_vendor.p({
           type: "primary",
           size: "40rpx",

@@ -118,8 +118,6 @@ const getNavBarInfo = () => {
 const handleBack = () => {
 	if (props.showBack) {
 		emit('back');
-		// 默认返回上一页
-		// uni.navigateBack();
 	}
 };
 

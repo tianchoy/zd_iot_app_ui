@@ -71,7 +71,7 @@
 				</view>
 			</view>
 		</view>
-		<customService />
+		<customService @connect_service="handleClick"></customService>
 	</view>
 </template>
 
@@ -129,6 +129,11 @@
 		uni.reLaunch({
 			url: '/pages/card/card?type=' + type
 		})
+	}
+
+	// 联系客服
+	const handleClick = () => {
+		console.log('联系客服1111')
 	}
 	
 	const getLogin = async () => {

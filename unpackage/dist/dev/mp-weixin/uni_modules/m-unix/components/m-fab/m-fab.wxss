@@ -31,6 +31,10 @@
   top: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.2);
+  z-index: 996;
+}
+.m-fab__wrap {
+  /* 位置通过内联样式控制 */
 }
 .m-fab__subs {
   display: flex;
@@ -45,6 +49,10 @@
   padding: 16rpx 28rpx;
   border-radius: 40rpx;
   margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+}
+.m-fab__sub:active {
+  transform: scale(0.95);
 }
 .m-fab__sub-img {
   width: 40rpx;
@@ -59,14 +67,23 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.1s ease;
 }
-.m-fab__main--drag {
-  /* 减少拖动时误触页面滚动（H5 等端） */
+.m-fab__main:active {
+  transform: scale(0.95);
 }
-
-/* 避免图标/文字子节点成为触摸目标，导致 touchmove 无法稳定派发到主按钮（H5 常见） */
-.m-fab__main--drag-pass > .m-fab__main-child {
+.m-fab__main--dragging {
+  opacity: 0.9;
+  transition: none;
+}
+.m-fab__main--dragging:active {
+  transform: none;
+}
+.m-fab__main-child {
   pointer-events: none;
+  /* 让子元素不拦截触摸事件 */
 }
 .m-fab__plus {
   font-size: 64rpx;

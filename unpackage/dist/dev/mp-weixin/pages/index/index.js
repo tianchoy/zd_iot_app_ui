@@ -64,6 +64,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/card/card?type=" + type
       });
     };
+    const handleClick = () => {
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:136", "联系客服1111");
+    };
     const getLogin = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         yield common_config.setToken("123456");
@@ -145,11 +148,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           shape: "circle",
           class: "data-v-00a60067"
         }),
-        r: common_vendor.p({
+        r: common_vendor.o(handleClick, "ee"),
+        s: common_vendor.p({
           class: "data-v-00a60067"
         }),
-        s: `${_ctx.u_s_b_h}px`,
-        t: `${_ctx.u_s_a_i_b}px`
+        t: `${_ctx.u_s_b_h}px`,
+        v: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };
