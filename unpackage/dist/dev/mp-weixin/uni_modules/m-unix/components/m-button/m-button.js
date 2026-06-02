@@ -178,60 +178,66 @@ const _sfc_main = common_vendor.defineComponent({
   },
   methods: {
     hexToRGB(hex) {
-      if (hex.length === 4) {
-        let text = hex.substring(1, 4);
-        hex = "#" + text + text;
+      let text = hex;
+      if (text.length === 4) {
+        const r_1 = text.substring(1, 2);
+        const g_1 = text.substring(2, 3);
+        const b_1 = text.substring(3, 4);
+        text = "#" + r_1 + r_1 + g_1 + g_1 + b_1 + b_1;
       }
-      let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? new common_vendor.UTSJSONObject({
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-      }) : new common_vendor.UTSJSONObject({});
+      if (text.length !== 7)
+        return "";
+      const r = parseInt(text.substring(1, 3), 16);
+      const g = parseInt(text.substring(3, 5), 16);
+      const b = parseInt(text.substring(5, 7), 16);
+      return `${r}, ${g}, ${b}`;
+    },
+    getBaseColor(type) {
+      switch (type) {
+        case "white":
+          return "#dbe5f0";
+        case "danger":
+          return "#EB0909";
+        case "warning":
+          return "#ff7900";
+        case "green":
+          return "#07c160";
+        case "blue":
+          return "#007aff";
+        case "gray":
+          return "#bfbfbf";
+        case "black":
+          return "#334155";
+        case "brown":
+          return "#ac9157";
+        case "gray-primary":
+        case "gray-danger":
+        case "gray-warning":
+        case "gray-green":
+          return "#f2f2f2";
+        default:
+          return "#5677fc";
+      }
     },
     getColorByType(type, isText = null, plain = null) {
-      let color = "";
-      const colors = new common_vendor.UTSJSONObject({
-        "primary": "#5677fc",
-        "white": "#dbe5f0",
-        "danger": "#EB0909",
-        "warning": "#ff7900",
-        "green": "#07c160",
-        "blue": "#007aff",
-        "gray": "#bfbfbf",
-        "black": "#334155",
-        "brown": "#ac9157",
-        "gray-primary": "#f2f2f2",
-        "gray-danger": "#f2f2f2",
-        "gray-warning": "#f2f2f2",
-        "gray-green": "#f2f2f2"
-      });
-      if (isText) {
-        if (type && ~type.indexOf("gray-")) {
-          const tp = type.replace("gray-", "");
-          if (tp in colors) {
-            color = colors[tp];
-          }
-        } else if (type === "white") {
-          color = "#334155";
-        } else {
-          if (plain) {
-            color = colors[type];
-          } else {
-            color = "#fff";
-          }
+      if (isText === true) {
+        if (type.indexOf("gray-") === 0) {
+          return this.getBaseColor(type.replace("gray-", ""));
         }
-      } else {
-        color = colors[type] || colors.primary;
+        if (type === "white") {
+          return "#334155";
+        }
+        return plain === true ? this.getBaseColor(type) : "#fff";
       }
-      return color;
+      return this.getBaseColor(type);
     },
     getShadow(type, plain) {
-      const color = this.getColorByType(type);
-      if (plain || !color)
+      if (plain)
         return "none";
-      const rgb = this.hexToRGB(color);
-      return `0 10rpx 14rpx 0 rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`;
+      const rgb = this.hexToRGB(this.getColorByType(type));
+      if (rgb.length === 0)
+        return "none";
+      return `0 10rpx 14rpx 0 rgba(${rgb}, 0.2)`;
     },
     getBgColor(type, plain) {
       return plain ? "transparent" : this.getColorByType(type);
@@ -280,7 +286,7 @@ const _sfc_main = common_vendor.defineComponent({
       var _b = _a == void 0 ? new common_vendor.UTSJSONObject({}) : _a, _c = _b.detail, detail = _c == void 0 ? new common_vendor.UTSJSONObject({}) : _c;
       this.$emit("launchapp", detail);
     },
-    getDisabledClass: function(disabled, type, plain) {
+    getDisabledClass(disabled, type, plain) {
       let className = "";
       if (disabled && type != "white" && type.indexOf("-") == -1) {
         let classVal = this.disabledGray ? "m-gray-disabled" : "m-dark-disabled";
@@ -288,7 +294,7 @@ const _sfc_main = common_vendor.defineComponent({
       }
       return className;
     },
-    getShapeClass: function(shape, plain) {
+    getShapeClass(shape, plain) {
       let className = "";
       if (shape == "circle") {
         className = plain ? "m-outline-fillet" : "m-fillet";
@@ -297,7 +303,7 @@ const _sfc_main = common_vendor.defineComponent({
       }
       return className;
     },
-    getHoverClass: function(disabled, type, plain) {
+    getHoverClass(disabled, type, plain) {
       let className = "";
       if (!disabled) {
         className = plain ? "m-outline-hover" : "m-" + (type || "primary") + "-hover";
@@ -325,19 +331,19 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     n: $props.formType,
     o: $props.openType,
     p: $props.appParameter,
-    q: common_vendor.o((...args) => $options.bindgetuserinfo && $options.bindgetuserinfo(...args), "88"),
-    r: common_vendor.o((...args) => $options.bindgetphonenumber && $options.bindgetphonenumber(...args), "ec"),
-    s: common_vendor.o((...args) => $options.bindcontact && $options.bindcontact(...args), "5a"),
-    t: common_vendor.o((...args) => $options.binderror && $options.binderror(...args), "bf"),
-    v: common_vendor.o((...args) => $options.bindchooseavatar && $options.bindchooseavatar(...args), "1b"),
-    w: common_vendor.o((...args) => $options.bindlaunchapp && $options.bindlaunchapp(...args), "22"),
+    q: common_vendor.o((...args) => $options.bindgetuserinfo && $options.bindgetuserinfo(...args), "45"),
+    r: common_vendor.o((...args) => $options.bindgetphonenumber && $options.bindgetphonenumber(...args), "3c"),
+    s: common_vendor.o((...args) => $options.bindcontact && $options.bindcontact(...args), "1a"),
+    t: common_vendor.o((...args) => $options.binderror && $options.binderror(...args), "94"),
+    v: common_vendor.o((...args) => $options.bindchooseavatar && $options.bindchooseavatar(...args), "ea"),
+    w: common_vendor.o((...args) => $options.bindlaunchapp && $options.bindlaunchapp(...args), "13"),
     x: $props.disabled,
-    y: common_vendor.o((...args) => $options.handleClick && $options.handleClick(...args), "35"),
+    y: common_vendor.o((...args) => $options.handleClick && $options.handleClick(...args), "8c"),
     z: !$props.link && $props.plain
   }, !$props.link && $props.plain ? {
     A: common_vendor.n($options.getShapeClass($props.shape, $props.plain)),
     B: common_vendor.n($options.getDisabledClass($props.disabled, $props.type, $props.plain)),
-    C: $options.getBgColor($props.type)
+    C: $options.getBgColor($props.type, $props.plain)
   } : {}, {
     D: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     E: common_vendor.n(($props.width === "100%" || !$props.width || $props.width === true) && (!$props.btnSize || $props.btnSize === true) ? "m-btn__flex-1" : ""),

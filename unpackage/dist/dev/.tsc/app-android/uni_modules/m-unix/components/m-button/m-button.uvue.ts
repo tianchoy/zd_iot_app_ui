@@ -105,9 +105,9 @@
 			}
 		},
 		computed: {
-			getWidth() {
+			getWidth(): string {
 				//medium 184*40 / small 120 40/ mini 58*32
-				let width = this.width;
+				let width = this.width as string;
 				const bs = this.btnSize as string
 				if (bs.length > 0) {
 					if (bs === 'medium') {
@@ -122,9 +122,9 @@
 				}
 				return width
 			},
-			getHeight() {
+			getHeight(): string {
 				//medium 184*40 / small 120 40/ mini 58*32
-				let height = this.height
+				let height = this.height as string
 				if (height.length === 0) {
 					height = '96rpx'
 				}
@@ -142,9 +142,9 @@
 				}
 				return height
 			},
-			getSize() {
+			getSize(): number {
 				// 显式传入 size（非 0）时优先；否则按 btnSize。btnSize 做 trim+小写，避免模板/端上大小写不一致导致档位不生效。
-				const sz = this.size
+				const sz = this.size as number | string
 				if (typeof sz === 'number') {
 					if (sz !== 0) {
 						return sz
@@ -190,68 +190,71 @@
 			};
 		},
 		methods: {
-			hexToRGB(hex:string) {
-				if (hex.length === 4) {
-					let text = hex.substring(1, 4);
-					hex = '#' + text + text;
-				}
-				let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-				return result ? {
-					r: parseInt(result[1], 16),
-					g: parseInt(result[2], 16),
-					b: parseInt(result[3], 16)
-				} : {};
-			},
-		getColorByType(type:string, isText?:boolean, plain?:boolean) {
-			// 默认主题颜色
-			let color:any = ''
-			const colors = {__$originalPosition: new UTSSourceMapPosition("colors", "uni_modules/m-unix/components/m-button/m-button.uvue", 252, 10),
-				'primary': '#5677fc',
-				'white': '#dbe5f0',
-				'danger': '#EB0909',
-				'warning': '#ff7900',
-				'green': '#07c160',
-				'blue': '#007aff',
-				'gray': '#bfbfbf',
-				'black': '#334155',
-				'brown': '#ac9157',
-				'gray-primary': '#f2f2f2',
-				'gray-danger': '#f2f2f2',
-				'gray-warning': '#f2f2f2',
-				'gray-green': '#f2f2f2'
-			}
-				if (isText) {
-					if (type && ~type.indexOf('gray-')) {
-						const tp = type.replace('gray-', '')
-						if (tp in colors){
-							color = colors[tp]
-						}
-					} else if (type === 'white') {
-						color = '#334155'
-					} else {
-						if (plain) {
-							color = colors[type]
-						} else {
-							color = '#fff'
-						}
+				hexToRGB(hex:string): string {
+					let text = hex
+					if (text.length === 4) {
+						const r = text.substring(1, 2)
+						const g = text.substring(2, 3)
+						const b = text.substring(3, 4)
+						text = '#' + r + r + g + g + b + b
 					}
-				} else {
-					color = colors[type] || colors.primary
-				}
-				return color;
-			},
-			getShadow(type:string, plain:boolean) {
-				const color = this.getColorByType(type)
-				if (plain || !color) return 'none';
-				const rgb = this.hexToRGB(color)
-				return `0 10rpx 14rpx 0 rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`
-			},
-			getBgColor(type:string, plain:boolean) {
-				return plain ? 'transparent' : this.getColorByType(type)
-			},
-			getColor(type:string, plain:boolean) {
-				return this.getColorByType(type, true, plain)
-			},
+					if (text.length !== 7) return ''
+					const r = parseInt(text.substring(1, 3), 16)
+					const g = parseInt(text.substring(3, 5), 16)
+					const b = parseInt(text.substring(5, 7), 16)
+					return `${r}, ${g}, ${b}`
+				},
+				getBaseColor(type:string): string {
+					switch (type) {
+						case 'white':
+							return '#dbe5f0'
+						case 'danger':
+							return '#EB0909'
+						case 'warning':
+							return '#ff7900'
+						case 'green':
+							return '#07c160'
+						case 'blue':
+							return '#007aff'
+						case 'gray':
+							return '#bfbfbf'
+						case 'black':
+							return '#334155'
+						case 'brown':
+							return '#ac9157'
+						case 'gray-primary':
+						case 'gray-danger':
+						case 'gray-warning':
+						case 'gray-green':
+							return '#f2f2f2'
+						default:
+							return '#5677fc'
+					}
+				},
+				getColorByType(type:string, isText?:boolean, plain?:boolean): string {
+					if (isText === true) {
+						if (type.indexOf('gray-') === 0) {
+							return this.getBaseColor(type.replace('gray-', ''))
+						}
+						if (type === 'white') {
+							return '#334155'
+						}
+						return plain === true ? this.getBaseColor(type) : '#fff'
+					}
+					return this.getBaseColor(type)
+				},
+				getShadow(type:string, plain:boolean): string {
+					if (plain) return 'none'
+					const rgb = this.hexToRGB(this.getColorByType(type))
+					if (rgb.length === 0) return 'none'
+					return `0 10rpx 14rpx 0 rgba(${rgb}, 0.2)`
+				},
+				getBgColor(type:string, plain:boolean): string {
+					return plain ? 'transparent' : this.getColorByType(type)
+				},
+				getColor(type:string, plain:boolean): string {
+					return this.getColorByType(type, true, plain)
+				},
 			handleClick() {
 				if (this.disabled) return;
 				if (this.loading) return;
@@ -296,15 +299,15 @@
 			} = {}) {
 				this.$emit('launchapp', detail);
 			},
-			getDisabledClass: function(disabled:boolean, type:string, plain:boolean) {
+			getDisabledClass(disabled:boolean, type:string, plain:boolean): string {
 				let className = '';
 				if (disabled && type != 'white' && type.indexOf('-') == -1) {
-					let classVal = this.disabledGray ? 'm-gray-disabled' : 'm-dark-disabled';
+					let classVal = (this.disabledGray as boolean) ? 'm-gray-disabled' : 'm-dark-disabled';
 					className = plain ? 'm-dark-disabled-outline' : classVal;
 				}
 				return className;
 			},
-			getShapeClass: function(shape:string, plain:boolean) {
+			getShapeClass(shape:string, plain:boolean): string {
 				let className = '';
 				if (shape == 'circle') {
 					className = plain ? 'm-outline-fillet' : 'm-fillet';
@@ -313,7 +316,7 @@
 				}
 				return className;
 			},
-			getHoverClass: function(disabled:boolean, type:string, plain:boolean) {
+			getHoverClass(disabled:boolean, type:string, plain:boolean): string {
 				let className = '';
 				if (!disabled) {
 					className = plain ? 'm-outline-hover' : 'm-' + (type || 'primary') + '-hover';
@@ -330,19 +333,19 @@ const _cache = this.$.renderCache
 const _component_m_loading = resolveEasyComponent("m-loading",_easycom_m_loading)
 
   return _cE("view", _uM({
-    class: _nC(["m-button__wrap", [(_ctx.width==='100%' || !_ctx.width || _ctx.width===true) && (!_ctx.btnSize || _ctx.btnSize===true)?'m-btn__flex-1':'',_ctx.getShapeClass(_ctx.shape, _ctx.plain),!_ctx.disabled?'m-button__hover':'']]),
+    class: _nC(["m-button__wrap", [(_ctx.width==='100%' || !_ctx.width || _ctx.width===true) && (!_ctx.btnSize || _ctx.btnSize===true)?'m-btn__flex-1':'',_ctx.getShapeClass(_ctx.shape as string, _ctx.plain as boolean),!_ctx.disabled?'m-button__hover':'']]),
     style: _nS(_uM({width: _ctx.getWidth, height: _ctx.getHeight, margin: _ctx.margin}))
   }), [
     _cE("button", _uM({
       class: _nC(["m-btn", [
 				_ctx.plain ? 'm-' + _ctx.type + '-outline' : 'm-btn-' + (_ctx.type || 'primary'),
-				_ctx.getDisabledClass(_ctx.disabled, _ctx.type, _ctx.plain),
-				_ctx.getShapeClass(_ctx.shape, _ctx.plain),
+				_ctx.getDisabledClass(_ctx.disabled as boolean, _ctx.type as string, _ctx.plain as boolean),
+				_ctx.getShapeClass(_ctx.shape as string, _ctx.plain as boolean),
 				_ctx.bold ? 'm-text-bold' : '',
 				_ctx.link ? 'm-btn__link' : '',
 				_ctx.loading ? 'm-btn--loading' : ''
 			]]),
-      style: _nS(_uM({ width: _ctx.getWidth, height: _ctx.getHeight, lineHeight: _ctx.getHeight, 'font-size': _ctx.fontSizeCss, background:_ctx.getBgColor(_ctx.type,_ctx.plain),color:_ctx.getColor(_ctx.type,_ctx.plain),boxShadow:_ctx.shadow?_ctx.getShadow(_ctx.type,_ctx.plain):'none' })),
+      style: _nS(_uM({ width: _ctx.getWidth, height: _ctx.getHeight, lineHeight: _ctx.getHeight, 'font-size': _ctx.fontSizeCss, background:_ctx.getBgColor(_ctx.type as string,_ctx.plain as boolean),color:_ctx.getColor(_ctx.type as string,_ctx.plain as boolean),boxShadow:_ctx.shadow?_ctx.getShadow(_ctx.type as string,_ctx.plain as boolean):'none' })),
       "form-type": _ctx.formType,
       disabled: _ctx.disabled,
       onClick: _ctx.handleClick
@@ -365,8 +368,8 @@ const _component_m_loading = resolveEasyComponent("m-loading",_easycom_m_loading
     isTrue(!_ctx.link && _ctx.plain)
       ? _cE("view", _uM({
           key: 0,
-          class: _nC(["m-button__border", [_ctx.getShapeClass(_ctx.shape, _ctx.plain),_ctx.getDisabledClass(_ctx.disabled, _ctx.type, _ctx.plain)]]),
-          style: _nS(_uM({borderColor:_ctx.getBgColor(_ctx.type)}))
+          class: _nC(["m-button__border", [_ctx.getShapeClass(_ctx.shape as string, _ctx.plain as boolean),_ctx.getDisabledClass(_ctx.disabled as boolean, _ctx.type as string, _ctx.plain as boolean)]]),
+          style: _nS(_uM({borderColor:_ctx.getBgColor(_ctx.type as string, _ctx.plain as boolean)}))
         }), null, 6 /* CLASS, STYLE */)
       : _cC("v-if", true)
   ], 6 /* CLASS, STYLE */)

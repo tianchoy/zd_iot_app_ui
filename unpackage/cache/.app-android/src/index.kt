@@ -119,7 +119,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.3.229"
     val port: String = "8090"
-    val id: String = "app-android_ZFimVr"
+    val id: String = "app-android_ac5oIm"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -2811,7 +2811,7 @@ open class LoginData (
     open var nickname: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("LoginData", "api/http.uts", 9, 13)
+        return UTSSourceMapPosition("LoginData", "api/http.uts", 4, 13)
     }
 }
 val card_detail = fun(id: String, countryCode: String): UTSPromise<ApiResponse<LoginData>> {

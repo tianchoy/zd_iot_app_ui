@@ -211,14 +211,13 @@ function request(options) {
     fullUrl += buildQueryString(data);
     requestData = new common_vendor.UTSJSONObject({});
   }
-  const reqHeader = new common_vendor.UTSJSONObject(
-    {
-      "Content-Type": "application/json"
-    }
-    // 添加 Token
-  );
+  const reqHeader = new common_vendor.UTSJSONObject({
+    "Content-Type": "application/json"
+  });
+  common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Request.uts:226", "request", withToken);
   if (withToken) {
     const token = common_config.getToken();
+    common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Request.uts:231", "otken", token);
     if (token != "") {
       reqHeader["token"] = token;
     }

@@ -3,12 +3,6 @@
 import { http, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
 import { getToken, setToken, clearToken } from '@/common/config'
 
-// 定义类型
-export type LoginParams = {
-  phone: string
-  password: string
-}
-
 export type LoginData = {
   token: string
   refreshToken: string

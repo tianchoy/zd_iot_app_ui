@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const common_config = require("../../common/config.js");
 const api_http = require("../../api/http.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
@@ -26,7 +27,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref(false);
     const card_number = common_vendor.ref("1064916585160");
     const goRecharge = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:87", "去充值");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:88", "去充值");
       common_vendor.index.navigateTo({
         url: "/pages/recharge/recharge"
       });
@@ -44,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:107", "查询卡号:", card_number.value);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:108", "查询卡号:", card_number.value);
     };
     const onScanResult = (data) => {
       var _a;
@@ -58,14 +59,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const cardType = (type) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:127", type);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:128", type);
       common_vendor.index.reLaunch({
         url: "/pages/card/card?type=" + type
       });
     };
     const getLogin = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        yield api_http.card_detail(card_number.value, "CHN");
+        yield common_config.setToken("123456");
+        yield api_http.card_detail(card_number.value, "CHN", false);
       });
     };
     common_vendor.onMounted(() => {

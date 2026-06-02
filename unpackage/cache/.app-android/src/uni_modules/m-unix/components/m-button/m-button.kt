@@ -28,7 +28,7 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
                     ""
                 }
                 ,
-                _ctx.getShapeClass(_ctx.shape, _ctx.plain),
+                _ctx.getShapeClass(_ctx.shape as String, _ctx.plain as Boolean),
                 if (!_ctx.disabled) {
                     "m-button__hover"
                 } else {
@@ -50,8 +50,8 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
                         )
                     }
                     ,
-                    _ctx.getDisabledClass(_ctx.disabled, _ctx.type, _ctx.plain),
-                    _ctx.getShapeClass(_ctx.shape, _ctx.plain),
+                    _ctx.getDisabledClass(_ctx.disabled as Boolean, _ctx.type as String, _ctx.plain as Boolean),
+                    _ctx.getShapeClass(_ctx.shape as String, _ctx.plain as Boolean),
                     if (_ctx.bold) {
                         "m-text-bold"
                     } else {
@@ -70,8 +70,8 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
                         ""
                     }
                 )
-            )), "style" to _nS(_uM("width" to _ctx.getWidth, "height" to _ctx.getHeight, "lineHeight" to _ctx.getHeight, "font-size" to _ctx.fontSizeCss, "background" to _ctx.getBgColor(_ctx.type, _ctx.plain), "color" to _ctx.getColor(_ctx.type, _ctx.plain), "boxShadow" to if (_ctx.shadow) {
-                _ctx.getShadow(_ctx.type, _ctx.plain)
+            )), "style" to _nS(_uM("width" to _ctx.getWidth, "height" to _ctx.getHeight, "lineHeight" to _ctx.getHeight, "font-size" to _ctx.fontSizeCss, "background" to _ctx.getBgColor(_ctx.type as String, _ctx.plain as Boolean), "color" to _ctx.getColor(_ctx.type as String, _ctx.plain as Boolean), "boxShadow" to if (_ctx.shadow) {
+                _ctx.getShadow(_ctx.type as String, _ctx.plain as Boolean)
             } else {
                 "none"
             }
@@ -96,10 +96,10 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
                 _cE("view", _uM("key" to 0, "class" to _nC(_uA(
                     "m-button__border",
                     _uA(
-                        _ctx.getShapeClass(_ctx.shape, _ctx.plain),
-                        _ctx.getDisabledClass(_ctx.disabled, _ctx.type, _ctx.plain)
+                        _ctx.getShapeClass(_ctx.shape as String, _ctx.plain as Boolean),
+                        _ctx.getDisabledClass(_ctx.disabled as Boolean, _ctx.type as String, _ctx.plain as Boolean)
                     )
-                )), "style" to _nS(_uM("borderColor" to _ctx.getBgColor(_ctx.type)))), null, 6)
+                )), "style" to _nS(_uM("borderColor" to _ctx.getBgColor(_ctx.type as String, _ctx.plain as Boolean)))), null, 6)
             } else {
                 _cC("v-if", true)
             }
@@ -133,7 +133,7 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
     @Suppress("USELESS_CAST")
     override fun data(): Map<String, Any?> {
         return _uM("time" to 0, "getWidth" to computed<String>(fun(): String {
-            var width = this.width
+            var width = this.width as String
             val bs = this.btnSize as String
             if (bs.length > 0) {
                 if (bs === "medium") {
@@ -149,7 +149,7 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
             return width
         }
         ), "getHeight" to computed<String>(fun(): String {
-            var height = this.height
+            var height = this.height as String
             if (height.length === 0) {
                 height = "96rpx"
             }
@@ -168,7 +168,7 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
             return height
         }
         ), "getSize" to computed<Number>(fun(): Number {
-            val sz = this.size
+            val sz = this.size as Any
             if (UTSAndroid.`typeof`(sz) === "number") {
                 if (sz as Number !== 0) {
                     return sz as Number
@@ -209,58 +209,77 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
         ))
     }
     open var hexToRGB = ::gen_hexToRGB_fn
-    open fun gen_hexToRGB_fn(reassignedHex: String) {
-        var hex = reassignedHex
-        if (hex.length === 4) {
-            var text = hex.substring(1, 4)
-            hex = "#" + text + text
+    open fun gen_hexToRGB_fn(hex: String): String {
+        var text = hex
+        if (text.length === 4) {
+            val r = text.substring(1, 2)
+            val g = text.substring(2, 3)
+            val b = text.substring(3, 4)
+            text = "#" + r + r + g + g + b + b
         }
-        var result = UTSRegExp("^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})\$", "i").exec(hex)
-        return if (isTruthy(result)) {
-            _uO("r" to parseInt(result[1], 16), "g" to parseInt(result[2], 16), "b" to parseInt(result[3], 16))
-        } else {
-            _uO()
+        if (text.length !== 7) {
+            return ""
+        }
+        val r = parseInt(text.substring(1, 3), 16)
+        val g = parseInt(text.substring(3, 5), 16)
+        val b = parseInt(text.substring(5, 7), 16)
+        return "" + r + ", " + g + ", " + b
+    }
+    open var getBaseColor = ::gen_getBaseColor_fn
+    open fun gen_getBaseColor_fn(type: String): String {
+        when (type) {
+            "white" -> 
+                return "#dbe5f0"
+            "danger" -> 
+                return "#EB0909"
+            "warning" -> 
+                return "#ff7900"
+            "green" -> 
+                return "#07c160"
+            "blue" -> 
+                return "#007aff"
+            "gray" -> 
+                return "#bfbfbf"
+            "black" -> 
+                return "#334155"
+            "brown" -> 
+                return "#ac9157"
+            "gray-primary", "gray-danger", "gray-warning", "gray-green" -> 
+                return "#f2f2f2"
+            else -> 
+                return "#5677fc"
         }
     }
     open var getColorByType = ::gen_getColorByType_fn
-    open fun gen_getColorByType_fn(type: String, isText: Boolean?, plain: Boolean?): Any {
-        var color: Any = ""
-        val colors: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("colors", "uni_modules/m-unix/components/m-button/m-button.uvue", 252, 10), "primary" to "#5677fc", "white" to "#dbe5f0", "danger" to "#EB0909", "warning" to "#ff7900", "green" to "#07c160", "blue" to "#007aff", "gray" to "#bfbfbf", "black" to "#334155", "brown" to "#ac9157", "gray-primary" to "#f2f2f2", "gray-danger" to "#f2f2f2", "gray-warning" to "#f2f2f2", "gray-green" to "#f2f2f2")
-        if (isTruthy(isText)) {
-            if (type != "" && type.indexOf("gray-").inv() != 0) {
-                val tp = type.replace("gray-", "")
-                if (resolveInOperator(colors, tp)) {
-                    color = colors[tp]
-                }
-            } else if (type === "white") {
-                color = "#334155"
-            } else {
-                if (isTruthy(plain)) {
-                    color = colors[type]
-                } else {
-                    color = "#fff"
-                }
+    open fun gen_getColorByType_fn(type: String, isText: Boolean?, plain: Boolean?): String {
+        if (isText === true) {
+            if (type.indexOf("gray-") === 0) {
+                return this.getBaseColor(type.replace("gray-", ""))
             }
-        } else {
-            color = if (isTruthy(colors[type])) {
-                colors[type]
+            if (type === "white") {
+                return "#334155"
+            }
+            return if (plain === true) {
+                this.getBaseColor(type)
             } else {
-                colors["primary"]
+                "#fff"
             }
         }
-        return color
+        return this.getBaseColor(type)
     }
     open var getShadow = ::gen_getShadow_fn
     open fun gen_getShadow_fn(type: String, plain: Boolean): String {
-        val color = this.getColorByType(type)
-        if (plain || !isTruthy(color)) {
+        if (plain) {
             return "none"
         }
-        val rgb = this.hexToRGB(color)
-        return "0 10rpx 14rpx 0 rgba(" + rgb["r"] + ", " + rgb["g"] + ", " + rgb["b"] + ", 0.2)"
+        val rgb = this.hexToRGB(this.getColorByType(type))
+        if (rgb.length === 0) {
+            return "none"
+        }
+        return "0 10rpx 14rpx 0 rgba(" + rgb + ", 0.2)"
     }
     open var getBgColor = ::gen_getBgColor_fn
-    open fun gen_getBgColor_fn(type: String, plain: Boolean): Any {
+    open fun gen_getBgColor_fn(type: String, plain: Boolean): String {
         return if (plain) {
             "transparent"
         } else {
@@ -268,7 +287,7 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
         }
     }
     open var getColor = ::gen_getColor_fn
-    open fun gen_getColor_fn(type: String, plain: Boolean): Any {
+    open fun gen_getColor_fn(type: String, plain: Boolean): String {
         return this.getColorByType(type, true, plain)
     }
     open var handleClick = ::gen_handleClick_fn
@@ -313,7 +332,7 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
     open fun gen_getDisabledClass_fn(disabled: Boolean, type: String, plain: Boolean): String {
         var className = ""
         if (disabled && type != "white" && type.indexOf("-") == -1) {
-            var classVal = if (this.disabledGray) {
+            var classVal = if ((this.disabledGray as Boolean)) {
                 "m-gray-disabled"
             } else {
                 "m-dark-disabled"

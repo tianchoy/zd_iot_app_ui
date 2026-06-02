@@ -174,6 +174,13 @@ function getToken() {
   }
   return token;
 }
+function setToken(token, refreshToken = null) {
+  common_vendor.index.setStorageSync(config.storage.token, token);
+  if (refreshToken) {
+    common_vendor.index.setStorageSync(config.storage.refreshToken, refreshToken);
+  }
+}
 exports.config = config;
 exports.getToken = getToken;
+exports.setToken = setToken;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/config.js.map
