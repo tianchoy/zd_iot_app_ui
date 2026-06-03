@@ -3,24 +3,52 @@
 	<view class="container">
 		<image src="/static/defaultAvator.png" class="logo"></image>
 		<view class="login-btn">
-			<m-wx-login
-				type="code"
-				text="微信一键登录"
-				@success="handleSuccess"
-			>
-			</m-wx-login>
+			<button 
+			open-type="getPhoneNumber" 
+			type="primary" 
+			plain="true"	
+			@getphonenumber="handleGetPhoneNumber">
+			个人用户登录
+			</button>
+		</view>
+		<view class="no-login">
+			<view class="no-login-text">暂不登录</view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
-	
-	const handleSuccess = (res: UTSJSONObject) => {
-		console.log('登录成功:', res)
+	import {login} from '@/api/http.uts'
+	const wxGetPhoneLogin = ref('')
+	const handleGetPhoneNumber = (res: UTSJSONObject) => {
+		console.log('获取手机号:', res)
 	}
 
+	//获取 code
+	const code = ref<string>('')
+	const getCode = () => {
+		uni.login({
+			success: (res) => {
+				code.value = res.code
+				userLoginByOpenid(res.code);
+			}
+		})
+	}
+
+	//登录
+	const userLoginByOpenid = async (codes: string) => {
+		const res = await login({
+			xcxCode: codes,
+			isLogin: '1',
+		})
+		console.log('登录:', res)
+	}
 	onLoad((options) => {
 		console.log(options)
+		if(options['wxGetPhoneLogin'] != null){
+			wxGetPhoneLogin.value = options['wxGetPhoneLogin']
+		}
+		getCode();
 	})
 </script>
 
@@ -34,12 +62,28 @@
 		.logo{
 			width: 200rpx;
 			height: 200rpx;
-			margin: 300rpx 0 40rpx 0;
+			margin: 200rpx 0 80rpx 0;
 			border-radius: 50%;
 		}
 		.login-btn{
 			width:80%;
 			margin: 0 40rpx;
+		}
+		.no-login{
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-top: 100rpx;
+			width: 80%;
+			.no-login-text{
+				width: 100%;
+				border-top: 1rpx solid #e8eef7;
+				padding-top: 40rpx;
+				font-size: 24rpx;
+				color: #64748b;
+				line-height: 1.45;
+				text-align: center;
+			}
 		}
 	}
 </style>

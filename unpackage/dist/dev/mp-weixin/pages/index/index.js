@@ -85,11 +85,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    common_vendor.onMounted(() => {
-      getTenantInfos();
-      common_vendor.index.$on("scanResult", onScanResult);
+    common_vendor.onLoad(() => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const token = common_config.getStorageSync("token");
+        if (!token) {
+          getTenantInfos();
+        }
+        common_vendor.index.$on("scanResult", onScanResult);
+      });
     });
-    common_vendor.onUnmounted(() => {
+    common_vendor.onUnload(() => {
       common_vendor.index.$off("scanResult", onScanResult);
     });
     return (_ctx, _cache) => {

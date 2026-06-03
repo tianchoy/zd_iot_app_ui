@@ -31,6 +31,7 @@ page .container.data-v-00a60067 {
   background-color: #f4f7fb;
   min-height: 1000rpx;
   padding-bottom: 40rpx;
+  height: 100%;
 }
 page .card-info.data-v-00a60067 {
   display: flex;

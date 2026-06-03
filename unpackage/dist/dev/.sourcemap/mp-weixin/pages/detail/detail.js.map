@@ -1,1 +1,0 @@
-{"version":3,"file":"detail.js","sources":["pages/detail/detail.uvue?type=page"],"sourcesContent":["import MiniProgramPage from '/Users/xyhc/Documents/zd_iot_app_ui/pages/detail/detail.uvue'\nwx.createPage(MiniProgramPage)"],"names":[],"mappings":";;;;;;;;AACA,GAAG,WAAW,eAAe;"}

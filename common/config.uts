@@ -1,8 +1,8 @@
 // common/config.ts
 export type AuthApiPaths = {
-  login: string
-  logout: string
-  refreshToken: string
+  tenantId: string
+  clientId: string
+  grantType: string
 }
 
 // ApiPaths 只引用已定义的 interface
@@ -32,15 +32,12 @@ export type ProjectConfig = {
   api: ApiPaths
   storage: StorageKeys
   configInfo: ConfigInfo
-  tenantId: string
   loginPagePath?: string
   loginRequiredPaths?: string[]
 }
 
-// ============ 配置值 ============
-
 // 环境配置
-const ENV = 'dev' // local | dev | prod
+const ENV = 'dev' //  dev | prod
 
 const API_CONFIG: UTSJSONObject = {
   dev: {
@@ -60,13 +57,13 @@ export const config: ProjectConfig = {
   baseUrl: currentConfig['baseUrl'] as string,
   timeout: currentConfig['timeout'] as number,
   env: ENV,
-  tenantId: '000000', // 租户ID
+  
   
   api: {
     auth: {
-      login: '/auth/login',
-      logout: '/auth/logout',
-      refreshToken: '/auth/refresh'
+      tenantId: '000000', // 租户ID
+      clientId: '12353d4772a25656d6d2a67d53353cc3',
+      grantType: 'xcx',
     },
   },
   
@@ -76,7 +73,7 @@ export const config: ProjectConfig = {
   },
   
   configInfo: {
-    name: '我的应用',
+    name: '中导云卡',
     versionCode: 1,
     versionName: '1.0.0',
     appId: 'your-app-id'

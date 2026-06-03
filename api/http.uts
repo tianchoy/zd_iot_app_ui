@@ -26,6 +26,9 @@ export type TenantInfoData = {
   wxGetPhoneLogin: string
   wxMiniPayType: string
   wxPayClass: string
+  h5IsPullMini: string;
+  h5PayType: string;
+  serviceJumpUrl: string; 
 }
 
 
@@ -61,9 +64,9 @@ export function login(data: UTSJSONObject, withToken: boolean = true): Promise<A
     method: 'POST',
     data:{
       ...data,
-      tenantId: config.tenantId,
-      clientId: '12353d4772a25656d6d2a67d53353cc3',
-      grantType: 'xcx'
+      tenantId: config.api.auth.tenantId,
+      clientId: config.api.auth.clientId,
+      grantType: config.api.auth.grantType,
     },
     withToken
   })
@@ -73,16 +76,16 @@ export function login(data: UTSJSONObject, withToken: boolean = true): Promise<A
 // 获取租户页面配置（自动适配平台）
 export function getTenantInfo(tenantId: string, withToken: boolean = true): Promise<ApiResponse<TenantInfoData>> {
   // #ifdef MP-WEIXIN
-  const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + tenantId
+  const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + config.api.auth.tenantId
   // #endif
   
   // #ifdef H5
-  const url = (ApiUrl.getTenantPageConfigH as string) + '/' + tenantId
+  const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
   // #endif
   
   // #ifndef MP-WEIXIN || H5
   // 其他平台默认使用H5配置
-  const url = (ApiUrl.getTenantPageConfigH as string) + '/' + tenantId
+  const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
   // #endif
   
   return request<TenantInfoData>({

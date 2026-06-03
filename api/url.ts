@@ -1,7 +1,7 @@
 export const ApiUrl = {
     getTenantPageConfigXcx: '/system/tenantPageConfig/getTenantPageConfigXcx', // 查询租户页面配置小程序
     getTenantPageConfigH: '/system/tenantPageConfig/getTenantPageConfigH',// 查询租户页面配置H5
-    login: '/auth/login',
+    login: '/auth/login', // 登录
     card_detail: '/app/card/info/', // 查询卡详情
     countries: '/app/card/getH5CountryList', // 查询国家列表
     addOrder: '/order/pkgOrder', // 添加订单

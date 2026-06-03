@@ -2,7 +2,7 @@
 const common_vendor = require("../common/vendor.js");
 const api_url = require("./url.js");
 const uni_modules_mUnix_components_mTools_Request = require("../uni_modules/m-unix/components/m-tools/Request.js");
-require("../common/config.js");
+const common_config = require("../common/config.js");
 class LoginData extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -62,7 +62,10 @@ class TenantInfoData extends common_vendor.UTS.UTSType {
           wxAuditHideNo: { type: String, optional: false },
           wxGetPhoneLogin: { type: String, optional: false },
           wxMiniPayType: { type: String, optional: false },
-          wxPayClass: { type: String, optional: false }
+          wxPayClass: { type: String, optional: false },
+          h5IsPullMini: { type: String, optional: false },
+          h5PayType: { type: String, optional: false },
+          serviceJumpUrl: { type: String, optional: false }
         };
       },
       name: "TenantInfoData"
@@ -79,6 +82,9 @@ class TenantInfoData extends common_vendor.UTS.UTSType {
     this.wxGetPhoneLogin = this.__props__.wxGetPhoneLogin;
     this.wxMiniPayType = this.__props__.wxMiniPayType;
     this.wxPayClass = this.__props__.wxPayClass;
+    this.h5IsPullMini = this.__props__.h5IsPullMini;
+    this.h5PayType = this.__props__.h5PayType;
+    this.serviceJumpUrl = this.__props__.serviceJumpUrl;
     delete this.__props__;
   }
 }
@@ -101,8 +107,27 @@ function getCountryList(withToken = false) {
     withToken
   }));
 }
+function login(data, withToken = true) {
+  return uni_modules_mUnix_components_mTools_Request.request(new uni_modules_mUnix_components_mTools_Request.RequestOptions({
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.login,
+    method: "POST",
+    data: new common_vendor.UTSJSONObject(Object.assign(Object.assign({}, data), { tenantId: common_config.config.api.auth.tenantId, clientId: common_config.config.api.auth.clientId, grantType: common_config.config.api.auth.grantType })),
+    withToken
+  }));
+}
 function getTenantInfo(tenantId, withToken = true) {
-  const url = api_url.ApiUrl.getTenantPageConfigXcx + "/" + tenantId;
+  const url = api_url.ApiUrl.getTenantPageConfigXcx + "/" + common_config.config.api.auth.tenantId;
   return uni_modules_mUnix_components_mTools_Request.request(new uni_modules_mUnix_components_mTools_Request.RequestOptions({
     data: null,
     header: null,
@@ -123,4 +148,5 @@ function getTenantInfo(tenantId, withToken = true) {
 }
 exports.getCountryList = getCountryList;
 exports.getTenantInfo = getTenantInfo;
+exports.login = login;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

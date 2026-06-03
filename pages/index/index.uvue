@@ -77,7 +77,7 @@
 
 <script setup lang="uts">
 	import { ref, onMounted, onUnmounted } from 'vue'
-	import { setStorageSync,config } from '@/common/config.uts'
+	import { setStorageSync,config,getStorageSync } from '@/common/config.uts'
 	import { card_detail,getTenantInfo } from '@/api/http.uts'
 	
 	const title = ref('Hello')
@@ -154,13 +154,17 @@
 		}
 	}
 
-	onMounted(() => {
-		getTenantInfos()
+	onLoad(async () => {
+		const token = getStorageSync('token')
+		if(!token){
+			getTenantInfos()
+		}
+		
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
 	})
 	
-	onUnmounted(() => {
+	onUnload(() => {
 		// 移除事件监听
 		uni.$off('scanResult', onScanResult)
 	})
@@ -173,6 +177,7 @@
 		background-color: #f4f7fb;
 		min-height: 1000rpx;
 		padding-bottom: 40rpx;
+		height: 100%;
 	}
 	.card-info{
 		display: flex;

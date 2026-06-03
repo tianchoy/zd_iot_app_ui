@@ -1,1 +1,0 @@
-{"version":3,"file":"m-popup.js","sources":["/Users/xyhc/Documents/zd_iot_app_ui/uni_modules/m-unix/components/m-popup/m-popup.uvue?type=component"],"sourcesContent":["import Component from '/Users/xyhc/Documents/zd_iot_app_ui/uni_modules/m-unix/components/m-popup/m-popup.uvue'\nwx.createComponent(Component)"],"names":["Component"],"mappings":";;AACA,GAAG,gBAAgBA,wBAAS,WAAA;"}

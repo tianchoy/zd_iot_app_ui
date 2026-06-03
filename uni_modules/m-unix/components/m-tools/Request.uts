@@ -230,12 +230,9 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
         'Content-Language': DEFAULT_LANGUAGE
 	}
 
-	console.log('request', withToken)
-
 	// 添加 Token
 	if (withToken) {
 		const token = getToken()
-		console.log('otken', token)
 		if (token != '') {
 			reqHeader['token'] = token
 		}

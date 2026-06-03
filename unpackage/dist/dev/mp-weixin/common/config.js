@@ -6,9 +6,9 @@ class AuthApiPaths extends common_vendor.UTS.UTSType {
       kind: 2,
       get fields() {
         return {
-          login: { type: String, optional: false },
-          logout: { type: String, optional: false },
-          refreshToken: { type: String, optional: false }
+          tenantId: { type: String, optional: false },
+          clientId: { type: String, optional: false },
+          grantType: { type: String, optional: false }
         };
       },
       name: "AuthApiPaths"
@@ -17,9 +17,9 @@ class AuthApiPaths extends common_vendor.UTS.UTSType {
   constructor(options, metadata = AuthApiPaths.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.login = this.__props__.login;
-    this.logout = this.__props__.logout;
-    this.refreshToken = this.__props__.refreshToken;
+    this.tenantId = this.__props__.tenantId;
+    this.clientId = this.__props__.clientId;
+    this.grantType = this.__props__.grantType;
     delete this.__props__;
   }
 }
@@ -104,7 +104,6 @@ class ProjectConfig extends common_vendor.UTS.UTSType {
           api: { type: ApiPaths, optional: false },
           storage: { type: StorageKeys, optional: false },
           configInfo: { type: ConfigInfo, optional: false },
-          tenantId: { type: String, optional: false },
           loginPagePath: { type: String, optional: true },
           loginRequiredPaths: { type: common_vendor.UTS.UTSType.withGenerics(Array, [String]), optional: true }
         };
@@ -121,7 +120,6 @@ class ProjectConfig extends common_vendor.UTS.UTSType {
     this.api = this.__props__.api;
     this.storage = this.__props__.storage;
     this.configInfo = this.__props__.configInfo;
-    this.tenantId = this.__props__.tenantId;
     this.loginPagePath = this.__props__.loginPagePath;
     this.loginRequiredPaths = this.__props__.loginRequiredPaths;
     delete this.__props__;
@@ -143,12 +141,11 @@ const config = new ProjectConfig({
   baseUrl: currentConfig["baseUrl"],
   timeout: currentConfig["timeout"],
   env: ENV,
-  tenantId: "000000",
   api: new ApiPaths({
     auth: new AuthApiPaths({
-      login: "/auth/login",
-      logout: "/auth/logout",
-      refreshToken: "/auth/refresh"
+      tenantId: "000000",
+      clientId: "12353d4772a25656d6d2a67d53353cc3",
+      grantType: "xcx"
     })
   }),
   storage: new StorageKeys({
@@ -158,7 +155,7 @@ const config = new ProjectConfig({
   configInfo: new ConfigInfo({
     logo: null,
     desc: null,
-    name: "我的应用",
+    name: "中导云卡",
     versionCode: 1,
     versionName: "1.0.0",
     appId: "your-app-id"
@@ -176,7 +173,11 @@ function getToken() {
 function setStorageSync(key, value = null) {
   common_vendor.index.setStorageSync(key, value);
 }
+function getStorageSync(key) {
+  return common_vendor.index.getStorageSync(key);
+}
 exports.config = config;
+exports.getStorageSync = getStorageSync;
 exports.getToken = getToken;
 exports.setStorageSync = setStorageSync;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/config.js.map

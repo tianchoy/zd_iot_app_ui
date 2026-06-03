@@ -215,15 +215,16 @@ function request(options) {
     fullUrl += buildQueryString(data);
     requestData = new common_vendor.UTSJSONObject({});
   }
-  const reqHeader = new common_vendor.UTSJSONObject({
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-    "Content-Language": DEFAULT_LANGUAGE
-  });
-  common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Request.uts:233", "request", withToken);
+  const reqHeader = new common_vendor.UTSJSONObject(
+    {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Content-Language": DEFAULT_LANGUAGE
+    }
+    // 添加 Token
+  );
   if (withToken) {
     const token = common_config.getToken();
-    common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Request.uts:238", "otken", token);
     if (token != "") {
       reqHeader["token"] = token;
     }
