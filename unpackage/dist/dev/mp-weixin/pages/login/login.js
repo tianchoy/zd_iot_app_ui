@@ -17,6 +17,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handleGetPhoneNumber = (res) => {
       common_vendor.index.__f__("log", "at pages/login/login.uvue:24", "获取手机号:", res);
     };
+    const userLoginByOpenid = (codes) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_http.login(new common_vendor.UTSJSONObject({
+          xcxCode: codes,
+          isLogin: "1"
+        }));
+        common_vendor.index.__f__("log", "at pages/login/login.uvue:33", "登录:", res);
+      });
+    };
     const code = common_vendor.ref("");
     const getCode = () => {
       common_vendor.index.login(new common_vendor.UTSJSONObject({
@@ -25,15 +34,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           userLoginByOpenid(res.code);
         }
       }));
-    };
-    const userLoginByOpenid = (codes) => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_http.login(new common_vendor.UTSJSONObject({
-          xcxCode: codes,
-          isLogin: "1"
-        }));
-        common_vendor.index.__f__("log", "at pages/login/login.uvue:44", "登录:", res);
-      });
     };
     common_vendor.onLoad((options) => {
       common_vendor.index.__f__("log", "at pages/login/login.uvue:47", options);

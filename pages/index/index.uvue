@@ -141,7 +141,7 @@
 
 	// 获取租户页面配置
 	const getTenantInfos = async () => {
-		const res = await getTenantInfo(config.tenantId,false)
+		const res = await getTenantInfo(config.api.auth.tenantId,false)
 		if(res.code == 200){
 			const tenantInfo = res.data
 			const wxGetPhoneLogin = '' + tenantInfo.wxGetPhoneLogin
@@ -154,12 +154,12 @@
 		}
 	}
 
-	onLoad(async () => {
+	onLoad(() => {
 		const token = getStorageSync('token')
 		if(!token){
 			getTenantInfos()
 		}
-		
+
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
 	})

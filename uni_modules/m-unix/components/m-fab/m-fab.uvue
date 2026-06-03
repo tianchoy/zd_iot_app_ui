@@ -166,7 +166,7 @@ export default {
 			isDragging: false as boolean,
 			hasMoved: false as boolean,  // 是否发生了移动
 			moveDistance: 0 as number,    // 移动距离
-			clickTimer: null as any,      // 点击延迟定时器
+			clickTimer: -1 as number,      // 点击延迟定时器
 		}
 	},
 	computed: {
@@ -340,9 +340,9 @@ export default {
 			this.moveDistance = 0
 			
 			// 清除之前的定时器
-			if (this.clickTimer) {
+			if (this.clickTimer !== -1) {
 				clearTimeout(this.clickTimer)
-				this.clickTimer = null
+				this.clickTimer = -1
 			}
 		},
 		
@@ -380,8 +380,6 @@ export default {
 				this.dragLeftPx = newLeft
 				this.dragTopPx = newTop
 				
-				// 阻止页面滚动
-				e.preventDefault?.()
 			}
 		},
 		
@@ -405,7 +403,7 @@ export default {
 				// 延迟执行点击，避免与拖拽结束冲突
 				this.clickTimer = setTimeout(() => {
 					this.onClick()
-					this.clickTimer = null
+					this.clickTimer = -1
 				}, 50)
 			}
 			
@@ -419,9 +417,9 @@ export default {
 		
 		// 触摸取消
 		onTouchCancel(e: any) {
-			if (this.clickTimer) {
+			if (this.clickTimer !== -1) {
 				clearTimeout(this.clickTimer)
-				this.clickTimer = null
+				this.clickTimer = -1
 			}
 			this.hasMoved = false
 			this.moveDistance = 0

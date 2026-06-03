@@ -57,7 +57,7 @@ class TenantInfoData extends common_vendor.UTS.UTSType {
         return {
           rechargeTip: { type: String, optional: false },
           servicePhone: { type: String, optional: false },
-          serviceQrcode: { type: "Unknown", optional: false },
+          serviceQrcode: { type: String, optional: false },
           wxAuditHide: { type: String, optional: false },
           wxAuditHideNo: { type: String, optional: false },
           wxGetPhoneLogin: { type: String, optional: false },

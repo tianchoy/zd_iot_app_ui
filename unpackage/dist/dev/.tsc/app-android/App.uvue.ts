@@ -1,0 +1,61 @@
+const __sfc__ = defineApp({
+  __name: 'App',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+	let firstBackTime = 0
+
+
+	onLaunch(() => {
+
+		  uni.loadFontFace({
+		    family: 'iconfont',
+		    source: 'url("/static/iconfont/iconfont.ttf")',
+		    success: () => {
+		      console.log('图标字体加载成功', " at App.uvue:12")
+		    },
+		    fail: (err) => {
+		      console.log('图标字体加载失败', err, " at App.uvue:15")
+		    }
+		  })
+
+		console.log('App Launch', " at App.uvue:19")
+	})
+
+	onAppShow(() => {
+		console.log('App Show', " at App.uvue:23")
+	})
+
+	onAppHide(() => {
+		console.log('App Hide', " at App.uvue:27")
+	})
+
+
+	onLastPageBackPress(() => {
+		console.log('App LastPageBackPress', " at App.uvue:32")
+		if (firstBackTime == 0) {
+			uni.showToast({
+				title: '再按一次退出应用',
+				position: 'bottom',
+			})
+			firstBackTime = Date.now()
+			setTimeout(() => {
+				firstBackTime = 0
+			}, 2000)
+		} else if (Date.now() - firstBackTime < 2000) {
+			firstBackTime = Date.now()
+			uni.exit()
+		}
+	})
+
+	onExit(() => {
+		console.log('App Exit', " at App.uvue:49")
+	})
+
+return (): any | null => { return null } }
+})
+export default __sfc__
+const GenAppStyles = [_uM([["flex", _pS(_uM([["display", "flex"], ["flexDirection", "row"]]))], ["flex-row", _pS(_uM([["display", "flex"], ["flexDirection", "row"]]))], ["flex-column", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))], ["flex-wrap", _pS(_uM([["flexWrap", "wrap"]]))], ["flex-nowrap", _pS(_uM([["flexWrap", "nowrap"]]))], ["justify-start", _pS(_uM([["justifyContent", "flex-start"]]))], ["justify-end", _pS(_uM([["justifyContent", "flex-end"]]))], ["justify-center", _pS(_uM([["justifyContent", "center"]]))], ["justify-between", _pS(_uM([["justifyContent", "space-between"]]))], ["justify-around", _pS(_uM([["justifyContent", "space-around"]]))], ["items-start", _pS(_uM([["alignItems", "flex-start"]]))], ["items-end", _pS(_uM([["alignItems", "flex-end"]]))], ["items-center", _pS(_uM([["alignItems", "center"]]))], ["items-stretch", _pS(_uM([["alignItems", "stretch"]]))], ["flex-auto", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "auto"]]))], ["flex-1", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-2", _pS(_uM([["flexGrow", 2], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-3", _pS(_uM([["flexGrow", 3], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["flex-none", _pS(_uM([["flexGrow", 0], ["flexShrink", 0], ["flexBasis", "auto"]]))], ["self-auto", _pS(_uM([["alignSelf", "auto"]]))], ["self-start", _pS(_uM([["alignSelf", "flex-start"]]))], ["self-end", _pS(_uM([["alignSelf", "flex-end"]]))], ["self-center", _pS(_uM([["alignSelf", "center"]]))], ["self-stretch", _pS(_uM([["alignSelf", "stretch"]]))], ["flex-center", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["flex-between", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]]))], ["w-10", _pS(_uM([["width", "10%"]]))], ["w-20", _pS(_uM([["width", "20%"]]))], ["w-25", _pS(_uM([["width", "25%"]]))], ["w-30", _pS(_uM([["width", "30%"]]))], ["w-40", _pS(_uM([["width", "40%"]]))], ["w-50", _pS(_uM([["width", "50%"]]))], ["w-60", _pS(_uM([["width", "60%"]]))], ["w-70", _pS(_uM([["width", "70%"]]))], ["w-75", _pS(_uM([["width", "75%"]]))], ["w-80", _pS(_uM([["width", "80%"]]))], ["w-90", _pS(_uM([["width", "90%"]]))], ["w-100", _pS(_uM([["width", "100%"]]))], ["p-0", _pS(_uM([["paddingTop", 0], ["paddingRight", 0], ["paddingBottom", 0], ["paddingLeft", 0]]))], ["p-10", _pS(_uM([["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]]))], ["p-20", _pS(_uM([["paddingTop", "40rpx"], ["paddingRight", "40rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "40rpx"]]))], ["p-30", _pS(_uM([["paddingTop", "60rpx"], ["paddingRight", "60rpx"], ["paddingBottom", "60rpx"], ["paddingLeft", "60rpx"]]))], ["p-l-0", _pS(_uM([["paddingLeft", 0]]))], ["p-l-10", _pS(_uM([["paddingLeft", "20rpx"]]))], ["p-l-20", _pS(_uM([["paddingLeft", "40rpx"]]))], ["p-r-0", _pS(_uM([["paddingRight", 0]]))], ["p-r-10", _pS(_uM([["paddingRight", "20rpx"]]))], ["p-r-20", _pS(_uM([["paddingRight", "40rpx"]]))], ["p-t-0", _pS(_uM([["paddingTop", 0]]))], ["p-t-10", _pS(_uM([["paddingTop", "20rpx"]]))], ["p-t-20", _pS(_uM([["paddingTop", "40rpx"]]))], ["p-b-0", _pS(_uM([["paddingBottom", 0]]))], ["p-b-10", _pS(_uM([["paddingBottom", "20rpx"]]))], ["p-b-20", _pS(_uM([["paddingBottom", "40rpx"]]))], ["m-0", _pS(_uM([["marginTop", 0], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0]]))], ["m-10", _pS(_uM([["marginTop", "20rpx"], ["marginRight", "20rpx"], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"]]))], ["m-20", _pS(_uM([["marginTop", "40rpx"], ["marginRight", "40rpx"], ["marginBottom", "40rpx"], ["marginLeft", "40rpx"]]))], ["m-l-0", _pS(_uM([["marginLeft", 0]]))], ["m-l-10", _pS(_uM([["marginLeft", "20rpx"]]))], ["m-l-20", _pS(_uM([["marginLeft", "40rpx"]]))], ["m-r-0", _pS(_uM([["marginRight", 0]]))], ["m-r-10", _pS(_uM([["marginRight", "20rpx"]]))], ["m-r-20", _pS(_uM([["marginRight", "40rpx"]]))], ["m-t-0", _pS(_uM([["marginTop", 0]]))], ["m-t-10", _pS(_uM([["marginTop", "20rpx"]]))], ["m-t-20", _pS(_uM([["marginTop", "40rpx"]]))], ["m-b-0", _pS(_uM([["marginBottom", 0]]))], ["m-b-10", _pS(_uM([["marginBottom", "20rpx"]]))], ["m-b-20", _pS(_uM([["marginBottom", "40rpx"]]))], ["rounded", _pS(_uM([["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"]]))], ["rounded-full", _pS(_uM([["borderTopLeftRadius", "9999rpx"], ["borderTopRightRadius", "9999rpx"], ["borderBottomRightRadius", "9999rpx"], ["borderBottomLeftRadius", "9999rpx"]]))], ["rounded-sm", _pS(_uM([["borderTopLeftRadius", "8rpx"], ["borderTopRightRadius", "8rpx"], ["borderBottomRightRadius", "8rpx"], ["borderBottomLeftRadius", "8rpx"]]))], ["rounded-lg", _pS(_uM([["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"]]))], ["border", _pS(_uM([["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e5e5e5"], ["borderRightColor", "#e5e5e5"], ["borderBottomColor", "#e5e5e5"], ["borderLeftColor", "#e5e5e5"]]))], ["border-t", _pS(_uM([["borderTopWidth", 1], ["borderTopStyle", "solid"], ["borderTopColor", "#e5e5e5"]]))], ["border-b", _pS(_uM([["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#e5e5e5"]]))], ["border-l", _pS(_uM([["borderLeftWidth", 1], ["borderLeftStyle", "solid"], ["borderLeftColor", "#e5e5e5"]]))], ["border-r", _pS(_uM([["borderRightWidth", 1], ["borderRightStyle", "solid"], ["borderRightColor", "#e5e5e5"]]))], ["text-left", _pS(_uM([["textAlign", "left"]]))], ["text-center", _pS(_uM([["textAlign", "center"]]))], ["text-right", _pS(_uM([["textAlign", "right"]]))], ["ellipsis", _pS(_uM([["overflow", "hidden"], ["textOverflow", "ellipsis"], ["whiteSpace", "nowrap"]]))], ["f-x", _pS(_uM([["display", "flex"], ["flexDirection", "row"]]))], ["f-y", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))], ["f-c", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]]))], ["f-y-c", _pS(_uM([["justifyContent", "center"]]))], ["f-y-l", _pS(_uM([["justifyContent", "flex-start"]]))], ["f-y-r", _pS(_uM([["justifyContent", "flex-end"]]))], ["f-y-b", _pS(_uM([["justifyContent", "space-between"]]))], ["f-y-a", _pS(_uM([["justifyContent", "space-around"]]))], ["f-x-c", _pS(_uM([["alignItems", "center"]]))], ["f-x-l", _pS(_uM([["alignItems", "flex-start"]]))], ["f-x-r", _pS(_uM([["alignItems", "flex-end"]]))], ["f-x-st", _pS(_uM([["alignItems", "stretch"]]))], ["m-primary", _pS(_uM([["color", "#ff0844"]]))], ["m-success", _pS(_uM([["color", "#52c41a"]]))], ["m-warning", _pS(_uM([["color", "#faad14"]]))], ["m-danger", _pS(_uM([["color", "#f56c6c"]]))], ["m-info", _pS(_uM([["color", "#1890ff"]]))], ["text-primary", _pS(_uM([["color", "#333333"]]))]]),_uM([["text-secondary", _pS(_uM([["color", "#666666"]]))], ["text-muted", _pS(_uM([["color", "#999999"]]))], ["text-white", _pS(_uM([["color", "#ffffff"]]))], ["bg-primary", _pS(_uM([["backgroundColor", "#ff0844"]]))], ["bg-white", _pS(_uM([["backgroundColor", "#ffffff"]]))], ["bg-gray", _pS(_uM([["backgroundColor", "#f5f5f5"]]))], ["text-xs", _pS(_uM([["fontSize", "24rpx"]]))], ["text-sm", _pS(_uM([["fontSize", "26rpx"]]))], ["text-base", _pS(_uM([["fontSize", "28rpx"]]))], ["text-md", _pS(_uM([["fontSize", "30rpx"]]))], ["text-lg", _pS(_uM([["fontSize", "32rpx"]]))], ["text-xl", _pS(_uM([["fontSize", "36rpx"]]))], ["text-2xl", _pS(_uM([["fontSize", "40rpx"]]))], ["font-normal", _pS(_uM([["fontWeight", 400]]))], ["font-medium", _pS(_uM([["fontWeight", 500]]))], ["font-bold", _pS(_uM([["fontWeight", 700]]))], ["safe-area-top", _pS(_uM([["paddingTop", "40rpx"]]))], ["safe-area-bottom", _pS(_uM([["paddingBottom", "40rpx"]]))], ["m-animate", _pS(_uM([["transitionProperty", "opacity,transform"], ["transitionDuration", "300ms"], ["transitionTimingFunction", "ease-out"]]))], ["m-animate-fast", _pS(_uM([["transitionDuration", "150ms"]]))], ["m-animate-slow", _pS(_uM([["transitionDuration", "450ms"]]))], ["m-animate-ease-in", _pS(_uM([["transitionTimingFunction", "ease-in"]]))], ["m-animate-ease-in-out", _pS(_uM([["transitionTimingFunction", "ease-in-out"]]))], ["m-opacity-0", _pS(_uM([["opacity", 0]]))], ["m-opacity-1", _pS(_uM([["opacity", 1]]))], ["m-fade-from", _pS(_uM([["opacity", 0]]))], ["m-fade-to", _pS(_uM([["opacity", 1]]))], ["m-slide-up-from", _pS(_uM([["opacity", 0], ["transform", "translateY(24rpx)"]]))], ["m-slide-up-to", _pS(_uM([["opacity", 1], ["transform", "translateY(0)"]]))], ["m-slide-up-out", _pS(_uM([["opacity", 0], ["transform", "translateY(-24rpx)"]]))], ["m-slide-down-from", _pS(_uM([["opacity", 0], ["transform", "translateY(-24rpx)"]]))], ["m-slide-down-to", _pS(_uM([["opacity", 1], ["transform", "translateY(0)"]]))], ["m-slide-left-from", _pS(_uM([["opacity", 0], ["transform", "translateX(24rpx)"]]))], ["m-slide-left-to", _pS(_uM([["opacity", 1], ["transform", "translateX(0)"]]))], ["m-slide-right-from", _pS(_uM([["opacity", 0], ["transform", "translateX(-24rpx)"]]))], ["m-slide-right-to", _pS(_uM([["opacity", 1], ["transform", "translateX(0)"]]))], ["m-scale-from", _pS(_uM([["opacity", 0], ["transform", "scale(0.92)"]]))], ["m-scale-to", _pS(_uM([["opacity", 1], ["transform", "scale(1)"]]))], ["m-visible", _pS(_uM([["opacity", 1]]))], ["m-hidden", _pS(_uM([["opacity", 0]]))], ["m-hidden-touch", _pS(_uM([["opacity", 0], ["pointerEvents", "none"]]))], ["m-rotate-0", _pS(_uM([["transform", "rotate(0deg)"]]))], ["m-rotate-90", _pS(_uM([["transform", "rotate(90deg)"]]))], ["m-rotate-180", _pS(_uM([["transform", "rotate(180deg)"]]))], ["m-rotate-270", _pS(_uM([["transform", "rotate(270deg)"]]))], ["iconfont", _pS(_uM([["!fontFamily", "iconfont"], ["fontSize", "32rpx"], ["fontStyle", "normal"], ["WebkitFontSmoothing", "antialiased"], ["MozOsxFontSmoothing", "grayscale"]]))], ["uni-row", _pS(_uM([["flexDirection", "row"]]))], ["uni-column", _pS(_uM([["flexDirection", "column"]]))], ["mr-24", _pS(_uM([["!marginRight", "24rpx"]]))], ["ml-24", _pS(_uM([["!marginLeft", "24rpx"]]))], ["mb-24", _pS(_uM([["!marginBottom", "24rpx"]]))], ["mt-24", _pS(_uM([["!marginTop", "24rpx"]]))], ["@TRANSITION", _uM([["m-animate", _uM([["property", "opacity,transform"], ["duration", "300ms"], ["timingFunction", "ease-out"]])], ["m-animate-fast", _uM([["duration", "150ms"]])], ["m-animate-slow", _uM([["duration", "450ms"]])], ["m-animate-ease-in", _uM([["timingFunction", "ease-in"]])], ["m-animate-ease-in-out", _uM([["timingFunction", "ease-in-out"]])]])]])]

@@ -1,0 +1,126 @@
+type PaymentMethod = {
+    __$originalPosition?: UTSSourceMapPosition<"PaymentMethod", "components/payment.uvue", 114, 6>;
+    id: string;
+    label: string;
+    desc?: string;
+};
+const __sfc__ = defineComponent({
+    __name: 'payment',
+    props: {
+        cardNumber: { type: String, required: false },
+        productName: { type: String, required: false },
+        traffic: { type: String, required: false },
+        validityPeriod: { type: String, required: false },
+        amount: { type: Number, required: true }
+    },
+    emits: ["cancel", "confirm"],
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        // 定义组件属性 (props)
+        const props = __props;
+        // 设置默认值
+        const cardNumber = props.cardNumber ?? '1064916585160';
+        const productName = props.productName ?? '车联网月包20G';
+        const traffic = props.traffic ?? '20GB';
+        const validityPeriod = props.validityPeriod ?? '30天';
+        // 定义组件事件
+        function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+            __ins.emit(event, ...do_not_transform_spread);
+        }
+        // 获取格式化后的金额显示
+        const formattedAmount = computed((): string => {
+            return `￥${props.amount}`;
+        });
+        const paymentMethods = ref<PaymentMethod[]>([
+            { id: 'wechat_h5', label: '微信H5支付', desc: '推荐使用微信完成支付' } as PaymentMethod,
+            { id: 'alipay', label: '支付宝支付', desc: '通过支付宝完成支付' } as PaymentMethod,
+            { id: 'bank_card', label: '银行卡支付', desc: '支持常见银行卡支付' } as PaymentMethod
+        ]);
+        // 当前选中的支付方式ID
+        const selectedMethodId = ref<string>('wechat_h5'); // 默认选中微信H5支付
+        // 选择支付方式
+        const selectPaymentMethod = (methodId: string) => {
+            selectedMethodId.value = methodId;
+        };
+        // --- 事件处理 ---
+        const handleCancel = () => {
+            emit('cancel');
+        };
+        const handleConfirm = () => {
+            // H5等环境：使用当前选中的支付方式
+            emit('confirm', selectedMethodId.value);
+        };
+        return (): any | null => {
+            return _cE("view", _uM({ class: "payment-content" }), [
+                _cE("view", _uM({ class: "payment-info" }), [
+                    _cE("text", _uM({ class: "info-title" }), "确认支付信息"),
+                    _cE("view", _uM({ class: "info-item" }), [
+                        _cE("text", _uM({ class: "item-label" }), "卡号"),
+                        _cE("text", _uM({ class: "item-value" }), _tD(unref(cardNumber)), 1 /* TEXT */)
+                    ]),
+                    _cE("view", _uM({ class: "info-item" }), [
+                        _cE("text", _uM({ class: "item-label" }), "商品"),
+                        _cE("text", _uM({ class: "item-value" }), _tD(unref(productName)), 1 /* TEXT */)
+                    ]),
+                    _cE("view", _uM({ class: "info-item" }), [
+                        _cE("text", _uM({ class: "item-label" }), "流量"),
+                        _cE("text", _uM({ class: "item-value" }), _tD(unref(traffic)), 1 /* TEXT */)
+                    ]),
+                    _cE("view", _uM({ class: "info-item" }), [
+                        _cE("text", _uM({ class: "item-label" }), "有效期"),
+                        _cE("text", _uM({ class: "item-value" }), _tD(unref(validityPeriod)), 1 /* TEXT */)
+                    ]),
+                    _cE("view", _uM({ class: "payment-methods" }), [
+                        _cE("view", _uM({ class: "method-section" }), [
+                            _cE("text", _uM({ class: "section-title" }), "选择支付方式"),
+                            _cE(Fragment, null, RenderHelpers.renderList(unref(paymentMethods), (method, __key, __index, _cached): any => {
+                                return _cE("view", _uM({
+                                    class: _nC(["method-option", _uM({ 'method-selected': unref(selectedMethodId) === method.id })]),
+                                    key: method.id,
+                                    onClick: () => { selectPaymentMethod(method.id); }
+                                }), [
+                                    _cE("view", _uM({ class: "method-left" }), [
+                                        _cE("text", _uM({ class: "method-label" }), _tD(method.label), 1 /* TEXT */),
+                                        isTrue(method.desc)
+                                            ? _cE("text", _uM({
+                                                key: 0,
+                                                class: "method-desc"
+                                            }), _tD(method.desc), 1 /* TEXT */)
+                                            : _cC("v-if", true)
+                                    ]),
+                                    _cE("view", _uM({ class: "method-right" }), [
+                                        _cE("view", _uM({
+                                            class: _nC(['radio', _uM({ 'radio-selected': unref(selectedMethodId) === method.id })])
+                                        }), null, 2 /* CLASS */)
+                                    ])
+                                ], 10 /* CLASS, PROPS */, ["onClick"]);
+                            }), 128 /* KEYED_FRAGMENT */)
+                        ])
+                    ]),
+                    _cE("view", _uM({ class: "info-item" }), [
+                        _cE("text", _uM({ class: "item-label" }), "应付金额"),
+                        _cE("text", _uM({ class: "item-value amount" }), _tD(unref(formattedAmount)), 1 /* TEXT */)
+                    ])
+                ]),
+                _cE("view", _uM({ class: "tips" }), [
+                    _cE("text", _uM({ class: "tips-text" }), "续费后套餐将在30分钟内生效，如续费后设备始终无法上线，请您联系客服处理！")
+                ]),
+                _cE("view", _uM({ class: "action-buttons" }), [
+                    _cE("button", _uM({
+                        class: "btn cancel-btn",
+                        onClick: handleCancel
+                    }), "取消"),
+                    _cE("button", _uM({
+                        class: "btn confirm-btn",
+                        onClick: handleConfirm
+                    }), "确认支付")
+                ])
+            ]);
+        };
+    }
+});
+export default __sfc__;
+const GenComponentsPaymentStyles = [_uM([["payment-content", _pS(_uM([["backgroundColor", "#ffffff"], ["paddingTop", "32rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "48rpx"], ["paddingLeft", "32rpx"], ["boxSizing", "border-box"]]))], ["payment-info", _pS(_uM([["marginBottom", "32rpx"]]))], ["info-title", _pS(_uM([["fontSize", "36rpx"], ["fontWeight", 600], ["color", "#333333"], ["textAlign", "center"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eef2f7"], ["marginBottom", "40rpx"], ["paddingBottom", "20rpx"]]))], ["info-item", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0]]))], ["item-label", _pS(_uM([["fontSize", "24rpx"], ["color", "#666666"]]))], ["item-value", _pS(_uM([["fontSize", "24rpx"], ["color", "#333333"], ["fontWeight", "bold"]]))], ["amount", _pS(_uM([["color", "#f23030"], ["fontSize", "32rpx"], ["fontWeight", 700]]))], ["payment-methods", _pS(_uM([["marginBottom", "24rpx"]]))], ["method-item", _uM([[".fixed-method", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingBottom", "20rpx"]])]])], ["method-label", _uM([[".method-item ", _uM([["fontSize", "24rpx"], ["color", "#666666"]])], ["", _uM([["fontSize", "24rpx"], ["color", "#333333"], ["fontWeight", 500], ["marginBottom", "8rpx"]])]])], ["method-name", _uM([[".method-item ", _uM([["fontSize", "24rpx"], ["color", "#333333"], ["fontWeight", 500]])]])], ["method-section", _pS(_uM([["marginTop", "8rpx"]]))], ["section-title", _pS(_uM([["fontSize", "24rpx"], ["color", "#666666"], ["marginBottom", "24rpx"]]))], ["method-option", _uM([["", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "16rpx"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e5e5e5"], ["borderRightColor", "#e5e5e5"], ["borderBottomColor", "#e5e5e5"], ["borderLeftColor", "#e5e5e5"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["backgroundColor", "#ffffff"], ["transitionProperty", "all"], ["transitionDuration", "0.3s"], ["transitionTimingFunction", "ease"]])], [".method-selected", _uM([["borderTopColor", "#2563eb"], ["borderRightColor", "#2563eb"], ["borderBottomColor", "#2563eb"], ["borderLeftColor", "#2563eb"], ["backgroundColor", "#f8fbff"]])]])], ["method-left", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "column"]]))], ["method-desc", _pS(_uM([["fontSize", "20rpx"], ["color", "#999999"]]))], ["method-right", _pS(_uM([["paddingLeft", "20rpx"]]))], ["radio", _pS(_uM([["width", "25rpx"], ["height", "25rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dddddd"], ["borderRightColor", "#dddddd"], ["borderBottomColor", "#dddddd"], ["borderLeftColor", "#dddddd"], ["backgroundColor", "#ffffff"], ["position", "relative"], ["boxSizing", "border-box"], ["transitionProperty", "all"], ["transitionDuration", "0.2s"], ["transitionTimingFunction", "ease"]]))], ["radio-selected", _pS(_uM([["borderTopColor", "#2563eb"], ["borderRightColor", "#2563eb"], ["borderBottomColor", "#2563eb"], ["borderLeftColor", "#2563eb"], ["backgroundColor", "#2563eb"]]))], ["tips", _pS(_uM([["backgroundColor", "#f9f9f9"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["marginBottom", "48rpx"]]))], ["tips-text", _pS(_uM([["fontSize", "24rpx"], ["color", "#999999"], ["lineHeight", 1.4]]))], ["action-buttons", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"]]))], ["btn", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["fontSize", "32rpx"], ["fontWeight", 500], ["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["backgroundColor", "rgba(0,0,0,0)"]]))], ["cancel-btn", _pS(_uM([["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dbe5f0"], ["borderRightColor", "#dbe5f0"], ["borderBottomColor", "#dbe5f0"], ["borderLeftColor", "#dbe5f0"], ["color", "#334155"]]))], ["confirm-btn", _pS(_uM([["backgroundImage", "linear-gradient(135deg, #2563eb 0%, #4c88f4 100%)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#ffffff"]]))], ["@TRANSITION", _uM([["method-option", _uM([["property", "all"], ["duration", "0.3s"], ["timingFunction", "ease"]])], ["radio", _uM([["property", "all"], ["duration", "0.2s"], ["timingFunction", "ease"]])]])]])];
+//# sourceMappingURL=payment.uvue.map

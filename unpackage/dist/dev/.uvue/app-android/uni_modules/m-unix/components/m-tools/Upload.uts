@@ -1,0 +1,182 @@
+/**
+ * 图片压缩与 multipart 上传（与 Request 共用 getHostProjectConfig().baseUrl 与 Storage，不依赖 request()）
+ */
+import { getHostProjectConfig } from './ProjectConfig.uts';
+import { storage } from './Storage.uts';
+export type UploadApiResponse<T = any> = {
+    code: number;
+    msg: string;
+    data: T;
+};
+export type UploadFileOptions = {
+    /** 接口路径（相对 base）或完整 https URL */
+    url: string;
+    filePath: string;
+    /** 表单字段名，需与后端一致 */
+    name?: string;
+    formData?: UTSJSONObject;
+    /** 覆盖 baseUrl（默认使用 getHostProjectConfig().baseUrl） */
+    baseUrl?: string;
+    withToken?: boolean;
+    header?: UTSJSONObject;
+    showLoading?: boolean;
+    loadingText?: string;
+    showError?: boolean;
+    successCodes?: number[];
+};
+function resolveUploadBase(override?: string): string {
+    if (override != null && override !== '') {
+        return override;
+    }
+    return getHostProjectConfig().baseUrl;
+}
+function buildUploadFullUrl(path: string, baseOverride?: string): string {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+    }
+    const base = resolveUploadBase(baseOverride);
+    const sep = path.startsWith('/') ? '' : '/';
+    return base + sep + path;
+}
+/**
+ * 从常见后端返回里取出可访问的图片 URL
+ */
+export function pickUploadUrl(data: any): string {
+    if (data == null) {
+        return '';
+    }
+    if (typeof data === 'string') {
+        const s = data as string;
+        return s !== '' ? s : '';
+    }
+    const o = data as UTSJSONObject;
+    const tryKeys = ['url', 'fileUrl', 'path', 'src'];
+    for (let i = 0; i < tryKeys.length; i++) {
+        const k = tryKeys[i];
+        const v = o[k];
+        if (typeof v === 'string') {
+            const vs = v as string;
+            if (vs !== '') {
+                return vs;
+            }
+        }
+    }
+    return '';
+}
+/**
+ * 压缩本地图片；失败或质量为 0/100 时返回原路径
+ */
+export function compressImagePath(src: string, quality: number): Promise<string> {
+    return new Promise((resolve, _reject) => {
+        if (quality >= 100 || quality <= 0) {
+            resolve(src);
+            return;
+        }
+        uni.compressImage({
+            src,
+            quality,
+            success: (r) => {
+                const p = r.tempFilePath;
+                if (p != null && p !== '') {
+                    resolve(p);
+                }
+                else {
+                    resolve(src);
+                }
+            },
+            fail: () => {
+                resolve(src);
+            }
+        });
+    });
+}
+/**
+ * multipart 上传单个文件，解析 JSON 响应并按 successCodes 判定成功
+ */
+export function uploadFileRequest<T = any>(options: UploadFileOptions): Promise<UploadApiResponse<T>> {
+    const url = options.url;
+    const filePath = options.filePath;
+    const name = options.name != null && options.name !== '' ? options.name! : 'file';
+    const formData = options.formData;
+    const baseUrl = options.baseUrl;
+    const withToken = options.withToken != null ? options.withToken! : true;
+    const header = options.header != null ? options.header! : {} as UTSJSONObject;
+    const showLoading = options.showLoading != null ? options.showLoading! : false;
+    const loadingText = options.loadingText != null ? options.loadingText! : '上传中...';
+    const showError = options.showError != null ? options.showError! : true;
+    const successCodes = options.successCodes != null ? options.successCodes! : [0, 200];
+    const fullUrl = buildUploadFullUrl(url, baseUrl);
+    if (showLoading) {
+        uni.showLoading({ title: loadingText, mask: true });
+    }
+    const reqHeader: UTSJSONObject = header;
+    if (withToken) {
+        const token = storage.getToken();
+        if (token !== '') {
+            reqHeader['Authorization'] = token;
+        }
+    }
+    return new Promise((resolve, reject) => {
+        const fd = formData != null ? formData : {};
+        uni.uploadFile({
+            url: fullUrl,
+            filePath,
+            name,
+            formData: fd as UTSJSONObject,
+            header: reqHeader as UTSJSONObject,
+            success: (res) => {
+                if (showLoading) {
+                    uni.hideLoading();
+                }
+                let parsed: UploadApiResponse<T>;
+                try {
+                    const raw = ((res.data as string) ?? '').replace(/\ufeff/g, '');
+                    const json = raw !== '' ? raw : '{}';
+                    parsed = JSON.parse(json) as UploadApiResponse<T>;
+                }
+                catch (e: any) {
+                    if (showError) {
+                        uni.showToast({ title: '上传响应解析失败', icon: 'none' });
+                    }
+                    reject({
+                        code: -1,
+                        msg: 'parse error',
+                        data: null
+                    } as UploadApiResponse<T>);
+                    return;
+                }
+                const code = parsed.code;
+                let ok = false;
+                for (let j = 0; j < successCodes.length; j++) {
+                    if (successCodes[j] === code) {
+                        ok = true;
+                        break;
+                    }
+                }
+                if (ok) {
+                    resolve(parsed);
+                    return;
+                }
+                const m = parsed.msg;
+                if (showError && m != null && m !== '') {
+                    uni.showToast({ title: m, icon: 'none' });
+                }
+                reject(parsed);
+            },
+            fail: (err) => {
+                if (showLoading) {
+                    uni.hideLoading();
+                }
+                if (showError) {
+                    uni.showToast({ title: '上传失败', icon: 'none' });
+                }
+                reject({
+                    code: -1,
+                    msg: 'network',
+                    data: err
+                } as UploadApiResponse<T>);
+            }
+        });
+    });
+}
+//# sourceMappingURL=Upload.uts.map

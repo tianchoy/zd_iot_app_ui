@@ -1,0 +1,471 @@
+import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue';
+import _easycom_m_tag from '@/uni_modules/m-unix/components/m-tag/m-tag.uvue';
+import _easycom_m_div from '@/uni_modules/m-unix/components/m-div/m-div.uvue';
+import _easycom_m_button from '@/uni_modules/m-unix/components/m-button/m-button.uvue';
+import _easycom_m_tabs from '@/uni_modules/m-unix/components/m-tabs/m-tabs.uvue';
+import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue';
+import _easycom_m_segmented_control from '@/uni_modules/m-unix/components/m-segmented-control/m-segmented-control.uvue';
+type CardDetailTabItem = {
+    __$originalPosition?: UTSSourceMapPosition<"CardDetailTabItem", "pages/cardDetail/cardDetail.uvue", 264, 7>;
+    name: string;
+};
+type CardDetailTabEvent = {
+    __$originalPosition?: UTSSourceMapPosition<"CardDetailTabEvent", "pages/cardDetail/cardDetail.uvue", 268, 7>;
+    index: number;
+    item: CardDetailTabItem;
+};
+const __sfc__ = defineComponent({
+    __name: 'cardDetail',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const card_number = ref('');
+        const active = ref(0);
+        const activeName = ref('基本信息');
+        const pkgMore = ref(false);
+        const tabs = ref([
+            { name: '基本信息' },
+            { name: '卡片套餐' },
+            { name: '卡片订单' }
+        ]);
+        const pkgTabs = ref(['全部', '在用套餐', '待生效', '已失效']);
+        const current = ref(0);
+        const handleClick = (e: UTSJSONObject) => {
+            current.value = e.getNumber('index') ?? 0;
+        };
+        const changeTab = (e: CardDetailTabEvent) => {
+            active.value = e.index;
+            activeName.value = e.item.name;
+        };
+        const showMore = () => {
+            console.log(pkgMore.value, " at pages/cardDetail/cardDetail.uvue:296");
+            pkgMore.value = !pkgMore.value;
+        };
+        const cardDetail = (cardNumber: string) => {
+            card_number.value = cardNumber;
+        };
+        const goBack = () => {
+            uni.navigateBack({
+                delta: 1
+            });
+        };
+        onLoad((options) => {
+            const cardNumber = options.getString('card_number') ?? '';
+            console.log(cardNumber, " at pages/cardDetail/cardDetail.uvue:312");
+            card_number.value = cardNumber;
+        });
+        return (): any | null => {
+            const _component_topNavBar = resolveEasyComponent("topNavBar", _easycom_topNavBar);
+            const _component_m_tag = resolveEasyComponent("m-tag", _easycom_m_tag);
+            const _component_m_div = resolveEasyComponent("m-div", _easycom_m_div);
+            const _component_m_button = resolveEasyComponent("m-button", _easycom_m_button);
+            const _component_m_tabs = resolveEasyComponent("m-tabs", _easycom_m_tabs);
+            const _component_m_icon = resolveEasyComponent("m-icon", _easycom_m_icon);
+            const _component_m_segmented_control = resolveEasyComponent("m-segmented-control", _easycom_m_segmented_control);
+            return _cE(Fragment, null, [
+                _cV(_component_topNavBar, _uM({
+                    title: "卡片详情",
+                    "show-back": true,
+                    onBack: goBack,
+                    backgroundColor: "#f4f7fb",
+                    textColor: "#333",
+                    showCapsule: false
+                })),
+                _cE("view", _uM({ class: "container" }), [
+                    _cE("view", _uM({ class: "card-box" }), [
+                        _cE("view", _uM({
+                            class: "card-item",
+                            onClick: () => { cardDetail('1064916585160'); }
+                        }), [
+                            _cE("view", _uM({ class: "item-head" }), [
+                                _cE("view", _uM({ class: "item-head-label" }), [
+                                    _cE("text", _uM({ class: "card-item-title" }), "1064916585160"),
+                                    _cE("text", _uM({ class: "card-item-content" }), "ICCID: 89860421123456789012")
+                                ]),
+                                _cV(_component_m_tag, _uM({
+                                    text: "标签",
+                                    round: true,
+                                    plain: true,
+                                    size: "small",
+                                    type: "primary"
+                                }))
+                            ]),
+                            _cE("view", _uM({ class: "item-package" }), [
+                                _cE("text", _uM({ class: "package-label" }), "当前套餐:"),
+                                _cE("text", _uM({ class: "package-value" }), "车联网月包20G")
+                            ]),
+                            _cV(_component_m_div, _uM({
+                                backgroundColor: "#f1f5f9",
+                                textClass: "divider"
+                            })),
+                            _cE("view", _uM({ class: "card-metrics" }), [
+                                _cE("view", _uM({ class: "metric-box" }), [
+                                    _cE("view", _uM({ class: "metric-label" }), "到期时间"),
+                                    _cE("view", _uM({ class: "metric-value" }), "2026-04-30")
+                                ]),
+                                _cE("view", _uM({ class: "metric-box" }), [
+                                    _cE("view", _uM({ class: "metric-label" }), "本月流量"),
+                                    _cE("view", _uM({ class: "metric-value" }), "11.34GB / 20GB")
+                                ])
+                            ]),
+                            _cE("view", _uM({ class: "card-bottom" }), [
+                                _cE("text", _uM({ class: "cycle-label" }), "总流量 20GB")
+                            ])
+                        ], 8 /* PROPS */, ["onClick"]),
+                        _cE("view", _uM({ class: "card-botton" }), [
+                            _cV(_component_m_button, _uM({
+                                type: "black",
+                                plain: true,
+                                margin: '0 20rpx',
+                                height: "70rpx",
+                                shape: "circle",
+                                bold: true
+                            }), _uM({
+                                default: withSlotCtx((): any[] => ["诊断"]),
+                                _: 1 /* STABLE */
+                            })),
+                            _cV(_component_m_button, _uM({
+                                type: "black",
+                                plain: true,
+                                margin: '0 20rpx',
+                                height: "70rpx",
+                                shape: "circle",
+                                bold: true,
+                                disabledGray: true,
+                                disabled: true
+                            }), _uM({
+                                default: withSlotCtx((): any[] => ["已绑定"]),
+                                _: 1 /* STABLE */
+                            })),
+                            _cV(_component_m_button, _uM({
+                                type: "primary",
+                                plain: false,
+                                margin: '0 20rpx',
+                                height: "70rpx",
+                                shape: "circle",
+                                bold: true,
+                                shadow: true
+                            }), _uM({
+                                default: withSlotCtx((): any[] => ["去充值"]),
+                                _: 1 /* STABLE */
+                            }))
+                        ])
+                    ]),
+                    _cE("view", _uM({ class: "card-box" }), [
+                        _cV(_component_m_tabs, _uM({
+                            tabs: unref(tabs),
+                            width: "auto",
+                            padding: 0,
+                            isSlider: false,
+                            currentTab: unref(active),
+                            onChange: changeTab,
+                            unlined: true,
+                            bold: true,
+                            itemStyle: { backgroundColor: '#fff', borderRadius: '24rpx', padding: '0 40rpx', border: '1rpx solid #e7edf5' },
+                            selectedBgColor: '#eff6ff',
+                            selectedBorderColor: '#bfdbfe'
+                        }), null, 8 /* PROPS */, ["tabs", "currentTab"]),
+                        _cE("view", _uM({ class: "card-content" }), [
+                            _cE("view", _uM({ class: "section-title" }), _tD(unref(activeName)), 1 /* TEXT */),
+                            unref(activeName) == '基本信息'
+                                ? _cE("view", _uM({
+                                    key: 0,
+                                    class: "section-content"
+                                }), [
+                                    _cE("view", _uM({ class: "base-info-box" }), [
+                                        _cE("view", _uM({ class: "base-info" }), [
+                                            _cE("view", _uM({ class: "info-item" }), [
+                                                _cE("text", _uM({ class: "info-label" }), "卡片号"),
+                                                _cE("text", _uM({ class: "info-value" }), _tD(unref(card_number)), 1 /* TEXT */)
+                                            ]),
+                                            _cE("view", _uM({ class: "info-item" }), [
+                                                _cE("text", _uM({ class: "info-label" }), "ICCID"),
+                                                _cE("text", _uM({ class: "info-value" }), _tD(unref(card_number)), 1 /* TEXT */)
+                                            ]),
+                                            _cE("view", _uM({ class: "info-item" }), [
+                                                _cE("text", _uM({ class: "info-label" }), "IMSI"),
+                                                _cE("text", _uM({ class: "info-value" }), _tD(unref(card_number)), 1 /* TEXT */)
+                                            ]),
+                                            _cE("view", _uM({ class: "info-item" }), [
+                                                _cE("text", _uM({ class: "info-label" }), "最近使用"),
+                                                _cE("text", _uM({ class: "info-value" }), _tD(unref(card_number)), 1 /* TEXT */)
+                                            ])
+                                        ])
+                                    ]),
+                                    _cE("view", _uM({ class: "section-title" }), "套餐状态"),
+                                    _cE("view", _uM({ class: "pkg-content" }), [
+                                        _cE("view", _uM({ class: "pkg-item" }), [
+                                            _cE("text", _uM({ class: "pkg-label" }), "当前套餐:"),
+                                            _cE("text", _uM({ class: "pkg-value" }), "车联网月包20G")
+                                        ]),
+                                        _cE("view", _uM({ class: "pkg-item" }), [
+                                            _cE("text", _uM({ class: "pkg-label" }), "套餐流量:"),
+                                            _cE("text", _uM({ class: "pkg-value" }), "20GB")
+                                        ]),
+                                        _cE("view", _uM({ class: "pkg-item" }), [
+                                            _cE("text", _uM({ class: "pkg-label" }), "套餐有效期:"),
+                                            _cE("text", _uM({ class: "pkg-value" }), "2026-04-30")
+                                        ]),
+                                        _cE("view", _uM({ class: "pkg-item" }), [
+                                            _cE("text", _uM({ class: "pkg-label" }), "待生效期数:"),
+                                            _cE("view", _uM({ class: "pkg-value" }), [
+                                                _cE("text", null, "11"),
+                                                _cE("text", _uM({
+                                                    class: "pkg-icon",
+                                                    onClick: showMore
+                                                }), [
+                                                    isTrue(!unref(pkgMore))
+                                                        ? _cV(_component_m_icon, _uM({
+                                                            key: 0,
+                                                            name: "arrow-down-filling",
+                                                            size: "20rpx"
+                                                        }))
+                                                        : _cV(_component_m_icon, _uM({
+                                                            key: 1,
+                                                            name: "arrow-up-filling",
+                                                            size: "20rpx"
+                                                        }))
+                                                ])
+                                            ])
+                                        ]),
+                                        isTrue(unref(pkgMore))
+                                            ? _cE("view", _uM({
+                                                key: 0,
+                                                class: "pkg-date"
+                                            }), [
+                                                _cE("view", _uM({ class: "date-list" }), [
+                                                    _cE("text", _uM({ class: "date-label" }), [
+                                                        _cE("text", _uM({ class: "date-period" }), "第 1 期"),
+                                                        _cE("text", null, "2026-04-30")
+                                                    ]),
+                                                    _cV(_component_m_tag, _uM({
+                                                        text: "标签",
+                                                        round: true,
+                                                        plain: true,
+                                                        size: "small",
+                                                        type: "primary"
+                                                    }))
+                                                ])
+                                            ])
+                                            : _cC("v-if", true),
+                                        _cE("view", _uM({ class: "pkg-item" }), [
+                                            _cE("text", _uM({ class: "pkg-label" }), "下期开始时间:"),
+                                            _cE("text", _uM({ class: "pkg-value" }), "2026-04-30")
+                                        ]),
+                                        _cE("view", _uM({ class: "pkg-item" }), [
+                                            _cE("text", _uM({ class: "pkg-label" }), "当前期次:"),
+                                            _cE("text", _uM({ class: "pkg-value" }), "第 1 期")
+                                        ]),
+                                        _cE("view", _uM({ class: "pkg-item" }), [
+                                            _cE("text", _uM({ class: "pkg-label" }), "当前期有效期:"),
+                                            _cE("text", _uM({ class: "pkg-value" }), "2026-04-30")
+                                        ]),
+                                        _cE("view", _uM({ class: "pkg-item" }), [
+                                            _cE("text", _uM({ class: "pkg-label" }), "计费方式:"),
+                                            _cE("text", _uM({ class: "pkg-value" }), "按月计费")
+                                        ])
+                                    ]),
+                                    _cE("view", _uM({ class: "section-title" }), "流量使用"),
+                                    _cE("view", _uM({ class: "data-total" }), [
+                                        _cE("view", _uM({ class: "total-item" }), [
+                                            _cE("text", _uM({ class: "total-label" }), "本月已用:"),
+                                            _cE("text", _uM({ class: "total-value" }), "20GB")
+                                        ]),
+                                        _cE("view", _uM({ class: "total-item" }), [
+                                            _cE("text", _uM({ class: "total-label" }), "剩余流量:"),
+                                            _cE("text", _uM({ class: "total-value" }), "20GB")
+                                        ]),
+                                        _cE("view", _uM({ class: "total-item" }), [
+                                            _cE("text", _uM({ class: "total-label" }), "总流量:"),
+                                            _cE("text", _uM({ class: "total-value" }), "20GB")
+                                        ])
+                                    ])
+                                ])
+                                : _cC("v-if", true),
+                            unref(activeName) == '卡片套餐'
+                                ? _cE("view", _uM({
+                                    key: 1,
+                                    class: "section-content"
+                                }), [
+                                    _cV(_component_m_segmented_control, _uM({
+                                        values: unref(pkgTabs),
+                                        current: unref(current),
+                                        textActiveColor: '#2563eb',
+                                        onClick: handleClick,
+                                        customStyle: { height: 'unset', padding: '5rpx 10rpx', border: '1rpx solid #e5edf6' }
+                                    }), null, 8 /* PROPS */, ["values", "current"]),
+                                    _cE("view", _uM({ class: "card-pkg-box" }), [
+                                        unref(current) == 0
+                                            ? _cE("view", _uM({
+                                                key: 0,
+                                                class: "card-pkg-all-box"
+                                            }), [
+                                                _cE("view", _uM({ class: "item" }), [
+                                                    _cE("view", _uM({ class: "item-head" }), [
+                                                        _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
+                                                        _cV(_component_m_tag, _uM({
+                                                            text: "全部",
+                                                            round: true,
+                                                            plain: true,
+                                                            size: "small",
+                                                            type: "primary"
+                                                        }))
+                                                    ]),
+                                                    _cE("view", _uM({ class: "item-sub-title" }), "生效时间：待生效"),
+                                                    _cE("view", _uM({ class: "item-data" }), [
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ]),
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ]),
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ])
+                                                    ])
+                                                ])
+                                            ])
+                                            : _cC("v-if", true),
+                                        unref(current) == 1
+                                            ? _cE("view", _uM({
+                                                key: 1,
+                                                class: "card-pkg-active-box"
+                                            }), [
+                                                _cE("view", _uM({ class: "item" }), [
+                                                    _cE("view", _uM({ class: "item-head" }), [
+                                                        _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
+                                                        _cV(_component_m_tag, _uM({
+                                                            text: "在用",
+                                                            round: true,
+                                                            plain: true,
+                                                            size: "small",
+                                                            type: "primary"
+                                                        }))
+                                                    ]),
+                                                    _cE("view", _uM({ class: "item-sub-title" }), "生效时间：待生效"),
+                                                    _cE("view", _uM({ class: "item-data" }), [
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ]),
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ]),
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ])
+                                                    ])
+                                                ])
+                                            ])
+                                            : _cC("v-if", true),
+                                        unref(current) == 2
+                                            ? _cE("view", _uM({
+                                                key: 2,
+                                                class: "card-pkg-exp-box"
+                                            }), [
+                                                _cE("view", _uM({ class: "item" }), [
+                                                    _cE("view", _uM({ class: "item-head" }), [
+                                                        _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
+                                                        _cV(_component_m_tag, _uM({
+                                                            text: "待生效",
+                                                            round: true,
+                                                            plain: true,
+                                                            size: "small",
+                                                            type: "primary"
+                                                        }))
+                                                    ]),
+                                                    _cE("view", _uM({ class: "item-sub-title" }), "生效时间：待生效"),
+                                                    _cE("view", _uM({ class: "item-data" }), [
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ]),
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ]),
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ])
+                                                    ])
+                                                ])
+                                            ])
+                                            : _cC("v-if", true),
+                                        unref(current) == 3
+                                            ? _cE("view", _uM({
+                                                key: 3,
+                                                class: "card-pkg-fail-box"
+                                            }), [
+                                                _cE("view", _uM({ class: "item" }), [
+                                                    _cE("view", _uM({ class: "item-head" }), [
+                                                        _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
+                                                        _cV(_component_m_tag, _uM({
+                                                            text: "已失效",
+                                                            round: true,
+                                                            plain: true,
+                                                            size: "small",
+                                                            type: "primary"
+                                                        }))
+                                                    ]),
+                                                    _cE("view", _uM({ class: "item-sub-title" }), "生效时间：待生效"),
+                                                    _cE("view", _uM({ class: "item-data" }), [
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ]),
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ]),
+                                                        _cE("view", _uM({ class: "item-data-item" }), [
+                                                            _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                            _cE("text", _uM({ class: "item-data-value" }), "20GB")
+                                                        ])
+                                                    ])
+                                                ])
+                                            ])
+                                            : _cC("v-if", true)
+                                    ])
+                                ])
+                                : _cC("v-if", true),
+                            unref(activeName) == '卡片订单'
+                                ? _cE("view", _uM({
+                                    key: 2,
+                                    class: "section-content card-order"
+                                }), [
+                                    _cE("view", _uM({ class: "item" }), [
+                                        _cE("view", _uM({ class: "item-head" }), [
+                                            _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
+                                            _cV(_component_m_tag, _uM({
+                                                text: "已失效",
+                                                round: true,
+                                                plain: true,
+                                                size: "small",
+                                                type: "primary"
+                                            }))
+                                        ]),
+                                        _cE("view", _uM({ class: "item-sub-title" }), "订单号: " + _tD(unref(card_number)), 1 /* TEXT */),
+                                        _cE("view", _uM({ class: "item-data" }), [
+                                            _cE("text", null, "2023-01-01"),
+                                            _cE("text", _uM({ class: "total-value" }), "¥200")
+                                        ])
+                                    ])
+                                ])
+                                : _cC("v-if", true)
+                        ])
+                    ])
+                ])
+            ], 64 /* STABLE_FRAGMENT */);
+        };
+    }
+});
+export default __sfc__;
+const GenPagesCardDetailCardDetailStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"]]))], ["card-box", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]])]])], ["card-item", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["item-head", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "flex-start"], ["justifyContent", "space-between"]])], [".container .card-box .card-content .card-pkg-box .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["color", "#334155"], ["marginBottom", "12rpx"]])], [".container .card-box .card-content .card-order .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["color", "#334155"], ["marginBottom", "12rpx"]])]])], ["card-item-title", _uM([[".container .card-box .card-item .item-head ", _uM([["fontSize", "32rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.25]])]])], ["card-item-content", _uM([[".container .card-box .card-item .item-head ", _uM([["marginTop", 5], ["fontSize", 12], ["color", "#94a3b8"], ["lineHeight", 1.45]])]])], ["item-package", _uM([[".container .card-box .card-item ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["minWidth", 0]])]])], ["package-label", _uM([[".container .card-box .card-item .item-package ", _uM([["fontSize", 12], ["color", "#64748b"], ["lineHeight", 1.4]])]])], ["package-value", _uM([[".container .card-box .card-item .item-package ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "25rpx"], ["fontWeight", 700], ["color", "#334155"], ["lineHeight", 1.45], ["whiteSpace", "nowrap"], ["overflow", "hidden"], ["textOverflow", "ellipsis"]])]])], ["card-metrics", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0]])]])], ["metric-box", _uM([[".container .card-box .card-item .card-metrics ", _uM([["width", "48%"], ["boxSizing", "border-box"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["minWidth", 0]])]])], ["metric-label", _uM([[".container .card-box .card-item .card-metrics .metric-box ", _uM([["fontSize", "25rpx"], ["color", "#94a3b8"], ["lineHeight", 1.4]])]])], ["metric-value", _uM([[".container .card-box .card-item .card-metrics .metric-box ", _uM([["marginTop", "15rpx"], ["fontSize", "25rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.4]])]])], ["card-bottom", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["cycle-label", _uM([[".container .card-box .card-item .card-bottom ", _uM([["fontSize", "25rpx"], ["color", "#64748b"], ["lineHeight", 1.45]])]])], ["card-botton", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0]])]])], ["card-content", _uM([[".container .card-box ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"]])]])], ["section-title", _uM([[".container .card-box .card-content ", _uM([["fontSize", "28rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["marginBottom", "20rpx"]])]])], ["base-info-box", _uM([[".container .card-box .card-content ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["base-info", _uM([[".container .card-box .card-content .base-info-box ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingBottom", "24rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eef2f7"], ["marginBottom", "24rpx"]])]])], ["info-item", _uM([[".container .card-box .card-content .base-info-box .base-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0]])]])], ["info-label", _uM([[".container .card-box .card-content .base-info-box .base-info .info-item ", _uM([["color", "#64748b"]])]])], ["info-value", _uM([[".container .card-box .card-content .base-info-box .base-info .info-item ", _uM([["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["pkg-content", _uM([[".container .card-box .card-content ", _uM([["display", "flex"], ["flexDirection", "column"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "20rpx"]])]])], ["pkg-item", _uM([[".container .card-box .card-content .pkg-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["marginBottom", "12rpx"]])]])], ["pkg-label", _uM([[".container .card-box .card-content .pkg-content .pkg-item ", _uM([["color", "#64748b"]])]])], ["pkg-value", _uM([[".container .card-box .card-content .pkg-content .pkg-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["pkg-icon", _uM([[".container .card-box .card-content .pkg-content .pkg-item .pkg-value ", _uM([["backgroundColor", "#ffffff"], ["width", "40rpx"], ["height", "40rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["marginLeft", "25rpx"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["lineHeight", "15rpx"]])]])], ["pkg-date", _uM([[".container .card-box .card-content .pkg-content ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eef2f7"], ["paddingTop", "20rpx"]])]])], ["date-list", _uM([[".container .card-box .card-content .pkg-content .pkg-date ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0], ["fontSize", "26rpx"], ["color", "#334155"]])]])], ["date-period", _uM([[".container .card-box .card-content .pkg-content .pkg-date .date-list ", _uM([["marginRight", "10rpx"]])]])], ["data-total", _uM([[".container .card-box .card-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["color", "#334155"]])]])], ["total-item", _uM([[".container .card-box .card-content .data-total ", _uM([["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["marginTop", 0], ["marginRight", "10rpx"], ["marginBottom", 0], ["marginLeft", "10rpx"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["total-label", _uM([[".container .card-box .card-content .data-total .total-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["lineHeight", 1.4], ["marginBottom", "10rpx"]])]])], ["total-value", _uM([[".container .card-box .card-content .data-total .total-item ", _uM([["fontSize", "25rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.4]])], [".container .card-box .card-content .card-order .item-data ", _uM([["fontSize", "30rpx"], ["fontWeight", 900], ["color", "#ef4444"]])]])], ["item", _uM([[".container .card-box .card-content .card-pkg-box ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"]])], [".container .card-box .card-content .card-order ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"]])]])], ["item-label", _uM([[".container .card-box .card-content .card-pkg-box .item .item-head ", _uM([["color", "#64748b"], ["fontWeight", "bold"]])], [".container .card-box .card-content .card-order .item .item-head ", _uM([["color", "#64748b"], ["fontWeight", "bold"]])]])], ["item-sub-title", _uM([[".container .card-box .card-content .card-pkg-box .item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])], [".container .card-box .card-content .card-order .item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])]])], ["item-data", _uM([[".container .card-box .card-content .card-pkg-box .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["marginTop", "20rpx"], ["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])], [".container .card-box .card-content .card-order .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["marginTop", "20rpx"], ["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])], [".container .card-box .card-content .card-order ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["item-data-item", _uM([[".container .card-box .card-content .card-pkg-box .item .item-data ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "10rpx"], ["marginRight", "10rpx"], ["marginBottom", "10rpx"], ["marginLeft", "10rpx"]])], [".container .card-box .card-content .card-order .item .item-data ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "10rpx"], ["marginRight", "10rpx"], ["marginBottom", "10rpx"], ["marginLeft", "10rpx"]])]])]])];
+//# sourceMappingURL=cardDetail.uvue.map

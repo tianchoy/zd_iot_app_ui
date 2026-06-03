@@ -1,0 +1,188 @@
+import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
+import _easycom_m_segmented_control from '@/uni_modules/m-unix/components/m-segmented-control/m-segmented-control.uvue'
+import { ref, computed } from 'vue'
+	
+	// 套餐状态类型
+	type PackageStatus = '全部' | '在用套餐' | '待生效' | '已失效'
+	type PackageItemStatus = '在用套餐' | '待生效' | '已失效'
+
+	// 套餐数据结构
+	interface PackageItem {
+		name: string
+		status: PackageItemStatus
+		effectiveTime: string
+		totalTraffic: string
+		remainingTraffic: string
+		expireDate: string
+	}
+	
+	// Tab 列表
+	
+const __sfc__ = defineComponent({
+  __name: 'myPkg',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	const pkgTabs = ref<PackageStatus[]>(['全部', '在用套餐', '待生效', '已失效'])
+	const current = ref<number>(0)
+	
+	// 套餐数据
+	const packageList = ref<any[]>([
+		{
+			name: '车联网月包20G',
+			status: '在用套餐',
+			effectiveTime: '2026-04-01',
+			totalTraffic: '20GB',
+			remainingTraffic: '8.66GB',
+			expireDate: '2026-04-30'
+		},
+		{
+			name: '车联网月包10G',
+			status: '待生效',
+			effectiveTime: '待生效',
+			totalTraffic: '10GB',
+			remainingTraffic: '10GB',
+			expireDate: '2026-05-30'
+		},
+		{
+			name: '工业设备月包5G',
+			status: '待生效',
+			effectiveTime: '待生效',
+			totalTraffic: '5GB',
+			remainingTraffic: '5GB',
+			expireDate: '2026-06-30'
+		},
+		{
+			name: '测试套餐1G',
+			status: '已失效',
+			effectiveTime: '2026-03-01',
+			totalTraffic: '1GB',
+			remainingTraffic: '0',
+			expireDate: '2026-03-31'
+		}
+	])
+	
+	const getPackageText = (item: any, key: string): string => {
+		const value = (item as UTSJSONObject)[key]
+		return value == null ? '' : '' + value
+	}
+
+	// 根据 Tab 筛选套餐
+	const filteredPackages = computed<any[]>(() : any[] => {
+		const currentStatus = pkgTabs.value[current.value]
+		if (currentStatus === '全部') {
+			return packageList.value
+		}
+		return packageList.value.filter((item: any) : boolean => getPackageText(item, 'status') === currentStatus)
+	})
+	
+	// Tab 切换处理
+	const handleClick = (e: UTSJSONObject) => {
+		current.value = e.index as number
+	}
+	
+	// 获取状态样式类
+	const getStatusClass = (status: string): string => {
+		switch (status) {
+			case '在用套餐':
+				return 'status-active'
+			case '待生效':
+				return 'status-pending'
+			case '已失效':
+				return 'status-expired'
+			default:
+				return ''
+		}
+	}
+
+	// 返回上一页
+	const goBack = () => {
+		uni.navigateBack({
+			delta: 1
+		})
+	}
+		
+
+return (): any | null => {
+
+const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar)
+const _component_m_segmented_control = resolveEasyComponent("m-segmented-control",_easycom_m_segmented_control)
+
+  return _cE(Fragment, null, [
+    _cV(_component_topNavBar, _uM({
+      title: "我的套餐",
+      "show-back": true,
+      onBack: goBack,
+      backgroundColor: "#f4f7fb",
+      textColor: "#333",
+      showCapsule: false
+    })),
+    _cE("view", _uM({ class: "container" }), [
+      _cE("view", _uM({ class: "card-info" }), [
+        _cE("view", _uM({ class: "info-title" }), "当前卡号"),
+        _cE("view", _uM({ class: "info-value" }), "1064916585160")
+      ]),
+      _cE("view", _uM({ class: "pkg-box" }), [
+        _cV(_component_m_segmented_control, _uM({
+          values: pkgTabs.value,
+          current: current.value,
+          textActiveColor: '#2563eb',
+          onClick: handleClick,
+          customStyle: {height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}
+        }), null, 8 /* PROPS */, ["values", "current"]),
+        _cE("scroll-view", _uM({
+          class: "package-list",
+          "scroll-y": "",
+          enhanced: true
+        }), [
+          filteredPackages.value.length === 0
+            ? _cE("view", _uM({
+                key: 0,
+                class: "empty-state"
+              }), [
+                _cE("text", _uM({ class: "empty-text" }), "暂无套餐")
+              ])
+            : _cC("v-if", true),
+          _cE(Fragment, null, RenderHelpers.renderList(filteredPackages.value, (item, index, __index, _cached): any => {
+            return _cE("view", _uM({
+              key: index,
+              class: "package-card"
+            }), [
+              _cE("view", _uM({ class: "package-header" }), [
+                _cE("text", _uM({ class: "package-name" }), _tD(getPackageText(item, 'name')), 1 /* TEXT */),
+                _cE("text", _uM({
+                  class: _nC(["status-tag", getStatusClass(getPackageText(item, 'status'))])
+                }), _tD(getPackageText(item, 'status')), 3 /* TEXT, CLASS */)
+              ]),
+              _cE("view", _uM({ class: "effective-time" }), [
+                _cE("text", _uM({ class: "time-label" }), "生效时间："),
+                _cE("text", _uM({ class: "time-value" }), _tD(getPackageText(item, 'effectiveTime')), 1 /* TEXT */)
+              ]),
+              _cE("view", _uM({ class: "package-metrics" }), [
+                _cE("view", _uM({ class: "metric-item" }), [
+                  _cE("text", _uM({ class: "metric-label" }), "流量"),
+                  _cE("text", _uM({ class: "metric-value" }), _tD(getPackageText(item, 'totalTraffic')), 1 /* TEXT */)
+                ]),
+                _cE("view", _uM({ class: "metric-item" }), [
+                  _cE("text", _uM({ class: "metric-label" }), "剩余"),
+                  _cE("text", _uM({ class: "metric-value" }), _tD(getPackageText(item, 'remainingTraffic')), 1 /* TEXT */)
+                ]),
+                _cE("view", _uM({ class: "metric-item" }), [
+                  _cE("text", _uM({ class: "metric-label" }), "到期"),
+                  _cE("text", _uM({ class: "metric-value" }), _tD(getPackageText(item, 'expireDate')), 1 /* TEXT */)
+                ])
+              ])
+            ])
+          }), 128 /* KEYED_FRAGMENT */)
+        ])
+      ])
+    ])
+  ], 64 /* STABLE_FRAGMENT */)
+}
+}
+
+})
+export default __sfc__
+const GenPagesMyPkgMyPkgStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"], ["minHeight", "1000rpx"]]))], ["card-info", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["boxShadow", "0 8rpx 20rpx rgba(15, 23, 42, 0.04)"]]))], ["pkg-box", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["boxShadow", "0 8rpx 20rpx rgba(15, 23, 42, 0.04)"]]))], ["info-title", _uM([[".card-info ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginBottom", "12rpx"]])], [".pkg-box ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginBottom", "12rpx"]])]])], ["info-value", _uM([[".card-info ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#333333"]])], [".pkg-box ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["package-list", _uM([[".pkg-box ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["marginTop", "24rpx"], ["marginRight", 0], ["marginBottom", "24rpx"], ["marginLeft", 0]])]])], ["package-card", _uM([[".pkg-box ", _uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "28rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "28rpx"], ["marginBottom", "24rpx"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["boxShadow", "0 4rpx 12rpx rgba(15, 23, 42, 0.04)"]])]])], ["package-header", _uM([[".pkg-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "20rpx"]])]])], ["package-name", _uM([[".pkg-box .package-header ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#1f2937"]])]])], ["status-tag", _uM([[".pkg-box .package-header ", _uM([["fontSize", "24rpx"], ["paddingTop", "6rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["status-active", _uM([[".pkg-box .package-header ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ecfdf5"], ["color", "#059669"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#a7f3d0"], ["borderRightColor", "#a7f3d0"], ["borderBottomColor", "#a7f3d0"], ["borderLeftColor", "#a7f3d0"]])]])], ["status-pending", _uM([[".pkg-box .package-header ", _uM([["backgroundColor", "#fff3e0"], ["color", "#ed6c02"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#f3cea7"], ["borderRightColor", "#f3cea7"], ["borderBottomColor", "#f3cea7"], ["borderLeftColor", "#f3cea7"]])]])], ["status-expired", _uM([[".pkg-box .package-header ", _uM([["backgroundImage", "none"], ["backgroundColor", "#fef2f2"], ["color", "#dc2626"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#fecaca"], ["borderRightColor", "#fecaca"], ["borderBottomColor", "#fecaca"], ["borderLeftColor", "#fecaca"]])]])], ["effective-time", _uM([[".pkg-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginBottom", "28rpx"]])]])], ["time-label", _uM([[".pkg-box .effective-time ", _uM([["fontSize", "22rpx"], ["color", "#64748b"]])]])], ["time-value", _uM([[".pkg-box .effective-time ", _uM([["fontSize", "22rpx"], ["color", "#64748b"]])]])], ["package-metrics", _uM([[".pkg-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"]])]])], ["metric-item", _uM([[".pkg-box .package-metrics ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["backgroundColor", "#f8fafc"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["marginTop", 0], ["marginRight", "12rpx"], ["marginBottom", 0], ["marginLeft", "12rpx"]])]])], ["metric-label", _uM([[".pkg-box .package-metrics .metric-item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"]])]])], ["metric-value", _uM([[".pkg-box .package-metrics .metric-item ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#1f2937"]])]])], ["empty-state", _uM([[".pkg-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", "200rpx"]])]])], ["empty-text", _uM([[".pkg-box .empty-state ", _uM([["fontSize", "28rpx"], ["color", "#9ca3af"]])]])]])]

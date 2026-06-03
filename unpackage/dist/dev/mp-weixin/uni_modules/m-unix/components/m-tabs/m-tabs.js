@@ -1,325 +1,425 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
+class TouchPoint {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+}
 const _sfc_main = common_vendor.defineComponent({
-  name: "mTabs",
-  emits: ["change"],
+  name: "mFab",
+  emits: ["click", "dragend"],
   props: {
-    tabs: {
+    left: {
+      type: [Number, String],
+      default: 0
+    },
+    right: {
+      type: [Number, String],
+      default: 80
+    },
+    bottom: {
+      type: [Number, String],
+      default: 100
+    },
+    top: {
+      type: [Number, String],
+      default: 0
+    },
+    zIndex: {
+      type: [Number, String],
+      default: 997
+    },
+    width: {
+      type: [Number, String],
+      default: 80
+    },
+    height: {
+      type: [Number, String],
+      default: 80
+    },
+    radius: {
+      type: String,
+      default: "50%"
+    },
+    custom: {
+      type: Boolean,
+      default: false
+    },
+    icon: {
+      type: String,
+      default: ""
+    },
+    iconSize: {
+      type: [Number, String],
+      default: 52
+    },
+    draggable: {
+      type: Boolean,
+      default: true
+    },
+    snapEdge: {
+      type: Boolean,
+      default: true
+    },
+    snapPadding: {
+      type: [Number, String],
+      default: 16
+    },
+    bgColor: {
+      type: String,
+      default: "#5677fc"
+    },
+    color: {
+      type: String,
+      default: "#ffffff"
+    },
+    btnList: {
       type: Array,
       default() {
         return [];
       }
     },
-    field: {
+    textField: {
       type: String,
-      default: "name"
+      default: "text"
     },
-    badgeField: {
+    imgField: {
       type: String,
-      default: "num"
-    },
-    height: {
-      type: Number,
-      default: 80
-    },
-    padding: {
-      type: Number,
-      default: 30
-    },
-    backgroundColor: {
-      type: String,
-      default: "#FFFFFF"
-    },
-    isFixed: {
-      type: Boolean,
-      default: false
-    },
-    top: {
-      type: Number,
-      default: 0
-    },
-    unlined: {
-      type: Boolean,
-      default: false
-    },
-    currentTab: {
-      type: Number,
-      default: 0
-    },
-    isSlider: {
-      type: Boolean,
-      default: true
-    },
-    sliderWidth: {
-      type: Number,
-      default: 68
-    },
-    sliderHeight: {
-      type: Number,
-      default: 6
-    },
-    sliderBgColor: {
-      type: String,
-      default: "#5677fc"
-    },
-    sliderRadius: {
-      type: String,
-      default: "50rpx"
-    },
-    itemWidth: {
-      type: String,
-      default: ""
-    },
-    color: {
-      type: String,
-      default: "#666666"
-    },
-    selectedColor: {
-      type: String,
-      default: "#5677fc"
+      default: "imgUrl"
     },
     size: {
-      type: Number,
+      type: [Number, String],
       default: 28
     },
-    bold: {
-      type: Boolean,
-      default: false
-    },
-    scale: {
-      type: [Number, String],
-      default: 1
-    },
-    badgeColor: {
-      type: String,
-      default: "#ffffff"
-    },
-    badgeBgColor: {
-      type: String,
-      default: "#F74D54"
-    },
-    zIndex: {
-      type: [Number, String],
-      default: 996
-    },
-    customStyle: {
-      type: Object,
-      default: () => {
-        return new common_vendor.UTSJSONObject({});
-      }
-    },
-    itemStyle: {
-      type: Object,
-      default: () => {
-        return new common_vendor.UTSJSONObject({});
-      }
-    },
-    // ========== 新增选中项样式参数 ==========
-    selectedBgColor: {
-      type: String,
-      default: ""
-    },
-    selectedBorderColor: {
-      type: String,
-      default: ""
-    },
-    selectedBorderWidth: {
-      type: String,
-      default: "0"
-    },
-    selectedBorderRadius: {
-      type: String,
-      default: "0"
-    },
-    // 未选中项背景色（可选）
-    unselectedBgColor: {
-      type: String,
-      default: ""
-    },
-    // 是否显示选中项边框
-    showSelectedBorder: {
+    maskClosable: {
       type: Boolean,
       default: false
     }
+  },
+  data() {
+    return {
+      expanded: false,
+      winW: 0,
+      winH: 0,
+      dragLeftPx: 0,
+      dragTopPx: 0,
+      dragReady: false,
+      wrapWpx: 0,
+      wrapHpx: 0,
+      touchStartX: 0,
+      touchStartY: 0,
+      touchStartLeft: 0,
+      touchStartTop: 0,
+      isDragging: false,
+      hasMoved: false,
+      moveDistance: 0,
+      clickTimer: -1
+    };
   },
   computed: {
-    tabCount() {
-      return this.tabs.length;
+    safeBtnList() {
+      const list = this.btnList;
+      return list == null ? [] : list;
     },
-    itemWidthComputed() {
-      const iw = this.itemWidth;
-      if (iw != null && iw.length > 0) {
-        return iw;
-      }
-      const n = this.tabCount;
-      if (n <= 0) {
-        return "25%";
-      }
-      return 100 / n + "%";
+    iconName() {
+      const s = this.icon;
+      if (s == null)
+        return "";
+      const t = s.trim();
+      return t;
     },
-    rootStyle() {
+    baseZ() {
+      const zi = this.zIndex;
+      const n = typeof zi === "number" ? zi : parseInt("" + zi);
+      return isNaN(n) ? 997 : n;
+    },
+    maskZIndex() {
+      return this.baseZ - 1;
+    },
+    wrapStyle() {
       const st = new common_vendor.UTSJSONObject({});
-      const z = this.zIndex;
-      st["zIndex"] = typeof z === "number" ? z : parseInt("" + z);
-      if (this.isFixed) {
-        st["position"] = "fixed";
-        st["left"] = "0";
-        st["right"] = "0";
-        st["top"] = this.top + "px";
-      }
-      if (this.customStyle != null) {
-        Object.assign(st, this.customStyle);
+      st["zIndex"] = this.baseZ;
+      st["position"] = "fixed";
+      st["left"] = this.dragLeftPx + "px";
+      st["top"] = this.dragTopPx + "px";
+      st["right"] = "auto";
+      st["bottom"] = "auto";
+      st["display"] = "flex";
+      st["flexDirection"] = "column";
+      st["alignItems"] = "flex-end";
+      return st;
+    },
+    mainStyle() {
+      const st = new common_vendor.UTSJSONObject({});
+      st["width"] = "" + this.width + "rpx";
+      st["height"] = "" + this.height + "rpx";
+      st["borderRadius"] = this.radius;
+      st["backgroundColor"] = this.bgColor;
+      if (!this.isDragging) {
+        st["transition"] = "left 0.2s ease, top 0.2s ease";
       }
       return st;
     },
-    sliderAnchorStyle() {
-      const n = this.tabCount;
-      if (n <= 0) {
-        return new common_vendor.UTSJSONObject({});
+    mainDragClass() {
+      const out = [];
+      out.push("m-fab__main");
+      if (this.isDragging) {
+        out.push("m-fab__main--dragging");
       }
-      let i = this.currentTab;
-      if (i < 0) {
-        i = 0;
-      }
-      if (i >= n) {
-        i = n - 1;
-      }
-      const pct = (i + 0.5) / n * 100;
-      return new common_vendor.UTSJSONObject({
-        left: pct + "%",
-        transition: "left 0.32s cubic-bezier(0.25, 0.8, 0.25, 1)"
-      });
+      return out;
     }
   },
+  mounted() {
+    this.initPosition();
+    this.$nextTick(() => {
+      this.measureWrapSize();
+    });
+  },
   methods: {
-    tabLabel(tab) {
-      const k = this.field;
-      const v = tab[k];
-      return v == null ? "" : "" + v;
+    initPosition() {
+      const sys = common_vendor.index.getSystemInfoSync();
+      this.winW = sys.windowWidth;
+      this.winH = sys.windowHeight;
+      const fabW = common_vendor.index.rpx2px(parseInt(this.width));
+      const fabH = common_vendor.index.rpx2px(parseInt(this.height));
+      const right = common_vendor.index.rpx2px(parseInt(this.right));
+      const bottom = common_vendor.index.rpx2px(parseInt(this.bottom));
+      this.dragLeftPx = this.winW - fabW - right;
+      this.dragTopPx = this.winH - fabH - bottom;
     },
-    badgeText(tab) {
-      const k = this.badgeField;
-      const v = tab[k];
-      if (v == null) {
-        return "";
+    measureWrapSize() {
+      const self = this;
+      try {
+        const q = common_vendor.index.createSelectorQuery().in(self);
+        q.select(".m-fab__wrap").boundingClientRect((rect = null) => {
+          if (rect == null)
+            return null;
+          const data = rect;
+          const w = data["width"];
+          const h = data["height"];
+          if (w > 0 && h > 0) {
+            self.wrapWpx = w;
+            self.wrapHpx = h;
+          }
+        }).exec();
+      } catch (_e) {
       }
-      const s = "" + v;
-      if (s === "0" || s === "") {
-        return "";
-      }
-      return s;
     },
-    tabDot(tab) {
-      return tab["isDot"] === true;
-    },
-    tabDisabled(tab) {
-      return tab["disabled"] === true;
-    },
-    // 计算每个选项卡内层的样式（支持选中/未选中背景色、边框）
-    itemInnerStyle(idx, tab) {
-      const st = new common_vendor.UTSJSONObject({});
-      const isSelected = this.currentTab === idx;
-      const isDisabled = this.tabDisabled(tab);
-      if (this.itemStyle != null) {
-        Object.assign(st, this.itemStyle);
-      }
-      if (isDisabled) {
-        st["opacity"] = "0.5";
-      } else if (isSelected) {
-        if (this.selectedBgColor && this.selectedBgColor !== "") {
-          st["backgroundColor"] = this.selectedBgColor;
-        }
-        if (this.showSelectedBorder && this.selectedBorderColor) {
-          st["borderColor"] = this.selectedBorderColor;
-          st["borderWidth"] = this.selectedBorderWidth;
-          st["borderStyle"] = "solid";
-        }
-        if (this.selectedBorderRadius && this.selectedBorderRadius !== "0") {
-          st["borderRadius"] = this.selectedBorderRadius;
-        }
+    applySnap() {
+      if (!this.snapEdge)
+        return null;
+      const pad = common_vendor.index.rpx2px(this.snapPaddingRpx());
+      const w = this.wrapWpx > 0 ? this.wrapWpx : common_vendor.index.rpx2px(parseInt(this.width));
+      const currentCenter = this.dragLeftPx + w / 2;
+      if (currentCenter < this.winW / 2) {
+        this.dragLeftPx = pad;
       } else {
-        if (this.unselectedBgColor && this.unselectedBgColor !== "") {
-          st["backgroundColor"] = this.unselectedBgColor;
-        }
+        this.dragLeftPx = this.winW - w - pad;
       }
-      return st;
+      const h = this.wrapHpx > 0 ? this.wrapHpx : common_vendor.index.rpx2px(parseInt(this.height));
+      this.dragTopPx = Math.max(pad, Math.min(this.dragTopPx, this.winH - h - pad));
     },
-    textStyle(idx, tab) {
-      const st = new common_vendor.UTSJSONObject({});
-      const sel = this.currentTab === idx;
-      const dis = this.tabDisabled(tab);
-      if (dis) {
-        st["color"] = "#cccccc";
-      } else if (sel) {
-        st["color"] = this.selectedColor;
-      } else {
-        st["color"] = this.color;
-      }
-      st["font-size"] = this.size + "rpx";
-      if (this.bold && sel) {
-        st["font-weight"] = "bold";
-      }
-      if (sel) {
-        const sc = this.scale;
-        const f = typeof sc === "number" ? sc : parseFloat("" + sc);
-        if (!isNaN(f) && f !== 1) {
-          st["transform"] = "scale(" + f + ")";
-        }
-      }
-      return st;
+    snapPaddingRpx() {
+      const sp = this.snapPadding;
+      const n = typeof sp === "number" ? sp : parseInt("" + sp);
+      return isNaN(n) ? 16 : n;
     },
-    onTabTap(idx, tab) {
-      if (this.tabDisabled(tab)) {
+    getTouchPoint(e = null) {
+      const event = e;
+      const touches = event["touches"];
+      if (touches == null || touches.length == 0)
+        return null;
+      const touch = touches[0];
+      let x = touch["clientX"];
+      let y = touch["clientY"];
+      if (x == null)
+        x = touch["pageX"];
+      if (y == null)
+        y = touch["pageY"];
+      return new TouchPoint(x == null ? 0 : x, y == null ? 0 : y);
+    },
+    onTouchStart(e = null) {
+      if (!this.draggable) {
+        this.onClick();
         return null;
       }
-      this.$emit("change", new common_vendor.UTSJSONObject({ index: idx, item: tab }));
+      const point = this.getTouchPoint(e);
+      if (point == null)
+        return null;
+      this.touchStartX = point.x;
+      this.touchStartY = point.y;
+      this.touchStartLeft = this.dragLeftPx;
+      this.touchStartTop = this.dragTopPx;
+      this.hasMoved = false;
+      this.moveDistance = 0;
+      if (this.clickTimer !== -1) {
+        clearTimeout(this.clickTimer);
+        this.clickTimer = -1;
+      }
+    },
+    onTouchMove(e = null) {
+      if (!this.draggable)
+        return null;
+      const point = this.getTouchPoint(e);
+      if (point == null)
+        return null;
+      const deltaX = point.x - this.touchStartX;
+      const deltaY = point.y - this.touchStartY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      if (distance > 10) {
+        if (!this.hasMoved) {
+          this.hasMoved = true;
+          this.isDragging = true;
+        }
+        this.moveDistance = distance;
+        let newLeft = this.touchStartLeft + deltaX;
+        let newTop = this.touchStartTop + deltaY;
+        const pad = common_vendor.index.rpx2px(this.snapPaddingRpx());
+        const w = this.wrapWpx > 0 ? this.wrapWpx : common_vendor.index.rpx2px(parseInt(this.width));
+        const h_1 = this.wrapHpx > 0 ? this.wrapHpx : common_vendor.index.rpx2px(parseInt(this.height));
+        newLeft = Math.max(pad, Math.min(newLeft, this.winW - w - pad));
+        newTop = Math.max(pad, Math.min(newTop, this.winH - h_1 - pad));
+        this.dragLeftPx = newLeft;
+        this.dragTopPx = newTop;
+      }
+    },
+    onTouchEnd(e = null) {
+      if (!this.draggable)
+        return null;
+      if (this.hasMoved && this.moveDistance > 10) {
+        this.isDragging = false;
+        this.applySnap();
+        this.$emit("dragend", new common_vendor.UTSJSONObject({
+          leftPx: this.dragLeftPx,
+          topPx: this.dragTopPx
+        }));
+      } else if (!this.hasMoved || this.moveDistance <= 10) {
+        const timer = setTimeout(() => {
+          this.onClick();
+          this.clickTimer = -1;
+        }, 50);
+        this.clickTimer = timer;
+      }
+      setTimeout(() => {
+        this.hasMoved = false;
+        this.moveDistance = 0;
+        this.isDragging = false;
+      }, 100);
+    },
+    onTouchCancel(e = null) {
+      if (this.clickTimer !== -1) {
+        clearTimeout(this.clickTimer);
+        this.clickTimer = -1;
+      }
+      this.hasMoved = false;
+      this.moveDistance = 0;
+      this.isDragging = false;
+    },
+    onClick() {
+      const list = this.btnList;
+      if (list.length > 0) {
+        this.expanded = !this.expanded;
+        this.$emit("click", new common_vendor.UTSJSONObject({ index: 0 }));
+        return null;
+      }
+      this.$emit("click", new common_vendor.UTSJSONObject({ index: 0 }));
+    },
+    onSubTap(idx) {
+      this.$emit("click", new common_vendor.UTSJSONObject({ index: idx + 1 }));
+      this.expanded = false;
+    },
+    collapse() {
+      this.expanded = false;
+    },
+    subText(btn) {
+      const k = this.textField;
+      const v = btn[k];
+      return v == null ? "" : "" + v;
+    },
+    subImg(btn) {
+      const k = this.imgField;
+      const v = btn[k];
+      return v == null ? "" : "" + v;
+    },
+    subColor(btn) {
+      const c = btn["color"];
+      return c == null ? "#ffffff" : "" + c;
+    },
+    subFontSize(btn) {
+      const fs = btn["fontSize"];
+      if (fs != null) {
+        const n = typeof fs === "number" ? fs : parseInt("" + fs);
+        if (!isNaN(n))
+          return n;
+      }
+      const d = this.size;
+      return typeof d === "number" ? d : parseInt("" + d);
+    },
+    subStyle(btn) {
+      const st = new common_vendor.UTSJSONObject({});
+      const bg = btn["bgColor"];
+      st["backgroundColor"] = bg == null ? "#16c2c2" : "" + bg;
+      return st;
     }
   }
 });
+if (!Array) {
+  const _easycom_m_icon2 = common_vendor.resolveComponent("m-icon");
+  _easycom_m_icon2();
+}
+const _easycom_m_icon = () => "../m-icon/m-icon.js";
+if (!Math) {
+  _easycom_m_icon();
+}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   "raw js";
   return common_vendor.e({
-    a: common_vendor.f($props.tabs, (tab, idx, i0) => {
+    a: $data.expanded && $props.maskClosable
+  }, $data.expanded && $props.maskClosable ? {
+    b: $options.maskZIndex,
+    c: common_vendor.o((...args) => $options.collapse && $options.collapse(...args), "5b")
+  } : {}, {
+    d: $options.safeBtnList.length > 0
+  }, $options.safeBtnList.length > 0 ? {
+    e: common_vendor.f($options.safeBtnList, (btn, idx, i0) => {
       return common_vendor.e({
-        a: common_vendor.t($options.tabLabel(tab)),
-        b: common_vendor.s($options.textStyle(idx, tab)),
-        c: $options.badgeText(tab) !== ""
-      }, $options.badgeText(tab) !== "" ? {
-        d: common_vendor.t($options.badgeText(tab)),
-        e: $props.badgeColor,
-        f: $props.badgeBgColor
-      } : $options.tabDot(tab) ? {
-        h: $props.badgeBgColor
+        a: $options.subImg(btn) !== ""
+      }, $options.subImg(btn) !== "" ? {
+        b: $options.subImg(btn)
       } : {}, {
-        g: $options.tabDot(tab),
-        i: common_vendor.s($options.itemInnerStyle(idx, tab)),
-        j: idx,
-        k: common_vendor.o(($event) => $options.onTabTap(idx, tab), idx)
+        c: common_vendor.t($options.subText(btn)),
+        d: $options.subColor(btn),
+        e: $options.subFontSize(btn) + "rpx",
+        f: idx,
+        g: common_vendor.s($options.subStyle(btn)),
+        h: common_vendor.o(($event) => $options.onSubTap(idx), idx)
       });
     }),
-    b: $options.itemWidthComputed,
-    c: $props.isSlider && $options.tabCount > 0
-  }, $props.isSlider && $options.tabCount > 0 ? {
-    d: $props.sliderBgColor,
-    e: $props.sliderHeight + "rpx",
-    f: $props.sliderRadius,
-    g: $props.sliderWidth + "rpx",
-    h: common_vendor.s($options.sliderAnchorStyle)
+    f: $data.expanded
   } : {}, {
-    i: $props.height + "rpx",
-    j: $props.padding + "rpx",
-    k: $props.padding + "rpx",
-    l: $props.backgroundColor,
-    m: !$props.unlined
-  }, !$props.unlined ? {} : {}, {
-    n: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    o: $props.isFixed ? 1 : "",
-    p: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-    q: common_vendor.s($options.rootStyle),
-    r: common_vendor.s({
-      "--status-bar-height": `${_ctx.u_s_b_h}px`,
-      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+    g: $props.custom
+  }, $props.custom ? {} : $options.iconName !== "" ? {
+    i: common_vendor.p({
+      name: $options.iconName,
+      size: $props.iconSize,
+      color: $props.color
     })
+  } : {
+    j: $props.color
+  }, {
+    h: $options.iconName !== "",
+    k: common_vendor.n($options.mainDragClass),
+    l: common_vendor.s($options.mainStyle),
+    m: common_vendor.o((...args) => $options.onTouchStart && $options.onTouchStart(...args), "35"),
+    n: common_vendor.o((...args) => $options.onTouchMove && $options.onTouchMove(...args), "cb"),
+    o: common_vendor.o((...args) => $options.onTouchEnd && $options.onTouchEnd(...args), "8f"),
+    p: common_vendor.o((...args) => $options.onTouchCancel && $options.onTouchCancel(...args), "75"),
+    q: common_vendor.s($options.wrapStyle),
+    r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+    s: `${_ctx.u_s_b_h}px`,
+    t: `${_ctx.u_s_a_i_b}px`,
+    v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);

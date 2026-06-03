@@ -2,8 +2,28 @@
 import { config } from '@/common/config.uts'
 import { injectMUnixHostProjectConfig, getHostProjectConfig } from '@/uni_modules/m-unix/components/m-tools/ProjectConfig.uts'
 
+const mUnixConfig = {
+	env: config.env,
+	baseUrl: config.baseUrl,
+	storage: {
+		token: config.storage.token,
+		userInfo: 'userInfo',
+	},
+	loginRequiredPaths: config.loginRequiredPaths,
+	loginPagePath: config.loginPagePath,
+	api: {},
+	configInfo: {
+		name: config.configInfo.name,
+		logo: config.configInfo.logo,
+		desc: config.configInfo.desc,
+		versionCode: config.configInfo.versionCode,
+		versionName: config.configInfo.versionName,
+	},
+	mUi: null,
+} as UTSJSONObject
+
 // 注入配置到 m-unix
-injectMUnixHostProjectConfig(config)
+injectMUnixHostProjectConfig(mUnixConfig)
 
 // 验证配置是否注入成功
 const injectedConfig = getHostProjectConfig()

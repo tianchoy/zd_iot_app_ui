@@ -1,0 +1,55 @@
+// utils/routerParams.ts
+export function getPageParams(): Record<string, any> {
+  const pages = getCurrentPages()
+  const currentPage = pages[pages.length - 1] as any
+  
+
+
+
+
+
+
+
+
+
+  
+
+  // App 端（uni-app x）
+  if (currentPage?.$page?.query) {
+    return currentPage.$page.query
+  }
+  if (currentPage?.query) {
+    return currentPage.query
+  }
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  return {}
+}

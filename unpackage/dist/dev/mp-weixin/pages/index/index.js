@@ -72,7 +72,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const getTenantInfos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_http.getTenantInfo(common_config.config.tenantId, false);
+        const res = yield api_http.getTenantInfo(common_config.config.api.auth.tenantId, false);
         if (res.code == 200) {
           const tenantInfo = res.data;
           const wxGetPhoneLogin = "" + tenantInfo.wxGetPhoneLogin;
@@ -86,13 +86,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad(() => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const token = common_config.getStorageSync("token");
-        if (!token) {
-          getTenantInfos();
-        }
-        common_vendor.index.$on("scanResult", onScanResult);
-      });
+      const token = common_config.getStorageSync("token");
+      if (!token) {
+        getTenantInfos();
+      }
+      common_vendor.index.$on("scanResult", onScanResult);
     });
     common_vendor.onUnload(() => {
       common_vendor.index.$off("scanResult", onScanResult);

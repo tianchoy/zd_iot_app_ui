@@ -20,7 +20,7 @@ export type CountryData = {
 export type TenantInfoData = {
   rechargeTip: string
   servicePhone: string
-  serviceQrcode: null
+  serviceQrcode: string
   wxAuditHide: string
   wxAuditHideNo: string
   wxGetPhoneLogin: string
@@ -60,7 +60,7 @@ export function card_detail(id: string, countryCode: string, withToken: boolean 
 */
 export function login(data: UTSJSONObject, withToken: boolean = true): Promise<ApiResponse<LoginData>> {
   return request<LoginData>({
-    url: ApiUrl.login,
+    url: ApiUrl.login as string,
     method: 'POST',
     data:{
       ...data,

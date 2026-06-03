@@ -116,7 +116,7 @@ const _sfc_main = common_vendor.defineComponent({
       isDragging: false,
       hasMoved: false,
       moveDistance: 0,
-      clickTimer: null
+      clickTimer: -1
       // 点击延迟定时器
     };
   },
@@ -272,14 +272,13 @@ const _sfc_main = common_vendor.defineComponent({
       this.touchStartTop = this.dragTopPx;
       this.hasMoved = false;
       this.moveDistance = 0;
-      if (this.clickTimer) {
+      if (this.clickTimer !== -1) {
         clearTimeout(this.clickTimer);
-        this.clickTimer = null;
+        this.clickTimer = -1;
       }
     },
     // 触摸移动
     onTouchMove(e = null) {
-      var _a;
       if (!this.draggable)
         return null;
       const point = this.getTouchPoint(e);
@@ -303,7 +302,6 @@ const _sfc_main = common_vendor.defineComponent({
         newTop = Math.max(pad, Math.min(newTop, this.winH - h_1 - pad));
         this.dragLeftPx = newLeft;
         this.dragTopPx = newTop;
-        (_a = e.preventDefault) === null || _a === void 0 ? null : _a.call(e);
       }
     },
     // 触摸结束
@@ -320,7 +318,7 @@ const _sfc_main = common_vendor.defineComponent({
       } else if (!this.hasMoved || this.moveDistance <= 10) {
         this.clickTimer = setTimeout(() => {
           this.onClick();
-          this.clickTimer = null;
+          this.clickTimer = -1;
         }, 50);
       }
       setTimeout(() => {
@@ -331,9 +329,9 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // 触摸取消
     onTouchCancel(e = null) {
-      if (this.clickTimer) {
+      if (this.clickTimer !== -1) {
         clearTimeout(this.clickTimer);
-        this.clickTimer = null;
+        this.clickTimer = -1;
       }
       this.hasMoved = false;
       this.moveDistance = 0;
