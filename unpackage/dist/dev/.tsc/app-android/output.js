@@ -56,4 +56,8 @@ const orderRecord_uvue_vue_type_style_index_0_lang = {};
 
 const myPkg_uvue_vue_type_style_index_0_lang = {};
 
+const mWxLogin_uvue_vue_type_style_index_0_lang = {};
+
+const login_uvue_vue_type_style_index_0_lang = {};
+
 const App_uvue_vue_type_style_index_0_lang = {};

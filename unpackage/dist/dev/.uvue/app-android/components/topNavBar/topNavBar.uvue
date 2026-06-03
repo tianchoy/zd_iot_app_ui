@@ -55,8 +55,6 @@ const __sfc__ = defineComponent({
         const handleBack = () => {
             if (props.showBack) {
                 emit('back');
-                // 默认返回上一页
-                // uni.navigateBack();
             }
         };
         onMounted(() => {

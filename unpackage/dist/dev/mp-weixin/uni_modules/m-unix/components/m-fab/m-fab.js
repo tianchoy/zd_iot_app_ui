@@ -1,5 +1,11 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
+class TouchPoint {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+}
 const _sfc_main = common_vendor.defineComponent({
   name: "mFab",
   emits: ["click", "dragend"],
@@ -115,6 +121,10 @@ const _sfc_main = common_vendor.defineComponent({
     };
   },
   computed: {
+    safeBtnList() {
+      const list = this.btnList;
+      return list == null ? [] : list;
+    },
     iconName() {
       const s = this.icon;
       if (s == null)
@@ -145,8 +155,8 @@ const _sfc_main = common_vendor.defineComponent({
     },
     mainStyle() {
       const st = new common_vendor.UTSJSONObject({});
-      st["width"] = this.width + "rpx";
-      st["height"] = this.height + "rpx";
+      st["width"] = "" + this.width + "rpx";
+      st["height"] = "" + this.height + "rpx";
       st["borderRadius"] = this.radius;
       st["backgroundColor"] = this.bgColor;
       if (!this.isDragging) {
@@ -201,8 +211,9 @@ const _sfc_main = common_vendor.defineComponent({
         q.select(".m-fab__wrap").boundingClientRect((rect = null) => {
           if (rect == null)
             return null;
-          const w = rect.width;
-          const h = rect.height;
+          const data = rect;
+          const w = data["width"];
+          const h = data["height"];
           if (w > 0 && h > 0) {
             self.wrapWpx = w;
             self.wrapHpx = h;
@@ -233,14 +244,18 @@ const _sfc_main = common_vendor.defineComponent({
     },
     // 获取触摸点坐标
     getTouchPoint(e = null) {
-      var _a, _b, _c, _d, _f;
-      const touch = (_a = e.touches) === null || _a === void 0 ? null : _a[0];
-      if (!touch)
+      const event = e;
+      const touches = event["touches"];
+      if (touches == null || touches.length == 0)
         return null;
-      return {
-        x: (_c = (_b = touch.clientX) !== null && _b !== void 0 ? _b : touch.pageX) !== null && _c !== void 0 ? _c : 0,
-        y: (_f = (_d = touch.clientY) !== null && _d !== void 0 ? _d : touch.pageY) !== null && _f !== void 0 ? _f : 0
-      };
+      const touch = touches[0];
+      let x = touch["clientX"];
+      let y = touch["clientY"];
+      if (x == null)
+        x = touch["pageX"];
+      if (y == null)
+        y = touch["pageY"];
+      return new TouchPoint(x == null ? 0 : x, y == null ? 0 : y);
     },
     // 触摸开始
     onTouchStart(e = null) {
@@ -249,7 +264,7 @@ const _sfc_main = common_vendor.defineComponent({
         return null;
       }
       const point = this.getTouchPoint(e);
-      if (!point)
+      if (point == null)
         return null;
       this.touchStartX = point.x;
       this.touchStartY = point.y;
@@ -268,7 +283,7 @@ const _sfc_main = common_vendor.defineComponent({
       if (!this.draggable)
         return null;
       const point = this.getTouchPoint(e);
-      if (!point)
+      if (point == null)
         return null;
       const deltaX = point.x - this.touchStartX;
       const deltaY = point.y - this.touchStartY;
@@ -396,9 +411,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: $options.maskZIndex,
     c: common_vendor.o((...args) => $options.collapse && $options.collapse(...args), "5b")
   } : {}, {
-    d: $props.btnList.length > 0
-  }, $props.btnList.length > 0 ? {
-    e: common_vendor.f($props.btnList, (btn, idx, i0) => {
+    d: $options.safeBtnList.length > 0
+  }, $options.safeBtnList.length > 0 ? {
+    e: common_vendor.f($options.safeBtnList, (btn, idx, i0) => {
       return common_vendor.e({
         a: $options.subImg(btn) !== ""
       }, $options.subImg(btn) !== "" ? {
@@ -427,10 +442,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     h: $options.iconName !== "",
     k: common_vendor.n($options.mainDragClass),
     l: common_vendor.s($options.mainStyle),
-    m: common_vendor.o((...args) => $options.onTouchStart && $options.onTouchStart(...args), "23"),
-    n: common_vendor.o((...args) => $options.onTouchMove && $options.onTouchMove(...args), "a4"),
-    o: common_vendor.o((...args) => $options.onTouchEnd && $options.onTouchEnd(...args), "5e"),
-    p: common_vendor.o((...args) => $options.onTouchCancel && $options.onTouchCancel(...args), "36"),
+    m: common_vendor.o((...args) => $options.onTouchStart && $options.onTouchStart(...args), "35"),
+    n: common_vendor.o((...args) => $options.onTouchMove && $options.onTouchMove(...args), "cb"),
+    o: common_vendor.o((...args) => $options.onTouchEnd && $options.onTouchEnd(...args), "8f"),
+    p: common_vendor.o((...args) => $options.onTouchCancel && $options.onTouchCancel(...args), "75"),
     q: common_vendor.s($options.wrapStyle),
     r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
     s: `${_ctx.u_s_b_h}px`,

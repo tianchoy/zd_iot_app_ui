@@ -7,9 +7,9 @@
 			@tap="collapse"
 		></view>
 		<view class="m-fab__wrap" :style="wrapStyle">
-			<view class="m-fab__subs" v-if="btnList.length > 0">
+			<view class="m-fab__subs" v-if="safeBtnList.length > 0">
 				<view
-					v-for="(btn, idx) in btnList"
+					v-for="(btn, idx) in safeBtnList"
 					:key="idx"
 					v-show="expanded"
 					class="m-fab__sub"
@@ -47,6 +47,15 @@
 
 <script lang="uts">
 type FabBtn = UTSJSONObject
+
+class TouchPoint {
+	x: number
+	y: number
+	constructor(x: number, y: number) {
+		this.x = x
+		this.y = y
+	}
+}
 
 export default {
 	name: 'mFab',
@@ -161,6 +170,10 @@ export default {
 		}
 	},
 	computed: {
+		safeBtnList(): UTSJSONObject[] {
+			const list = this.btnList as UTSJSONObject[] | null
+			return list == null ? [] : list
+		},
 		iconName(): string {
 			const s = this.icon as string
 			if (s == null) return ''
@@ -191,8 +204,8 @@ export default {
 		},
 		mainStyle(): UTSJSONObject {
 			const st = {} as UTSJSONObject
-			st['width'] = this.width + 'rpx'
-			st['height'] = this.height + 'rpx'
+			st['width'] = '' + this.width + 'rpx'
+			st['height'] = '' + this.height + 'rpx'
 			st['borderRadius'] = this.radius as string
 			st['backgroundColor'] = this.bgColor as string
 			// 拖拽时添加过渡效果
@@ -257,8 +270,9 @@ export default {
 				q.select('.m-fab__wrap')
 					.boundingClientRect((rect: any) => {
 						if (rect == null) return
-						const w = rect.width as number
-						const h = rect.height as number
+						const data = rect as UTSJSONObject
+						const w = data['width'] as number
+						const h = data['height'] as number
 						if (w > 0 && h > 0) {
 							self.wrapWpx = w
 							self.wrapHpx = h
@@ -295,13 +309,16 @@ export default {
 		},
 		
 		// 获取触摸点坐标
-		getTouchPoint(e: any): { x: number, y: number } | null {
-			const touch = e.touches?.[0]
-			if (!touch) return null
-			return {
-				x: touch.clientX ?? touch.pageX ?? 0,
-				y: touch.clientY ?? touch.pageY ?? 0
-			}
+		getTouchPoint(e: any): TouchPoint | null {
+			const event = e as UTSJSONObject
+			const touches = event['touches'] as any[] | null
+			if (touches == null || touches.length == 0) return null
+			const touch = touches[0] as UTSJSONObject
+			let x = touch['clientX'] as number | null
+			let y = touch['clientY'] as number | null
+			if (x == null) x = touch['pageX'] as number | null
+			if (y == null) y = touch['pageY'] as number | null
+			return new TouchPoint(x == null ? 0 : x, y == null ? 0 : y)
 		},
 		
 		// 触摸开始
@@ -313,10 +330,10 @@ export default {
 			}
 			
 			const point = this.getTouchPoint(e)
-			if (!point) return
+			if (point == null) return
 			
-			this.touchStartX = point.x
-			this.touchStartY = point.y
+			this.touchStartX = point!!.x
+			this.touchStartY = point!!.y
 			this.touchStartLeft = this.dragLeftPx
 			this.touchStartTop = this.dragTopPx
 			this.hasMoved = false
@@ -334,10 +351,10 @@ export default {
 			if (!(this.draggable as boolean)) return
 			
 			const point = this.getTouchPoint(e)
-			if (!point) return
+			if (point == null) return
 			
-			const deltaX = point.x - this.touchStartX
-			const deltaY = point.y - this.touchStartY
+			const deltaX = point!!.x - this.touchStartX
+			const deltaY = point!!.y - this.touchStartY
 			const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
 			
 			// 移动超过 10px 才认为是拖拽

@@ -37,6 +37,7 @@ import GenPagesScanCodeScanCodeClass from './pages/scanCode/scanCode.uvue'
 import GenPagesH5SearchH5SearchClass from './pages/h5Search/h5Search.uvue'
 import GenPagesOrderRecordOrderRecordClass from './pages/orderRecord/orderRecord.uvue'
 import GenPagesMyPkgMyPkgClass from './pages/myPkg/myPkg.uvue'
+import GenPagesLoginLoginClass from './pages/login/login.uvue'
 function definePageRoutes() {
 __uniRoutes.push({ path: "pages/index/index", component: GenPagesIndexIndexClass, meta: { isQuit: true } as UniPageMeta, style: _uM() } as UniPageRoute)
 __uniRoutes.push({ path: "pages/card/card", component: GenPagesCardCardClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
@@ -51,6 +52,7 @@ __uniRoutes.push({ path: "pages/scanCode/scanCode", component: GenPagesScanCodeS
 __uniRoutes.push({ path: "pages/h5Search/h5Search", component: GenPagesH5SearchH5SearchClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/orderRecord/orderRecord", component: GenPagesOrderRecordOrderRecordClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/myPkg/myPkg", component: GenPagesMyPkgMyPkgClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
+__uniRoutes.push({ path: "pages/login/login", component: GenPagesLoginLoginClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 }
 const __uniTabBar: Map<string, any | null> | null = _uM([["color","#64748b"],["selectedColor","#2563eb"],["borderStyle","black"],["backgroundColor","#ffffff"],["list",[_uM([["pagePath","pages/index/index"],["iconPath","/static/tabBar/home.png"],["selectedIconPath","/static/tabBar/home1.png"],["text","首页"]]),_uM([["pagePath","pages/card/card"],["iconPath","/static/tabBar/card.png"],["selectedIconPath","/static/tabBar/card1.png"],["text","卡片"]]),_uM([["pagePath","pages/mine/mine"],["iconPath","/static/tabBar/mine.png"],["selectedIconPath","/static/tabBar/mine1.png"],["text","我的"]])]]])
 const __uniLaunchPage: Map<string, any | null> = _uM([["url","pages/index/index"],["style",_uM<string, any | null>()]])

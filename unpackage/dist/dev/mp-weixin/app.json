@@ -12,7 +12,8 @@
     "pages/scanCode/scanCode",
     "pages/h5Search/h5Search",
     "pages/orderRecord/orderRecord",
-    "pages/myPkg/myPkg"
+    "pages/myPkg/myPkg",
+    "pages/login/login"
   ],
   "window": {
     "navigationStyle": "custom",

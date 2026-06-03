@@ -2,6 +2,7 @@
 const common_vendor = require("../common/vendor.js");
 const api_url = require("./url.js");
 const uni_modules_mUnix_components_mTools_Request = require("../uni_modules/m-unix/components/m-tools/Request.js");
+require("../common/config.js");
 class LoginData extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -48,7 +49,40 @@ class CountryData extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-const getCountryList = (withToken = false) => {
+class TenantInfoData extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          rechargeTip: { type: String, optional: false },
+          servicePhone: { type: String, optional: false },
+          serviceQrcode: { type: "Unknown", optional: false },
+          wxAuditHide: { type: String, optional: false },
+          wxAuditHideNo: { type: String, optional: false },
+          wxGetPhoneLogin: { type: String, optional: false },
+          wxMiniPayType: { type: String, optional: false },
+          wxPayClass: { type: String, optional: false }
+        };
+      },
+      name: "TenantInfoData"
+    };
+  }
+  constructor(options, metadata = TenantInfoData.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.rechargeTip = this.__props__.rechargeTip;
+    this.servicePhone = this.__props__.servicePhone;
+    this.serviceQrcode = this.__props__.serviceQrcode;
+    this.wxAuditHide = this.__props__.wxAuditHide;
+    this.wxAuditHideNo = this.__props__.wxAuditHideNo;
+    this.wxGetPhoneLogin = this.__props__.wxGetPhoneLogin;
+    this.wxMiniPayType = this.__props__.wxMiniPayType;
+    this.wxPayClass = this.__props__.wxPayClass;
+    delete this.__props__;
+  }
+}
+function getCountryList(withToken = false) {
   return uni_modules_mUnix_components_mTools_Request.request(new uni_modules_mUnix_components_mTools_Request.RequestOptions({
     data: null,
     header: null,
@@ -66,8 +100,9 @@ const getCountryList = (withToken = false) => {
     method: "GET",
     withToken
   }));
-};
-const card_detail = (id, countryCode, withToken = true) => {
+}
+function getTenantInfo(tenantId, withToken = true) {
+  const url = api_url.ApiUrl.getTenantPageConfigXcx + "/" + tenantId;
   return uni_modules_mUnix_components_mTools_Request.request(new uni_modules_mUnix_components_mTools_Request.RequestOptions({
     data: null,
     header: null,
@@ -81,11 +116,11 @@ const card_detail = (id, countryCode, withToken = true) => {
     successCodes: null,
     unauthorizedCodes: null,
     onErrorCode: null,
-    url: api_url.ApiUrl.card_detail + id + "/" + countryCode,
+    url,
     method: "GET",
     withToken
   }));
-};
-exports.card_detail = card_detail;
+}
 exports.getCountryList = getCountryList;
+exports.getTenantInfo = getTenantInfo;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

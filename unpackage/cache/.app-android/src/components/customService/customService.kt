@@ -20,12 +20,15 @@ open class GenComponentsCustomServiceCustomService : VueComponent {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenComponentsCustomServiceCustomService
             val _cache = __ins.renderCache
-            val connect_service = fun(){
-                console.log("联系客服", " at components/customService/customService.uvue:7")
+            fun emit(event: String, vararg do_not_transform_spread: Any?) {
+                __ins.emit(event, *do_not_transform_spread)
+            }
+            val handleClick = fun(e: Any){
+                emit("connect_service")
             }
             return fun(): Any? {
                 val _component_m_fab = resolveEasyComponent("m-fab", GenUniModulesMUnixComponentsMFabMFabClass)
-                return _cV(_component_m_fab, _uM("type" to "primary", "size" to "40rpx", "icon" to "customer-service", "draggable" to true, "onClick" to connect_service))
+                return _cV(_component_m_fab, _uM("type" to "primary", "size" to "40rpx", "icon" to "customer-service", "draggable" to true, "onClick" to handleClick))
             }
         }
         val styles: Map<String, Map<String, Map<String, Any>>> by lazy {
@@ -33,7 +36,7 @@ open class GenComponentsCustomServiceCustomService : VueComponent {
         }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
-        var emits: Map<String, Any?> = _uM()
+        var emits: Map<String, Any?> = _uM("connect_service" to null)
         var props = _nP(_uM())
         var propsNeedCastKeys: UTSArray<String> = _uA()
         var components: Map<String, CreateVueComponent> = _uM()

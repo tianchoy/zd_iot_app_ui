@@ -226,7 +226,7 @@ const __sfc__ = defineComponent({
                     return '#5677fc';
             }
         },
-        getColorByType(type: string, isText?: boolean, plain?: boolean): string {
+        getColorByType(type: string, isText: boolean = false, plain: boolean = false): string {
             if (isText === true) {
                 if (type.indexOf('gray-') === 0) {
                     return this.getBaseColor(type.replace('gray-', ''));
@@ -266,26 +266,26 @@ const __sfc__ = defineComponent({
                 }, 200);
             }
             this.$emit('click', {
-                index: Number(this.index)
+                index: parseInt('' + this.index)
             });
         },
-        bindgetuserinfo({ detail = {} } = {}) {
-            this.$emit('getuserinfo', detail);
+        bindgetuserinfo(e: UTSJSONObject) {
+            this.$emit('getuserinfo', e['detail']);
         },
-        bindcontact({ detail = {} } = {}) {
-            this.$emit('contact', detail);
+        bindcontact(e: UTSJSONObject) {
+            this.$emit('contact', e['detail']);
         },
-        bindgetphonenumber({ detail = {} } = {}) {
-            this.$emit('getphonenumber', detail);
+        bindgetphonenumber(e: UTSJSONObject) {
+            this.$emit('getphonenumber', e['detail']);
         },
-        binderror({ detail = {} } = {}) {
-            this.$emit('error', detail);
+        binderror(e: UTSJSONObject) {
+            this.$emit('error', e['detail']);
         },
-        bindchooseavatar({ detail = {} } = {}) {
-            this.$emit('chooseavatar', detail);
+        bindchooseavatar(e: UTSJSONObject) {
+            this.$emit('chooseavatar', e['detail']);
         },
-        bindlaunchapp({ detail = {} } = {}) {
-            this.$emit('launchapp', detail);
+        bindlaunchapp(e: UTSJSONObject) {
+            this.$emit('launchapp', e['detail']);
         },
         getDisabledClass(disabled: boolean, type: string, plain: boolean): string {
             let className = '';

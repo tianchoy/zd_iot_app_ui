@@ -219,7 +219,7 @@ const _sfc_main = common_vendor.defineComponent({
           return "#5677fc";
       }
     },
-    getColorByType(type, isText = null, plain = null) {
+    getColorByType(type, isText = false, plain = false) {
       if (isText === true) {
         if (type.indexOf("gray-") === 0) {
           return this.getBaseColor(type.replace("gray-", ""));
@@ -259,32 +259,26 @@ const _sfc_main = common_vendor.defineComponent({
         }, 200);
       }
       this.$emit("click", new common_vendor.UTSJSONObject({
-        index: Number(this.index)
+        index: parseInt("" + this.index)
       }));
     },
-    bindgetuserinfo(_a) {
-      var _b = _a == void 0 ? new common_vendor.UTSJSONObject({}) : _a, _c = _b.detail, detail = _c == void 0 ? new common_vendor.UTSJSONObject({}) : _c;
-      this.$emit("getuserinfo", detail);
+    bindgetuserinfo(e) {
+      this.$emit("getuserinfo", e["detail"]);
     },
-    bindcontact(_a) {
-      var _b = _a == void 0 ? new common_vendor.UTSJSONObject({}) : _a, _c = _b.detail, detail = _c == void 0 ? new common_vendor.UTSJSONObject({}) : _c;
-      this.$emit("contact", detail);
+    bindcontact(e) {
+      this.$emit("contact", e["detail"]);
     },
-    bindgetphonenumber(_a) {
-      var _b = _a == void 0 ? new common_vendor.UTSJSONObject({}) : _a, _c = _b.detail, detail = _c == void 0 ? new common_vendor.UTSJSONObject({}) : _c;
-      this.$emit("getphonenumber", detail);
+    bindgetphonenumber(e) {
+      this.$emit("getphonenumber", e["detail"]);
     },
-    binderror(_a) {
-      var _b = _a == void 0 ? new common_vendor.UTSJSONObject({}) : _a, _c = _b.detail, detail = _c == void 0 ? new common_vendor.UTSJSONObject({}) : _c;
-      this.$emit("error", detail);
+    binderror(e) {
+      this.$emit("error", e["detail"]);
     },
-    bindchooseavatar(_a) {
-      var _b = _a == void 0 ? new common_vendor.UTSJSONObject({}) : _a, _c = _b.detail, detail = _c == void 0 ? new common_vendor.UTSJSONObject({}) : _c;
-      this.$emit("chooseavatar", detail);
+    bindchooseavatar(e) {
+      this.$emit("chooseavatar", e["detail"]);
     },
-    bindlaunchapp(_a) {
-      var _b = _a == void 0 ? new common_vendor.UTSJSONObject({}) : _a, _c = _b.detail, detail = _c == void 0 ? new common_vendor.UTSJSONObject({}) : _c;
-      this.$emit("launchapp", detail);
+    bindlaunchapp(e) {
+      this.$emit("launchapp", e["detail"]);
     },
     getDisabledClass(disabled, type, plain) {
       let className = "";

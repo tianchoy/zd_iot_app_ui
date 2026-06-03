@@ -3,6 +3,7 @@ import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue'
 import _easycom_m_bottom_popup from '@/uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup.uvue'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 	import SearchSelect from '@/components/selectCountry.uvue'
+	import { getCountryList, type CountryData } from '@/api/http.uts'
 	
 	
 const __sfc__ = defineComponent({
@@ -18,22 +19,10 @@ const _cache = __ins.renderCache;
 	const showCountryPopup = ref<boolean>(false)
 	const selectedCountry = ref<string>('')
 	const searchSelectRef = ref(null)
+	const resCountry = ref<string>('')
 	
 	// 国家/地区选项列表
-	const countryOptions = ref([
-		{ value: '1', label: '中国' },
-		{ value: '2', label: '美国' },
-		{ value: '3', label: '日本' },
-		{ value: '4', label: '韩国' },
-		{ value: '5', label: '英国' },
-		{ value: '6', label: '德国' },
-		{ value: '7', label: '法国' },
-		{ value: '8', label: '澳大利亚' },
-		{ value: '9', label: '加拿大' },
-		{ value: '10', label: '新加坡' },
-		{ value: '11', label: '马来西亚' },
-		{ value: '12', label: '泰国' }
-	])
+	const countryOptions = ref<UTSJSONObject[]>([])
 	
 	// 显示选中的国家/地区标签
 	const selectedCountryLabel = computed<string>(() : string => {
@@ -55,12 +44,10 @@ const _cache = __ins.renderCache;
 	
 	// 国家/地区选择变化
 	const onCountryChange = (value: string | number | null, item: any) => {
-		console.log('选中国家/地区:', value, item, " at pages/h5Search/h5Search.uvue:131")
+		// console.log('选中国家/地区:', value, item)
 		showCountryPopup.value = false
-		uni.showToast({
-			title: `已选择：${(item as UTSJSONObject)['label']}`,
-			icon: 'success'
-		})
+		resCountry.value = value as string
+		console.log('选中国家/地区:', resCountry.value, " at pages/h5Search/h5Search.uvue:123")
 	}
 	
 	// 关闭弹窗时重置搜索
@@ -91,8 +78,8 @@ const _cache = __ins.renderCache;
 			})
 			return
 		}
-		console.log('查询卡号:', cardNumber.value, " at pages/h5Search/h5Search.uvue:167")
-		console.log('国家/地区:', selectedCountryLabel.value, " at pages/h5Search/h5Search.uvue:168")
+		console.log('查询卡号:', cardNumber.value, " at pages/h5Search/h5Search.uvue:154")
+		console.log('国家/地区:', resCountry.value, " at pages/h5Search/h5Search.uvue:155")
 		uni.showToast({
 			title: '查询中...',
 			icon: 'loading'
@@ -114,8 +101,23 @@ const _cache = __ins.renderCache;
 			})
 		}
 	}
+
+	// 初始化国家列表
+	const initCountryList = async () => {
+		const res = await getCountryList(false)
+		console.log('查询国家列表:', res, " at pages/h5Search/h5Search.uvue:181")
+		if (res.code == 200) {
+			countryOptions.value = res.data.map((item: CountryData): UTSJSONObject => {
+				return {
+					value: item.letterCode,
+					label: item.fullName
+				} as UTSJSONObject
+			})
+		}
+	}
 	
 	onMounted(() => {
+		initCountryList()
 		uni.$on('scanResult', onScanResult)
 	})
 	

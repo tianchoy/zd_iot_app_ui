@@ -4,7 +4,7 @@
 
 <script setup lang="uts">
 	const emit = defineEmits(['connect_service']);
-	const handleClick = (e) => {
+	const handleClick = (e: any) => {
 		emit('connect_service');
 	}
 </script>

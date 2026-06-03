@@ -29,7 +29,7 @@ open class GenPagesIndexIndex : BasePage {
             val show = ref(false)
             val card_number = ref("1064916585160")
             val goRecharge = fun(){
-                console.log("去充值", " at pages/index/index.uvue:87")
+                console.log("去充值", " at pages/index/index.uvue:88")
                 uni_navigateTo(NavigateToOptions(url = "/pages/recharge/recharge"))
             }
             val scanCode = fun(){
@@ -40,7 +40,8 @@ open class GenPagesIndexIndex : BasePage {
                     uni_showToast(ShowToastOptions(title = "请输入卡号", icon = "none"))
                     return
                 }
-                console.log("查询卡号:", card_number.value, " at pages/index/index.uvue:107")
+                console.log("查询卡号:", card_number.value, " at pages/index/index.uvue:108")
+                uni_navigateTo(NavigateToOptions(url = "/pages/login/login"))
             }
             val onScanResult = fun(data: UTSJSONObject){
                 val result = data.getString("result") ?: ""
@@ -50,17 +51,28 @@ open class GenPagesIndexIndex : BasePage {
                 }
             }
             val cardType = fun(type: Number){
-                console.log(type, " at pages/index/index.uvue:127")
+                console.log(type, " at pages/index/index.uvue:131")
                 uni_reLaunch(ReLaunchOptions(url = "/pages/card/card?type=" + type))
             }
-            val getLogin = fun(): UTSPromise<Unit> {
+            val handleClick = fun(){
+                console.log("联系客服1111", " at pages/index/index.uvue:139")
+            }
+            val getTenantInfos = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        val res = await(card_detail(card_number.value, "CHN"))
+                        val res = await(getTenantInfo(config.tenantId, false))
+                        if (res.code == 200) {
+                            val tenantInfo = res.data as UTSJSONObject
+                            val wxGetPhoneLogin = "" + tenantInfo["wxGetPhoneLogin"]
+                            setStorageSync("tenant_infos", tenantInfo)
+                            if (wxGetPhoneLogin == "0") {
+                                uni_navigateTo(NavigateToOptions(url = "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin))
+                            }
+                        }
                 })
             }
             onMounted(fun(){
+                getTenantInfos()
                 uni__on("scanResult", onScanResult)
-                getLogin()
             }
             )
             onUnmounted(fun(){
@@ -110,7 +122,7 @@ open class GenPagesIndexIndex : BasePage {
                             ))
                         )),
                         _cE("view", _uM("class" to "card-box mt-24 mb-24"), _uA(
-                            _cE("view", _uM("class" to "card-label"), "卡号查询"),
+                            _cE("view", _uM("class" to "card-label mb-24"), "卡号查询"),
                             _cE("view", _uM("class" to "search-value"), _uA(
                                 _cE("input", _uM("modelValue" to card_number.value, "onInput" to fun(`$event`: UniInputEvent){
                                     card_number.value = `$event`.detail.value
@@ -182,7 +194,7 @@ open class GenPagesIndexIndex : BasePage {
                                 ))
                             ))
                         )),
-                        _cV(_component_customService)
+                        _cV(_component_customService, _uM("onConnect_service" to handleClick))
                     ))
                 ), 64)
             }

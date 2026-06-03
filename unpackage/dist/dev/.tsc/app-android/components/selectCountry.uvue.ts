@@ -41,7 +41,7 @@ const __sfc__ = defineComponent({
 		// 最大高度
 		maxHeight: {
 			type: String,
-			default: '600rpx'
+			default: 'auto'
 		}
 	},
   emits: ["update:modelValue", "change"],

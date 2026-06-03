@@ -104,6 +104,7 @@ class ProjectConfig extends common_vendor.UTS.UTSType {
           api: { type: ApiPaths, optional: false },
           storage: { type: StorageKeys, optional: false },
           configInfo: { type: ConfigInfo, optional: false },
+          tenantId: { type: String, optional: false },
           loginPagePath: { type: String, optional: true },
           loginRequiredPaths: { type: common_vendor.UTS.UTSType.withGenerics(Array, [String]), optional: true }
         };
@@ -120,19 +121,16 @@ class ProjectConfig extends common_vendor.UTS.UTSType {
     this.api = this.__props__.api;
     this.storage = this.__props__.storage;
     this.configInfo = this.__props__.configInfo;
+    this.tenantId = this.__props__.tenantId;
     this.loginPagePath = this.__props__.loginPagePath;
     this.loginRequiredPaths = this.__props__.loginRequiredPaths;
     delete this.__props__;
   }
 }
-const ENV = "prod";
+const ENV = "dev";
 const API_CONFIG = new common_vendor.UTSJSONObject({
-  local: new common_vendor.UTSJSONObject({
-    baseUrl: "http://localhost:3000/api",
-    timeout: 3e4
-  }),
   dev: new common_vendor.UTSJSONObject({
-    baseUrl: "https://dev-api.yourdomain.com/api",
+    baseUrl: "http://192.168.3.7:8081",
     timeout: 3e4
   }),
   prod: new common_vendor.UTSJSONObject({
@@ -140,11 +138,12 @@ const API_CONFIG = new common_vendor.UTSJSONObject({
     timeout: 3e4
   })
 });
-const currentConfig = API_CONFIG["prod"];
+const currentConfig = API_CONFIG[ENV];
 const config = new ProjectConfig({
   baseUrl: currentConfig["baseUrl"],
   timeout: currentConfig["timeout"],
   env: ENV,
+  tenantId: "000000",
   api: new ApiPaths({
     auth: new AuthApiPaths({
       login: "/auth/login",
@@ -174,13 +173,10 @@ function getToken() {
   }
   return token;
 }
-function setToken(token, refreshToken = null) {
-  common_vendor.index.setStorageSync(config.storage.token, token);
-  if (refreshToken) {
-    common_vendor.index.setStorageSync(config.storage.refreshToken, refreshToken);
-  }
+function setStorageSync(key, value = null) {
+  common_vendor.index.setStorageSync(key, value);
 }
 exports.config = config;
 exports.getToken = getToken;
-exports.setToken = setToken;
+exports.setStorageSync = setStorageSync;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/config.js.map

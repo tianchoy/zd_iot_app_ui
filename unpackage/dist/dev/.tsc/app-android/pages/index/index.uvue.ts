@@ -5,7 +5,8 @@ import _easycom_m_tag from '@/uni_modules/m-unix/components/m-tag/m-tag.uvue'
 import _easycom_m_div from '@/uni_modules/m-unix/components/m-div/m-div.uvue'
 import _easycom_customService from '@/components/customService/customService.uvue'
 import { ref, onMounted, onUnmounted } from 'vue'
-	import { card_detail } from '@/api/http.uts'
+	import { setStorageSync,config } from '@/common/config.uts'
+	import { card_detail,getTenantInfo } from '@/api/http.uts'
 	
 	
 const __sfc__ = defineComponent({
@@ -20,7 +21,7 @@ const _cache = __ins.renderCache;
 	const card_number = ref('1064916585160')
 
 	const goRecharge = () => {
-		console.log('去充值', " at pages/index/index.uvue:87")
+		console.log('去充值', " at pages/index/index.uvue:88")
 		uni.navigateTo({
 			url: '/pages/recharge/recharge'
 		})
@@ -40,8 +41,11 @@ const _cache = __ins.renderCache;
 			})
 			return
 		}
-		console.log('查询卡号:', card_number.value, " at pages/index/index.uvue:107")
+		console.log('查询卡号:', card_number.value, " at pages/index/index.uvue:108")
 		// 处理查询逻辑
+		uni.navigateTo({
+			url: '/pages/login/login'
+		})
 	}
 	
 	// 接收扫码结果
@@ -60,20 +64,36 @@ const _cache = __ins.renderCache;
 
 	// 卡片类型切换
 	const cardType = (type: number) => {
-		console.log(type, " at pages/index/index.uvue:127")
+		console.log(type, " at pages/index/index.uvue:131")
 		uni.reLaunch({
 			url: '/pages/card/card?type=' + type
 		})
 	}
-	
-	const getLogin = async () => {
-		const res = await card_detail(card_number.value, 'CHN')
+
+	// 联系客服
+	const handleClick = () => {
+		console.log('联系客服1111', " at pages/index/index.uvue:139")
+	}
+
+	// 获取租户页面配置
+	const getTenantInfos = async () => {
+		const res = await getTenantInfo(config.tenantId,false)
+		if(res.code == 200){
+				const tenantInfo = res.data as UTSJSONObject
+				const wxGetPhoneLogin = '' + tenantInfo['wxGetPhoneLogin']
+			setStorageSync('tenant_infos', tenantInfo)
+			if(wxGetPhoneLogin == '0'){
+				uni.navigateTo({
+					url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin
+				})
+			}
+		}
 	}
 
 	onMounted(() => {
+		getTenantInfos()
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
-		getLogin()
 	})
 	
 	onUnmounted(() => {
@@ -126,7 +146,7 @@ const _component_customService = resolveEasyComponent("customService",_easycom_c
         ])
       ]),
       _cE("view", _uM({ class: "card-box mt-24 mb-24" }), [
-        _cE("view", _uM({ class: "card-label" }), "卡号查询"),
+        _cE("view", _uM({ class: "card-label mb-24" }), "卡号查询"),
         _cE("view", _uM({ class: "search-value" }), [
           _cE("input", _uM({
             modelValue: card_number.value,
@@ -220,7 +240,7 @@ const _component_customService = resolveEasyComponent("customService",_easycom_c
           ])
         ])
       ]),
-      _cV(_component_customService)
+      _cV(_component_customService, _uM({ onConnect_service: handleClick }))
     ])
   ], 64 /* STABLE_FRAGMENT */)
 }

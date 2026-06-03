@@ -119,7 +119,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.3.229"
     val port: String = "8090"
-    val id: String = "app-android_ac5oIm"
+    val id: String = "app-android_C192Ju"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -199,6 +199,8 @@ open class ProjectConfig (
     open var storage: StorageKeys,
     @JsonNotNull
     open var configInfo: ConfigInfo,
+    @JsonNotNull
+    open var tenantId: String,
     open var loginPagePath: String? = null,
     open var loginRequiredPaths: UTSArray<String>? = null,
 ) : UTSObject(), IUTSSourceMap {
@@ -206,16 +208,19 @@ open class ProjectConfig (
         return UTSSourceMapPosition("ProjectConfig", "common/config.uts", 24, 13)
     }
 }
-val ENV = "prod"
-val API_CONFIG: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("API_CONFIG", "common/config.uts", 37, 7), "local" to _uO("baseUrl" to "http://localhost:3000/api", "timeout" to 30000), "dev" to _uO("baseUrl" to "https://dev-api.yourdomain.com/api", "timeout" to 30000), "prod" to _uO("baseUrl" to "https://cmpapp.zdiot.cn/prod-api", "timeout" to 30000))
-val currentConfig = API_CONFIG["prod"] as UTSJSONObject
-val config = ProjectConfig(baseUrl = currentConfig["baseUrl"] as String, timeout = currentConfig["timeout"] as Number, env = ENV, api = ApiPaths(auth = AuthApiPaths(login = "/auth/login", logout = "/auth/logout", refreshToken = "/auth/refresh")), storage = StorageKeys(token = "access_token", refreshToken = "refresh_token"), configInfo = ConfigInfo(name = "我的应用", versionCode = 1, versionName = "1.0.0", appId = "your-app-id"), loginPagePath = "", loginRequiredPaths = _uA())
+val ENV = "dev"
+val API_CONFIG: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("API_CONFIG", "common/config.uts", 38, 7), "dev" to _uO("baseUrl" to "http://192.168.3.7:8081", "timeout" to 30000), "prod" to _uO("baseUrl" to "https://cmpapp.zdiot.cn/prod-api", "timeout" to 30000))
+val currentConfig = API_CONFIG[ENV] as UTSJSONObject
+val config = ProjectConfig(baseUrl = currentConfig["baseUrl"] as String, timeout = currentConfig["timeout"] as Number, env = ENV, tenantId = "000000", api = ApiPaths(auth = AuthApiPaths(login = "/auth/login", logout = "/auth/logout", refreshToken = "/auth/refresh")), storage = StorageKeys(token = "access_token", refreshToken = "refresh_token"), configInfo = ConfigInfo(name = "我的应用", versionCode = 1, versionName = "1.0.0", appId = "your-app-id"), loginPagePath = "", loginRequiredPaths = _uA())
 fun getToken(): String {
     val token = uni_getStorageSync(config.storage.token)
     if (token == null) {
         return ""
     }
     return token as String
+}
+fun setStorageSync(key: String, value: Any) {
+    uni_setStorageSync(key, value)
 }
 open class HostStorageConfig (
     @JsonNotNull
@@ -1533,6 +1538,11 @@ open class ApiResponse<T> (
         return UTSSourceMapPosition("ApiResponse", "uni_modules/m-unix/components/m-tools/Request.uts", 13, 13)
     }
 }
+val systemInfo = uni_getSystemInfoSync()
+val DEFAULT_LANGUAGE = (systemInfo.language ?: "zh_CN").replace("-", "_") as String
+val runBlock5 = run {
+    console.log("DEFAULT_LANGUAGE", DEFAULT_LANGUAGE, " at uni_modules/m-unix/components/m-tools/Request.uts:25")
+}
 open class RequestOptions__1 (
     @JsonNotNull
     open var url: String,
@@ -1552,7 +1562,7 @@ open class RequestOptions__1 (
     open var onErrorCode: ((response: ApiResponse<Any>) -> Unit)? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("RequestOptions", "uni_modules/m-unix/components/m-tools/Request.uts", 19, 13)
+        return UTSSourceMapPosition("RequestOptions", "uni_modules/m-unix/components/m-tools/Request.uts", 22, 13)
     }
 }
 val DEFAULT_TIMEOUT: Number = 30000
@@ -1581,7 +1591,7 @@ fun buildQueryString(data: UTSJSONObject): String {
     for(key in resolveUTSKeyIterator(data)){
         val value = data.getString(key)
         if (value != null && value.length > 0) {
-            parts.push(key + "=" + UTSAndroid.consoleDebugError(encodeURIComponent(value), " at uni_modules/m-unix/components/m-tools/Request.uts:80"))
+            parts.push(key + "=" + UTSAndroid.consoleDebugError(encodeURIComponent(value), " at uni_modules/m-unix/components/m-tools/Request.uts:83"))
         }
     }
     return if (parts.length > 0) {
@@ -1715,9 +1725,11 @@ fun <T> request(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
         fullUrl += buildQueryString(data)
         requestData = _uO()
     }
-    val reqHeader: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("reqHeader", "uni_modules/m-unix/components/m-tools/Request.uts", 184, 11), "Content-Type" to "application/json")
+    val reqHeader: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("reqHeader", "uni_modules/m-unix/components/m-tools/Request.uts", 187, 11), "Content-Type" to "application/json", "Accept" to "application/json", "Content-Language" to DEFAULT_LANGUAGE)
+    console.log("request", withToken, " at uni_modules/m-unix/components/m-tools/Request.uts:233")
     if (withToken) {
         val token = getToken()
+        console.log("otken", token, " at uni_modules/m-unix/components/m-tools/Request.uts:238")
         if (token != "") {
             reqHeader["token"] = token
         }
@@ -1806,7 +1818,7 @@ fun <T> loadingRequest(options: RequestOptions__1, loadingText: String?): UTSPro
     }
     return request<T>(requestOptions)
 }
-val http: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("http", "uni_modules/m-unix/components/m-tools/Request.uts", 307, 14), "get" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
+val http: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("http", "uni_modules/m-unix/components/m-tools/Request.uts", 314, 14), "get" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
     return get<Any>(url, data, options)
 }
 , "post" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
@@ -2783,6 +2795,14 @@ val GenUniModulesMUnixComponentsMDivMDivClass = CreateVueComponent(GenUniModules
 }
 )
 typealias FabBtn = UTSJSONObject
+open class TouchPoint {
+    open lateinit var x: Number
+    open lateinit var y: Number
+    constructor(x: Number, y: Number){
+        this.x = x
+        this.y = y
+    }
+}
 val GenUniModulesMUnixComponentsMFabMFabClass = CreateVueComponent(GenUniModulesMUnixComponentsMFabMFab::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMFabMFab.name, inheritAttrs = GenUniModulesMUnixComponentsMFabMFab.inheritAttrs, inject = GenUniModulesMUnixComponentsMFabMFab.inject, props = GenUniModulesMUnixComponentsMFabMFab.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMFabMFab.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMFabMFab.emits, components = GenUniModulesMUnixComponentsMFabMFab.components, styles = GenUniModulesMUnixComponentsMFabMFab.styles)
 }
@@ -2800,22 +2820,45 @@ val GenComponentsCustomServiceCustomServiceClass = CreateVueComponent(GenCompone
     return GenComponentsCustomServiceCustomService(instance)
 }
 )
-open class LoginData (
+val ApiUrl: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("ApiUrl", "api/url.uts", 1, 14), "getTenantPageConfigXcx" to "/system/tenantPageConfig/getTenantPageConfigXcx", "getTenantPageConfigH" to "/system/tenantPageConfig/getTenantPageConfigH", "login" to "/auth/login", "card_detail" to "/app/card/info/", "countries" to "/app/card/getH5CountryList", "addOrder" to "/order/pkgOrder", "queryOrder" to "/order/pkgOrder/", "goPay" to "/pay/order/goPayment", "queryBySuccessId" to "/order/pkgOrder/success/", "queryPkgInfoList" to "/card/pkgInfo/list", "queryPkgInfoDetail" to "/card/pkgInfo/info/", "queryOrderList" to "/order/pkgOrder/list", "queryOrderPackInfo" to "/order/pkgOrder/getOrderPackInfo/")
+open class CountryData (
     @JsonNotNull
-    open var token: String,
+    open var fullName: String,
     @JsonNotNull
-    open var refreshToken: String,
-    @JsonNotNull
-    open var userId: Number,
-    @JsonNotNull
-    open var nickname: String,
+    open var letterCode: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("LoginData", "api/http.uts", 4, 13)
+        return UTSSourceMapPosition("CountryData", "api/http.uts", 12, 13)
     }
 }
-val card_detail = fun(id: String, countryCode: String): UTSPromise<ApiResponse<LoginData>> {
-    return http.get("/app/card/info/" + id + "/" + countryCode) as UTSPromise<ApiResponse<LoginData>>
+open class TenantInfoData (
+    @JsonNotNull
+    open var rechargeTip: String,
+    @JsonNotNull
+    open var servicePhone: String,
+    @JsonNotNull
+    open var serviceQrcode: null,
+    @JsonNotNull
+    open var wxAuditHide: String,
+    @JsonNotNull
+    open var wxAuditHideNo: String,
+    @JsonNotNull
+    open var wxGetPhoneLogin: String,
+    @JsonNotNull
+    open var wxMiniPayType: String,
+    @JsonNotNull
+    open var wxPayClass: String,
+) : UTSObject(), IUTSSourceMap {
+    override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
+        return UTSSourceMapPosition("TenantInfoData", "api/http.uts", 16, 13)
+    }
+}
+fun getCountryList(withToken: Boolean = false): UTSPromise<ApiResponse<UTSArray<CountryData>>> {
+    return request<UTSArray<CountryData>>(RequestOptions__1(url = ApiUrl["countries"] as String, method = "GET", withToken = withToken))
+}
+fun getTenantInfo(tenantId: String, withToken: Boolean = true): UTSPromise<ApiResponse<TenantInfoData>> {
+    val url = (ApiUrl["getTenantPageConfigH"] as String) + "/" + tenantId
+    return request<TenantInfoData>(RequestOptions__1(url = url, method = "GET", withToken = withToken))
 }
 val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesIndexIndex.inheritAttrs, inject = GenPagesIndexIndex.inject, props = GenPagesIndexIndex.props, propsNeedCastKeys = GenPagesIndexIndex.propsNeedCastKeys, emits = GenPagesIndexIndex.emits, components = GenPagesIndexIndex.components, styles = GenPagesIndexIndex.styles, setup = fun(props: ComponentPublicInstance): Any? {
@@ -3245,6 +3288,23 @@ val GenPagesMyPkgMyPkgClass = CreateVueComponent(GenPagesMyPkgMyPkg::class.java,
     return GenPagesMyPkgMyPkg(instance, renderer)
 }
 )
+val GenUniModulesMUnixComponentsMWxLoginMWxLoginClass = CreateVueComponent(GenUniModulesMUnixComponentsMWxLoginMWxLogin::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMWxLoginMWxLogin.name, inheritAttrs = GenUniModulesMUnixComponentsMWxLoginMWxLogin.inheritAttrs, inject = GenUniModulesMUnixComponentsMWxLoginMWxLogin.inject, props = GenUniModulesMUnixComponentsMWxLoginMWxLogin.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMWxLoginMWxLogin.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMWxLoginMWxLogin.emits, components = GenUniModulesMUnixComponentsMWxLoginMWxLogin.components, styles = GenUniModulesMUnixComponentsMWxLoginMWxLogin.styles)
+}
+, fun(instance, renderer): GenUniModulesMUnixComponentsMWxLoginMWxLogin {
+    return GenUniModulesMUnixComponentsMWxLoginMWxLogin(instance)
+}
+)
+val GenPagesLoginLoginClass = CreateVueComponent(GenPagesLoginLogin::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "page", name = "", inheritAttrs = GenPagesLoginLogin.inheritAttrs, inject = GenPagesLoginLogin.inject, props = GenPagesLoginLogin.props, propsNeedCastKeys = GenPagesLoginLogin.propsNeedCastKeys, emits = GenPagesLoginLogin.emits, components = GenPagesLoginLogin.components, styles = GenPagesLoginLogin.styles, setup = fun(props: ComponentPublicInstance): Any? {
+        return GenPagesLoginLogin.setup(props as GenPagesLoginLogin)
+    }
+    )
+}
+, fun(instance, renderer): GenPagesLoginLogin {
+    return GenPagesLoginLogin(instance, renderer)
+}
+)
 fun createApp(): UTSJSONObject {
     val app = createSSRApp(GenAppClass)
     return _uO("app" to app)
@@ -3277,6 +3337,7 @@ fun definePageRoutes() {
     __uniRoutes.push(UniPageRoute(path = "pages/h5Search/h5Search", component = GenPagesH5SearchH5SearchClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "")))
     __uniRoutes.push(UniPageRoute(path = "pages/orderRecord/orderRecord", component = GenPagesOrderRecordOrderRecordClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "")))
     __uniRoutes.push(UniPageRoute(path = "pages/myPkg/myPkg", component = GenPagesMyPkgMyPkgClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "")))
+    __uniRoutes.push(UniPageRoute(path = "pages/login/login", component = GenPagesLoginLoginClass, meta = UniPageMeta(isQuit = false), style = _uM("navigationBarTitleText" to "")))
 }
 val __uniTabBar: Map<String, Any?>? = _uM("color" to "#64748b", "selectedColor" to "#2563eb", "borderStyle" to "black", "backgroundColor" to "#ffffff", "list" to _uA(
     _uM("pagePath" to "pages/index/index", "iconPath" to "/static/tabBar/home.png", "selectedIconPath" to "/static/tabBar/home1.png", "text" to "首页"),

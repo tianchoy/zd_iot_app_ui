@@ -250,8 +250,7 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
                 return "#5677fc"
         }
     }
-    open var getColorByType = ::gen_getColorByType_fn
-    open fun gen_getColorByType_fn(type: String, isText: Boolean?, plain: Boolean?): String {
+    open fun getColorByType(type: String, isText: Boolean = false, plain: Boolean = false): String {
         if (isText === true) {
             if (type.indexOf("gray-") === 0) {
                 return this.getBaseColor(type.replace("gray-", ""))
@@ -308,25 +307,31 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
             }
             , 200)
         }
-        this.`$emit`("click", _uO("index" to Number(this.index)))
+        this.`$emit`("click", _uO("index" to parseInt("" + this.index)))
     }
-    open fun bindgetuserinfo({ detail =_uO()  } = _uO()) {
-        this.`$emit`("getuserinfo", detail)
+    open var bindgetuserinfo = ::gen_bindgetuserinfo_fn
+    open fun gen_bindgetuserinfo_fn(e: UTSJSONObject) {
+        this.`$emit`("getuserinfo", e["detail"])
     }
-    open fun bindcontact({ detail =_uO()  } = _uO()) {
-        this.`$emit`("contact", detail)
+    open var bindcontact = ::gen_bindcontact_fn
+    open fun gen_bindcontact_fn(e: UTSJSONObject) {
+        this.`$emit`("contact", e["detail"])
     }
-    open fun bindgetphonenumber({ detail =_uO()  } = _uO()) {
-        this.`$emit`("getphonenumber", detail)
+    open var bindgetphonenumber = ::gen_bindgetphonenumber_fn
+    open fun gen_bindgetphonenumber_fn(e: UTSJSONObject) {
+        this.`$emit`("getphonenumber", e["detail"])
     }
-    open fun binderror({ detail =_uO()  } = _uO()) {
-        this.`$emit`("error", detail)
+    open var binderror = ::gen_binderror_fn
+    open fun gen_binderror_fn(e: UTSJSONObject) {
+        this.`$emit`("error", e["detail"])
     }
-    open fun bindchooseavatar({ detail =_uO()  } = _uO()) {
-        this.`$emit`("chooseavatar", detail)
+    open var bindchooseavatar = ::gen_bindchooseavatar_fn
+    open fun gen_bindchooseavatar_fn(e: UTSJSONObject) {
+        this.`$emit`("chooseavatar", e["detail"])
     }
-    open fun bindlaunchapp({ detail =_uO()  } = _uO()) {
-        this.`$emit`("launchapp", detail)
+    open var bindlaunchapp = ::gen_bindlaunchapp_fn
+    open fun gen_bindlaunchapp_fn(e: UTSJSONObject) {
+        this.`$emit`("launchapp", e["detail"])
     }
     open var getDisabledClass = ::gen_getDisabledClass_fn
     open fun gen_getDisabledClass_fn(disabled: Boolean, type: String, plain: Boolean): String {

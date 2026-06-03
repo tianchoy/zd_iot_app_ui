@@ -77,8 +77,8 @@
 
 <script setup lang="uts">
 	import { ref, onMounted, onUnmounted } from 'vue'
-	import { getToken, setToken, clearToken } from '@/common/config'
-	import { card_detail,login } from '@/api/http.uts'
+	import { setStorageSync,config } from '@/common/config.uts'
+	import { card_detail,getTenantInfo } from '@/api/http.uts'
 	
 	const title = ref('Hello')
 	const show = ref(false)
@@ -107,6 +107,9 @@
 		}
 		console.log('查询卡号:', card_number.value)
 		// 处理查询逻辑
+		uni.navigateTo({
+			url: '/pages/login/login'
+		})
 	}
 	
 	// 接收扫码结果
@@ -135,15 +138,24 @@
 	const handleClick = () => {
 		console.log('联系客服1111')
 	}
-	
-	const getLogin = async () => {
-		await setToken('123456')
-		const res = await card_detail(card_number.value, 'CHN',false)
+
+	// 获取租户页面配置
+	const getTenantInfos = async () => {
+		const res = await getTenantInfo(config.tenantId,false)
+		if(res.code == 200){
+			const tenantInfo = res.data
+			const wxGetPhoneLogin = '' + tenantInfo.wxGetPhoneLogin
+			setStorageSync('tenant_infos', tenantInfo)
+			if(wxGetPhoneLogin == '0'){
+				uni.navigateTo({
+					url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin
+				})
+			}
+		}
 	}
 
-
 	onMounted(() => {
-		getLogin()
+		getTenantInfos()
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
 	})

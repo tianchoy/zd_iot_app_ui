@@ -1,4 +1,12 @@
 type FabBtn = UTSJSONObject;
+class TouchPoint {
+    x!: number;
+    y!: number;
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+}
 const __sfc__ = defineComponent({
     name: 'mFab',
     emits: ['click', 'dragend'],
@@ -39,27 +47,22 @@ const __sfc__ = defineComponent({
             type: Boolean,
             default: false
         },
-        /** m-icon 名称；非空且非 custom 时显示图标，否则显示「+」 */
         icon: {
             type: String,
             default: ''
         },
-        /** 主按钮图标字号（rpx，与 m-icon size 一致） */
         iconSize: {
             type: [Number, String],
             default: 52
         },
-        /** 为 true 时可按住主按钮拖动，松手后可选吸边 */
         draggable: {
             type: Boolean,
-            default: false
+            default: true // 默认启用拖拽
         },
-        /** 拖动结束后是否吸附到左右近侧（需 draggable） */
         snapEdge: {
             type: Boolean,
             default: true
         },
-        /** 吸边与拖动边界留白（rpx） */
         snapPadding: {
             type: [Number, String],
             default: 16
@@ -105,20 +108,26 @@ const __sfc__ = defineComponent({
             dragReady: false as boolean,
             wrapWpx: 0 as number,
             wrapHpx: 0 as number,
-            dragStartTouchX: 0 as number,
-            dragStartTouchY: 0 as number,
-            dragStartLeftPx: 0 as number,
-            dragStartTopPx: 0 as number,
-            dragMoved: false as boolean,
-            dragSuppressedTap: false as boolean
+            // 拖拽相关
+            touchStartX: 0 as number,
+            touchStartY: 0 as number,
+            touchStartLeft: 0 as number,
+            touchStartTop: 0 as number,
+            isDragging: false as boolean,
+            hasMoved: false as boolean,
+            moveDistance: 0 as number,
+            clickTimer: null as any, // 点击延迟定时器
         };
     },
     computed: {
+        safeBtnList(): UTSJSONObject[] {
+            const list = this.btnList as UTSJSONObject[] | null;
+            return list == null ? [] : list;
+        },
         iconName(): string {
             const s = this.icon as string;
-            if (s == null) {
+            if (s == null)
                 return '';
-            }
             const t = s.trim();
             return t;
         },
@@ -131,141 +140,74 @@ const __sfc__ = defineComponent({
             return this.baseZ - 1;
         },
         wrapStyle(): UTSJSONObject {
-            if (this.draggable as boolean) {
-                const st = { __$originalPosition: new UTSSourceMapPosition("st", "uni_modules/m-unix/components/m-fab/m-fab.uvue", 185, 11), } as UTSJSONObject;
-                st['zIndex'] = this.baseZ;
-                st['position'] = 'fixed';
-                st['left'] = this.dragLeftPx + 'px';
-                st['top'] = this.dragTopPx + 'px';
-                st['right'] = 'auto';
-                st['bottom'] = 'auto';
-                st['display'] = 'flex';
-                st['flexDirection'] = 'column';
-                st['alignItems'] = 'flex-end';
-                return st;
-            }
-            const st = { __$originalPosition: new UTSSourceMapPosition("st", "uni_modules/m-unix/components/m-fab/m-fab.uvue", 197, 10), } as UTSJSONObject;
+            // 简化样式，统一使用绝对定位
+            const st = { __$originalPosition: new UTSSourceMapPosition("st", "uni_modules/m-unix/components/m-fab/m-fab.uvue", 193, 10), } as UTSJSONObject;
             st['zIndex'] = this.baseZ;
             st['position'] = 'fixed';
-            const t = this.top as number | string;
-            const tp = typeof t === 'number' ? t as number : parseInt('' + (t as string));
-            if (!isNaN(tp) && tp > 0) {
-                st['top'] = t + 'rpx';
-                st['bottom'] = 'auto';
-            }
-            else {
-                st['bottom'] = this.bottom + 'rpx';
-            }
-            const l = this.left as number | string;
-            const ln = typeof l === 'number' ? l as number : parseInt('' + (l as string));
-            if (!isNaN(ln) && ln > 0) {
-                st['left'] = l + 'rpx';
-                st['right'] = 'auto';
-            }
-            else {
-                st['right'] = this.right + 'rpx';
-                st['left'] = 'auto';
-            }
+            st['left'] = this.dragLeftPx + 'px';
+            st['top'] = this.dragTopPx + 'px';
+            st['right'] = 'auto';
+            st['bottom'] = 'auto';
             st['display'] = 'flex';
             st['flexDirection'] = 'column';
             st['alignItems'] = 'flex-end';
             return st;
         },
         mainStyle(): UTSJSONObject {
-            const st = { __$originalPosition: new UTSSourceMapPosition("st", "uni_modules/m-unix/components/m-fab/m-fab.uvue", 223, 10), } as UTSJSONObject;
-            st['width'] = this.width + 'rpx';
-            st['height'] = this.height + 'rpx';
+            const st = { __$originalPosition: new UTSSourceMapPosition("st", "uni_modules/m-unix/components/m-fab/m-fab.uvue", 206, 10), } as UTSJSONObject;
+            st['width'] = '' + this.width + 'rpx';
+            st['height'] = '' + this.height + 'rpx';
             st['borderRadius'] = this.radius as string;
             st['backgroundColor'] = this.bgColor as string;
+            // 拖拽时添加过渡效果
+            if (!this.isDragging) {
+                st['transition'] = 'left 0.2s ease, top 0.2s ease';
+            }
             return st;
         },
-        /** 内置图标/「+」时子节点不抢触摸；custom 插槽不关闭子节点事件 */
         mainDragClass(): string[] {
             const out = [] as string[];
             out.push('m-fab__main');
-            const d = this.draggable as boolean;
-            if (d) {
-                out.push('m-fab__main--drag');
-                if (!(this.custom as boolean)) {
-                    out.push('m-fab__main--drag-pass');
-                }
+            if (this.isDragging) {
+                out.push('m-fab__main--dragging');
             }
             return out;
         }
     },
-    watch: {
-        expanded() {
-            this.$nextTick(() => {
-                this.measureWrapSize();
-            });
-        }
-    },
     mounted() {
-        this.initDragMetrics();
+        this.initPosition();
         this.$nextTick(() => {
             this.measureWrapSize();
         });
     },
     methods: {
-        snapPaddingRpx(): number {
-            const sp = this.snapPadding as number | string;
-            const n = typeof sp === 'number' ? sp as number : parseInt('' + (sp as string));
-            return isNaN(n) ? 16 : n;
-        },
-        mainWidthPx(): number {
-            const w = this.width as number | string;
-            const n = typeof w === 'number' ? w as number : parseInt('' + (w as string));
-            return uni.rpx2px(isNaN(n) ? 108 : n);
-        },
-        mainHeightPx(): number {
-            const h = this.height as number | string;
-            const n = typeof h === 'number' ? h as number : parseInt('' + (h as string));
-            return uni.rpx2px(isNaN(n) ? 108 : n);
-        },
-        wrapWOrDefault(): number {
-            if (this.wrapWpx > 0) {
-                return this.wrapWpx;
-            }
-            return this.mainWidthPx();
-        },
-        wrapHOrDefault(): number {
-            if (this.wrapHpx > 0) {
-                return this.wrapHpx;
-            }
-            return this.mainHeightPx();
-        },
-        initDragMetrics() {
+        // 初始化位置
+        initPosition() {
             if (!(this.draggable as boolean)) {
-                return;
-            }
-            const sys = uni.getSystemInfoSync();
-            this.winW = sys.windowWidth as number;
-            this.winH = sys.windowHeight as number;
-            const fabW = this.mainWidthPx();
-            const fabH = this.mainHeightPx();
-            const t = this.top as number | string;
-            const tp = typeof t === 'number' ? t as number : parseInt('' + (t as string));
-            const l = this.left as number | string;
-            const ln = typeof l === 'number' ? l as number : parseInt('' + (l as string));
-            const r = this.right as number | string;
-            const rn = typeof r === 'number' ? r as number : parseInt('' + (r as string));
-            const b = this.bottom as number | string;
-            const bn = typeof b === 'number' ? b as number : parseInt('' + (b as string));
-            if (!isNaN(tp) && tp > 0) {
-                const lr = !isNaN(ln) && ln > 0 ? uni.rpx2px(ln) : uni.rpx2px(80);
-                this.dragLeftPx = lr;
-                this.dragTopPx = uni.rpx2px(tp);
+                // 如果不支持拖拽，使用传入的 left/right/bottom/top
+                const sys = uni.getSystemInfoSync();
+                this.winW = sys.windowWidth as number;
+                this.winH = sys.windowHeight as number;
+                const fabW = uni.rpx2px(parseInt(this.width as string));
+                const fabH = uni.rpx2px(parseInt(this.height as string));
+                const right = uni.rpx2px(parseInt(this.right as string));
+                const bottom = uni.rpx2px(parseInt(this.bottom as string));
+                this.dragLeftPx = this.winW - fabW - right;
+                this.dragTopPx = this.winH - fabH - bottom;
             }
             else {
-                this.dragTopPx = this.winH - fabH - uni.rpx2px(isNaN(bn) ? 100 : bn);
-                if (!isNaN(ln) && ln > 0) {
-                    this.dragLeftPx = uni.rpx2px(ln);
-                }
-                else {
-                    this.dragLeftPx = this.winW - fabW - uni.rpx2px(isNaN(rn) ? 80 : rn);
-                }
+                // 拖拽模式，从 props 初始化位置
+                const sys = uni.getSystemInfoSync();
+                this.winW = sys.windowWidth as number;
+                this.winH = sys.windowHeight as number;
+                const fabW = uni.rpx2px(parseInt(this.width as string));
+                const fabH = uni.rpx2px(parseInt(this.height as string));
+                // 默认右下角
+                const right = uni.rpx2px(parseInt(this.right as string));
+                const bottom = uni.rpx2px(parseInt(this.bottom as string));
+                this.dragLeftPx = this.winW - fabW - right;
+                this.dragTopPx = this.winH - fabH - bottom;
             }
-            this.dragReady = true;
         },
         measureWrapSize() {
             const self = this;
@@ -273,11 +215,11 @@ const __sfc__ = defineComponent({
                 const q = uni.createSelectorQuery().in(self as any);
                 q.select('.m-fab__wrap')
                     .boundingClientRect((rect: any) => {
-                    if (rect == null) {
+                    if (rect == null)
                         return;
-                    }
-                    const w = rect.width as number;
-                    const h = rect.height as number;
+                    const data = rect as UTSJSONObject;
+                    const w = data['width'] as number;
+                    const h = data['height'] as number;
                     if (w > 0 && h > 0) {
                         self.wrapWpx = w;
                         self.wrapHpx = h;
@@ -285,142 +227,141 @@ const __sfc__ = defineComponent({
                 })
                     .exec();
             }
-            catch (_e: any) {
-                // ignore
-            }
+            catch (_e: any) { }
         },
+        // 吸边
         applySnap() {
+            if (!(this.snapEdge as boolean))
+                return;
             const pad = uni.rpx2px(this.snapPaddingRpx());
-            const w = this.wrapWOrDefault();
-            const cx = this.dragLeftPx + w / 2;
-            if (cx < this.winW / 2) {
+            const w = this.wrapWpx > 0 ? this.wrapWpx : uni.rpx2px(parseInt(this.width as string));
+            const currentCenter = this.dragLeftPx + w / 2;
+            // 吸附到左边或右边
+            if (currentCenter < this.winW / 2) {
                 this.dragLeftPx = pad;
             }
             else {
                 this.dragLeftPx = this.winW - w - pad;
             }
-            const h = this.wrapHOrDefault();
+            // 限制上下边界
+            const h = this.wrapHpx > 0 ? this.wrapHpx : uni.rpx2px(parseInt(this.height as string));
             this.dragTopPx = Math.max(pad, Math.min(this.dragTopPx, this.winH - h - pad));
         },
-        /** 与 m-swipe-action 一致：优先 clientX/Y，兼容 pageX/Y（各端触摸对象字段不一致） */
-        touchClientXY(e: any): number[] | null {
-            const touches = e['touches'] as any[] | null;
-            if (touches == null || touches.length == 0) {
+        snapPaddingRpx(): number {
+            const sp = this.snapPadding as number | string;
+            const n = typeof sp === 'number' ? sp as number : parseInt('' + (sp as string));
+            return isNaN(n) ? 16 : n;
+        },
+        // 获取触摸点坐标
+        getTouchPoint(e: any): TouchPoint | null {
+            const event = e as UTSJSONObject;
+            const touches = event['touches'] as any[] | null;
+            if (touches == null || touches.length == 0)
                 return null;
-            }
-            const t0 = touches[0] as UTSJSONObject;
-            let x = t0['clientX'] as number | null;
-            let y = t0['clientY'] as number | null;
-            if (x == null) {
-                x = t0['pageX'] as number | null;
-            }
-            if (y == null) {
-                y = t0['pageY'] as number | null;
-            }
-            if (x == null || y == null) {
-                return null;
-            }
-            return [x as number, y as number];
+            const touch = touches[0] as UTSJSONObject;
+            let x = touch['clientX'] as number | null;
+            let y = touch['clientY'] as number | null;
+            if (x == null)
+                x = touch['pageX'] as number | null;
+            if (y == null)
+                y = touch['pageY'] as number | null;
+            return new TouchPoint(x == null ? 0 : x, y == null ? 0 : y);
         },
-        onDragStart(e: any) {
+        // 触摸开始
+        onTouchStart(e: any) {
             if (!(this.draggable as boolean)) {
+                // 不可拖拽时，直接触发点击
+                this.onClick();
                 return;
             }
-            if (this.winW <= 0 || this.winH <= 0) {
-                this.initDragMetrics();
-            }
-            const xy = this.touchClientXY(e);
-            if (xy == null) {
+            const point = this.getTouchPoint(e);
+            if (point == null)
                 return;
+            this.touchStartX = point!!.x;
+            this.touchStartY = point!!.y;
+            this.touchStartLeft = this.dragLeftPx;
+            this.touchStartTop = this.dragTopPx;
+            this.hasMoved = false;
+            this.moveDistance = 0;
+            // 清除之前的定时器
+            if (isTruthy(this.clickTimer)) {
+                clearTimeout(this.clickTimer);
+                this.clickTimer = null;
             }
-            this.dragStartTouchX = xy[0];
-            this.dragStartTouchY = xy[1];
-            this.dragStartLeftPx = this.dragLeftPx;
-            this.dragStartTopPx = this.dragTopPx;
-            this.dragMoved = false;
         },
-        onDragMove(e: any) {
-            if (!(this.draggable as boolean)) {
+        // 触摸移动
+        onTouchMove(e: any) {
+            if (!(this.draggable as boolean))
                 return;
-            }
-            const xy = this.touchClientXY(e);
-            if (xy == null) {
+            const point = this.getTouchPoint(e);
+            if (point == null)
                 return;
+            const deltaX = point!!.x - this.touchStartX;
+            const deltaY = point!!.y - this.touchStartY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            // 移动超过 10px 才认为是拖拽
+            if (distance > 10) {
+                if (!this.hasMoved) {
+                    this.hasMoved = true;
+                    this.isDragging = true;
+                }
+                this.moveDistance = distance;
+                // 更新位置
+                let newLeft = this.touchStartLeft + deltaX;
+                let newTop = this.touchStartTop + deltaY;
+                // 边界限制
+                const pad = uni.rpx2px(this.snapPaddingRpx());
+                const w = this.wrapWpx > 0 ? this.wrapWpx : uni.rpx2px(parseInt(this.width as string));
+                const h = this.wrapHpx > 0 ? this.wrapHpx : uni.rpx2px(parseInt(this.height as string));
+                newLeft = Math.max(pad, Math.min(newLeft, this.winW - w - pad));
+                newTop = Math.max(pad, Math.min(newTop, this.winH - h - pad));
+                this.dragLeftPx = newLeft;
+                this.dragTopPx = newTop;
+                // 阻止页面滚动
+                e.preventDefault?.();
             }
-            const dx = xy[0] - this.dragStartTouchX;
-            const dy = xy[1] - this.dragStartTouchY;
-            if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
-                this.dragMoved = true;
-            }
-            const pad = uni.rpx2px(this.snapPaddingRpx());
-            const w = this.wrapWOrDefault();
-            const h = this.wrapHOrDefault();
-            let nx = this.dragStartLeftPx + dx;
-            let ny = this.dragStartTopPx + dy;
-            nx = Math.max(pad, Math.min(nx, this.winW - w - pad));
-            ny = Math.max(pad, Math.min(ny, this.winH - h - pad));
-            this.dragLeftPx = nx;
-            this.dragTopPx = ny;
         },
-        onDragEnd() {
-            if (!(this.draggable as boolean)) {
+        // 触摸结束
+        onTouchEnd(e: any) {
+            if (!(this.draggable as boolean))
                 return;
-            }
-            const didMove = this.dragMoved;
-            if (didMove && (this.snapEdge as boolean)) {
+            // 如果是拖拽操作
+            if (this.hasMoved && this.moveDistance > 10) {
+                this.isDragging = false;
                 this.applySnap();
-            }
-            if (didMove) {
-                this.dragSuppressedTap = true;
+                // 触发 dragend 事件
                 this.$emit('dragend', {
                     leftPx: this.dragLeftPx,
                     topPx: this.dragTopPx
                 } as UTSJSONObject);
-                const self = this;
-                setTimeout(() => {
-                    self.dragSuppressedTap = false;
-                }, 120);
             }
-            this.dragMoved = false;
-        },
-        subText(btn: FabBtn): string {
-            const k = this.textField as string;
-            const v = btn[k];
-            return v == null ? '' : '' + v;
-        },
-        subImg(btn: FabBtn): string {
-            const k = this.imgField as string;
-            const v = btn[k];
-            return v == null ? '' : '' + v;
-        },
-        subColor(btn: FabBtn): string {
-            const c = btn['color'];
-            return c == null ? '#ffffff' : '' + c;
-        },
-        subFontSize(btn: FabBtn): number {
-            const fs = btn['fontSize'];
-            if (fs != null) {
-                const n = typeof fs === 'number' ? fs as number : parseInt('' + fs);
-                if (!isNaN(n)) {
-                    return n;
-                }
+            // 如果没有移动或移动距离很小，认为是点击
+            else if (!this.hasMoved || this.moveDistance <= 10) {
+                // 延迟执行点击，避免与拖拽结束冲突
+                this.clickTimer = setTimeout(() => {
+                    this.onClick();
+                    this.clickTimer = null;
+                }, 50);
             }
-            const d = this.size;
-            return typeof d === 'number' ? d as number : parseInt('' + (d as string));
+            // 重置状态
+            setTimeout(() => {
+                this.hasMoved = false;
+                this.moveDistance = 0;
+                this.isDragging = false;
+            }, 100);
         },
-        subStyle(btn: FabBtn): UTSJSONObject {
-            const st = { __$originalPosition: new UTSSourceMapPosition("st", "uni_modules/m-unix/components/m-fab/m-fab.uvue", 456, 10), } as UTSJSONObject;
-            const bg = btn['bgColor'];
-            st['backgroundColor'] = bg == null ? '#16c2c2' : '' + bg;
-            return st;
-        },
-        collapse() {
-            this.expanded = false;
-        },
-        onMainTap() {
-            if (this.dragSuppressedTap) {
-                return;
+        // 触摸取消
+        onTouchCancel(e: any) {
+            if (isTruthy(this.clickTimer)) {
+                clearTimeout(this.clickTimer);
+                this.clickTimer = null;
             }
+            this.hasMoved = false;
+            this.moveDistance = 0;
+            this.isDragging = false;
+        },
+        // 点击处理
+        onClick() {
             const list = this.btnList as any[];
             if (list.length > 0) {
                 this.expanded = !this.expanded;
@@ -429,9 +370,49 @@ const __sfc__ = defineComponent({
             }
             this.$emit('click', { index: 0 });
         },
+        // 子菜单点击
         onSubTap(idx: number) {
             this.$emit('click', { index: idx + 1 });
             this.expanded = false;
+        },
+        // 收起菜单
+        collapse() {
+            this.expanded = false;
+        },
+        // 子菜单文本
+        subText(btn: FabBtn): string {
+            const k = this.textField as string;
+            const v = btn[k];
+            return v == null ? '' : '' + v;
+        },
+        // 子菜单图片
+        subImg(btn: FabBtn): string {
+            const k = this.imgField as string;
+            const v = btn[k];
+            return v == null ? '' : '' + v;
+        },
+        // 子菜单颜色
+        subColor(btn: FabBtn): string {
+            const c = btn['color'];
+            return c == null ? '#ffffff' : '' + c;
+        },
+        // 子菜单字体大小
+        subFontSize(btn: FabBtn): number {
+            const fs = btn['fontSize'];
+            if (fs != null) {
+                const n = typeof fs === 'number' ? fs as number : parseInt('' + fs);
+                if (!isNaN(n))
+                    return n;
+            }
+            const d = this.size;
+            return typeof d === 'number' ? d as number : parseInt('' + (d as string));
+        },
+        // 子菜单样式
+        subStyle(btn: FabBtn): UTSJSONObject {
+            const st = { __$originalPosition: new UTSSourceMapPosition("st", "uni_modules/m-unix/components/m-fab/m-fab.uvue", 486, 10), } as UTSJSONObject;
+            const bg = btn['bgColor'];
+            st['backgroundColor'] = bg == null ? '#16c2c2' : '' + bg;
+            return st;
         }
     }
 });
@@ -453,12 +434,12 @@ function GenUniModulesMUnixComponentsMFabMFabRender(this: InstanceType<typeof __
             class: "m-fab__wrap",
             style: _nS(_ctx.wrapStyle)
         }), [
-            _ctx.btnList.length > 0
+            _ctx.safeBtnList.length > 0
                 ? _cE("view", _uM({
                     key: 0,
                     class: "m-fab__subs"
                 }), [
-                    _cE(Fragment, null, RenderHelpers.renderList(_ctx.btnList, (btn, idx, __index, _cached): any => {
+                    _cE(Fragment, null, RenderHelpers.renderList(_ctx.safeBtnList, (btn, idx, __index, _cached): any => {
                         return withDirectives(_cE("view", _uM({
                             key: idx,
                             class: "m-fab__sub",
@@ -486,11 +467,10 @@ function GenUniModulesMUnixComponentsMFabMFabRender(this: InstanceType<typeof __
             _cE("view", _uM({
                 class: _nC(_ctx.mainDragClass),
                 style: _nS(_ctx.mainStyle),
-                onClick: _ctx.onMainTap,
-                onTouchstart: withModifiers(_ctx.onDragStart, ["stop"]),
-                onTouchmove: withModifiers(_ctx.onDragMove, ["stop", "prevent"]),
-                onTouchend: _ctx.onDragEnd,
-                onTouchcancel: _ctx.onDragEnd
+                onTouchstart: _ctx.onTouchStart,
+                onTouchmove: _ctx.onTouchMove,
+                onTouchend: _ctx.onTouchEnd,
+                onTouchcancel: _ctx.onTouchCancel
             }), [
                 isTrue(_ctx.custom)
                     ? _cE("view", _uM({
@@ -515,11 +495,11 @@ function GenUniModulesMUnixComponentsMFabMFabRender(this: InstanceType<typeof __
                             class: "m-fab__main-child m-fab__plus",
                             style: _nS(_uM({ color: _ctx.color }))
                         }), "+", 4 /* STYLE */)
-            ], 46 /* CLASS, STYLE, PROPS, NEED_HYDRATION */, ["onClick", "onTouchstart", "onTouchmove", "onTouchend", "onTouchcancel"])
+            ], 46 /* CLASS, STYLE, PROPS, NEED_HYDRATION */, ["onTouchstart", "onTouchmove", "onTouchend", "onTouchcancel"])
         ], 4 /* STYLE */)
     ]);
 }
 export type MFabComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesMUnixComponentsMFabMFabStyles = [_uM([["m-fab__mask", _pS(_uM([["position", "fixed"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["backgroundColor", "rgba(0,0,0,0.2)"]]))], ["m-fab__subs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-end"], ["marginBottom", "24rpx"]]))], ["m-fab__sub", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", "16rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "28rpx"], ["borderTopLeftRadius", "40rpx"], ["borderTopRightRadius", "40rpx"], ["borderBottomRightRadius", "40rpx"], ["borderBottomLeftRadius", "40rpx"], ["marginBottom", "16rpx"]]))], ["m-fab__sub-img", _pS(_uM([["width", "40rpx"], ["height", "40rpx"], ["marginRight", "12rpx"]]))], ["m-fab__sub-text", _pS(_uM([["fontSize", "28rpx"]]))], ["m-fab__main", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"]]))], ["m-fab__main-child", _uM([[".m-fab__main--drag-pass>", _uM([["pointerEvents", "none"]])]])], ["m-fab__plus", _pS(_uM([["fontSize", "64rpx"], ["lineHeight", 1]]))]])];
+const GenUniModulesMUnixComponentsMFabMFabStyles = [_uM([["m-fab__mask", _pS(_uM([["position", "fixed"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["backgroundColor", "rgba(0,0,0,0.2)"], ["zIndex", 996]]))], ["m-fab__subs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-end"], ["marginBottom", "24rpx"]]))], ["m-fab__sub", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", "16rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "28rpx"], ["borderTopLeftRadius", "40rpx"], ["borderTopRightRadius", "40rpx"], ["borderBottomRightRadius", "40rpx"], ["borderBottomLeftRadius", "40rpx"], ["marginBottom", "16rpx"], ["boxShadow", "0 2rpx 8rpx rgba(0, 0, 0, 0.15)"], ["transform:active", "scale(0.95)"]]))], ["m-fab__sub-img", _pS(_uM([["width", "40rpx"], ["height", "40rpx"], ["marginRight", "12rpx"]]))], ["m-fab__sub-text", _pS(_uM([["fontSize", "28rpx"]]))], ["m-fab__main", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["boxShadow", "0 4rpx 12rpx rgba(0, 0, 0, 0.2)"], ["cursor", "pointer"], ["transitionProperty", "transform"], ["transitionDuration", "0.1s"], ["transitionTimingFunction", "ease"], ["transform:active", "scale(0.95)"]]))], ["m-fab__main--dragging", _pS(_uM([["opacity", 0.9], ["transitionProperty", "none"], ["transform:active", "none"]]))], ["m-fab__main-child", _pS(_uM([["pointerEvents", "none"]]))], ["m-fab__plus", _pS(_uM([["fontSize", "64rpx"], ["lineHeight", 1]]))], ["@TRANSITION", _uM([["m-fab__main", _uM([["property", "transform"], ["duration", "0.1s"], ["timingFunction", "ease"]])], ["m-fab__main--dragging", _uM([["property", "none"]])]])]])];
 import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue';
 //# sourceMappingURL=m-fab.uvue.map

@@ -209,7 +209,7 @@ open class GenComponentsSelectCountry : VueComponent {
         var props = _nP(_uM("modelValue" to _uM("default" to null), "options" to _uM("type" to "Array", "default" to fun(): UTSArray<Any?> {
             return _uA()
         }
-        ), "valueKey" to _uM("type" to "String", "default" to "value"), "labelKey" to _uM("type" to "String", "default" to "label"), "searchPlaceholder" to _uM("type" to "String", "default" to "请输入关键词搜索"), "emptyText" to _uM("type" to "String", "default" to "暂无数据"), "maxHeight" to _uM("type" to "String", "default" to "600rpx")))
+        ), "valueKey" to _uM("type" to "String", "default" to "value"), "labelKey" to _uM("type" to "String", "default" to "label"), "searchPlaceholder" to _uM("type" to "String", "default" to "请输入关键词搜索"), "emptyText" to _uM("type" to "String", "default" to "暂无数据"), "maxHeight" to _uM("type" to "String", "default" to "auto")))
         var propsNeedCastKeys = _uA(
             "modelValue",
             "options",

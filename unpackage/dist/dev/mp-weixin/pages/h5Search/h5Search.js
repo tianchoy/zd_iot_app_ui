@@ -91,8 +91,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (res.code == 200) {
           countryOptions.value = res.data.map((item) => {
             return new common_vendor.UTSJSONObject({
-              value: item["letterCode"],
-              label: item["fullName"]
+              value: item.letterCode,
+              label: item.fullName
             });
           });
         }

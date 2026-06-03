@@ -28,20 +28,8 @@ open class GenPagesH5SearchH5Search : BasePage {
             val showCountryPopup = ref<Boolean>(false)
             val selectedCountry = ref<String>("")
             val searchSelectRef = ref(null)
-            val countryOptions = ref(_uA(
-                _uO("value" to "1", "label" to "中国"),
-                _uO("value" to "2", "label" to "美国"),
-                _uO("value" to "3", "label" to "日本"),
-                _uO("value" to "4", "label" to "韩国"),
-                _uO("value" to "5", "label" to "英国"),
-                _uO("value" to "6", "label" to "德国"),
-                _uO("value" to "7", "label" to "法国"),
-                _uO("value" to "8", "label" to "澳大利亚"),
-                _uO("value" to "9", "label" to "加拿大"),
-                _uO("value" to "10", "label" to "新加坡"),
-                _uO("value" to "11", "label" to "马来西亚"),
-                _uO("value" to "12", "label" to "泰国")
-            ))
+            val resCountry = ref<String>("")
+            val countryOptions = ref(_uA<UTSJSONObject>())
             val selectedCountryLabel = computed<String>(fun(): String {
                 if (!(selectedCountry.value != "")) {
                     return ""
@@ -68,9 +56,9 @@ open class GenPagesH5SearchH5Search : BasePage {
                 showCountryPopup.value = true
             }
             val onCountryChange = fun(value: Any?, item: Any){
-                console.log("选中国家/地区:", value, item, " at pages/h5Search/h5Search.uvue:131")
                 showCountryPopup.value = false
-                uni_showToast(ShowToastOptions(title = "已选择：" + (item as UTSJSONObject)["label"], icon = "success"))
+                resCountry.value = value as String
+                console.log("选中国家/地区:", resCountry.value, " at pages/h5Search/h5Search.uvue:123")
             }
             val onPopupClose = fun(){
                 showCountryPopup.value = false
@@ -87,8 +75,8 @@ open class GenPagesH5SearchH5Search : BasePage {
                     uni_showToast(ShowToastOptions(title = "请选择国家/地区", icon = "none"))
                     return
                 }
-                console.log("查询卡号:", cardNumber.value, " at pages/h5Search/h5Search.uvue:167")
-                console.log("国家/地区:", selectedCountryLabel.value, " at pages/h5Search/h5Search.uvue:168")
+                console.log("查询卡号:", cardNumber.value, " at pages/h5Search/h5Search.uvue:154")
+                console.log("国家/地区:", resCountry.value, " at pages/h5Search/h5Search.uvue:155")
                 uni_showToast(ShowToastOptions(title = "查询中...", icon = "loading"))
             }
             val onScanResult = fun(data: UTSJSONObject){
@@ -98,7 +86,20 @@ open class GenPagesH5SearchH5Search : BasePage {
                     uni_showToast(ShowToastOptions(title = "扫码成功", icon = "success"))
                 }
             }
+            val initCountryList = fun(): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        val res = await(getCountryList(false))
+                        console.log("查询国家列表:", res, " at pages/h5Search/h5Search.uvue:181")
+                        if (res.code == 200) {
+                            countryOptions.value = res.data.map(fun(item: CountryData): UTSJSONObject {
+                                return _uO("value" to item.letterCode, "label" to item.fullName)
+                            }
+                            )
+                        }
+                })
+            }
             onMounted(fun(){
+                initCountryList()
                 uni__on("scanResult", onScanResult)
             }
             )

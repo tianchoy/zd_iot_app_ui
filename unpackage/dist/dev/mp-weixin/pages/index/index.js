@@ -46,6 +46,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       }
       common_vendor.index.__f__("log", "at pages/index/index.uvue:108", "查询卡号:", card_number.value);
+      common_vendor.index.navigateTo({
+        url: "/pages/login/login"
+      });
     };
     const onScanResult = (data) => {
       var _a;
@@ -59,22 +62,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const cardType = (type) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:128", type);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:131", type);
       common_vendor.index.reLaunch({
         url: "/pages/card/card?type=" + type
       });
     };
     const handleClick = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:136", "联系客服1111");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:139", "联系客服1111");
     };
-    const getLogin = () => {
+    const getTenantInfos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        yield common_config.setToken("123456");
-        yield api_http.card_detail(card_number.value, "CHN", false);
+        const res = yield api_http.getTenantInfo(common_config.config.tenantId, false);
+        if (res.code == 200) {
+          const tenantInfo = res.data;
+          const wxGetPhoneLogin = "" + tenantInfo.wxGetPhoneLogin;
+          common_config.setStorageSync("tenant_infos", tenantInfo);
+          if (wxGetPhoneLogin == "0") {
+            common_vendor.index.navigateTo({
+              url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin
+            });
+          }
+        }
       });
     };
     common_vendor.onMounted(() => {
-      getLogin();
+      getTenantInfos();
       common_vendor.index.$on("scanResult", onScanResult);
     });
     common_vendor.onUnmounted(() => {

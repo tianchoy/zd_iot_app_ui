@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "top-nav-bar": "../../components/topNavBar/topNavBar",
+    "m-wx-login": "../../uni_modules/m-unix/components/m-wx-login/m-wx-login"
+  }
+}

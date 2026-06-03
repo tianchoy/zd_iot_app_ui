@@ -1,6 +1,8 @@
 // api/http.uts
 import { ApiUrl } from './url'
 import { request, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
+import { config } from '@/common/config.uts'
+
 
 
 export type LoginData = {
@@ -15,22 +17,35 @@ export type CountryData = {
   letterCode: string
 }
 
+export type TenantInfoData = {
+  rechargeTip: string
+  servicePhone: string
+  serviceQrcode: null
+  wxAuditHide: string
+  wxAuditHideNo: string
+  wxGetPhoneLogin: string
+  wxMiniPayType: string
+  wxPayClass: string
+}
+
+
+
 // 查询国家列表
-export const getCountryList = (withToken: boolean = false): Promise<ApiResponse<CountryData>> => {
-  return request({
-    url: ApiUrl.countries,
+export function getCountryList(withToken: boolean = false): Promise<ApiResponse<CountryData[]>> {
+  return request<CountryData[]>({
+    url: ApiUrl.countries as string,
     method: 'GET',
     withToken
-  }) as Promise<ApiResponse<CountryData>>
+  })
 }
 
 // 查询卡详情
-export const card_detail = (id: string, countryCode: string, withToken: boolean = true): Promise<ApiResponse<LoginData>> => {
-  return request({
-    url: ApiUrl.card_detail + id + '/' + countryCode,
+export function card_detail(id: string, countryCode: string, withToken: boolean = true): Promise<ApiResponse<LoginData>> {
+  return request<LoginData>({
+    url: (ApiUrl.card_detail as string) + id + '/' + countryCode,
     method: 'GET',
     withToken
-  }) as Promise<ApiResponse<LoginData>>
+  })
 }
 
 // 登录
@@ -40,16 +55,39 @@ export const card_detail = (id: string, countryCode: string, withToken: boolean 
 * clientId:12353d4772a25656d6d2a67d53353cc3
 * grantType:xcx
 */
-export const login = (data: UTSJSONObject, withToken: boolean = true): Promise<ApiResponse<LoginData>> => {
-  return request({
-    url: ApiUrl.addOrder,
+export function login(data: UTSJSONObject, withToken: boolean = true): Promise<ApiResponse<LoginData>> {
+  return request<LoginData>({
+    url: ApiUrl.login,
     method: 'POST',
     data:{
       ...data,
-      tenantId: '123456',
+      tenantId: config.tenantId,
       clientId: '12353d4772a25656d6d2a67d53353cc3',
       grantType: 'xcx'
     },
-    withToken 
-  }) as Promise<ApiResponse<LoginData>>
+    withToken
+  })
+}
+
+
+// 获取租户页面配置（自动适配平台）
+export function getTenantInfo(tenantId: string, withToken: boolean = true): Promise<ApiResponse<TenantInfoData>> {
+  // #ifdef MP-WEIXIN
+  const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + tenantId
+  // #endif
+  
+  // #ifdef H5
+  const url = (ApiUrl.getTenantPageConfigH as string) + '/' + tenantId
+  // #endif
+  
+  // #ifndef MP-WEIXIN || H5
+  // 其他平台默认使用H5配置
+  const url = (ApiUrl.getTenantPageConfigH as string) + '/' + tenantId
+  // #endif
+  
+  return request<TenantInfoData>({
+    url: url,
+    method: 'GET',
+    withToken
+  })
 }

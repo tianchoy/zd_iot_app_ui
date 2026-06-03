@@ -1,0 +1,45 @@
+<template>
+	<topNavBar title="中导云卡登录" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<view class="container">
+		<image src="/static/defaultAvator.png" class="logo"></image>
+		<view class="login-btn">
+			<m-wx-login
+				type="code"
+				text="微信一键登录"
+				@success="handleSuccess"
+			>
+			</m-wx-login>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	
+	const handleSuccess = (res: UTSJSONObject) => {
+		console.log('登录成功:', res)
+	}
+
+	onLoad((options) => {
+		console.log(options)
+	})
+</script>
+
+<style lang="scss" scoped>
+	.container{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		background-color: #f4f7fb;
+		padding-bottom: 40rpx;
+		.logo{
+			width: 200rpx;
+			height: 200rpx;
+			margin: 300rpx 0 40rpx 0;
+			border-radius: 50%;
+		}
+		.login-btn{
+			width:80%;
+			margin: 0 40rpx;
+		}
+	}
+</style>

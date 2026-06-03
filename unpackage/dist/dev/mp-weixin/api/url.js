@@ -1,5 +1,8 @@
 "use strict";
 const ApiUrl = {
+  getTenantPageConfigXcx: "/system/tenantPageConfig/getTenantPageConfigXcx",
+  getTenantPageConfigH: "/system/tenantPageConfig/getTenantPageConfigH",
+  login: "/auth/login",
   card_detail: "/app/card/info/",
   countries: "/app/card/getH5CountryList",
   addOrder: "/order/pkgOrder",
