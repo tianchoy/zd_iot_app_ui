@@ -154,6 +154,10 @@ onMounted(() => {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	padding: 0 20rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
 }
 
 .capsule {
@@ -161,7 +165,7 @@ onMounted(() => {
 	align-items: center;
 	justify-content: flex-end;
 	flex-shrink: 0;
-	min-width: 70rpx;
+	width: 70rpx;
 }
 
 .capsule-item {
@@ -174,4 +178,25 @@ onMounted(() => {
 	width: 40rpx;
 	height: 40rpx;
 }
+
+/* #ifdef APP-ANDROID */
+.navbar {
+	position: relative;
+	justify-content: center;
+}
+
+.title {
+	position: absolute;
+	left: 0;
+	right: 0;
+	width: 100%;
+	padding: 0;
+	z-index: 1;
+}
+
+.back-btn,
+.capsule {
+	z-index: 2;
+}
+/* #endif */
 </style>

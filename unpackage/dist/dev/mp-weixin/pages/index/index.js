@@ -23,12 +23,12 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
-    const title = common_vendor.ref("Hello");
+    const title = common_vendor.ref("");
     common_vendor.ref(false);
-    const card_number = common_vendor.ref("1064916585160");
+    const card_number = common_vendor.ref("");
     const wxGetPhoneLogin = common_vendor.ref("");
     const goRecharge = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:89", "去充值");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:131", "去充值");
       common_vendor.index.navigateTo({
         url: "/pages/recharge/recharge"
       });
@@ -46,10 +46,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:109", "查询卡号:", card_number.value);
-      common_vendor.index.navigateTo({
-        url: "/pages/login/login"
-      });
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:151", "查询卡号:", card_number.value);
     };
     const onScanResult = (data) => {
       var _a;
@@ -63,13 +60,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const cardType = (type) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:132", type);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:170", type);
       common_vendor.index.reLaunch({
         url: "/pages/card/card?type=" + type
       });
     };
     const handleClick = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:140", "联系客服1111");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:178", "联系客服1111");
     };
     const userId = common_vendor.ref("");
     const userLoginByOpenid = (codes) => {
@@ -105,13 +102,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    common_vendor.onLoad(() => {
+    const handleLogin = () => {
       const token = common_config.getToken();
       if (!token) {
         getTenantInfos().then(() => {
           getCode();
         });
       }
+    };
+    common_vendor.onLoad(() => {
       common_vendor.index.$on("scanResult", onScanResult);
     });
     common_vendor.onUnload(() => {
@@ -119,7 +118,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     return (_ctx, _cache) => {
       "raw js";
-      const __returned__ = {
+      const __returned__ = common_vendor.e({
         a: common_vendor.p({
           title: "首页",
           ["show-back"]: false,
@@ -128,42 +127,47 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-00a60067"
         }),
-        b: common_vendor.t(title.value),
-        c: common_vendor.o(($event) => {
-          return cardType(0);
-        }, "8e"),
-        d: common_vendor.o(($event) => {
-          return cardType(1);
-        }, "f6"),
+        b: title.value
+      }, title.value ? {
+        c: common_vendor.t(title.value)
+      } : {
+        d: common_vendor.o(handleLogin, "b0")
+      }, {
         e: common_vendor.o(($event) => {
-          return cardType(2);
-        }, "f1"),
-        f: card_number.value,
+          return cardType(0);
+        }, "33"),
+        f: common_vendor.o(($event) => {
+          return cardType(1);
+        }, "9d"),
         g: common_vendor.o(($event) => {
+          return cardType(2);
+        }, "73"),
+        h: card_number.value,
+        i: common_vendor.o(($event) => {
           return card_number.value = $event.detail.value;
-        }, "84"),
-        h: common_vendor.p({
+        }, "92"),
+        j: common_vendor.p({
           name: "scanning",
           size: "40rpx",
           class: "data-v-00a60067"
         }),
-        i: common_vendor.o(scanCode, "4d"),
-        j: common_vendor.p({
+        k: common_vendor.o(scanCode, "05"),
+        l: common_vendor.p({
           type: "white",
           plain: true,
           width: "90rpx",
           class: "scan-btn data-v-00a60067"
         }),
-        k: common_vendor.o(handleQuery, "be"),
-        l: common_vendor.p({
+        m: common_vendor.o(handleQuery, "95"),
+        n: common_vendor.p({
           type: "primary",
           width: "120rpx",
           class: "data-v-00a60067"
         }),
-        m: common_vendor.o(($event) => {
+        o: common_vendor.o(($event) => {
           return cardType(0);
-        }, "27"),
-        n: common_vendor.p({
+        }, "e7"),
+        p: common_vendor.p({
           text: "标签",
           round: true,
           plain: true,
@@ -171,13 +175,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           type: "primary",
           class: "data-v-00a60067"
         }),
-        o: common_vendor.p({
+        q: common_vendor.p({
           backgroundColor: "#f1f5f9",
           textClass: "divider",
           class: "data-v-00a60067"
         }),
-        p: common_vendor.o(goRecharge, "6a"),
-        q: common_vendor.p({
+        r: common_vendor.o(goRecharge, "05"),
+        s: common_vendor.p({
           type: "primary",
           width: "200rpx",
           btnSize: "mini",
@@ -185,13 +189,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           shape: "circle",
           class: "data-v-00a60067"
         }),
-        r: common_vendor.o(handleClick, "53"),
-        s: common_vendor.p({
+        t: common_vendor.o(handleClick, "e0"),
+        v: common_vendor.p({
           class: "data-v-00a60067"
         }),
-        t: `${_ctx.u_s_b_h}px`,
-        v: `${_ctx.u_s_a_i_b}px`
-      };
+        w: `${_ctx.u_s_b_h}px`,
+        x: `${_ctx.u_s_a_i_b}px`
+      });
       return __returned__;
     };
   }

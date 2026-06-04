@@ -213,15 +213,44 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
                 if (showLoading) {
                     hideLoadingModal();
                 }
-                const result = res.data as ApiResponse<T>;
-                const { code, msg, data: resData } = result;
+                const raw = res.data as UTSJSONObject;
+                const rawCode = raw['code'];
+                let code = 0;
+                if (typeof rawCode === 'number') {
+                    code = rawCode as number;
+                }
+                else if (rawCode != null) {
+                    const parsedCode = parseInt('' + rawCode);
+                    code = isNaN(parsedCode) ? 0 : parsedCode;
+                }
+                const rawMsg = raw['msg'] ?? raw['message'];
+                const result = {
+                    code,
+                    msg: rawMsg == null ? '' : '' + rawMsg,
+                    data: raw['data'] as T
+                } as ApiResponse<T>;
+                const msg = result.msg;
                 // 请求成功
-                if (finalSuccessCodes.indexOf(code) >= 0) {
+                let isSuccessCode = false;
+                for (let i = 0; i < finalSuccessCodes.length; i++) {
+                    if (('' + finalSuccessCodes[i]) == ('' + code)) {
+                        isSuccessCode = true;
+                        break;
+                    }
+                }
+                if (isSuccessCode) {
                     resolve(result);
                     return;
                 }
+                let isUnauthorizedCode = false;
+                for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
+                    if (('' + finalUnauthorizedCodes[i]) == ('' + code)) {
+                        isUnauthorizedCode = true;
+                        break;
+                    }
+                }
                 // 未授权处理
-                if (finalUnauthorizedCodes.indexOf(code) >= 0) {
+                if (isUnauthorizedCode) {
                     if (redirectOnUnauthorized) {
                         navigateToLogin(finalLoginPage);
                     }

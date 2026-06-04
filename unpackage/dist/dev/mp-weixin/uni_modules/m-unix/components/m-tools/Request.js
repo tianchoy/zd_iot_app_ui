@@ -241,17 +241,45 @@ function request(options) {
       header: reqHeader,
       timeout,
       success: (res) => {
+        var _a3;
         if (showLoading) {
           hideLoadingModal();
         }
-        const result = res.data;
-        const code = result.code, msg = result.msg;
-        result.data;
-        if (finalSuccessCodes.indexOf(code) >= 0) {
+        const raw = res.data;
+        const rawCode = raw["code"];
+        let code = 0;
+        if (typeof rawCode === "number") {
+          code = rawCode;
+        } else if (rawCode != null) {
+          const parsedCode = parseInt("" + rawCode);
+          code = isNaN(parsedCode) ? 0 : parsedCode;
+        }
+        const rawMsg = (_a3 = raw["msg"]) !== null && _a3 !== void 0 ? _a3 : raw["message"];
+        const result = new ApiResponse({
+          code,
+          msg: rawMsg == null ? "" : "" + rawMsg,
+          data: raw["data"]
+        });
+        const msg = result.msg;
+        let isSuccessCode = false;
+        for (let i = 0; i < finalSuccessCodes.length; i++) {
+          if ("" + finalSuccessCodes[i] == "" + code) {
+            isSuccessCode = true;
+            break;
+          }
+        }
+        if (isSuccessCode) {
           resolve(result);
           return null;
         }
-        if (finalUnauthorizedCodes.indexOf(code) >= 0) {
+        let isUnauthorizedCode = false;
+        for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
+          if ("" + finalUnauthorizedCodes[i] == "" + code) {
+            isUnauthorizedCode = true;
+            break;
+          }
+        }
+        if (isUnauthorizedCode) {
           if (redirectOnUnauthorized) {
             navigateToLogin(finalLoginPage);
           }

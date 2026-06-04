@@ -25,13 +25,17 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	padding: 0 20rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
 }
 .capsule.data-v-83d0d8fa {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
 	flex-shrink: 0;
-	min-width: 70rpx;
+	width: 70rpx;
 }
 .capsule-item.data-v-83d0d8fa {
 	display: flex;

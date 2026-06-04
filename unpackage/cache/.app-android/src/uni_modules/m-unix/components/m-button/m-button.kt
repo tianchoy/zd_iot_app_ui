@@ -70,7 +70,7 @@ open class GenUniModulesMUnixComponentsMButtonMButton : VueComponent {
                         ""
                     }
                 )
-            )), "style" to _nS(_uM("width" to _ctx.getWidth, "height" to _ctx.getHeight, "lineHeight" to _ctx.getHeight, "font-size" to _ctx.fontSizeCss, "background" to _ctx.getBgColor(_ctx.type as String, _ctx.plain as Boolean), "color" to _ctx.getColor(_ctx.type as String, _ctx.plain as Boolean), "boxShadow" to if (_ctx.shadow) {
+            )), "style" to _nS(_uM("width" to _ctx.getWidth, "height" to _ctx.getHeight, "lineHeight" to _ctx.getHeight, "font-size" to _ctx.fontSizeCss, "background" to _ctx.getBgColor(_ctx.type as String, _ctx.plain as Boolean), "backgroundColor" to _ctx.getBgColor(_ctx.type as String, _ctx.plain as Boolean), "color" to _ctx.getColor(_ctx.type as String, _ctx.plain as Boolean), "boxShadow" to if (_ctx.shadow) {
                 _ctx.getShadow(_ctx.type as String, _ctx.plain as Boolean)
             } else {
                 "none"

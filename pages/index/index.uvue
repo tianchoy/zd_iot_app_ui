@@ -1,18 +1,39 @@
 <template>
 	<topNavBar title="首页" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
+		<!-- #ifdef APP-ANDROID -->
+		<view class="card-info" style="background-color: #4d88f5; box-shadow: none;">
+		<!-- #endif -->
+		<!-- #ifndef APP-ANDROID -->
 		<view class="card-info">
-			<text class="persion-name">Hi,{{title}}</text>
+		<!-- #endif -->
+			<text class="persion-name" v-if="title">Hi,{{title}}</text>
+			<text class="persion-name" v-else @click="handleLogin">Hi,请先登录</text>
 			<view class="persion-card">
+				<!-- #ifdef APP-ANDROID -->
+				<view class="persion-card-item" style="background-color: #6fa3ff; box-shadow: none;color: #fff;" @click="cardType(0)">
+				<!-- #endif -->
+				<!-- #ifndef APP-ANDROID -->
 				<view class="persion-card-item" @click="cardType(0)">
+				<!-- #endif -->
 					<text class="persion-card-item-title">我的卡片</text>
 					<text class="persion-card-item-content">12</text>
 				</view>
+				<!-- #ifdef APP-ANDROID -->
+				<view class="persion-card-item" style="background-color: #6fa3ff; box-shadow: none;color: #fff;" @click="cardType(1)">
+				<!-- #endif -->
+				<!-- #ifndef APP-ANDROID -->
 				<view class="persion-card-item" @click="cardType(1)">
+				<!-- #endif -->
 					<text class="persion-card-item-title">在用卡片</text>
 					<text class="persion-card-item-content">12</text>
 				</view>
+				<!-- #ifdef APP-ANDROID -->
+				<view class="persion-card-item" style="background-color: #6fa3ff; box-shadow: none;color: #fff;" @click="cardType(2)">
+				<!-- #endif -->
+				<!-- #ifndef APP-ANDROID -->
 				<view class="persion-card-item" @click="cardType(2)">
+				<!-- #endif -->
 					<text class="persion-card-item-title">异常卡片</text>
 					<text class="persion-card-item-content">12</text>
 				</view>
@@ -26,10 +47,24 @@
 					placeholder="请输入 ICCID / MSISDN"
 					class="search-input"
 				/>
+				<!-- #ifdef APP-ANDROID -->
+				<view class="android-scan-btn" style="width: 90rpx; height: 95rpx; border-left: 1px solid #eef2f7; display: flex; flex-direction: row; align-items: center; justify-content: center; background-color: #ffffff;" @click="scanCode">
+					<m-icon name="scanning" size="40rpx" color="#334155"></m-icon>
+				</view>
+				<!-- #endif -->
+				<!-- #ifndef APP-ANDROID -->
 				<m-button type="white" :plain="true" class="scan-btn" width="90rpx" @click="scanCode">
 					<m-icon name="scanning" size="40rpx"></m-icon>
 				</m-button>
+				<!-- #endif -->
+				<!-- #ifdef APP-ANDROID -->
+				<view class="android-query-btn" style="width: 120rpx; height: 95rpx; border-radius: 0 24rpx 24rpx 0; background-color: #5677fc; display: flex; flex-direction: row; align-items: center; justify-content: center;" @click="handleQuery">
+					<text class="android-btn-text">查询</text>
+				</view>
+				<!-- #endif -->
+				<!-- #ifndef APP-ANDROID -->
 				<m-button type="primary" width="120rpx" @click="handleQuery">查询</m-button>
+				<!-- #endif -->
 			</view>
 		</view>
 		<view class="card-box">
@@ -66,7 +101,14 @@
 							<text class="cycle-label">当前周期：</text>
 							<text class="cycle-value">第1期 / 共12期</text>
 						</view>
+						<!-- #ifdef APP-ANDROID -->
+						<view class="android-recharge-btn" style="padding: 0 24rpx; height: 64rpx; border-radius: 220rpx; background-color: #5677fc; display: flex; flex-direction: row; align-items: center; justify-content: center;" @click="goRecharge">
+							<text class="android-btn-text" style="color: #ffffff;">去充值</text>
+						</view>
+						<!-- #endif -->
+						<!-- #ifndef APP-ANDROID -->
 						<m-button type="primary" width="200rpx" btnSize="mini" size="25rpx" shape="circle" @click="goRecharge">去充值</m-button>
+						<!-- #endif -->
 					</view>
 				</view>
 			</view>
@@ -80,10 +122,10 @@
 	import { setStorageSync,getTenantId,getToken } from '@/common/config.uts'
 	import { login,card_detail,getTenantInfo } from '@/api/http.uts'
 	
-	const title = ref('Hello')
-	const show = ref(false)
-	const card_number = ref('1064916585160')
-	const wxGetPhoneLogin = ref('')
+	const title = ref<string>('')
+	const show = ref<boolean>(false)
+	const card_number = ref<string>('')
+	const wxGetPhoneLogin = ref<string>('')
 
 	const goRecharge = () => {
 		console.log('去充值')
@@ -107,10 +149,6 @@
 			return
 		}
 		console.log('查询卡号:', card_number.value)
-		// 处理查询逻辑
-		uni.navigateTo({
-			url: '/pages/login/login'
-		})
 	}
 	
 	// 接收扫码结果
@@ -177,14 +215,16 @@
 		}
 	}
 
-	onLoad(() => {
+	const handleLogin = () => {
 		const token = getToken()
 		if(!token){
 			getTenantInfos().then(() => {
 				getCode()
 			})
 		}
+	}
 
+	onLoad(() => {
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
 	})
@@ -243,6 +283,7 @@
 				font-size: 40rpx;
 				font-weight: 800;
 				line-height: 1;
+				color: #ffffff;
 			}
 		}
 	}
@@ -283,9 +324,34 @@
 			.scan-btn{
 				border-left: 1px solid #eef2f7;
 			}
+			.android-scan-btn{
+				width: 90rpx;
+				height: 95rpx;
+				border-left: 1px solid #eef2f7;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+				background-color: #ffffff;
+			}
+			.android-query-btn{
+				width: 120rpx;
+				height: 95rpx;
+				border-radius: 0 24rpx 24rpx 0;
+				background-color: #5677fc;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+			}
+			.android-btn-text{
+				font-size: 30rpx;
+				color: #ffffff;
+				font-weight: 500;
+			}
 		}
-		
-		.card-item{
+
+.card-item{
 			display: flex;
 			flex-direction: column;
 			border: 1px solid #e7edf5;

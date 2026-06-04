@@ -71,7 +71,16 @@ open class GenUniModulesMUnixComponentsMTabsMTabs : VueComponent {
                     _cC("v-if", true)
                 }
                 ,
-                _cE("view", _uM("class" to _nC(_ctx.mainDragClass), "style" to _nS(_ctx.mainStyle), "onTouchstart" to _ctx.onTouchStart, "onTouchmove" to _ctx.onTouchMove, "onTouchend" to _ctx.onTouchEnd, "onTouchcancel" to _ctx.onTouchCancel), _uA(
+                _cE("view", _uM("class" to _nC(_ctx.mainDragClass), "style" to _nS(_ctx.mainStyle), "onTouchstart" to withModifiers(_ctx.onTouchStart, _uA(
+                    "stop"
+                )), "onTouchmove" to withModifiers(_ctx.onTouchMove, _uA(
+                    "stop",
+                    "prevent"
+                )), "onTouchend" to withModifiers(_ctx.onTouchEnd, _uA(
+                    "stop"
+                )), "onTouchcancel" to withModifiers(_ctx.onTouchCancel, _uA(
+                    "stop"
+                ))), _uA(
                     if (isTrue(_ctx.custom)) {
                         _cE("view", _uM("key" to 0, "class" to "m-fab__main-child"), _uA(
                             renderSlot(_ctx.`$slots`, "default")

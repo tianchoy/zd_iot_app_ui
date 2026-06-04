@@ -12,7 +12,7 @@
 				getShapeClass(shape as string, plain as boolean),
 				bold ? 'm-text-bold' : '',
 				link ? 'm-btn__link' : ''
-			]" :style="{ width: getWidth, height: getHeight, lineHeight: getHeight, 'font-size': fontSizeCss, background:getBgColor(type as string,plain as boolean),color:getColor(type as string,plain as boolean),boxShadow:shadow?getShadow(type as string,plain as boolean):'none' }"
+			]" :style="{ width: getWidth, height: getHeight, lineHeight: getHeight, 'font-size': fontSizeCss, background:getBgColor(type as string,plain as boolean),backgroundColor:getBgColor(type as string,plain as boolean),color:getColor(type as string,plain as boolean),boxShadow:shadow?getShadow(type as string,plain as boolean):'none' }"
 			:loading="loading" :form-type="formType" :open-type="openType" :app-parameter="appParameter"
 			@getuserinfo="bindgetuserinfo" @getphonenumber="bindgetphonenumber" @contact="bindcontact"
 			@error="binderror" @chooseavatar="bindchooseavatar" @launchapp="bindlaunchapp" :disabled="disabled"
@@ -28,7 +28,7 @@
 				bold ? 'm-text-bold' : '',
 				link ? 'm-btn__link' : '',
 				loading ? 'm-btn--loading' : ''
-			]" :style="{ width: getWidth, height: getHeight, lineHeight: getHeight, 'font-size': fontSizeCss, background:getBgColor(type as string,plain as boolean),color:getColor(type as string,plain as boolean),boxShadow:shadow?getShadow(type as string,plain as boolean):'none' }"
+			]" :style="{ width: getWidth, height: getHeight, lineHeight: getHeight, 'font-size': fontSizeCss, background:getBgColor(type as string,plain as boolean),backgroundColor:getBgColor(type as string,plain as boolean),color:getColor(type as string,plain as boolean),boxShadow:shadow?getShadow(type as string,plain as boolean):'none' }"
 			:form-type="formType" :disabled="disabled" @tap="handleClick">
 			<view class="m-btn__inner" :style="{ 'font-size': fontSizeCss }">
 				<m-loading v-if="loading" text="" size="14rpx" :color="loadingSpinnerColor" />

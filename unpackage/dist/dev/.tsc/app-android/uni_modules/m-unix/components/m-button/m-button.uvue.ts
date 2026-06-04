@@ -333,7 +333,7 @@ const _component_m_loading = resolveEasyComponent("m-loading",_easycom_m_loading
 				_ctx.link ? 'm-btn__link' : '',
 				_ctx.loading ? 'm-btn--loading' : ''
 			]]),
-      style: _nS(_uM({ width: _ctx.getWidth, height: _ctx.getHeight, lineHeight: _ctx.getHeight, 'font-size': _ctx.fontSizeCss, background:_ctx.getBgColor(_ctx.type as string,_ctx.plain as boolean),color:_ctx.getColor(_ctx.type as string,_ctx.plain as boolean),boxShadow:_ctx.shadow?_ctx.getShadow(_ctx.type as string,_ctx.plain as boolean):'none' })),
+      style: _nS(_uM({ width: _ctx.getWidth, height: _ctx.getHeight, lineHeight: _ctx.getHeight, 'font-size': _ctx.fontSizeCss, background:_ctx.getBgColor(_ctx.type as string,_ctx.plain as boolean),backgroundColor:_ctx.getBgColor(_ctx.type as string,_ctx.plain as boolean),color:_ctx.getColor(_ctx.type as string,_ctx.plain as boolean),boxShadow:_ctx.shadow?_ctx.getShadow(_ctx.type as string,_ctx.plain as boolean):'none' })),
       "form-type": _ctx.formType,
       disabled: _ctx.disabled,
       onClick: _ctx.handleClick

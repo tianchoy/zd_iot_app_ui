@@ -28,10 +28,10 @@
 			<view
 				:class="mainDragClass"
 				:style="mainStyle"
-				@touchstart="onTouchStart"
-				@touchmove="onTouchMove"
-				@touchend="onTouchEnd"
-				@touchcancel="onTouchCancel"
+				@touchstart.stop="onTouchStart"
+				@touchmove.stop.prevent="onTouchMove"
+				@touchend.stop="onTouchEnd"
+				@touchcancel.stop="onTouchCancel"
 			>
 				<view class="m-fab__main-child" v-if="custom">
 					<slot></slot>

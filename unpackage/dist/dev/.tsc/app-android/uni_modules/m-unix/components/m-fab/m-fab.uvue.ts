@@ -494,10 +494,10 @@ const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
       _cE("view", _uM({
         class: _nC(_ctx.mainDragClass),
         style: _nS(_ctx.mainStyle),
-        onTouchstart: _ctx.onTouchStart,
-        onTouchmove: _ctx.onTouchMove,
-        onTouchend: _ctx.onTouchEnd,
-        onTouchcancel: _ctx.onTouchCancel
+        onTouchstart: withModifiers(_ctx.onTouchStart, ["stop"]),
+        onTouchmove: withModifiers(_ctx.onTouchMove, ["stop","prevent"]),
+        onTouchend: withModifiers(_ctx.onTouchEnd, ["stop"]),
+        onTouchcancel: withModifiers(_ctx.onTouchCancel, ["stop"])
       }), [
         isTrue(_ctx.custom)
           ? _cE("view", _uM({

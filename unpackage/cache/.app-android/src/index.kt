@@ -117,9 +117,9 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
     )
 }
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
-    val hosts: String = "127.0.0.1,192.168.3.229"
+    val hosts: String = "127.0.0.1,192.168.3.239"
     val port: String = "8090"
-    val id: String = "app-android_MxHEhy"
+    val id: String = "app-android_-rs7YV"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -1098,6 +1098,24 @@ val GenComponentsTopNavBarTopNavBarClass = CreateVueComponent(GenComponentsTopNa
     return GenComponentsTopNavBarTopNavBar(instance)
 }
 )
+val GenUniModulesMUnixComponentsMTagMTagClass = CreateVueComponent(GenUniModulesMUnixComponentsMTagMTag::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMTagMTag.name, inheritAttrs = GenUniModulesMUnixComponentsMTagMTag.inheritAttrs, inject = GenUniModulesMUnixComponentsMTagMTag.inject, props = GenUniModulesMUnixComponentsMTagMTag.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMTagMTag.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMTagMTag.emits, components = GenUniModulesMUnixComponentsMTagMTag.components, styles = GenUniModulesMUnixComponentsMTagMTag.styles)
+}
+, fun(instance, renderer): GenUniModulesMUnixComponentsMTagMTag {
+    return GenUniModulesMUnixComponentsMTagMTag(instance)
+}
+)
+enum class RunType__1(override val value: String) : UTSEnumString {
+    Android("android"),
+    IOS("ios"),
+    HarmonyOs("harmonyos"),
+    WxAppl("devtools"),
+    Windows("windows")
+}
+enum class StorageEnum__1(override val value: String) : UTSEnumString {
+    MEMBER_INFO_KEY("memberInfo"),
+    TOKEN_KEY("token")
+}
 open class R<T> (
     @JsonNotNull
     open var code: Number,
@@ -1123,17 +1141,6 @@ open class StoreMemberVo (
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
         return UTSSourceMapPosition("StoreMemberVo", "uni_modules/m-unix/components/m-tools/utype/type.uts", 29, 13)
     }
-}
-enum class RunType__1(override val value: String) : UTSEnumString {
-    Android("android"),
-    IOS("ios"),
-    HarmonyOs("harmonyos"),
-    WxAppl("devtools"),
-    Windows("windows")
-}
-enum class StorageEnum__1(override val value: String) : UTSEnumString {
-    MEMBER_INFO_KEY("memberInfo"),
-    TOKEN_KEY("token")
 }
 val CACHE_PREFIX = "app_cache_"
 open class CacheMeta (
@@ -1751,15 +1758,54 @@ fun <T> request(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
             if (showLoading) {
                 hideLoadingModal()
             }
-            val result = res.data as ApiResponse<T>
-            val code = result.code
+            val raw = res.data as UTSJSONObject
+            val rawCode = raw["code"]
+            var code: Number = 0
+            if (UTSAndroid.`typeof`(rawCode) === "number") {
+                code = rawCode as Number
+            } else if (rawCode != null) {
+                val parsedCode = parseInt("" + rawCode)
+                code = if (isNaN(parsedCode)) {
+                    0
+                } else {
+                    parsedCode
+                }
+            }
+            val rawMsg = raw["msg"] ?: raw["message"]
+            val result = ApiResponse(code = code, msg = if (rawMsg == null) {
+                ""
+            } else {
+                "" + rawMsg
+            }
+            , data = raw["data"] as T)
             val msg = result.msg
-            val resData = result.data
-            if (finalSuccessCodes.indexOf(code) >= 0) {
+            var isSuccessCode = false
+            run {
+                var i: Number = 0
+                while(i < finalSuccessCodes.length){
+                    if (("" + finalSuccessCodes[i]) == ("" + code)) {
+                        isSuccessCode = true
+                        break
+                    }
+                    i++
+                }
+            }
+            if (isSuccessCode) {
                 resolve(result)
                 return
             }
-            if (finalUnauthorizedCodes.indexOf(code) >= 0) {
+            var isUnauthorizedCode = false
+            run {
+                var i: Number = 0
+                while(i < finalUnauthorizedCodes.length){
+                    if (("" + finalUnauthorizedCodes[i]) == ("" + code)) {
+                        isUnauthorizedCode = true
+                        break
+                    }
+                    i++
+                }
+            }
+            if (isUnauthorizedCode) {
                 if (redirectOnUnauthorized) {
                     navigateToLogin(finalLoginPage)
                 }
@@ -1821,7 +1867,7 @@ fun <T> loadingRequest(options: RequestOptions__1, loadingText: String?): UTSPro
     }
     return request<T>(requestOptions)
 }
-val http: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("http", "uni_modules/m-unix/components/m-tools/Request.uts", 312, 14), "get" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
+val http: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("http", "uni_modules/m-unix/components/m-tools/Request.uts", 341, 14), "get" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
     return get<Any>(url, data, options)
 }
 , "post" to fun(url: String, data: UTSJSONObject?, options: RequestOptions__1?): UTSPromise<ApiResponse<Any>> {
@@ -2769,27 +2815,6 @@ val tools: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("t
     return useAuth()
 }
 )
-val GenUniModulesMUnixComponentsMLoadingMLoadingClass = CreateVueComponent(GenUniModulesMUnixComponentsMLoadingMLoading::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMLoadingMLoading.name, inheritAttrs = GenUniModulesMUnixComponentsMLoadingMLoading.inheritAttrs, inject = GenUniModulesMUnixComponentsMLoadingMLoading.inject, props = GenUniModulesMUnixComponentsMLoadingMLoading.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMLoadingMLoading.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMLoadingMLoading.emits, components = GenUniModulesMUnixComponentsMLoadingMLoading.components, styles = GenUniModulesMUnixComponentsMLoadingMLoading.styles)
-}
-, fun(instance, renderer): GenUniModulesMUnixComponentsMLoadingMLoading {
-    return GenUniModulesMUnixComponentsMLoadingMLoading(instance)
-}
-)
-val GenUniModulesMUnixComponentsMButtonMButtonClass = CreateVueComponent(GenUniModulesMUnixComponentsMButtonMButton::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMButtonMButton.name, inheritAttrs = GenUniModulesMUnixComponentsMButtonMButton.inheritAttrs, inject = GenUniModulesMUnixComponentsMButtonMButton.inject, props = GenUniModulesMUnixComponentsMButtonMButton.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMButtonMButton.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMButtonMButton.emits, components = GenUniModulesMUnixComponentsMButtonMButton.components, styles = GenUniModulesMUnixComponentsMButtonMButton.styles)
-}
-, fun(instance, renderer): GenUniModulesMUnixComponentsMButtonMButton {
-    return GenUniModulesMUnixComponentsMButtonMButton(instance)
-}
-)
-val GenUniModulesMUnixComponentsMTagMTagClass = CreateVueComponent(GenUniModulesMUnixComponentsMTagMTag::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMTagMTag.name, inheritAttrs = GenUniModulesMUnixComponentsMTagMTag.inheritAttrs, inject = GenUniModulesMUnixComponentsMTagMTag.inject, props = GenUniModulesMUnixComponentsMTagMTag.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMTagMTag.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMTagMTag.emits, components = GenUniModulesMUnixComponentsMTagMTag.components, styles = GenUniModulesMUnixComponentsMTagMTag.styles)
-}
-, fun(instance, renderer): GenUniModulesMUnixComponentsMTagMTag {
-    return GenUniModulesMUnixComponentsMTagMTag(instance)
-}
-)
 val GenUniModulesMUnixComponentsMDivMDivClass = CreateVueComponent(GenUniModulesMUnixComponentsMDivMDiv::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMDivMDiv.name, inheritAttrs = GenUniModulesMUnixComponentsMDivMDiv.inheritAttrs, inject = GenUniModulesMUnixComponentsMDivMDiv.inject, props = GenUniModulesMUnixComponentsMDivMDiv.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMDivMDiv.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMDivMDiv.emits, components = GenUniModulesMUnixComponentsMDivMDiv.components, styles = GenUniModulesMUnixComponentsMDivMDiv.styles)
 }
@@ -2898,6 +2923,20 @@ val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java,
 }
 , fun(instance, renderer): GenPagesIndexIndex {
     return GenPagesIndexIndex(instance, renderer)
+}
+)
+val GenUniModulesMUnixComponentsMLoadingMLoadingClass = CreateVueComponent(GenUniModulesMUnixComponentsMLoadingMLoading::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMLoadingMLoading.name, inheritAttrs = GenUniModulesMUnixComponentsMLoadingMLoading.inheritAttrs, inject = GenUniModulesMUnixComponentsMLoadingMLoading.inject, props = GenUniModulesMUnixComponentsMLoadingMLoading.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMLoadingMLoading.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMLoadingMLoading.emits, components = GenUniModulesMUnixComponentsMLoadingMLoading.components, styles = GenUniModulesMUnixComponentsMLoadingMLoading.styles)
+}
+, fun(instance, renderer): GenUniModulesMUnixComponentsMLoadingMLoading {
+    return GenUniModulesMUnixComponentsMLoadingMLoading(instance)
+}
+)
+val GenUniModulesMUnixComponentsMButtonMButtonClass = CreateVueComponent(GenUniModulesMUnixComponentsMButtonMButton::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMButtonMButton.name, inheritAttrs = GenUniModulesMUnixComponentsMButtonMButton.inheritAttrs, inject = GenUniModulesMUnixComponentsMButtonMButton.inject, props = GenUniModulesMUnixComponentsMButtonMButton.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMButtonMButton.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMButtonMButton.emits, components = GenUniModulesMUnixComponentsMButtonMButton.components, styles = GenUniModulesMUnixComponentsMButtonMButton.styles)
+}
+, fun(instance, renderer): GenUniModulesMUnixComponentsMButtonMButton {
+    return GenUniModulesMUnixComponentsMButtonMButton(instance)
 }
 )
 val GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControlClass = CreateVueComponent(GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl::class.java, fun(): VueComponentOptions {

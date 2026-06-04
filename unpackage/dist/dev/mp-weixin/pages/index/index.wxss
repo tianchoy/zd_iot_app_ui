@@ -73,6 +73,7 @@ page .card-info .persion-card .persion-card-item-content.data-v-00a60067 {
   font-size: 40rpx;
   font-weight: 800;
   line-height: 1;
+  color: #ffffff;
 }
 page .card-box.data-v-00a60067 {
   display: flex;
@@ -112,6 +113,31 @@ page .card-box .search-value .search-input.data-v-00a60067 {
 }
 page .card-box .search-value .scan-btn.data-v-00a60067 {
   border-left: 1px solid #eef2f7;
+}
+page .card-box .search-value .android-scan-btn.data-v-00a60067 {
+  width: 90rpx;
+  height: 95rpx;
+  border-left: 1px solid #eef2f7;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+page .card-box .search-value .android-query-btn.data-v-00a60067 {
+  width: 120rpx;
+  height: 95rpx;
+  border-radius: 0 24rpx 24rpx 0;
+  background-color: #5677fc;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+page .card-box .search-value .android-btn-text.data-v-00a60067 {
+  font-size: 30rpx;
+  color: #ffffff;
+  font-weight: 500;
 }
 page .card-box .card-item.data-v-00a60067 {
   display: flex;

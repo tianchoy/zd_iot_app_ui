@@ -319,37 +319,38 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     h: $options.getHeight,
     i: $options.fontSizeCss,
     j: $options.getBgColor($props.type, $props.plain),
-    k: $options.getColor($props.type, $props.plain),
-    l: $props.shadow ? $options.getShadow($props.type, $props.plain) : "none",
-    m: $props.loading,
-    n: $props.formType,
-    o: $props.openType,
-    p: $props.appParameter,
-    q: common_vendor.o((...args) => $options.bindgetuserinfo && $options.bindgetuserinfo(...args), "45"),
-    r: common_vendor.o((...args) => $options.bindgetphonenumber && $options.bindgetphonenumber(...args), "3c"),
-    s: common_vendor.o((...args) => $options.bindcontact && $options.bindcontact(...args), "1a"),
-    t: common_vendor.o((...args) => $options.binderror && $options.binderror(...args), "94"),
-    v: common_vendor.o((...args) => $options.bindchooseavatar && $options.bindchooseavatar(...args), "ea"),
-    w: common_vendor.o((...args) => $options.bindlaunchapp && $options.bindlaunchapp(...args), "13"),
-    x: $props.disabled,
-    y: common_vendor.o((...args) => $options.handleClick && $options.handleClick(...args), "8c"),
-    z: !$props.link && $props.plain
+    k: $options.getBgColor($props.type, $props.plain),
+    l: $options.getColor($props.type, $props.plain),
+    m: $props.shadow ? $options.getShadow($props.type, $props.plain) : "none",
+    n: $props.loading,
+    o: $props.formType,
+    p: $props.openType,
+    q: $props.appParameter,
+    r: common_vendor.o((...args) => $options.bindgetuserinfo && $options.bindgetuserinfo(...args), "3c"),
+    s: common_vendor.o((...args) => $options.bindgetphonenumber && $options.bindgetphonenumber(...args), "a8"),
+    t: common_vendor.o((...args) => $options.bindcontact && $options.bindcontact(...args), "44"),
+    v: common_vendor.o((...args) => $options.binderror && $options.binderror(...args), "b6"),
+    w: common_vendor.o((...args) => $options.bindchooseavatar && $options.bindchooseavatar(...args), "99"),
+    x: common_vendor.o((...args) => $options.bindlaunchapp && $options.bindlaunchapp(...args), "e1"),
+    y: $props.disabled,
+    z: common_vendor.o((...args) => $options.handleClick && $options.handleClick(...args), "fb"),
+    A: !$props.link && $props.plain
   }, !$props.link && $props.plain ? {
-    A: common_vendor.n($options.getShapeClass($props.shape, $props.plain)),
-    B: common_vendor.n($options.getDisabledClass($props.disabled, $props.type, $props.plain)),
-    C: $options.getBgColor($props.type, $props.plain)
+    B: common_vendor.n($options.getShapeClass($props.shape, $props.plain)),
+    C: common_vendor.n($options.getDisabledClass($props.disabled, $props.type, $props.plain)),
+    D: $options.getBgColor($props.type, $props.plain)
   } : {}, {
-    D: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    E: common_vendor.n(($props.width === "100%" || !$props.width || $props.width === true) && (!$props.btnSize || $props.btnSize === true) ? "m-btn__flex-1" : ""),
-    F: common_vendor.n($options.getShapeClass($props.shape, $props.plain)),
-    G: common_vendor.n(!$props.disabled ? "m-button__hover" : ""),
-    H: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
-    I: common_vendor.s({
+    E: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+    F: common_vendor.n(($props.width === "100%" || !$props.width || $props.width === true) && (!$props.btnSize || $props.btnSize === true) ? "m-btn__flex-1" : ""),
+    G: common_vendor.n($options.getShapeClass($props.shape, $props.plain)),
+    H: common_vendor.n(!$props.disabled ? "m-button__hover" : ""),
+    I: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    J: common_vendor.s({
       width: $options.getWidth,
       height: $options.getHeight,
       margin: $props.margin
     }),
-    J: common_vendor.s({
+    K: common_vendor.s({
       "--status-bar-height": `${_ctx.u_s_b_h}px`,
       "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
     })
