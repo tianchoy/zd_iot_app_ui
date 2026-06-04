@@ -9,7 +9,9 @@ class LoginData extends common_vendor.UTS.UTSType {
       kind: 2,
       get fields() {
         return {
+          id: { type: Number, optional: false },
           token: { type: String, optional: false },
+          access_token: { type: String, optional: false },
           refreshToken: { type: String, optional: false },
           userId: { type: Number, optional: false },
           nickname: { type: String, optional: false }
@@ -21,7 +23,9 @@ class LoginData extends common_vendor.UTS.UTSType {
   constructor(options, metadata = LoginData.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.id = this.__props__.id;
     this.token = this.__props__.token;
+    this.access_token = this.__props__.access_token;
     this.refreshToken = this.__props__.refreshToken;
     this.userId = this.__props__.userId;
     this.nickname = this.__props__.nickname;

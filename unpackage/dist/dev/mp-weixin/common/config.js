@@ -137,32 +137,38 @@ const API_CONFIG = new common_vendor.UTSJSONObject({
   })
 });
 const currentConfig = API_CONFIG[ENV];
-const config = new ProjectConfig({
-  baseUrl: currentConfig["baseUrl"],
-  timeout: currentConfig["timeout"],
-  env: ENV,
-  api: new ApiPaths({
-    auth: new AuthApiPaths({
-      tenantId: "000000",
-      clientId: "12353d4772a25656d6d2a67d53353cc3",
-      grantType: "xcx"
-    })
-  }),
-  storage: new StorageKeys({
-    token: "access_token",
-    refreshToken: "refresh_token"
-  }),
-  configInfo: new ConfigInfo({
-    logo: null,
-    desc: null,
-    name: "中导云卡",
-    versionCode: 1,
-    versionName: "1.0.0",
-    appId: "your-app-id"
-  }),
-  loginPagePath: "",
-  loginRequiredPaths: []
-});
+const config = new ProjectConfig(
+  {
+    baseUrl: currentConfig["baseUrl"],
+    timeout: currentConfig["timeout"],
+    env: ENV,
+    api: new ApiPaths({
+      auth: new AuthApiPaths({
+        tenantId: "000000",
+        clientId: "12353d4772a25656d6d2a67d53353cc3",
+        grantType: "xcx"
+      })
+    }),
+    storage: new StorageKeys({
+      token: "access_token",
+      refreshToken: "refresh_token"
+    }),
+    configInfo: new ConfigInfo({
+      logo: null,
+      desc: null,
+      name: "中导云卡",
+      versionCode: 1,
+      versionName: "1.0.0",
+      appId: "your-app-id"
+    }),
+    loginPagePath: "",
+    loginRequiredPaths: []
+  }
+  //获取租户ID
+);
+function getTenantId() {
+  return config.api.auth.tenantId;
+}
 function getToken() {
   const token = common_vendor.index.getStorageSync(config.storage.token);
   if (token == null) {
@@ -170,14 +176,18 @@ function getToken() {
   }
   return token;
 }
+function setToken(token, refreshToken = "") {
+  common_vendor.index.setStorageSync(config.storage.token, token);
+  if (refreshToken.length > 0) {
+    common_vendor.index.setStorageSync(config.storage.refreshToken, refreshToken);
+  }
+}
 function setStorageSync(key, value = null) {
   common_vendor.index.setStorageSync(key, value);
 }
-function getStorageSync(key) {
-  return common_vendor.index.getStorageSync(key);
-}
 exports.config = config;
-exports.getStorageSync = getStorageSync;
+exports.getTenantId = getTenantId;
 exports.getToken = getToken;
 exports.setStorageSync = setStorageSync;
+exports.setToken = setToken;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/config.js.map

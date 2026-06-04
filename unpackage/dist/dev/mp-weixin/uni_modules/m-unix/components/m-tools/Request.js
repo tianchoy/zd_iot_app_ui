@@ -30,7 +30,6 @@ class ApiResponse extends common_vendor.UTS.UTSType {
 }
 const systemInfo = common_vendor.index.getSystemInfoSync();
 const DEFAULT_LANGUAGE = ((_a = systemInfo.language) !== null && _a !== void 0 ? _a : "zh_CN").replace("-", "_");
-common_vendor.index.__f__("log", "at uni_modules/m-unix/components/m-tools/Request.uts:25", "DEFAULT_LANGUAGE", DEFAULT_LANGUAGE);
 class RequestOptions extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -219,7 +218,8 @@ function request(options) {
     {
       "Content-Type": "application/json",
       "Accept": "application/json",
-      "Content-Language": DEFAULT_LANGUAGE
+      "Content-Language": DEFAULT_LANGUAGE,
+      "clientId": common_config.config.api.auth.clientId
     }
     // 添加 Token
   );

@@ -14,6 +14,7 @@ import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
 import io.dcloud.uniapp.extapi.`$off` as uni__off
 import io.dcloud.uniapp.extapi.`$on` as uni__on
+import io.dcloud.uniapp.extapi.login as uni_login
 import io.dcloud.uniapp.extapi.navigateTo as uni_navigateTo
 import io.dcloud.uniapp.extapi.reLaunch as uni_reLaunch
 import io.dcloud.uniapp.extapi.showToast as uni_showToast
@@ -28,8 +29,9 @@ open class GenPagesIndexIndex : BasePage {
             val title = ref("Hello")
             val show = ref(false)
             val card_number = ref("1064916585160")
+            val wxGetPhoneLogin = ref("")
             val goRecharge = fun(){
-                console.log("去充值", " at pages/index/index.uvue:88")
+                console.log("去充值", " at pages/index/index.uvue:89")
                 uni_navigateTo(NavigateToOptions(url = "/pages/recharge/recharge"))
             }
             val scanCode = fun(){
@@ -40,7 +42,7 @@ open class GenPagesIndexIndex : BasePage {
                     uni_showToast(ShowToastOptions(title = "请输入卡号", icon = "none"))
                     return
                 }
-                console.log("查询卡号:", card_number.value, " at pages/index/index.uvue:108")
+                console.log("查询卡号:", card_number.value, " at pages/index/index.uvue:109")
                 uni_navigateTo(NavigateToOptions(url = "/pages/login/login"))
             }
             val onScanResult = fun(data: UTSJSONObject){
@@ -51,29 +53,47 @@ open class GenPagesIndexIndex : BasePage {
                 }
             }
             val cardType = fun(type: Number){
-                console.log(type, " at pages/index/index.uvue:131")
+                console.log(type, " at pages/index/index.uvue:132")
                 uni_reLaunch(ReLaunchOptions(url = "/pages/card/card?type=" + type))
             }
             val handleClick = fun(){
-                console.log("联系客服1111", " at pages/index/index.uvue:139")
+                console.log("联系客服1111", " at pages/index/index.uvue:140")
+            }
+            val userId = ref<String>("")
+            val userLoginByOpenid = fun(codes: String): UTSPromise<Unit> {
+                return wrapUTSPromise(suspend {
+                        val res = await(login(_uO("xcxCode" to codes, "isLogin" to "1")))
+                        if (res.code == 200) {
+                            userId.value = "" + res.data.id
+                            uni_navigateTo(NavigateToOptions(url = "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value))
+                        }
+                })
+            }
+            val code = ref<String>("")
+            val getCode = fun(){
+                uni_login(LoginOptions(success = fun(res){
+                    code.value = res.code
+                    userLoginByOpenid(res.code)
+                }
+                ))
             }
             val getTenantInfos = fun(): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        val res = await(getTenantInfo(config.api.auth.tenantId, false))
+                        val res = await(getTenantInfo(getTenantId(), false))
                         if (res.code == 200) {
                             val tenantInfo = res.data
-                            val wxGetPhoneLogin = "" + tenantInfo.wxGetPhoneLogin
+                            wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin
                             setStorageSync("tenant_infos", tenantInfo)
-                            if (wxGetPhoneLogin == "0") {
-                                uni_navigateTo(NavigateToOptions(url = "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin))
-                            }
                         }
                 })
             }
             onLoad(fun(_options){
-                val token = getStorageSync("token")
+                val token = getToken()
                 if (!(token != "")) {
-                    getTenantInfos()
+                    getTenantInfos().then(fun(){
+                        getCode()
+                    }
+                    )
                 }
                 uni__on("scanResult", onScanResult)
             }

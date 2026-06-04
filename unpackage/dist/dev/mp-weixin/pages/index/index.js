@@ -26,8 +26,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const title = common_vendor.ref("Hello");
     common_vendor.ref(false);
     const card_number = common_vendor.ref("1064916585160");
+    const wxGetPhoneLogin = common_vendor.ref("");
     const goRecharge = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:88", "去充值");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:89", "去充值");
       common_vendor.index.navigateTo({
         url: "/pages/recharge/recharge"
       });
@@ -45,7 +46,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:108", "查询卡号:", card_number.value);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:109", "查询卡号:", card_number.value);
       common_vendor.index.navigateTo({
         url: "/pages/login/login"
       });
@@ -62,33 +63,54 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const cardType = (type) => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:131", type);
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:132", type);
       common_vendor.index.reLaunch({
         url: "/pages/card/card?type=" + type
       });
     };
     const handleClick = () => {
-      common_vendor.index.__f__("log", "at pages/index/index.uvue:139", "联系客服1111");
+      common_vendor.index.__f__("log", "at pages/index/index.uvue:140", "联系客服1111");
+    };
+    const userId = common_vendor.ref("");
+    const userLoginByOpenid = (codes) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_http.login(new common_vendor.UTSJSONObject({
+          xcxCode: codes,
+          isLogin: "1"
+        }));
+        if (res.code == 200) {
+          userId.value = "" + res.data.id;
+          common_vendor.index.navigateTo({
+            url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value
+          });
+        }
+      });
+    };
+    const code = common_vendor.ref("");
+    const getCode = () => {
+      common_vendor.index.login(new common_vendor.UTSJSONObject({
+        success: (res) => {
+          code.value = res.code;
+          userLoginByOpenid(res.code);
+        }
+      }));
     };
     const getTenantInfos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_http.getTenantInfo(common_config.config.api.auth.tenantId, false);
+        const res = yield api_http.getTenantInfo(common_config.getTenantId(), false);
         if (res.code == 200) {
           const tenantInfo = res.data;
-          const wxGetPhoneLogin = "" + tenantInfo.wxGetPhoneLogin;
+          wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
           common_config.setStorageSync("tenant_infos", tenantInfo);
-          if (wxGetPhoneLogin == "0") {
-            common_vendor.index.navigateTo({
-              url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin
-            });
-          }
         }
       });
     };
     common_vendor.onLoad(() => {
-      const token = common_config.getStorageSync("token");
+      const token = common_config.getToken();
       if (!token) {
-        getTenantInfos();
+        getTenantInfos().then(() => {
+          getCode();
+        });
       }
       common_vendor.index.$on("scanResult", onScanResult);
     });

@@ -1,5 +1,6 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
 import {login} from '@/api/http.uts'
+	import {setToken} from '@/common/config.uts'
 	
 const __sfc__ = defineComponent({
   __name: 'login',
@@ -8,36 +9,36 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const wxGetPhoneLogin = ref('')
-	const handleGetPhoneNumber = (res: UTSJSONObject) => {
-		console.log('获取手机号:', res, " at pages/login/login.uvue:24")
-	}
+	const wxGetPhoneLogin = ref<string>('')
+	const userId = ref<string>('')
 
-	//登录
-	const userLoginByOpenid = async (codes: string) => {
+	const getLogin = async (code: string) => {
 		const res = await login({
-			xcxCode: codes,
-			isLogin: '1',
+			xcxCode: code,
+			userId: userId.value,
+			isLogin: wxGetPhoneLogin.value,
 		})
-		console.log('登录:', res, " at pages/login/login.uvue:33")
+		if(res.code == 200){
+			console.log('登录成功:', res.data.access_token, " at pages/login/login.uvue:33")
+			setToken(res.data.access_token, res.data.refreshToken)
+			uni.navigateBack({
+				delta: 1,
+			})
+		}
 	}
 
-	//获取 code
-	const code = ref<string>('')
-	const getCode = () => {
-		uni.login({
-			success: (res) => {
-				code.value = res.code
-				userLoginByOpenid(res.code);
-			}
-		})
+	const handleGetPhoneNumber =  (res: UTSJSONObject) => {
+		const detail = res['detail'] as UTSJSONObject
+		getLogin(detail['code'] as string)
 	}
-	onLoad((options) => {
-		console.log(options, " at pages/login/login.uvue:47")
+
+
+	onLoad((options: OnLoadOptions) => {
+		console.log('登录参数:', options, " at pages/login/login.uvue:48")
 		if(options['wxGetPhoneLogin'] != null){
 			wxGetPhoneLogin.value = options['wxGetPhoneLogin'] as string
+			userId.value = options['userId'] as string
 		}
-		getCode();
 	})
 
 return (): any | null => {

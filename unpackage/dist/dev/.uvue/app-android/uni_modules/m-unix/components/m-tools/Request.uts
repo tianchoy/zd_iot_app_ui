@@ -17,7 +17,6 @@ export type ApiResponse<T = any> = {
 };
 const systemInfo = uni.getSystemInfoSync();
 const DEFAULT_LANGUAGE = (systemInfo.language ?? 'zh_CN').replace('-', '_') as string;
-__f__('log', 'at uni_modules/m-unix/components/m-tools/Request.uts:25', 'DEFAULT_LANGUAGE', DEFAULT_LANGUAGE);
 /** 请求配置选项 */
 export type RequestOptions = {
     /** 请求地址（相对路径或完整URL） */
@@ -187,7 +186,8 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
     const reqHeader: UTSJSONObject = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Content-Language': DEFAULT_LANGUAGE
+        'Content-Language': DEFAULT_LANGUAGE,
+        'clientId': config.api.auth.clientId,
     };
     // 添加 Token
     if (withToken) {

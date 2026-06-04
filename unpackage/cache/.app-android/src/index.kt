@@ -119,7 +119,7 @@ fun tryConnectSocket(host: String, port: String, id: String): UTSPromise<SocketT
 fun initRuntimeSocketService(): UTSPromise<Boolean> {
     val hosts: String = "127.0.0.1,192.168.3.229"
     val port: String = "8090"
-    val id: String = "app-android_LP9ISa"
+    val id: String = "app-android_MxHEhy"
     if (hosts == "" || port == "" || id == "") {
         return UTSPromise.resolve(false)
     }
@@ -210,6 +210,9 @@ val ENV = "dev"
 val API_CONFIG: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("API_CONFIG", "common/config.uts", 36, 7), "dev" to _uO("baseUrl" to "http://192.168.3.7:8081", "timeout" to 30000), "prod" to _uO("baseUrl" to "https://cmpapp.zdiot.cn/prod-api", "timeout" to 30000))
 val currentConfig = API_CONFIG[ENV] as UTSJSONObject
 val config = ProjectConfig(baseUrl = currentConfig["baseUrl"] as String, timeout = currentConfig["timeout"] as Number, env = ENV, api = ApiPaths(auth = AuthApiPaths(tenantId = "000000", clientId = "12353d4772a25656d6d2a67d53353cc3", grantType = "xcx")), storage = StorageKeys(token = "access_token", refreshToken = "refresh_token"), configInfo = ConfigInfo(name = "中导云卡", versionCode = 1, versionName = "1.0.0", appId = "your-app-id"), loginPagePath = "", loginRequiredPaths = _uA())
+fun getTenantId(): String {
+    return config.api.auth.tenantId
+}
 fun getToken(): String {
     val token = uni_getStorageSync(config.storage.token)
     if (token == null) {
@@ -217,11 +220,14 @@ fun getToken(): String {
     }
     return token as String
 }
+fun setToken(token: String, refreshToken: String = "") {
+    uni_setStorageSync(config.storage.token, token)
+    if (refreshToken.length > 0) {
+        uni_setStorageSync(config.storage.refreshToken, refreshToken)
+    }
+}
 fun setStorageSync(key: String, value: Any) {
     uni_setStorageSync(key, value)
-}
-fun getStorageSync(key: String): String {
-    return uni_getStorageSync(key) as String
 }
 open class HostStorageConfig (
     @JsonNotNull
@@ -1542,9 +1548,6 @@ open class ApiResponse<T> (
 }
 val systemInfo = uni_getSystemInfoSync()
 val DEFAULT_LANGUAGE = (systemInfo.language ?: "zh_CN").replace("-", "_") as String
-val runBlock5 = run {
-    console.log("DEFAULT_LANGUAGE", DEFAULT_LANGUAGE, " at uni_modules/m-unix/components/m-tools/Request.uts:25")
-}
 open class RequestOptions__1 (
     @JsonNotNull
     open var url: String,
@@ -1564,7 +1567,7 @@ open class RequestOptions__1 (
     open var onErrorCode: ((response: ApiResponse<Any>) -> Unit)? = null,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("RequestOptions", "uni_modules/m-unix/components/m-tools/Request.uts", 22, 13)
+        return UTSSourceMapPosition("RequestOptions", "uni_modules/m-unix/components/m-tools/Request.uts", 21, 13)
     }
 }
 val DEFAULT_TIMEOUT: Number = 30000
@@ -1593,7 +1596,7 @@ fun buildQueryString(data: UTSJSONObject): String {
     for(key in resolveUTSKeyIterator(data)){
         val value = data.getString(key)
         if (value != null && value.length > 0) {
-            parts.push(key + "=" + UTSAndroid.consoleDebugError(encodeURIComponent(value), " at uni_modules/m-unix/components/m-tools/Request.uts:83"))
+            parts.push(key + "=" + UTSAndroid.consoleDebugError(encodeURIComponent(value), " at uni_modules/m-unix/components/m-tools/Request.uts:82"))
         }
     }
     return if (parts.length > 0) {
@@ -1727,7 +1730,7 @@ fun <T> request(options: RequestOptions__1): UTSPromise<ApiResponse<T>> {
         fullUrl += buildQueryString(data)
         requestData = _uO()
     }
-    val reqHeader: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("reqHeader", "uni_modules/m-unix/components/m-tools/Request.uts", 187, 11), "Content-Type" to "application/json", "Accept" to "application/json", "Content-Language" to DEFAULT_LANGUAGE)
+    val reqHeader: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("reqHeader", "uni_modules/m-unix/components/m-tools/Request.uts", 186, 11), "Content-Type" to "application/json", "Accept" to "application/json", "Content-Language" to DEFAULT_LANGUAGE, "clientId" to config.api.auth.clientId)
     if (withToken) {
         val token = getToken()
         if (token != "") {
@@ -2823,7 +2826,11 @@ val GenComponentsCustomServiceCustomServiceClass = CreateVueComponent(GenCompone
 val ApiUrl: UTSJSONObject = _uO("__\$originalPosition" to UTSSourceMapPosition("ApiUrl", "api/url.uts", 1, 14), "getTenantPageConfigXcx" to "/system/tenantPageConfig/getTenantPageConfigXcx", "getTenantPageConfigH" to "/system/tenantPageConfig/getTenantPageConfigH", "login" to "/auth/login", "card_detail" to "/app/card/info/", "countries" to "/app/card/getH5CountryList", "addOrder" to "/order/pkgOrder", "queryOrder" to "/order/pkgOrder/", "goPay" to "/pay/order/goPayment", "queryBySuccessId" to "/order/pkgOrder/success/", "queryPkgInfoList" to "/card/pkgInfo/list", "queryPkgInfoDetail" to "/card/pkgInfo/info/", "queryOrderList" to "/order/pkgOrder/list", "queryOrderPackInfo" to "/order/pkgOrder/getOrderPackInfo/")
 open class LoginData (
     @JsonNotNull
+    open var id: Number,
+    @JsonNotNull
     open var token: String,
+    @JsonNotNull
+    open var access_token: String,
     @JsonNotNull
     open var refreshToken: String,
     @JsonNotNull
@@ -2842,7 +2849,7 @@ open class CountryData (
     open var letterCode: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("CountryData", "api/http.uts", 12, 13)
+        return UTSSourceMapPosition("CountryData", "api/http.uts", 14, 13)
     }
 }
 open class TenantInfoData (
@@ -2870,7 +2877,7 @@ open class TenantInfoData (
     open var serviceJumpUrl: String,
 ) : UTSObject(), IUTSSourceMap {
     override fun `__$getOriginalPosition`(): UTSSourceMapPosition? {
-        return UTSSourceMapPosition("TenantInfoData", "api/http.uts", 16, 13)
+        return UTSSourceMapPosition("TenantInfoData", "api/http.uts", 18, 13)
     }
 }
 fun getCountryList(withToken: Boolean = false): UTSPromise<ApiResponse<UTSArray<CountryData>>> {

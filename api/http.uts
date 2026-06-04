@@ -6,7 +6,9 @@ import { config } from '@/common/config.uts'
 
 
 export type LoginData = {
+  id: number
   token: string
+  access_token: string
   refreshToken: string
   userId: number
   nickname: string

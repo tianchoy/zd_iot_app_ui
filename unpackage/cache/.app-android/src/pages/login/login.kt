@@ -12,7 +12,7 @@ import io.dcloud.uts.Map
 import io.dcloud.uts.Set
 import io.dcloud.uts.UTSAndroid
 import kotlin.properties.Delegates
-import io.dcloud.uniapp.extapi.login as uni_login
+import io.dcloud.uniapp.extapi.navigateBack as uni_navigateBack
 open class GenPagesLoginLogin : BasePage {
     constructor(__ins: ComponentInternalInstance, __renderer: String?) : super(__ins, __renderer) {}
     companion object {
@@ -21,30 +21,28 @@ open class GenPagesLoginLogin : BasePage {
             val __ins = getCurrentInstance()!!
             val _ctx = __ins.proxy as GenPagesLoginLogin
             val _cache = __ins.renderCache
-            val wxGetPhoneLogin = ref("")
-            val handleGetPhoneNumber = fun(res: UTSJSONObject){
-                console.log("获取手机号:", res, " at pages/login/login.uvue:24")
-            }
-            val userLoginByOpenid = fun(codes: String): UTSPromise<Unit> {
+            val wxGetPhoneLogin = ref<String>("")
+            val userId = ref<String>("")
+            val getLogin = fun(code: String): UTSPromise<Unit> {
                 return wrapUTSPromise(suspend {
-                        val res = await(login(_uO("xcxCode" to codes, "isLogin" to "1")))
-                        console.log("登录:", res, " at pages/login/login.uvue:33")
+                        val res = await(login(_uO("xcxCode" to code, "userId" to userId.value, "isLogin" to wxGetPhoneLogin.value)))
+                        if (res.code == 200) {
+                            console.log("登录成功:", res.data.access_token, " at pages/login/login.uvue:33")
+                            setToken(res.data.access_token, res.data.refreshToken)
+                            uni_navigateBack(NavigateBackOptions(delta = 1))
+                        }
                 })
             }
-            val code = ref<String>("")
-            val getCode = fun(){
-                uni_login(LoginOptions(success = fun(res){
-                    code.value = res.code
-                    userLoginByOpenid(res.code)
-                }
-                ))
+            val handleGetPhoneNumber = fun(res: UTSJSONObject){
+                val detail = res["detail"] as UTSJSONObject
+                getLogin(detail["code"] as String)
             }
-            onLoad(fun(options){
-                console.log(options, " at pages/login/login.uvue:47")
+            onLoad(fun(options: OnLoadOptions){
+                console.log("登录参数:", options, " at pages/login/login.uvue:48")
                 if (options["wxGetPhoneLogin"] != null) {
                     wxGetPhoneLogin.value = options["wxGetPhoneLogin"] as String
+                    userId.value = options["userId"] as String
                 }
-                getCode()
             }
             )
             return fun(): Any? {

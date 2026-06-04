@@ -82,7 +82,12 @@ export const config: ProjectConfig = {
   loginRequiredPaths: []
 }
 
+//获取租户ID
+export function getTenantId(): string {
+  return config.api.auth.tenantId
+}
 
+// 获取当前登录用户的 token
 export function getToken(): string {
   const token = uni.getStorageSync(config.storage.token)
   if (token == null) {
@@ -91,6 +96,7 @@ export function getToken(): string {
   return token as string
 }
 
+// 设置当前登录用户的 token
 export function setToken(token: string, refreshToken: string = '') {
   uni.setStorageSync(config.storage.token, token)
   if (refreshToken.length > 0) {
@@ -98,6 +104,7 @@ export function setToken(token: string, refreshToken: string = '') {
   }
 }
 
+// 清除当前登录用户的 token
 export function clearToken() {
   uni.removeStorageSync(config.storage.token)
   uni.removeStorageSync(config.storage.refreshToken)

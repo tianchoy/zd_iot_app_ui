@@ -5,8 +5,8 @@ import _easycom_m_tag from '@/uni_modules/m-unix/components/m-tag/m-tag.uvue'
 import _easycom_m_div from '@/uni_modules/m-unix/components/m-div/m-div.uvue'
 import _easycom_customService from '@/components/customService/customService.uvue'
 import { ref, onMounted, onUnmounted } from 'vue'
-	import { setStorageSync,config,getStorageSync } from '@/common/config.uts'
-	import { card_detail,getTenantInfo } from '@/api/http.uts'
+	import { setStorageSync,getTenantId,getToken } from '@/common/config.uts'
+	import { login,card_detail,getTenantInfo } from '@/api/http.uts'
 	
 	
 const __sfc__ = defineComponent({
@@ -19,9 +19,10 @@ const _cache = __ins.renderCache;
 	const title = ref('Hello')
 	const show = ref(false)
 	const card_number = ref('1064916585160')
+	const wxGetPhoneLogin = ref('')
 
 	const goRecharge = () => {
-		console.log('去充值', " at pages/index/index.uvue:88")
+		console.log('去充值', " at pages/index/index.uvue:89")
 		uni.navigateTo({
 			url: '/pages/recharge/recharge'
 		})
@@ -41,7 +42,7 @@ const _cache = __ins.renderCache;
 			})
 			return
 		}
-		console.log('查询卡号:', card_number.value, " at pages/index/index.uvue:108")
+		console.log('查询卡号:', card_number.value, " at pages/index/index.uvue:109")
 		// 处理查询逻辑
 		uni.navigateTo({
 			url: '/pages/login/login'
@@ -64,7 +65,7 @@ const _cache = __ins.renderCache;
 
 	// 卡片类型切换
 	const cardType = (type: number) => {
-		console.log(type, " at pages/index/index.uvue:131")
+		console.log(type, " at pages/index/index.uvue:132")
 		uni.reLaunch({
 			url: '/pages/card/card?type=' + type
 		})
@@ -72,28 +73,52 @@ const _cache = __ins.renderCache;
 
 	// 联系客服
 	const handleClick = () => {
-		console.log('联系客服1111', " at pages/index/index.uvue:139")
+		console.log('联系客服1111', " at pages/index/index.uvue:140")
 	}
 
-	// 获取租户页面配置
+	//登录
+	const userId = ref<string>('')
+	const userLoginByOpenid = async (codes: string) => {
+		const res = await login({
+			xcxCode: codes,
+			isLogin: '1',
+		})
+		
+		if(res.code == 200){
+			userId.value = '' + res.data.id
+			uni.navigateTo({
+				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value
+			})
+		}
+	}
+
+	//获取 code
+	const code = ref<string>('')
+	const getCode = () => {
+		uni.login({
+			success: (res) => {
+				code.value = res.code
+				userLoginByOpenid(res.code);
+			}
+		})
+	}
+
+		// 获取租户页面配置
 	const getTenantInfos = async () => {
-		const res = await getTenantInfo(config.api.auth.tenantId,false)
+		const res = await getTenantInfo(getTenantId(),false)
 		if(res.code == 200){
 			const tenantInfo = res.data
-			const wxGetPhoneLogin = '' + tenantInfo.wxGetPhoneLogin
+			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
 			setStorageSync('tenant_infos', tenantInfo)
-			if(wxGetPhoneLogin == '0'){
-				uni.navigateTo({
-					url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin
-				})
-			}
 		}
 	}
 
 	onLoad(() => {
-		const token = getStorageSync('token')
+		const token = getToken()
 		if(!token){
-			getTenantInfos()
+			getTenantInfos().then(() => {
+				getCode()
+			})
 		}
 
 		// 监听扫码结果事件
