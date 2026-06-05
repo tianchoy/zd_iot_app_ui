@@ -1,33 +1,132 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_http = require("../../api/http.js");
+const api_types = require("../../api/types.js");
+const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
-  (_easycom_topNavBar_1 + _easycom_m_icon_1)();
+  const _easycom_m_button_1 = common_vendor.resolveComponent("m-button");
+  (_easycom_topNavBar_1 + _easycom_m_icon_1 + _easycom_m_button_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
 const _easycom_m_icon = () => "../../uni_modules/m-unix/components/m-icon/m-icon.js";
+const _easycom_m_button = () => "../../uni_modules/m-unix/components/m-button/m-button.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_m_icon)();
+  (_easycom_topNavBar + _easycom_m_icon + _easycom_m_button)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "mine",
   setup(__props) {
-    const title = common_vendor.ref("用户");
+    common_vendor.ref("用户");
+    const wxGetPhoneLogin = common_vendor.ref("");
     const cardType = (type) => {
-      common_vendor.index.__f__("log", "at pages/mine/mine.uvue:44", type);
+      if (!isLogin())
+        return null;
       common_vendor.index.reLaunch({
         url: "/pages/card/card?type=" + type
       });
     };
     const toOrder = () => {
+      if (!isLogin())
+        return null;
       common_vendor.index.navigateTo({
         url: "/pages/myOrder/myOrder"
       });
     };
+    const userId = common_vendor.ref("");
+    const userLoginByOpenid = (codes) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_http.login(new common_vendor.UTSJSONObject({
+          xcxCode: codes,
+          isLogin: "1"
+        }));
+        if (res.code == 200) {
+          userId.value = "" + res.data.id;
+          common_vendor.index.navigateTo({
+            url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value
+          });
+        }
+      });
+    };
+    const code = common_vendor.ref("");
+    const getCode = () => {
+      common_vendor.index.login(new common_vendor.UTSJSONObject({
+        success: (res) => {
+          code.value = res.code;
+          userLoginByOpenid(res.code);
+        }
+      }));
+    };
+    const getTenantInfos = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_http.getTenantInfo(common_config.getTenantId(), false);
+        if (res.code == 200) {
+          const tenantInfo = res.data;
+          wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
+        }
+      });
+    };
+    const handleLogin = () => {
+      const token = common_config.getToken();
+      if (!token) {
+        getTenantInfos().then(() => {
+          getCode();
+        });
+      }
+    };
+    const handleLogout = () => {
+      common_config.clearToken();
+      common_vendor.index.showToast({
+        title: "退出登录成功",
+        icon: "none"
+      });
+      common_vendor.index.reLaunch({
+        url: "/pages/index/index"
+      });
+    };
+    const cardListSum = common_vendor.ref(new api_types.CardListSumData({
+      all: null,
+      inUse: null,
+      inNotUse: null
+    }));
+    const getCardListSum = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const res = yield api_http.queryCardListSum();
+          if (res.code === 200) {
+            cardListSum.value = res.data;
+            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:131", "查询卡列表统计成功:", res.data);
+          } else {
+            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:133", "查询卡列表统计失败:", res.msg);
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:136", "查询卡列表统计异常:", error);
+        }
+      });
+    };
+    const checkToken = () => {
+      const token = common_config.getToken();
+      return !!token;
+    };
+    const isLogin = () => {
+      if (!checkToken()) {
+        common_vendor.index.showToast({
+          title: "请先登录",
+          icon: "none"
+        });
+        return false;
+      }
+      return true;
+    };
+    common_vendor.onLoad(() => {
+      if (checkToken()) {
+        getCardListSum();
+      }
+    });
     return (_ctx, _cache) => {
       "raw js";
-      const __returned__ = {
+      const __returned__ = common_vendor.e({
         a: common_vendor.p({
           title: "我的",
           ["show-back"]: false,
@@ -36,35 +135,53 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-284ae985"
         }),
-        b: common_vendor.t(common_vendor.unref(title)),
+        b: common_vendor.t(common_vendor.unref(cardListSum).all || 0),
         c: common_vendor.o(($event) => {
           return cardType(0);
-        }, "37"),
-        d: common_vendor.o(($event) => {
-          return cardType(1);
-        }, "31"),
+        }, "f3"),
+        d: common_vendor.t(common_vendor.unref(cardListSum).inUse || 0),
         e: common_vendor.o(($event) => {
+          return cardType(1);
+        }, "2b"),
+        f: common_vendor.t(common_vendor.unref(cardListSum).inNotUse || 0),
+        g: common_vendor.o(($event) => {
           return cardType(2);
-        }, "6c"),
-        f: common_vendor.p({
-          name: "arrow-right-bold",
-          size: "20rpx",
-          class: "data-v-284ae985"
-        }),
-        g: common_vendor.o(toOrder, "87"),
+        }, "1a"),
         h: common_vendor.p({
           name: "arrow-right-bold",
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        i: common_vendor.p({
+        i: common_vendor.o(toOrder, "4f"),
+        j: common_vendor.p({
           name: "arrow-right-bold",
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        j: `${_ctx.u_s_b_h}px`,
-        k: `${_ctx.u_s_a_i_b}px`
-      };
+        k: common_vendor.p({
+          name: "arrow-right-bold",
+          size: "20rpx",
+          class: "data-v-284ae985"
+        }),
+        l: !isLogin()
+      }, !isLogin() ? {
+        m: common_vendor.o(handleLogin, "94"),
+        n: common_vendor.p({
+          type: "primary",
+          shape: "circle",
+          class: "data-v-284ae985"
+        })
+      } : {
+        o: common_vendor.o(handleLogout, "50"),
+        p: common_vendor.p({
+          type: "warning",
+          shape: "circle",
+          class: "data-v-284ae985"
+        })
+      }, {
+        q: `${_ctx.u_s_b_h}px`,
+        r: `${_ctx.u_s_a_i_b}px`
+      });
       return __returned__;
     };
   }

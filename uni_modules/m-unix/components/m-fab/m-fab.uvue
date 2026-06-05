@@ -67,11 +67,11 @@ export default {
 		},
 		right: {
 			type: [Number, String],
-			default: 80
+			default: 20
 		},
 		bottom: {
 			type: [Number, String],
-			default: 100
+			default: 150
 		},
 		top: {
 			type: [Number, String],
@@ -497,7 +497,6 @@ export default {
 	right: 0;
 	top: 0;
 	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.2);
 	z-index: 996;
 }
 
@@ -519,11 +518,6 @@ export default {
 	padding: 16rpx 28rpx;
 	border-radius: 40rpx;
 	margin-bottom: 16rpx;
-	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
-	
-	&:active {
-		transform: scale(0.95);
-	}
 }
 
 .m-fab__sub-img {
@@ -541,7 +535,6 @@ export default {
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
 	cursor: pointer;
 	transition: transform 0.1s ease;
 	

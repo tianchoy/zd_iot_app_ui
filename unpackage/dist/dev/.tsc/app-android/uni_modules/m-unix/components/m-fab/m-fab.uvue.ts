@@ -20,11 +20,11 @@ const __sfc__ = defineComponent({
 		},
 		right: {
 			type: [Number, String],
-			default: 80
+			default: 20
 		},
 		bottom: {
 			type: [Number, String],
-			default: 100
+			default: 150
 		},
 		top: {
 			type: [Number, String],
@@ -527,6 +527,6 @@ const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
   ])
 }
 export type MFabComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesMUnixComponentsMFabMFabStyles = [_uM([["m-fab__mask", _pS(_uM([["position", "fixed"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["backgroundColor", "rgba(0,0,0,0.2)"], ["zIndex", 996]]))], ["m-fab__subs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-end"], ["marginBottom", "24rpx"]]))], ["m-fab__sub", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", "16rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "28rpx"], ["borderTopLeftRadius", "40rpx"], ["borderTopRightRadius", "40rpx"], ["borderBottomRightRadius", "40rpx"], ["borderBottomLeftRadius", "40rpx"], ["marginBottom", "16rpx"], ["boxShadow", "0 2rpx 8rpx rgba(0, 0, 0, 0.15)"], ["transform:active", "scale(0.95)"]]))], ["m-fab__sub-img", _pS(_uM([["width", "40rpx"], ["height", "40rpx"], ["marginRight", "12rpx"]]))], ["m-fab__sub-text", _pS(_uM([["fontSize", "28rpx"]]))], ["m-fab__main", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["boxShadow", "0 4rpx 12rpx rgba(0, 0, 0, 0.2)"], ["cursor", "pointer"], ["transitionProperty", "transform"], ["transitionDuration", "0.1s"], ["transitionTimingFunction", "ease"], ["transform:active", "scale(0.95)"]]))], ["m-fab__main--dragging", _pS(_uM([["opacity", 0.9], ["transitionProperty", "none"], ["transform:active", "none"]]))], ["m-fab__main-child", _pS(_uM([["pointerEvents", "none"]]))], ["m-fab__plus", _pS(_uM([["fontSize", "64rpx"], ["lineHeight", 1]]))], ["@TRANSITION", _uM([["m-fab__main", _uM([["property", "transform"], ["duration", "0.1s"], ["timingFunction", "ease"]])], ["m-fab__main--dragging", _uM([["property", "none"]])]])]])]
+const GenUniModulesMUnixComponentsMFabMFabStyles = [_uM([["m-fab__mask", _pS(_uM([["position", "fixed"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["zIndex", 996]]))], ["m-fab__subs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-end"], ["marginBottom", "24rpx"]]))], ["m-fab__sub", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["paddingTop", "16rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "28rpx"], ["borderTopLeftRadius", "40rpx"], ["borderTopRightRadius", "40rpx"], ["borderBottomRightRadius", "40rpx"], ["borderBottomLeftRadius", "40rpx"], ["marginBottom", "16rpx"]]))], ["m-fab__sub-img", _pS(_uM([["width", "40rpx"], ["height", "40rpx"], ["marginRight", "12rpx"]]))], ["m-fab__sub-text", _pS(_uM([["fontSize", "28rpx"]]))], ["m-fab__main", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["cursor", "pointer"], ["transitionProperty", "transform"], ["transitionDuration", "0.1s"], ["transitionTimingFunction", "ease"], ["transform:active", "scale(0.95)"]]))], ["m-fab__main--dragging", _pS(_uM([["opacity", 0.9], ["transitionProperty", "none"], ["transform:active", "none"]]))], ["m-fab__main-child", _pS(_uM([["pointerEvents", "none"]]))], ["m-fab__plus", _pS(_uM([["fontSize", "64rpx"], ["lineHeight", 1]]))], ["@TRANSITION", _uM([["m-fab__main", _uM([["property", "transform"], ["duration", "0.1s"], ["timingFunction", "ease"]])], ["m-fab__main--dragging", _uM([["property", "none"]])]])]])]
 
 import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue'

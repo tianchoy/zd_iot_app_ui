@@ -14,11 +14,11 @@ const mFab_uvue_vue_type_style_index_0_lang = {};
 
 const index_uvue_vue_type_style_index_0_lang = {};
 
+const mSegmentedControl_uvue_vue_type_style_index_0_lang = {};
+
 const mLoading_uvue_vue_type_style_index_0_lang = {};
 
 const mButton_uvue_vue_type_style_index_0_lang = {};
-
-const mSegmentedControl_uvue_vue_type_style_index_0_lang = {};
 
 const card_uvue_vue_type_style_index_0_lang = {};
 

@@ -16,11 +16,11 @@ const _sfc_main = common_vendor.defineComponent({
     },
     right: {
       type: [Number, String],
-      default: 80
+      default: 20
     },
     bottom: {
       type: [Number, String],
-      default: 100
+      default: 150
     },
     top: {
       type: [Number, String],

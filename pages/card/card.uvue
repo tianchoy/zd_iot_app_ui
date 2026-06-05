@@ -9,17 +9,42 @@
 					v-model="card_number"
 					placeholder="请输入 ICCID / MSISDN"
 					class="search-input"
+					@input="handleInput"
 				/>
-				<m-button type="white" :plain="true" class="scan-btn" width="90rpx">
+				<!-- #ifdef APP-ANDROID -->
+				<view class="android-scan-btn" @click="scanCode">
+					<m-icon name="scanning" size="40rpx" color="#334155"></m-icon>
+				</view>
+				<view class="android-query-btn" @click="handleQuery">
+					<text class="android-btn-text">查询</text>
+				</view>
+				<!-- #endif -->
+				<!-- #ifndef APP-ANDROID -->
+				<m-button type="white" :plain="true" class="scan-btn" width="90rpx" @click="scanCode">
 					<m-icon name="scanning" size="40rpx"></m-icon>
 				</m-button>
-				<m-button type="primary" width="120rpx">查询</m-button>
+				<m-button type="primary" width="120rpx" @click="handleQuery">查询</m-button>
+				<!-- #endif -->
 			</view>
+			<!-- #ifdef APP-ANDROID -->
+			<m-segmented-control :values="tabs" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'72rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
+			<!-- #endif -->
+			<!-- #ifndef APP-ANDROID -->
 			<m-segmented-control :values="tabs" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
+			<!-- #endif -->
 		</view>
 		
 		<view class="card-box">
+			<!-- #ifdef APP-ANDROID -->
+			<scroll-view 
+				class="card-list android-card-scroll" 
+				scroll-y="true"
+				:style="{ height: scrollViewHeight + 'px' }"
+			>
+			<!-- #endif -->
+			<!-- #ifndef APP-ANDROID -->
 			<view class="card-list">
+			<!-- #endif -->
 				<view class="card-item" v-for="(card, index) in filteredCardList" :key="index">
 					<view class="item-head">
 						<view class="item-head-label">
@@ -48,12 +73,24 @@
 							<text class="cycle-label">当前周期：</text>
 							<text class="cycle-value">{{ getCardText(card, 'currentCycle') }}</text>
 						</view>
+						<!-- #ifdef APP-ANDROID -->
+						<view class="android-recharge-btn">
+							<text class="android-btn-text android-recharge-text">去充值</text>
+						</view>
+						<!-- #endif -->
+						<!-- #ifndef APP-ANDROID -->
 						<m-button type="primary" width="200rpx" btnSize="mini" size="25rpx" shape="circle">去充值</m-button>
+						<!-- #endif -->
 					</view>
 				</view>
+			<!-- #ifdef APP-ANDROID -->
+			</scroll-view>
+			<!-- #endif -->
+			<!-- #ifndef APP-ANDROID -->
 			</view>
+			<!-- #endif -->
 		</view>
-		
+
 		<!-- 空状态 -->
 		<view v-if="filteredCardList.length === 0" class="empty-state">
 			<text class="empty-text">暂无卡片数据</text>
@@ -62,12 +99,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed,onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { getPageParams } from '@/utils/routerParams'
 
 const card_number = ref('')
+const queryKeyword = ref('')
 const tabs = ref(['全部', '在用', '异常'])
 const current = ref(0)
+const scrollViewHeight = ref(0)
 
 // 卡片数据类型
 interface CardItem {
@@ -147,13 +186,26 @@ const allCardList = ref<any[]>([
 	}
 ])
 
-// 根据选中的 tab 过滤卡片列表
+// 根据选中的 tab 和查询卡号过滤卡片列表
 const filteredCardList = computed<any[]>(() : any[] => {
 	const currentStatus = tabs.value[current.value]
-	if (currentStatus === '全部') {
-		return allCardList.value
+	let list = allCardList.value
+	if (currentStatus !== '全部') {
+		list = list.filter((card: any) : boolean => {
+			const status = '' + (card as UTSJSONObject)['status']
+			if (currentStatus === '异常') {
+				return status !== '在用'
+			}
+			return status === currentStatus
+		})
 	}
-	return allCardList.value.filter((card: any) : boolean => (card as UTSJSONObject)['status'] === currentStatus)
+	if (queryKeyword.value !== '') {
+		list = list.filter((card: any) : boolean => {
+			const cardNumber = '' + (card as UTSJSONObject)['cardNumber']
+			return cardNumber.indexOf(queryKeyword.value) !== -1
+		})
+	}
+	return list
 })
 
 const getCardText = (card: any, key: string): string => {
@@ -182,12 +234,67 @@ const handleClick = (e: UTSJSONObject) => {
 	}
 }
 
+const scanCode = () => {
+	uni.navigateTo({
+		url: '/pages/scanCode/scanCode'
+	})
+}
+
+const handleInput = () => {
+	if (card_number.value.trim() === '') {
+		queryKeyword.value = ''
+	}
+}
+
+const handleQuery = () => {
+	const keyword = card_number.value.trim()
+	if (!keyword) {
+		uni.showToast({
+			title: '请输入卡号',
+			icon: 'none'
+		})
+		return
+	}
+	queryKeyword.value = keyword
+}
+
+// 计算 scroll-view 的高度
+const calculateScrollHeight = () => {
+	// #ifdef APP-ANDROID
+	nextTick(() => {
+		const systemInfo = uni.getSystemInfoSync()
+		const windowHeight = systemInfo.windowHeight
+		const statusBarHeight = systemInfo.statusBarHeight || 0
+		
+		// 获取顶部导航栏高度（假设 topNavBar 高度为 44px + 状态栏高度）
+		// 或者使用 uni.createSelectorQuery 动态获取
+		uni.createSelectorQuery().select('.container').boundingClientRect((rect) => {
+			if (rect) {
+				// 获取顶部搜索框区域高度
+				uni.createSelectorQuery().select('.card-box').boundingClientRect((searchRect) => {
+					if (searchRect) {
+						// container 的 padding-bottom 40rpx 转换为 px
+						const paddingBottom = 40 / 750 * systemInfo.windowWidth
+						// 减去顶部搜索区域和容器内边距，剩余高度给 scroll-view
+						scrollViewHeight.value = windowHeight - searchRect.top - paddingBottom - 20
+					}
+				}).exec()
+			}
+		}).exec()
+	})
+	// #endif
+}
+
 onLoad((options) => {
 	console.log(options)
 	const type = options['type']
 	if(type != null){
 		current.value = parseInt('' + type)
 	}
+})
+
+onMounted(() => {
+	calculateScrollHeight()
 })
 </script>
 
@@ -196,7 +303,6 @@ onLoad((options) => {
 		display: flex;
 		flex-direction: column;
 		background-color: #f4f7fb;
-		min-height: 1000rpx;
 		padding-bottom: 40rpx;
 		
 		.card-box{
@@ -305,6 +411,7 @@ onLoad((options) => {
 					flex-direction: row;
 					flex-wrap: wrap;
 					margin: 20rpx 0;
+					gap: 24rpx;
 					
 					.metric-box{
 						flex:1;
@@ -354,6 +461,23 @@ onLoad((options) => {
 				}
 			}
 
+			.card-item:last-child{
+				border-bottom: none;
+				margin-bottom: 0;
+				padding-bottom: 0;
+			}
+
+		}
+		
+		.card-list {
+			flex: 1;
+			width: 100%;
+			overflow: auto;
+		}
+		
+		.android-card-scroll {
+			flex: 1;
+			width: 100%;
 		}
 		
 		.empty-state {

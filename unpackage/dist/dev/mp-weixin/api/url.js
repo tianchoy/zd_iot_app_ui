@@ -3,6 +3,8 @@ const ApiUrl = {
   getTenantPageConfigXcx: "/system/tenantPageConfig/getTenantPageConfigXcx",
   getTenantPageConfigH: "/system/tenantPageConfig/getTenantPageConfigH",
   login: "/auth/login",
+  queryCardList: "/app/card/list",
+  queryCardListSum: "/app/card/listSum",
   card_detail: "/app/card/info/",
   countries: "/app/card/getH5CountryList",
   addOrder: "/order/pkgOrder",

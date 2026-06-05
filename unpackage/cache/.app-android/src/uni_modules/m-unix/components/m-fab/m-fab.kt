@@ -509,7 +509,7 @@ open class GenUniModulesMUnixComponentsMFabMFab : VueComponent {
         }
         val styles0: Map<String, Map<String, Map<String, Any>>>
             get() {
-                return _uM("m-fab__mask" to _pS(_uM("position" to "fixed", "left" to 0, "right" to 0, "top" to 0, "bottom" to 0, "backgroundColor" to "rgba(0,0,0,0.2)", "zIndex" to 996)), "m-fab__subs" to _pS(_uM("display" to "flex", "flexDirection" to "column", "alignItems" to "flex-end", "marginBottom" to "24rpx")), "m-fab__sub" to _pS(_uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "paddingTop" to "16rpx", "paddingRight" to "28rpx", "paddingBottom" to "16rpx", "paddingLeft" to "28rpx", "borderTopLeftRadius" to "40rpx", "borderTopRightRadius" to "40rpx", "borderBottomRightRadius" to "40rpx", "borderBottomLeftRadius" to "40rpx", "marginBottom" to "16rpx", "boxShadow" to "0 2rpx 8rpx rgba(0, 0, 0, 0.15)", "transform:active" to "scale(0.95)")), "m-fab__sub-img" to _pS(_uM("width" to "40rpx", "height" to "40rpx", "marginRight" to "12rpx")), "m-fab__sub-text" to _pS(_uM("fontSize" to "28rpx")), "m-fab__main" to _pS(_uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "center", "boxShadow" to "0 4rpx 12rpx rgba(0, 0, 0, 0.2)", "cursor" to "pointer", "transitionProperty" to "transform", "transitionDuration" to "0.1s", "transitionTimingFunction" to "ease", "transform:active" to "scale(0.95)")), "m-fab__main--dragging" to _pS(_uM("opacity" to 0.9, "transitionProperty" to "none", "transform:active" to "none")), "m-fab__main-child" to _pS(_uM("pointerEvents" to "none")), "m-fab__plus" to _pS(_uM("fontSize" to "64rpx", "lineHeight" to 1)), "@TRANSITION" to _uM("m-fab__main" to _uM("property" to "transform", "duration" to "0.1s", "timingFunction" to "ease"), "m-fab__main--dragging" to _uM("property" to "none")))
+                return _uM("m-fab__mask" to _pS(_uM("position" to "fixed", "left" to 0, "right" to 0, "top" to 0, "bottom" to 0, "zIndex" to 996)), "m-fab__subs" to _pS(_uM("display" to "flex", "flexDirection" to "column", "alignItems" to "flex-end", "marginBottom" to "24rpx")), "m-fab__sub" to _pS(_uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "paddingTop" to "16rpx", "paddingRight" to "28rpx", "paddingBottom" to "16rpx", "paddingLeft" to "28rpx", "borderTopLeftRadius" to "40rpx", "borderTopRightRadius" to "40rpx", "borderBottomRightRadius" to "40rpx", "borderBottomLeftRadius" to "40rpx", "marginBottom" to "16rpx")), "m-fab__sub-img" to _pS(_uM("width" to "40rpx", "height" to "40rpx", "marginRight" to "12rpx")), "m-fab__sub-text" to _pS(_uM("fontSize" to "28rpx")), "m-fab__main" to _pS(_uM("display" to "flex", "flexDirection" to "row", "alignItems" to "center", "justifyContent" to "center", "cursor" to "pointer", "transitionProperty" to "transform", "transitionDuration" to "0.1s", "transitionTimingFunction" to "ease", "transform:active" to "scale(0.95)")), "m-fab__main--dragging" to _pS(_uM("opacity" to 0.9, "transitionProperty" to "none", "transform:active" to "none")), "m-fab__main-child" to _pS(_uM("pointerEvents" to "none")), "m-fab__plus" to _pS(_uM("fontSize" to "64rpx", "lineHeight" to 1)), "@TRANSITION" to _uM("m-fab__main" to _uM("property" to "transform", "duration" to "0.1s", "timingFunction" to "ease"), "m-fab__main--dragging" to _uM("property" to "none")))
             }
         var inheritAttrs = true
         var inject: Map<String, Map<String, Any?>> = _uM()
@@ -520,10 +520,10 @@ open class GenUniModulesMUnixComponentsMFabMFab : VueComponent {
         ), "default" to 0), "right" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to 80), "bottom" to _uM("type" to _uA(
+        ), "default" to 20), "bottom" to _uM("type" to _uA(
             "Number",
             "String"
-        ), "default" to 100), "top" to _uM("type" to _uA(
+        ), "default" to 150), "top" to _uM("type" to _uA(
             "Number",
             "String"
         ), "default" to 0), "zIndex" to _uM("type" to _uA(

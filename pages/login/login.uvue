@@ -32,8 +32,8 @@
 		if(res.code == 200){
 			console.log('登录成功:', res.data.access_token)
 			setToken(res.data.access_token, res.data.refreshToken)
-			uni.navigateBack({
-				delta: 1,
+			uni.reLaunch({
+				url: '/pages/index/index'
 			})
 		}
 	}

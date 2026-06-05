@@ -111,11 +111,25 @@ function buildUrl(url, baseUrl) {
   return baseUrl + (url.startsWith("/") ? "" : "/") + url;
 }
 function buildQueryString(data) {
+  if (!data)
+    return "";
   const parts = [];
-  for (const key in data) {
-    const value = data.getString(key);
-    if (value != null && value.length > 0) {
-      parts.push(key + "=" + encodeURIComponent(value));
+  const keys = Object.keys(data);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const value = data[key];
+    if (value != null && value !== void 0 && value !== "") {
+      let strValue = "";
+      if (typeof value === "string") {
+        strValue = value;
+      } else if (typeof value === "number") {
+        strValue = value.toString();
+      } else if (typeof value === "boolean") {
+        strValue = value.toString();
+      } else {
+        strValue = common_vendor.UTS.JSON.stringify(value);
+      }
+      parts.push(key + "=" + encodeURIComponent(strValue));
     }
   }
   return parts.length > 0 ? "?" + parts.join("&") : "";
@@ -226,7 +240,7 @@ function request(options) {
   if (withToken) {
     const token = common_config.getToken();
     if (token != "") {
-      reqHeader["token"] = token;
+      reqHeader["authorization"] = "Bearer " + token;
     }
   }
   const finalSuccessCodes = successCodes !== null && successCodes !== void 0 ? successCodes : DEFAULT_SUCCESS_CODES;

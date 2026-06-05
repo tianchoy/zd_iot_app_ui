@@ -7,8 +7,6 @@
 		<!-- #ifndef APP-ANDROID -->
 		<view class="card-info">
 		<!-- #endif -->
-			<text class="persion-name" v-if="title">Hi,{{title}}</text>
-			<text class="persion-name" v-else @click="handleLogin">Hi,请先登录</text>
 			<view class="persion-card">
 				<!-- #ifdef APP-ANDROID -->
 				<view class="persion-card-item" style="background-color: #6fa3ff; box-shadow: none;color: #fff;" @click="cardType(0)">
@@ -17,7 +15,7 @@
 				<view class="persion-card-item" @click="cardType(0)">
 				<!-- #endif -->
 					<text class="persion-card-item-title">我的卡片</text>
-					<text class="persion-card-item-content">12</text>
+					<text class="persion-card-item-content">{{cardListSum.all || 0}}</text>
 				</view>
 				<!-- #ifdef APP-ANDROID -->
 				<view class="persion-card-item" style="background-color: #6fa3ff; box-shadow: none;color: #fff;" @click="cardType(1)">
@@ -26,7 +24,7 @@
 				<view class="persion-card-item" @click="cardType(1)">
 				<!-- #endif -->
 					<text class="persion-card-item-title">在用卡片</text>
-					<text class="persion-card-item-content">12</text>
+					<text class="persion-card-item-content">{{cardListSum.inUse || 0}}</text>
 				</view>
 				<!-- #ifdef APP-ANDROID -->
 				<view class="persion-card-item" style="background-color: #6fa3ff; box-shadow: none;color: #fff;" @click="cardType(2)">
@@ -35,7 +33,7 @@
 				<view class="persion-card-item" @click="cardType(2)">
 				<!-- #endif -->
 					<text class="persion-card-item-title">异常卡片</text>
-					<text class="persion-card-item-content">12</text>
+					<text class="persion-card-item-content">{{cardListSum.inNotUse || 0}}</text>
 				</view>
 			</view>
 		</view>
@@ -73,43 +71,48 @@
 				<text class="view-all" @click="cardType(0)">查看全部</text>
 			</view>
 			<view class="card-list">
-				<view class="card-item">
+				<!-- 循环渲染卡片列表 -->
+				<view class="card-item" v-for="(item, index) in cardList" :key="item.id || index">
 					<view class="item-head">
 						<view class="item-head-label">
-							<text class="card-item-title">1064916585160</text>
-							<text class="card-item-content">ICCID: 89860421123456789012</text>
+							<text class="card-item-title">{{ item.msisdn || item.iccid || '--' }}</text>
+							<text class="card-item-content">ICCID: {{ item.iccid || '--' }}</text>
 						</view>
-						<m-tag text="标签" :round="true" :plain="true" size="small" type="primary"></m-tag>
+						<m-tag :text="item.tag || '标签'" :round="true" :plain="true" size="small" type="primary"></m-tag>
 					</view>
 					<view class="item-package">
 						<text class="package-label">当前套餐:</text>
-						<text class="package-value">车联网月包20G</text>
+						<text class="package-value">{{ item.packageName || '--' }}</text>
 					</view>
 					<m-div backgroundColor="#f1f5f9" textClass="divider"></m-div>
 					<view class="card-metrics">
 						<view class="metric-box mr-24">
 							<view class="metric-label">到期时间</view>
-							<view class="metric-value">2026-04-30</view>
+							<view class="metric-value">{{ item.expireDate || '--' }}</view>
 						</view>
 						<view class="metric-box">
 							<view class="metric-label">本月流量</view>
-							<view class="metric-value">11.34GB / 20GB</view>
+							<view class="metric-value">{{ item.usedFlow || '0' }}GB / {{ item.totalFlow || '0' }}GB</view>
 						</view>
 					</view>
 					<view class="card-bottom">
 						<view class="card-cycle-text">
 							<text class="cycle-label">当前周期：</text>
-							<text class="cycle-value">第1期 / 共12期</text>
+							<text class="cycle-value">{{ item.cycleInfo || '--' }}</text>
 						</view>
 						<!-- #ifdef APP-ANDROID -->
-						<view class="android-recharge-btn" style="padding: 0 24rpx; height: 64rpx; border-radius: 220rpx; background-color: #5677fc; display: flex; flex-direction: row; align-items: center; justify-content: center;" @click="goRecharge">
+						<view class="android-recharge-btn" style="padding: 0 24rpx; height: 64rpx; border-radius: 220rpx; background-color: #5677fc; display: flex; flex-direction: row; align-items: center; justify-content: center;" @click="goRecharge(item)">
 							<text class="android-btn-text" style="color: #ffffff;">去充值</text>
 						</view>
 						<!-- #endif -->
 						<!-- #ifndef APP-ANDROID -->
-						<m-button type="primary" width="200rpx" btnSize="mini" size="25rpx" shape="circle" @click="goRecharge">去充值</m-button>
+						<m-button type="primary" width="200rpx" btnSize="mini" size="25rpx" shape="circle" @click="goRecharge(item)">去充值</m-button>
 						<!-- #endif -->
 					</view>
+				</view>
+				<!-- 空状态提示 -->
+				<view v-if="cardList.length === 0 && !loading" class="empty-state">
+					<text class="empty-text">暂无卡片数据</text>
 				</view>
 			</view>
 		</view>
@@ -120,15 +123,16 @@
 <script setup lang="uts">
 	import { ref, onMounted, onUnmounted } from 'vue'
 	import { setStorageSync,getTenantId,getToken } from '@/common/config.uts'
-	import { login,card_detail,getTenantInfo } from '@/api/http.uts'
+	import { queryCardList,queryCardListSum } from '@/api/http.uts'
+	import type { CardListSumData } from '@/api/types.uts'
 	
-	const title = ref<string>('')
-	const show = ref<boolean>(false)
 	const card_number = ref<string>('')
-	const wxGetPhoneLogin = ref<string>('')
+	// 卡片列表数据
+	const cardList = ref<any[]>([])
+	const loading = ref<boolean>(false)
 
-	const goRecharge = () => {
-		console.log('去充值')
+	const goRecharge = (item?: any) => {
+		console.log('去充值', item)
 		uni.navigateTo({
 			url: '/pages/recharge/recharge'
 		})
@@ -167,7 +171,7 @@
 
 	// 卡片类型切换
 	const cardType = (type: number) => {
-		console.log(type)
+		if (!isLogin()) return 
 		uni.reLaunch({
 			url: '/pages/card/card?type=' + type
 		})
@@ -178,53 +182,89 @@
 		console.log('联系客服1111')
 	}
 
-	//登录
-	const userId = ref<string>('')
-	const userLoginByOpenid = async (codes: string) => {
-		const res = await login({
-			xcxCode: codes,
-			isLogin: '1',
-		})
-		
-		if(res.code == 200){
-			userId.value = '' + res.data.id
-			uni.navigateTo({
-				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value
+	// 查询卡列表
+	const getCardList = async () => {
+		loading.value = true
+		try {
+			const res = await queryCardList({
+				rechargeNo: '',
+				status: '',
+				isSort: true
 			})
-		}
-	}
-
-	//获取 code
-	const code = ref<string>('')
-	const getCode = () => {
-		uni.login({
-			success: (res) => {
-				code.value = res.code
-				userLoginByOpenid(res.code);
+			if (res.code === 200) {
+				console.log('查询卡列表成功:', res.data)
+				// 假设返回的数据结构是 res.data.list 或 res.data 直接为数组，根据实际情况调整
+				if (Array.isArray(res.data)) {
+					cardList.value = res.data
+				} else if (res.data && Array.isArray(res.data.list)) {
+					cardList.value = res.data.list
+				} else {
+					cardList.value = []
+				}
+			} else {
+				console.log('查询卡列表失败:', res.msg)
+				cardList.value = []
+				uni.showToast({
+					title: res.msg || '查询失败',
+					icon: 'none'
+				})
 			}
-		})
-	}
-
-		// 获取租户页面配置
-	const getTenantInfos = async () => {
-		const res = await getTenantInfo(getTenantId(),false)
-		if(res.code == 200){
-			const tenantInfo = res.data
-			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
-			setStorageSync('tenant_infos', tenantInfo)
-		}
-	}
-
-	const handleLogin = () => {
-		const token = getToken()
-		if(!token){
-			getTenantInfos().then(() => {
-				getCode()
+		} catch (error) {
+			console.error('查询卡列表异常:', error)
+			cardList.value = []
+			uni.showToast({
+				title: '网络异常，请稍后重试',
+				icon: 'none'
 			})
+		} finally {
+			loading.value = false
 		}
 	}
+	
+	// 查询卡列表统计
+	const cardListSum = ref<CardListSumData>({})
+	const getCardListSum = async () => {
+		try {
+			const res = await queryCardListSum()
+			if (res.code === 200) {
+				cardListSum.value = res.data
+				console.log('查询卡列表统计成功:', res.data)
+			} else {
+				console.log('查询卡列表统计失败:', res.msg)
+			}
+		} catch (error) {
+			console.error('查询卡列表统计异常:', error)
+		}
+	}
+	
+
+	// 检查token状态
+	const checkToken = (): boolean => {
+		const token = getToken()
+		return !!token
+	}
+
+	// 检查是否登录
+	const isLogin = (): boolean => {
+		if (!checkToken()) {
+			uni.showToast({
+				title: '请先登录',
+				icon: 'none'
+			})
+			return false
+		}
+		return true
+	}
+
 
 	onLoad(() => {
+		// 检查token状态
+		if (checkToken()) {
+			//加载列表数据
+			getCardList()
+			//加载统计数据
+			getCardListSum()
+		}
 		// 监听扫码结果事件
 		uni.$on('scanResult', onScanResult)
 	})
@@ -240,7 +280,6 @@
 		display: flex;
 		flex-direction: column;
 		background-color: #f4f7fb;
-		min-height: 1000rpx;
 		padding-bottom: 40rpx;
 		height: 100%;
 	}
@@ -260,7 +299,6 @@
 			color: #ffffff;
 		}
 		.persion-card{
-			margin-top: 30rpx;
 			display: flex;
 			flex-direction: row;
 
@@ -445,6 +483,16 @@
 						font-weight: 800;
 					}
 				}
+			}
+		}
+		.empty-state {
+			padding: 60rpx 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			.empty-text {
+				font-size: 28rpx;
+				color: #94a3b8;
 			}
 		}
 	}

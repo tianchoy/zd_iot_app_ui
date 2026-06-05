@@ -86,11 +86,26 @@ function buildUrl(url: string, baseUrl: string): string {
  * 构建 GET 请求参数
  */
 function buildQueryString(data: UTSJSONObject): string {
+	if (!data) return ''
+	
 	const parts: string[] = []
-	for (const key in data) {
-		const value = data.getString(key)
-		if (value != null && value.length > 0) {
-			parts.push(key + '=' + encodeURIComponent(value))
+	// 使用 Object.keys 遍历
+	const keys = Object.keys(data)
+	for (let i = 0; i < keys.length; i++) {
+		const key = keys[i]
+		const value = data[key]
+		if (value != null && value !== undefined && value !== '') {
+			let strValue = ''
+			if (typeof value === 'string') {
+				strValue = value
+			} else if (typeof value === 'number') {
+				strValue = value.toString()
+			} else if (typeof value === 'boolean') {
+				strValue = value.toString()
+			} else {
+				strValue = JSON.stringify(value)
+			}
+			parts.push(key + '=' + encodeURIComponent(strValue))
 		}
 	}
 	return parts.length > 0 ? '?' + parts.join('&') : ''
@@ -232,7 +247,7 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 	if (withToken) {
 		const token = getToken()
 		if (token != '') {
-			reqHeader['token'] = token
+			reqHeader['authorization'] = 'Bearer ' + token
 		}
 	}
 

@@ -2925,6 +2925,13 @@ val GenPagesIndexIndexClass = CreateVueComponent(GenPagesIndexIndex::class.java,
     return GenPagesIndexIndex(instance, renderer)
 }
 )
+val GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControlClass = CreateVueComponent(GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl::class.java, fun(): VueComponentOptions {
+    return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.name, inheritAttrs = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.inheritAttrs, inject = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.inject, props = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.emits, components = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.components, styles = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.styles)
+}
+, fun(instance, renderer): GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl {
+    return GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl(instance)
+}
+)
 val GenUniModulesMUnixComponentsMLoadingMLoadingClass = CreateVueComponent(GenUniModulesMUnixComponentsMLoadingMLoading::class.java, fun(): VueComponentOptions {
     return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMLoadingMLoading.name, inheritAttrs = GenUniModulesMUnixComponentsMLoadingMLoading.inheritAttrs, inject = GenUniModulesMUnixComponentsMLoadingMLoading.inject, props = GenUniModulesMUnixComponentsMLoadingMLoading.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMLoadingMLoading.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMLoadingMLoading.emits, components = GenUniModulesMUnixComponentsMLoadingMLoading.components, styles = GenUniModulesMUnixComponentsMLoadingMLoading.styles)
 }
@@ -2937,13 +2944,6 @@ val GenUniModulesMUnixComponentsMButtonMButtonClass = CreateVueComponent(GenUniM
 }
 , fun(instance, renderer): GenUniModulesMUnixComponentsMButtonMButton {
     return GenUniModulesMUnixComponentsMButtonMButton(instance)
-}
-)
-val GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControlClass = CreateVueComponent(GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl::class.java, fun(): VueComponentOptions {
-    return VueComponentOptions(type = "component", name = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.name, inheritAttrs = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.inheritAttrs, inject = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.inject, props = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.props, propsNeedCastKeys = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.propsNeedCastKeys, emits = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.emits, components = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.components, styles = GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl.styles)
-}
-, fun(instance, renderer): GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl {
-    return GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControl(instance)
 }
 )
 val GenPagesCardCardClass = CreateVueComponent(GenPagesCardCard::class.java, fun(): VueComponentOptions {

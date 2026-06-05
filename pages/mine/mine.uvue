@@ -3,19 +3,18 @@
 	<view class="container">
 		
 		<view class="card-info mb-24">
-			<text class="persion-name">Hi,{{title}}</text>
 			<view class="persion-card">
 				<view class="persion-card-item"  @click="cardType(0)">
 					<text class="persion-card-item-title">我的卡片</text>
-					<text class="persion-card-item-content"> 12</text>
+					<text class="persion-card-item-content"> {{ cardListSum.all || 0 }}</text>
 				</view>
 				<view class="persion-card-item"  @click="cardType(1)">
 					<text class="persion-card-item-title">在用卡片</text>
-					<text class="persion-card-item-content"> 12</text>
+					<text class="persion-card-item-content"> {{ cardListSum.inUse || 0 }}</text>
 				</view>
 				<view class="persion-card-item"  @click="cardType(2)">
 					<text class="persion-card-item-title">异常卡片</text>
-					<text class="persion-card-item-content"> 12</text>
+					<text class="persion-card-item-content"> {{ cardListSum.inNotUse || 0 }}</text>
 				</view>
 			</view>
 		</view>
@@ -33,25 +32,137 @@
 				<m-icon name="arrow-right-bold" size="20rpx"></m-icon>
 			</view>
 		</view>
+		<view class="btn-box">
+			<m-button v-if="!isLogin()" type="primary" shape="circle" @click="handleLogin">登录</m-button>
+			<m-button v-else type="warning" shape="circle"  @click="handleLogout">退出登录</m-button>
+		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+	import { login,getTenantInfo,queryCardListSum} from '@/api/http.uts'
+	import type { CardListSumData } from '@/api/types.uts'
+	import { setStorageSync,getTenantId,getToken ,clearToken} from '@/common/config.uts'
+
+
 	const title = ref('用户');
+	const wxGetPhoneLogin = ref<string>('')
 
 	// 卡片类型切换
 	const cardType = (type: number) => {
-		console.log(type)
+		if (!isLogin()) return 
 		uni.reLaunch({
 			url: '/pages/card/card?type=' + type
 		})
 	}
 	// 跳转订单记录
 	const toOrder = () => {
+		if (!isLogin()) return 
 		uni.navigateTo({
 			url: '/pages/myOrder/myOrder'
 		})
 	}
+
+	//登录
+	const userId = ref<string>('')
+	const userLoginByOpenid = async (codes: string) => {
+		const res = await login({
+			xcxCode: codes,
+			isLogin: '1',
+		})
+		
+		if(res.code == 200){
+			userId.value = '' + res.data.id
+			uni.navigateTo({
+				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value
+			})
+		}
+	}
+
+	//获取 code
+	const code = ref<string>('')
+	const getCode = () => {
+		uni.login({
+			success: (res) => {
+				code.value = res.code
+				userLoginByOpenid(res.code);
+			}
+		})
+	}
+
+		// 获取租户页面配置
+	const getTenantInfos = async () => {
+		const res = await getTenantInfo(getTenantId(),false)
+		if(res.code == 200){
+			const tenantInfo = res.data
+			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
+			// setStorageSync('tenant_infos', tenantInfo)
+		}
+	}
+
+	const handleLogin = () => {
+		const token = getToken()
+		if(!token){
+			getTenantInfos().then(() => {
+				getCode()
+			})
+		}
+	}
+
+	// 退出登录
+	const handleLogout = () => {
+		clearToken()
+		uni.showToast({
+			title: '退出登录成功',
+			icon: 'none'
+		})
+		uni.reLaunch({
+			url: '/pages/index/index'
+		})
+	}
+
+	// 查询卡列表统计
+	const cardListSum = ref<CardListSumData>({})
+	const getCardListSum = async () => {
+		try {
+			const res = await queryCardListSum()
+			if (res.code === 200) {
+				cardListSum.value = res.data
+				console.log('查询卡列表统计成功:', res.data)
+			} else {
+				console.log('查询卡列表统计失败:', res.msg)
+			}
+		} catch (error) {
+			console.error('查询卡列表统计异常:', error)
+		}
+	}
+
+	// 检查token状态
+	const checkToken = (): boolean => {
+		const token = getToken()
+		return !!token
+	}
+
+	// 检查是否登录
+	const isLogin = (): boolean => {
+		if (!checkToken()) {
+			uni.showToast({
+				title: '请先登录',
+				icon: 'none'
+			})
+			return false
+		}
+		return true
+	}
+
+
+	onLoad(() => {
+		// 检查token状态
+		if (checkToken()) {
+			//加载统计数据
+			getCardListSum()
+		}
+	})
 </script>
 
 <style lang="scss" scoped>
@@ -59,6 +170,7 @@
 	display: flex;
 	flex-direction: column;
 	background-color: #f4f7fb;
+	height: 100%;
 	.card-info{
 		display: flex;
 		flex-direction: column;
@@ -75,7 +187,6 @@
 			color: #ffffff;
 		}
 		.persion-card{
-			margin-top: 30rpx;
 			display: flex;
 			flex-direction: row;
 
@@ -120,5 +231,13 @@
 		}
 
 	}
+	.btn-box{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		margin: 30rpx 24rpx 0 24rpx;
+	}
+	
 }
 </style>

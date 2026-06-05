@@ -30,7 +30,6 @@
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.2);
   z-index: 996;
 }
 .m-fab__wrap {
@@ -49,10 +48,6 @@
   padding: 16rpx 28rpx;
   border-radius: 40rpx;
   margin-bottom: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
-}
-.m-fab__sub:active {
-  transform: scale(0.95);
 }
 .m-fab__sub-img {
   width: 40rpx;
@@ -67,7 +62,6 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: transform 0.1s ease;
 }

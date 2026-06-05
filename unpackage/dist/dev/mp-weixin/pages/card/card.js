@@ -20,8 +20,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "card",
   setup(__props) {
     const card_number = common_vendor.ref("");
+    const queryKeyword = common_vendor.ref("");
     const tabs = common_vendor.ref(["全部", "在用", "异常"]);
     const current = common_vendor.ref(0);
+    common_vendor.ref(0);
     const allCardList = common_vendor.ref([
       new common_vendor.UTSJSONObject({
         id: 1,
@@ -86,12 +88,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     ]);
     const filteredCardList = common_vendor.computed(() => {
       const currentStatus = tabs.value[current.value];
-      if (currentStatus === "全部") {
-        return allCardList.value;
+      let list = allCardList.value;
+      if (currentStatus !== "全部") {
+        list = list.filter((card = null) => {
+          const status = "" + card["status"];
+          if (currentStatus === "异常") {
+            return status !== "在用";
+          }
+          return status === currentStatus;
+        });
       }
-      return allCardList.value.filter((card = null) => {
-        return card["status"] === currentStatus;
-      });
+      if (queryKeyword.value !== "") {
+        list = list.filter((card = null) => {
+          const cardNumber = "" + card["cardNumber"];
+          return cardNumber.indexOf(queryKeyword.value) !== -1;
+        });
+      }
+      return list;
     });
     const getCardText = (card = null, key) => {
       const value = card[key];
@@ -110,17 +123,40 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:179", e.index);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:231", e.index);
       if (e.index != null) {
         current.value = e.index;
       }
     };
+    const scanCode = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/scanCode/scanCode"
+      });
+    };
+    const handleInput = () => {
+      if (card_number.value.trim() === "") {
+        queryKeyword.value = "";
+      }
+    };
+    const handleQuery = () => {
+      const keyword = card_number.value.trim();
+      if (!keyword) {
+        common_vendor.index.showToast({
+          title: "请输入卡号",
+          icon: "none"
+        });
+        return null;
+      }
+      queryKeyword.value = keyword;
+    };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:186", options);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:289", options);
       const type = options["type"];
       if (type != null) {
         current.value = parseInt("" + type);
       }
+    });
+    common_vendor.onMounted(() => {
     });
     return (_ctx, _cache) => {
       "raw js";
@@ -133,28 +169,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-a89086b7"
         }),
-        b: card_number.value,
-        c: common_vendor.o(($event) => {
+        b: common_vendor.o([($event) => {
           return card_number.value = $event.detail.value;
-        }, "9c"),
+        }, handleInput], "85"),
+        c: card_number.value,
         d: common_vendor.p({
           name: "scanning",
           size: "40rpx",
           class: "data-v-a89086b7"
         }),
-        e: common_vendor.p({
+        e: common_vendor.o(scanCode, "81"),
+        f: common_vendor.p({
           type: "white",
           plain: true,
           width: "90rpx",
           class: "scan-btn data-v-a89086b7"
         }),
-        f: common_vendor.p({
+        g: common_vendor.o(handleQuery, "5a"),
+        h: common_vendor.p({
           type: "primary",
           width: "120rpx",
           class: "data-v-a89086b7"
         }),
-        g: common_vendor.o(handleClick, "50"),
-        h: common_vendor.p({
+        i: common_vendor.o(handleClick, "98"),
+        j: common_vendor.p({
           values: tabs.value,
           current: current.value,
           textActiveColor: "#2563eb",
@@ -165,7 +203,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           class: "data-v-a89086b7"
         }),
-        i: common_vendor.f(filteredCardList.value, (card, index, i0) => {
+        k: common_vendor.f(filteredCardList.value, (card, index, i0) => {
           return {
             a: common_vendor.t(getCardText(card, "cardNumber")),
             b: common_vendor.t(getCardText(card, "iccid")),
@@ -181,12 +219,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             l: index
           };
         }),
-        j: common_vendor.p({
+        l: common_vendor.p({
           backgroundColor: "#f1f5f9",
           textClass: "divider",
           class: "data-v-a89086b7"
         }),
-        k: common_vendor.p({
+        m: common_vendor.p({
           type: "primary",
           width: "200rpx",
           btnSize: "mini",
@@ -194,10 +232,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           shape: "circle",
           class: "data-v-a89086b7"
         }),
-        l: filteredCardList.value.length === 0
+        n: filteredCardList.value.length === 0
       }, filteredCardList.value.length === 0 ? {} : {}, {
-        m: `${_ctx.u_s_b_h}px`,
-        n: `${_ctx.u_s_a_i_b}px`
+        o: `${_ctx.u_s_b_h}px`,
+        p: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

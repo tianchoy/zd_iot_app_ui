@@ -29,7 +29,6 @@ page .container.data-v-00a60067 {
   display: flex;
   flex-direction: column;
   background-color: #f4f7fb;
-  min-height: 1000rpx;
   padding-bottom: 40rpx;
   height: 100%;
 }
@@ -50,7 +49,6 @@ page .card-info .persion-name.data-v-00a60067 {
   color: #ffffff;
 }
 page .card-info .persion-card.data-v-00a60067 {
-  margin-top: 30rpx;
   display: flex;
   flex-direction: row;
 }
@@ -234,4 +232,14 @@ page .card-box .card-item .card-bottom .card-cycle-text .cycle-value.data-v-00a6
   font-size: 24rpx;
   color: #334155;
   font-weight: 800;
+}
+page .card-box .empty-state.data-v-00a60067 {
+  padding: 60rpx 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+page .card-box .empty-state .empty-text.data-v-00a60067 {
+  font-size: 28rpx;
+  color: #94a3b8;
 }

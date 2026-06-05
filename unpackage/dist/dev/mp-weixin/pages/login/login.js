@@ -26,9 +26,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (res.code == 200) {
           common_vendor.index.__f__("log", "at pages/login/login.uvue:33", "登录成功:", res.data.access_token);
           common_config.setToken(res.data.access_token, res.data.refreshToken);
-          common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
-            delta: 1
-          }));
+          common_vendor.index.reLaunch({
+            url: "/pages/index/index"
+          });
         }
       });
     };

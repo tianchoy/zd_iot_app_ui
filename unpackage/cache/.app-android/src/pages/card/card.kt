@@ -60,13 +60,13 @@ open class GenPagesCardCard : BasePage {
                 }
             }
             val handleClick = fun(e: UTSJSONObject){
-                console.log(e["index"], " at pages/card/card.uvue:179")
+                console.log(e["index"], " at pages/card/card.uvue:194")
                 if (e["index"] != null) {
                     current.value = e["index"] as Number
                 }
             }
             onLoad(fun(options){
-                console.log(options, " at pages/card/card.uvue:186")
+                console.log(options, " at pages/card/card.uvue:201")
                 val type = options["type"]
                 if (type != null) {
                     current.value = parseInt("" + type)
@@ -76,9 +76,9 @@ open class GenPagesCardCard : BasePage {
             return fun(): Any? {
                 val _component_topNavBar = resolveEasyComponent("topNavBar", GenComponentsTopNavBarTopNavBarClass)
                 val _component_m_icon = resolveEasyComponent("m-icon", GenUniModulesMUnixComponentsMIconMIconClass)
-                val _component_m_button = resolveEasyComponent("m-button", GenUniModulesMUnixComponentsMButtonMButtonClass)
                 val _component_m_segmented_control = resolveEasyComponent("m-segmented-control", GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControlClass)
                 val _component_m_div = resolveEasyComponent("m-div", GenUniModulesMUnixComponentsMDivMDivClass)
+                val _component_m_button = resolveEasyComponent("m-button", GenUniModulesMUnixComponentsMButtonMButtonClass)
                 return _cE(Fragment, null, _uA(
                     _cV(_component_topNavBar, _uM("title" to "卡片", "show-back" to false, "backgroundColor" to "#f4f7fb", "textColor" to "#333", "showCapsule" to false)),
                     _cE("view", _uM("class" to "container"), _uA(
@@ -92,20 +92,18 @@ open class GenPagesCardCard : BasePage {
                                     "modelValue",
                                     "onInput"
                                 )),
-                                _cV(_component_m_button, _uM("type" to "white", "plain" to true, "class" to "scan-btn", "width" to "90rpx"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        _cV(_component_m_icon, _uM("name" to "scanning", "size" to "40rpx"))
-                                    )
-                                }
-                                ), "_" to 1)),
-                                _cV(_component_m_button, _uM("type" to "primary", "width" to "120rpx"), _uM("default" to withSlotCtx(fun(): UTSArray<Any> {
-                                    return _uA(
-                                        "查询"
-                                    )
-                                }
-                                ), "_" to 1))
+                                _cE("view", _uM("class" to "android-scan-btn", "onClick" to _ctx.scanCode), _uA(
+                                    _cV(_component_m_icon, _uM("name" to "scanning", "size" to "40rpx", "color" to "#334155"))
+                                ), 8, _uA(
+                                    "onClick"
+                                )),
+                                _cE("view", _uM("class" to "android-query-btn", "onClick" to _ctx.handleQuery), _uA(
+                                    _cE("text", _uM("class" to "android-btn-text"), "查询")
+                                ), 8, _uA(
+                                    "onClick"
+                                ))
                             )),
-                            _cV(_component_m_segmented_control, _uM("values" to tabs.value, "current" to current.value, "textActiveColor" to "#2563eb", "onClick" to handleClick, "customStyle" to _uO("height" to "unset", "padding" to "5rpx 10rpx", "border" to "1rpx solid #e5edf6")), null, 8, _uA(
+                            _cV(_component_m_segmented_control, _uM("values" to tabs.value, "current" to current.value, "textActiveColor" to "#2563eb", "onClick" to handleClick, "customStyle" to _uO("height" to "72rpx", "padding" to "5rpx 10rpx", "border" to "1rpx solid #e5edf6")), null, 8, _uA(
                                 "values",
                                 "current"
                             ))

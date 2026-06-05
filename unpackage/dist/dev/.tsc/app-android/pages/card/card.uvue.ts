@@ -1,8 +1,8 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
 import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue'
-import _easycom_m_button from '@/uni_modules/m-unix/components/m-button/m-button.uvue'
 import _easycom_m_segmented_control from '@/uni_modules/m-unix/components/m-segmented-control/m-segmented-control.uvue'
 import _easycom_m_div from '@/uni_modules/m-unix/components/m-div/m-div.uvue'
+import _easycom_m_button from '@/uni_modules/m-unix/components/m-button/m-button.uvue'
 import { ref, computed,onMounted } from 'vue'
 import { getPageParams } from '@/utils/routerParams'
 
@@ -125,14 +125,14 @@ const getStatusClass = (status: string): string => {
 }
 
 const handleClick = (e: UTSJSONObject) => {
-	console.log(e.index, " at pages/card/card.uvue:179")
+	console.log(e.index, " at pages/card/card.uvue:194")
 	if(e.index != null){
 		current.value = e.index as number
 	}
 }
 
 onLoad((options) => {
-	console.log(options, " at pages/card/card.uvue:186")
+	console.log(options, " at pages/card/card.uvue:201")
 	const type = options['type']
 	if(type != null){
 		current.value = parseInt('' + type)
@@ -143,9 +143,9 @@ return (): any | null => {
 
 const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar)
 const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
-const _component_m_button = resolveEasyComponent("m-button",_easycom_m_button)
 const _component_m_segmented_control = resolveEasyComponent("m-segmented-control",_easycom_m_segmented_control)
 const _component_m_div = resolveEasyComponent("m-div",_easycom_m_div)
+const _component_m_button = resolveEasyComponent("m-button",_easycom_m_button)
 
   return _cE(Fragment, null, [
     _cV(_component_topNavBar, _uM({
@@ -165,34 +165,29 @@ const _component_m_div = resolveEasyComponent("m-div",_easycom_m_div)
             placeholder: "请输入 ICCID / MSISDN",
             class: "search-input"
           }), null, 40 /* PROPS, NEED_HYDRATION */, ["modelValue", "onInput"]),
-          _cV(_component_m_button, _uM({
-            type: "white",
-            plain: true,
-            class: "scan-btn",
-            width: "90rpx"
-          }), _uM({
-            default: withSlotCtx((): any[] => [
-              _cV(_component_m_icon, _uM({
-                name: "scanning",
-                size: "40rpx"
-              }))
-            ]),
-            _: 1 /* STABLE */
-          })),
-          _cV(_component_m_button, _uM({
-            type: "primary",
-            width: "120rpx"
-          }), _uM({
-            default: withSlotCtx((): any[] => ["查询"]),
-            _: 1 /* STABLE */
-          }))
+          _cE("view", _uM({
+            class: "android-scan-btn",
+            onClick: _ctx.scanCode
+          }), [
+            _cV(_component_m_icon, _uM({
+              name: "scanning",
+              size: "40rpx",
+              color: "#334155"
+            }))
+          ], 8 /* PROPS */, ["onClick"]),
+          _cE("view", _uM({
+            class: "android-query-btn",
+            onClick: _ctx.handleQuery
+          }), [
+            _cE("text", _uM({ class: "android-btn-text" }), "查询")
+          ], 8 /* PROPS */, ["onClick"])
         ]),
         _cV(_component_m_segmented_control, _uM({
           values: tabs.value,
           current: current.value,
           textActiveColor: '#2563eb',
           onClick: handleClick,
-          customStyle: {height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}
+          customStyle: {height:'72rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}
         }), null, 8 /* PROPS */, ["values", "current"])
       ]),
       _cE("view", _uM({ class: "card-box" }), [

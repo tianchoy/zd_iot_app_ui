@@ -89,7 +89,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_http.getCountryList(false);
         common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:181", "查询国家列表:", res);
         if (res.code == 200) {
-          countryOptions.value = res.data.map((item) => {
+          countryOptions.value = res.data.map((item = null) => {
             return new common_vendor.UTSJSONObject({
               value: item.letterCode,
               label: item.fullName
