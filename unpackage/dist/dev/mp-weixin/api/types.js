@@ -135,6 +135,44 @@ class CardListSumData extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class CardItem extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          id: { type: Number, optional: false },
+          cardNumber: { type: String, optional: false },
+          iccid: { type: String, optional: false },
+          tag: { type: String, optional: false },
+          status: { type: String, optional: false },
+          currentPackage: { type: String, optional: false },
+          expireDate: { type: String, optional: false },
+          usedTraffic: { type: String, optional: false },
+          totalTraffic: { type: String, optional: false },
+          currentCycle: { type: String, optional: false }
+        };
+      },
+      name: "CardItem"
+    };
+  }
+  constructor(options, metadata = CardItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.id = this.__props__.id;
+    this.cardNumber = this.__props__.cardNumber;
+    this.iccid = this.__props__.iccid;
+    this.tag = this.__props__.tag;
+    this.status = this.__props__.status;
+    this.currentPackage = this.__props__.currentPackage;
+    this.expireDate = this.__props__.expireDate;
+    this.usedTraffic = this.__props__.usedTraffic;
+    this.totalTraffic = this.__props__.totalTraffic;
+    this.currentCycle = this.__props__.currentCycle;
+    delete this.__props__;
+  }
+}
+exports.CardItem = CardItem;
 exports.CardListSumData = CardListSumData;
 exports.QueryCardListParams = QueryCardListParams;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/types.js.map

@@ -3,8 +3,8 @@ Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
 require("./utils/inject-m-unix.js");
 if (!Math) {
-  "./pages/index/index.js";
   "./pages/card/card.js";
+  "./pages/index/index.js";
   "./pages/mine/mine.js";
   "./pages/cardDetail/cardDetail.js";
   "./pages/recharge/recharge.js";

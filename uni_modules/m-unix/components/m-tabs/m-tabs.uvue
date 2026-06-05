@@ -1,518 +1,332 @@
 <template>
-	<view>
+	<view
+		class="m-tabs"
+		:class="{ 'm-tabs--fixed': isFixed }"
+		:style="rootStyle"
+	>
 		<view
-			v-if="expanded && maskClosable"
-			class="m-fab__mask"
-			:style="{ zIndex: maskZIndex }"
-			@tap="collapse"
-		></view>
-		<view class="m-fab__wrap" :style="wrapStyle">
-			<view class="m-fab__subs" v-if="safeBtnList.length > 0">
-				<view
-					v-for="(btn, idx) in safeBtnList"
-					:key="idx"
-					v-show="expanded"
-					class="m-fab__sub"
-					:style="subStyle(btn)"
-					@tap.stop="onSubTap(idx)"
-				>
-					<image
-						v-if="subImg(btn) !== ''"
-						class="m-fab__sub-img"
-						:src="subImg(btn)"
-						mode="aspectFit"
-					></image>
-					<text class="m-fab__sub-text" :style="{ color: subColor(btn), 'font-size': subFontSize(btn) + 'rpx' }">{{ subText(btn) }}</text>
-				</view>
-			</view>
+			class="m-tabs__inner"
+			:style="{ 
+				height: height + 'rpx', 
+				paddingLeft: padding + 'rpx', 
+				paddingRight: padding + 'rpx', 
+				backgroundColor: backgroundColor,
+				gap: gap + 'rpx'
+			}"
+		>
 			<view
-				:class="mainDragClass"
-				:style="mainStyle"
-				@touchstart.stop="onTouchStart"
-				@touchmove.stop.prevent="onTouchMove"
-				@touchend.stop="onTouchEnd"
-				@touchcancel.stop="onTouchCancel"
+				v-for="(tab, idx) in tabs"
+				:key="idx"
+				class="m-tabs__item"
+				:class="{
+					'm-tabs__item--active': currentTab === idx,
+					'm-tabs__item--disabled': tabDisabled(tab)
+				}"
+				:style="{ width: itemWidthComputed }"
+				@tap="onTabTap(idx, tab)"
 			>
-				<view class="m-fab__main-child" v-if="custom">
-					<slot></slot>
+				<view class="m-tabs__item-inner">
+					<text
+						class="m-tabs__text"
+						:style="textStyle(idx, tab)"
+					>{{ tabLabel(tab) }}</text>
+					<view v-if="badgeText(tab) !== ''" class="m-tabs__badge-wrap">
+						<text class="m-tabs__badge" :style="{ color: badgeColor, backgroundColor: badgeBgColor }">{{ badgeText(tab) }}</text>
+					</view>
+					<view v-else-if="tabDot(tab)" class="m-tabs__dot" :style="{ backgroundColor: badgeBgColor }"></view>
 				</view>
-				<view class="m-fab__main-child" v-else-if="iconName !== ''">
-					<m-icon :name="iconName" :size="iconSize" :color="color" />
-				</view>
-				<text v-else class="m-fab__main-child m-fab__plus" :style="{ color: color }">+</text>
 			</view>
 		</view>
+		<view v-if="!unlined" class="m-tabs__line"></view>
 	</view>
 </template>
 
 <script lang="uts">
-type FabBtn = UTSJSONObject
+import { PropType } from 'vue'
 
-class TouchPoint {
-	x: number
-	y: number
-	constructor(x: number, y: number) {
-		this.x = x
-		this.y = y
-	}
-}
+type TabItem = UTSJSONObject
 
 export default {
-	name: 'mFab',
-	emits: ['click', 'dragend'],
+	name: 'mTabs',
+	emits: ['change'],
 	props: {
-		left: {
-			type: [Number, String],
-			default: 0
-		},
-		right: {
-			type: [Number, String],
-			default: 80
-		},
-		bottom: {
-			type: [Number, String],
-			default: 100
-		},
-		top: {
-			type: [Number, String],
-			default: 0
-		},
-		zIndex: {
-			type: [Number, String],
-			default: 997
-		},
-		width: {
-			type: [Number, String],
-			default: 80
-		},
-		height: {
-			type: [Number, String],
-			default: 80
-		},
-		radius: {
-			type: String,
-			default: '50%'
-		},
-		custom: {
-			type: Boolean,
-			default: false
-		},
-		icon: {
-			type: String,
-			default: ''
-		},
-		iconSize: {
-			type: [Number, String],
-			default: 52
-		},
-		draggable: {
-			type: Boolean,
-			default: true
-		},
-		snapEdge: {
-			type: Boolean,
-			default: true
-		},
-		snapPadding: {
-			type: [Number, String],
-			default: 16
-		},
-		bgColor: {
-			type: String,
-			default: '#5677fc'
-		},
-		color: {
-			type: String,
-			default: '#ffffff'
-		},
-		btnList: {
+		tabs: {
 			type: Array,
 			default(): any[] {
 				return []
 			}
 		},
-		textField: {
+		field: {
 			type: String,
-			default: 'text'
+			default: 'name'
 		},
-		imgField: {
+		badgeField: {
 			type: String,
-			default: 'imgUrl'
+			default: 'num'
 		},
-		size: {
-			type: [Number, String],
-			default: 28
+		height: {
+			type: Number,
+			default: 80
 		},
-		maskClosable: {
+		padding: {
+			type: Number,
+			default: 20
+		},
+		gap: {
+			type: Number,
+			default: 16
+		},
+		backgroundColor: {
+			type: String,
+			default: '#FFFFFF'
+		},
+		isFixed: {
 			type: Boolean,
 			default: false
-		}
-	},
-	data() {
-		return {
-			expanded: false as boolean,
-			winW: 0 as number,
-			winH: 0 as number,
-			dragLeftPx: 0 as number,
-			dragTopPx: 0 as number,
-			dragReady: false as boolean,
-			wrapWpx: 0 as number,
-			wrapHpx: 0 as number,
-			touchStartX: 0 as number,
-			touchStartY: 0 as number,
-			touchStartLeft: 0 as number,
-			touchStartTop: 0 as number,
-			isDragging: false as boolean,
-			hasMoved: false as boolean,
-			moveDistance: 0 as number,
-			clickTimer: -1 as number,
+		},
+		top: {
+			type: Number,
+			default: 0
+		},
+		unlined: {
+			type: Boolean,
+			default: false
+		},
+		currentTab: {
+			type: Number,
+			default: 0
+		},
+		// 移除 isSlider 相关，不再使用下滑块
+		itemWidth: {
+			type: String,
+			default: ''
+		},
+		color: {
+			type: String,
+			default: '#666666'
+		},
+		selectedColor: {
+			type: String,
+			default: '#5677fc'
+		},
+		size: {
+			type: Number,
+			default: 28
+		},
+		bold: {
+			type: Boolean,
+			default: true
+		},
+		// 移除 scale 相关
+		badgeColor: {
+			type: String,
+			default: '#ffffff'
+		},
+		badgeBgColor: {
+			type: String,
+			default: '#F74D54'
+		},
+		zIndex: {
+			type: [Number, String],
+			default: 996
+		},
+		customStyle: {
+			type: Object as PropType<UTSJSONObject>,
+			default: () => ({})
+		},
+		// 新增：选中状态背景色
+		activeBgColor: {
+			type: String,
+			default: '#eff6ff'
+		},
+		// 新增：选中状态边框色
+		activeBorderColor: {
+			type: String,
+			default: '#bfdbfe'
+		},
+		// 新增：未选中边框色
+		inactiveBorderColor: {
+			type: String,
+			default: '#E5E5E5'
+		},
+		// 新增：未选中背景色
+		inactiveBgColor: {
+			type: String,
+			default: '#F5F5F5'
+		},
+		// 新增：圆角大小
+		borderRadius: {
+			type: String,
+			default: '32rpx'
+		},
+		// 新增：内边距（控制每个item内部间距）
+		itemInnerPadding: {
+			type: String,
+			default: '16rpx 24rpx'
 		}
 	},
 	computed: {
-		safeBtnList(): UTSJSONObject[] {
-			const list = this.btnList as UTSJSONObject[] | null
-			return list == null ? [] : list
+		tabCount(): number {
+			return (this.tabs as any[]).length
 		},
-		iconName(): string {
-			const s = this.icon as string
-			if (s == null) return ''
-			const t = s.trim()
-			return t
+		itemWidthComputed(): string {
+			const iw = this.itemWidth as string
+			if (iw != null && iw.length > 0) {
+				return iw
+			}
+			const n = this.tabCount
+			if (n <= 0) {
+				return '25%'
+			}
+			// 如果有 gap，需要减去 gap 的总宽度
+			const gapTotal = (this.gap as number) * (n - 1)
+			return `calc((100% - ${gapTotal}rpx) / ${n})`
 		},
-		baseZ(): number {
-			const zi = this.zIndex
-			const n = typeof zi === 'number' ? zi as number : parseInt('' + zi)
-			return isNaN(n) ? 997 : n
-		},
-		maskZIndex(): number {
-			return this.baseZ - 1
-		},
-		wrapStyle(): UTSJSONObject {
+		rootStyle(): UTSJSONObject {
 			const st = {} as UTSJSONObject
-			st['zIndex'] = this.baseZ
-			st['position'] = 'fixed'
-			st['left'] = this.dragLeftPx + 'px'
-			st['top'] = this.dragTopPx + 'px'
-			st['right'] = 'auto'
-			st['bottom'] = 'auto'
-			st['display'] = 'flex'
-			st['flexDirection'] = 'column'
-			st['alignItems'] = 'flex-end'
-			return st
-		},
-		mainStyle(): UTSJSONObject {
-			const st = {} as UTSJSONObject
-			st['width'] = '' + this.width + 'rpx'
-			st['height'] = '' + this.height + 'rpx'
-			st['borderRadius'] = this.radius as string
-			st['backgroundColor'] = this.bgColor as string
-			if (!this.isDragging) {
-				st['transition'] = 'left 0.2s ease, top 0.2s ease'
+			const z = this.zIndex
+			st['zIndex'] = typeof z === 'number' ? z : parseInt('' + z)
+			if (this.isFixed) {
+				st['position'] = 'fixed'
+				st['left'] = '0'
+				st['right'] = '0'
+				st['top'] = (this.top as number) + 'px'
+			}
+			if (this.customStyle != null) {
+				Object.assign(st, this.customStyle)
 			}
 			return st
-		},
-		mainDragClass(): string[] {
-			const out = [] as string[]
-			out.push('m-fab__main')
-			if (this.isDragging) {
-				out.push('m-fab__main--dragging')
-			}
-			return out
 		}
 	},
-	mounted() {
-		this.initPosition()
-		this.$nextTick(() => {
-			this.measureWrapSize()
-		})
-	},
 	methods: {
-		initPosition() {
-			const sys = uni.getSystemInfoSync()
-			this.winW = sys.windowWidth as number
-			this.winH = sys.windowHeight as number
-			
-			const fabW = uni.rpx2px(parseInt(this.width as string))
-			const fabH = uni.rpx2px(parseInt(this.height as string))
-			
-			const right = uni.rpx2px(parseInt(this.right as string))
-			const bottom = uni.rpx2px(parseInt(this.bottom as string))
-			this.dragLeftPx = this.winW - fabW - right
-			this.dragTopPx = this.winH - fabH - bottom
-		},
-		
-		measureWrapSize() {
-			const self = this
-			try {
-				const q = uni.createSelectorQuery().in(self as any)
-				q.select('.m-fab__wrap')
-					.boundingClientRect((rect: any) => {
-						if (rect == null) return
-						const data = rect as UTSJSONObject
-						const w = data['width'] as number
-						const h = data['height'] as number
-						if (w > 0 && h > 0) {
-							self.wrapWpx = w
-							self.wrapHpx = h
-						}
-					})
-					.exec()
-			} catch (_e) {}
-		},
-		
-		applySnap() {
-			if (!(this.snapEdge as boolean)) return
-			
-			const pad = uni.rpx2px(this.snapPaddingRpx())
-			const w = this.wrapWpx > 0 ? this.wrapWpx : uni.rpx2px(parseInt(this.width as string))
-			const currentCenter = this.dragLeftPx + w / 2
-			
-			if (currentCenter < this.winW / 2) {
-				this.dragLeftPx = pad
-			} else {
-				this.dragLeftPx = this.winW - w - pad
-			}
-			
-			const h = this.wrapHpx > 0 ? this.wrapHpx : uni.rpx2px(parseInt(this.height as string))
-			this.dragTopPx = Math.max(pad, Math.min(this.dragTopPx, this.winH - h - pad))
-		},
-		
-		snapPaddingRpx(): number {
-			const sp = this.snapPadding as number | string
-			const n = typeof sp === 'number' ? sp as number : parseInt('' + sp)
-			return isNaN(n) ? 16 : n
-		},
-		
-		getTouchPoint(e: any): TouchPoint | null {
-			const event = e as UTSJSONObject
-			const touches = event['touches'] as any[] | null
-			if (touches == null || touches.length == 0) return null
-			const touch = touches[0] as UTSJSONObject
-			let x = touch['clientX'] as number | null
-			let y = touch['clientY'] as number | null
-			if (x == null) x = touch['pageX'] as number | null
-			if (y == null) y = touch['pageY'] as number | null
-			return new TouchPoint(x == null ? 0 : x, y == null ? 0 : y)
-		},
-		
-		onTouchStart(e: any) {
-			if (!(this.draggable as boolean)) {
-				this.onClick()
-				return
-			}
-			
-			const point = this.getTouchPoint(e)
-			if (point == null) return
-			
-			this.touchStartX = point.x
-			this.touchStartY = point.y
-			this.touchStartLeft = this.dragLeftPx
-			this.touchStartTop = this.dragTopPx
-			this.hasMoved = false
-			this.moveDistance = 0
-			
-			if (this.clickTimer !== -1) {
-				clearTimeout(this.clickTimer)
-				this.clickTimer = -1
-			}
-		},
-		
-		onTouchMove(e: any) {
-			if (!(this.draggable as boolean)) return
-			
-			const point = this.getTouchPoint(e)
-			if (point == null) return
-			
-			const deltaX = point.x - this.touchStartX
-			const deltaY = point.y - this.touchStartY
-			const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-			
-			if (distance > 10) {
-				if (!this.hasMoved) {
-					this.hasMoved = true
-					this.isDragging = true
-				}
-				this.moveDistance = distance
-				
-				let newLeft = this.touchStartLeft + deltaX
-				let newTop = this.touchStartTop + deltaY
-				
-				const pad = uni.rpx2px(this.snapPaddingRpx())
-				const w = this.wrapWpx > 0 ? this.wrapWpx : uni.rpx2px(parseInt(this.width as string))
-				const h = this.wrapHpx > 0 ? this.wrapHpx : uni.rpx2px(parseInt(this.height as string))
-				
-				newLeft = Math.max(pad, Math.min(newLeft, this.winW - w - pad))
-				newTop = Math.max(pad, Math.min(newTop, this.winH - h - pad))
-				
-				this.dragLeftPx = newLeft
-				this.dragTopPx = newTop
-			}
-		},
-		
-		onTouchEnd(e: any) {
-			if (!(this.draggable as boolean)) return
-			
-			if (this.hasMoved && this.moveDistance > 10) {
-				this.isDragging = false
-				this.applySnap()
-				
-				this.$emit('dragend', {
-					leftPx: this.dragLeftPx,
-					topPx: this.dragTopPx
-				} as UTSJSONObject)
-			} 
-			else if (!this.hasMoved || this.moveDistance <= 10) {
-				const timer = setTimeout(() => {
-					this.onClick()
-					this.clickTimer = -1
-				}, 50)
-				this.clickTimer = timer as number
-			}
-			
-			setTimeout(() => {
-				this.hasMoved = false
-				this.moveDistance = 0
-				this.isDragging = false
-			}, 100)
-		},
-		
-		onTouchCancel(e: any) {
-			if (this.clickTimer !== -1) {
-				clearTimeout(this.clickTimer)
-				this.clickTimer = -1
-			}
-			this.hasMoved = false
-			this.moveDistance = 0
-			this.isDragging = false
-		},
-		
-		onClick() {
-			const list = this.btnList as any[]
-			if (list.length > 0) {
-				this.expanded = !this.expanded
-				this.$emit('click', { index: 0 })
-				return
-			}
-			this.$emit('click', { index: 0 })
-		},
-		
-		onSubTap(idx: number) {
-			this.$emit('click', { index: idx + 1 })
-			this.expanded = false
-		},
-		
-		collapse() {
-			this.expanded = false
-		},
-		
-		subText(btn: FabBtn): string {
-			const k = this.textField as string
-			const v = btn[k]
+		tabLabel(tab: TabItem): string {
+			const k = this.field as string
+			const v = tab[k]
 			return v == null ? '' : '' + v
 		},
-		
-		subImg(btn: FabBtn): string {
-			const k = this.imgField as string
-			const v = btn[k]
-			return v == null ? '' : '' + v
-		},
-		
-		subColor(btn: FabBtn): string {
-			const c = btn['color']
-			return c == null ? '#ffffff' : '' + c
-		},
-		
-		subFontSize(btn: FabBtn): number {
-			const fs = btn['fontSize']
-			if (fs != null) {
-				const n = typeof fs === 'number' ? fs as number : parseInt('' + fs)
-				if (!isNaN(n)) return n
+		badgeText(tab: TabItem): string {
+			const k = this.badgeField as string
+			const v = tab[k]
+			if (v == null) {
+				return ''
 			}
-			const d = this.size
-			return typeof d === 'number' ? d as number : parseInt('' + d)
+			const s = '' + v
+			if (s === '0' || s === '') {
+				return ''
+			}
+			return s
 		},
-		
-		subStyle(btn: FabBtn): UTSJSONObject {
+		tabDot(tab: TabItem): boolean {
+			return tab['isDot'] === true
+		},
+		tabDisabled(tab: TabItem): boolean {
+			return tab['disabled'] === true
+		},
+		textStyle(idx: number, tab: TabItem): UTSJSONObject {
 			const st = {} as UTSJSONObject
-			const bg = btn['bgColor']
-			st['backgroundColor'] = bg == null ? '#16c2c2' : '' + bg
+			const sel = (this.currentTab as number) === idx
+			const dis = this.tabDisabled(tab)
+			st['color'] = dis ? '#cccccc' : (sel ? this.selectedColor as string : this.color as string)
+			st['font-size'] = (this.size as number) + 'rpx'
+			if (this.bold && sel) {
+				st['font-weight'] = 'bold'
+			}
 			return st
+		},
+		onTabTap(idx: number, tab: TabItem) {
+			if (this.tabDisabled(tab)) {
+				return
+			}
+			this.$emit('change', { index: idx, item: tab })
 		}
 	}
 }
 </script>
 
-<style lang="scss">
-.m-fab__mask {
-	position: fixed;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.2);
-	z-index: 996;
+<style lang="scss" scoped>
+.m-tabs {
+	width: 100%;
+	position: relative;
+	box-sizing: border-box;
 }
 
-.m-fab__subs {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	margin-bottom: 24rpx;
-}
-
-.m-fab__sub {
+.m-tabs__inner {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	padding: 16rpx 28rpx;
-	border-radius: 40rpx;
-	margin-bottom: 16rpx;
-	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+	width: 100%;
+	box-sizing: border-box;
+	position: relative;
+}
+
+.m-tabs__item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	position: relative;
+	border-radius: 24rpx;
+	transition: all 0.28s ease;
 	
-	&:active {
-		transform: scale(0.95);
+	// 默认样式（未选中）
+	background-color: v-bind(inactiveBgColor);
+	border: 2rpx solid v-bind(inactiveBorderColor);
+	
+	// 选中样式
+	&--active {
+		background-color: v-bind(activeBgColor);
+		border-color: v-bind(activeBorderColor);
+	}
+	
+	// 禁用样式
+	&--disabled {
+		opacity: 0.5;
 	}
 }
 
-.m-fab__sub-img {
-	width: 40rpx;
-	height: 40rpx;
-	margin-right: 12rpx;
-}
-
-.m-fab__sub-text {
-	font-size: 28rpx;
-}
-
-.m-fab__main {
+.m-tabs__item-inner {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
-	cursor: pointer;
-	transition: transform 0.1s ease;
-	
-	&:active {
-		transform: scale(0.95);
-	}
-	
-	&--dragging {
-		opacity: 0.9;
-		transition: none;
-		
-		&:active {
-			transform: none;
-		}
-	}
+	position: relative;
+	padding: 22rpx 0;
+	flex: 1;
 }
 
-.m-fab__main-child {
-	pointer-events: none;
+.m-tabs__text {
+	line-height: 1.2;
+	transition: color 0.28s ease;
 }
 
-.m-fab__plus {
-	font-size: 64rpx;
-	line-height: 1;
+.m-tabs__badge-wrap {
+	position: absolute;
+	top: -8rpx;
+	right: -8rpx;
+}
+
+.m-tabs__badge {
+	font-size: 20rpx;
+	padding: 2rpx 8rpx;
+	border-radius: 20rpx;
+	min-width: 28rpx;
+	text-align: center;
+}
+
+.m-tabs__dot {
+	position: absolute;
+	top: 0;
+	right: -6rpx;
+	width: 12rpx;
+	height: 12rpx;
+	border-radius: 50%;
+}
+
+.m-tabs__line {
+	height: 1rpx;
+	background-color: #eeeeee;
+	width: 100%;
+	margin-top: 16rpx;
 }
 </style>

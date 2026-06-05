@@ -308,7 +308,8 @@
 		}
 
 	onLoad((options) => {
-		const cardNumber = options.getString('card_number') ?? ''
+		console.log(options)
+		const cardNumber = options.cardNumber ?? ''
 		console.log(cardNumber)
 		card_number.value = cardNumber
 	})

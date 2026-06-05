@@ -1,427 +1,257 @@
 "use strict";
 const common_vendor = require("../../../../common/vendor.js");
-class TouchPoint {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-  }
-}
-const _sfc_main = common_vendor.defineComponent({
-  name: "mFab",
-  emits: ["click", "dragend"],
+const __default__ = common_vendor.defineComponent({
+  name: "mTabs",
+  emits: ["change"],
   props: {
-    left: {
-      type: [Number, String],
-      default: 0
-    },
-    right: {
-      type: [Number, String],
-      default: 80
-    },
-    bottom: {
-      type: [Number, String],
-      default: 100
-    },
-    top: {
-      type: [Number, String],
-      default: 0
-    },
-    zIndex: {
-      type: [Number, String],
-      default: 997
-    },
-    width: {
-      type: [Number, String],
-      default: 80
-    },
-    height: {
-      type: [Number, String],
-      default: 80
-    },
-    radius: {
-      type: String,
-      default: "50%"
-    },
-    custom: {
-      type: Boolean,
-      default: false
-    },
-    icon: {
-      type: String,
-      default: ""
-    },
-    iconSize: {
-      type: [Number, String],
-      default: 52
-    },
-    draggable: {
-      type: Boolean,
-      default: true
-    },
-    snapEdge: {
-      type: Boolean,
-      default: true
-    },
-    snapPadding: {
-      type: [Number, String],
-      default: 16
-    },
-    bgColor: {
-      type: String,
-      default: "#5677fc"
-    },
-    color: {
-      type: String,
-      default: "#ffffff"
-    },
-    btnList: {
+    tabs: {
       type: Array,
       default() {
         return [];
       }
     },
-    textField: {
+    field: {
       type: String,
-      default: "text"
+      default: "name"
     },
-    imgField: {
+    badgeField: {
       type: String,
-      default: "imgUrl"
+      default: "num"
     },
-    size: {
-      type: [Number, String],
-      default: 28
+    height: {
+      type: Number,
+      default: 80
     },
-    maskClosable: {
+    padding: {
+      type: Number,
+      default: 20
+    },
+    gap: {
+      type: Number,
+      default: 16
+    },
+    backgroundColor: {
+      type: String,
+      default: "#FFFFFF"
+    },
+    isFixed: {
       type: Boolean,
       default: false
+    },
+    top: {
+      type: Number,
+      default: 0
+    },
+    unlined: {
+      type: Boolean,
+      default: false
+    },
+    currentTab: {
+      type: Number,
+      default: 0
+    },
+    // 移除 isSlider 相关，不再使用下滑块
+    itemWidth: {
+      type: String,
+      default: ""
+    },
+    color: {
+      type: String,
+      default: "#666666"
+    },
+    selectedColor: {
+      type: String,
+      default: "#5677fc"
+    },
+    size: {
+      type: Number,
+      default: 28
+    },
+    bold: {
+      type: Boolean,
+      default: true
+    },
+    // 移除 scale 相关
+    badgeColor: {
+      type: String,
+      default: "#ffffff"
+    },
+    badgeBgColor: {
+      type: String,
+      default: "#F74D54"
+    },
+    zIndex: {
+      type: [Number, String],
+      default: 996
+    },
+    customStyle: {
+      type: Object,
+      default: () => {
+        return new common_vendor.UTSJSONObject({});
+      }
+    },
+    // 新增：选中状态背景色
+    activeBgColor: {
+      type: String,
+      default: "#eff6ff"
+    },
+    // 新增：选中状态边框色
+    activeBorderColor: {
+      type: String,
+      default: "#bfdbfe"
+    },
+    // 新增：未选中边框色
+    inactiveBorderColor: {
+      type: String,
+      default: "#E5E5E5"
+    },
+    // 新增：未选中背景色
+    inactiveBgColor: {
+      type: String,
+      default: "#F5F5F5"
+    },
+    // 新增：圆角大小
+    borderRadius: {
+      type: String,
+      default: "32rpx"
+    },
+    // 新增：内边距（控制每个item内部间距）
+    itemInnerPadding: {
+      type: String,
+      default: "16rpx 24rpx"
     }
-  },
-  data() {
-    return {
-      expanded: false,
-      winW: 0,
-      winH: 0,
-      dragLeftPx: 0,
-      dragTopPx: 0,
-      dragReady: false,
-      wrapWpx: 0,
-      wrapHpx: 0,
-      touchStartX: 0,
-      touchStartY: 0,
-      touchStartLeft: 0,
-      touchStartTop: 0,
-      isDragging: false,
-      hasMoved: false,
-      moveDistance: 0,
-      clickTimer: -1
-    };
   },
   computed: {
-    safeBtnList() {
-      const list = this.btnList;
-      return list == null ? [] : list;
+    tabCount() {
+      return this.tabs.length;
     },
-    iconName() {
-      const s = this.icon;
-      if (s == null)
-        return "";
-      const t = s.trim();
-      return t;
+    itemWidthComputed() {
+      const iw = this.itemWidth;
+      if (iw != null && iw.length > 0) {
+        return iw;
+      }
+      const n = this.tabCount;
+      if (n <= 0) {
+        return "25%";
+      }
+      const gapTotal = this.gap * (n - 1);
+      return `calc((100% - ${gapTotal}rpx) / ${n})`;
     },
-    baseZ() {
-      const zi = this.zIndex;
-      const n = typeof zi === "number" ? zi : parseInt("" + zi);
-      return isNaN(n) ? 997 : n;
-    },
-    maskZIndex() {
-      return this.baseZ - 1;
-    },
-    wrapStyle() {
+    rootStyle() {
       const st = new common_vendor.UTSJSONObject({});
-      st["zIndex"] = this.baseZ;
-      st["position"] = "fixed";
-      st["left"] = this.dragLeftPx + "px";
-      st["top"] = this.dragTopPx + "px";
-      st["right"] = "auto";
-      st["bottom"] = "auto";
-      st["display"] = "flex";
-      st["flexDirection"] = "column";
-      st["alignItems"] = "flex-end";
-      return st;
-    },
-    mainStyle() {
-      const st = new common_vendor.UTSJSONObject({});
-      st["width"] = "" + this.width + "rpx";
-      st["height"] = "" + this.height + "rpx";
-      st["borderRadius"] = this.radius;
-      st["backgroundColor"] = this.bgColor;
-      if (!this.isDragging) {
-        st["transition"] = "left 0.2s ease, top 0.2s ease";
+      const z = this.zIndex;
+      st["zIndex"] = typeof z === "number" ? z : parseInt("" + z);
+      if (this.isFixed) {
+        st["position"] = "fixed";
+        st["left"] = "0";
+        st["right"] = "0";
+        st["top"] = this.top + "px";
+      }
+      if (this.customStyle != null) {
+        Object.assign(st, this.customStyle);
       }
       return st;
-    },
-    mainDragClass() {
-      const out = [];
-      out.push("m-fab__main");
-      if (this.isDragging) {
-        out.push("m-fab__main--dragging");
-      }
-      return out;
     }
   },
-  mounted() {
-    this.initPosition();
-    this.$nextTick(() => {
-      this.measureWrapSize();
-    });
-  },
   methods: {
-    initPosition() {
-      const sys = common_vendor.index.getSystemInfoSync();
-      this.winW = sys.windowWidth;
-      this.winH = sys.windowHeight;
-      const fabW = common_vendor.index.rpx2px(parseInt(this.width));
-      const fabH = common_vendor.index.rpx2px(parseInt(this.height));
-      const right = common_vendor.index.rpx2px(parseInt(this.right));
-      const bottom = common_vendor.index.rpx2px(parseInt(this.bottom));
-      this.dragLeftPx = this.winW - fabW - right;
-      this.dragTopPx = this.winH - fabH - bottom;
-    },
-    measureWrapSize() {
-      const self = this;
-      try {
-        const q = common_vendor.index.createSelectorQuery().in(self);
-        q.select(".m-fab__wrap").boundingClientRect((rect = null) => {
-          if (rect == null)
-            return null;
-          const data = rect;
-          const w = data["width"];
-          const h = data["height"];
-          if (w > 0 && h > 0) {
-            self.wrapWpx = w;
-            self.wrapHpx = h;
-          }
-        }).exec();
-      } catch (_e) {
-      }
-    },
-    applySnap() {
-      if (!this.snapEdge)
-        return null;
-      const pad = common_vendor.index.rpx2px(this.snapPaddingRpx());
-      const w = this.wrapWpx > 0 ? this.wrapWpx : common_vendor.index.rpx2px(parseInt(this.width));
-      const currentCenter = this.dragLeftPx + w / 2;
-      if (currentCenter < this.winW / 2) {
-        this.dragLeftPx = pad;
-      } else {
-        this.dragLeftPx = this.winW - w - pad;
-      }
-      const h = this.wrapHpx > 0 ? this.wrapHpx : common_vendor.index.rpx2px(parseInt(this.height));
-      this.dragTopPx = Math.max(pad, Math.min(this.dragTopPx, this.winH - h - pad));
-    },
-    snapPaddingRpx() {
-      const sp = this.snapPadding;
-      const n = typeof sp === "number" ? sp : parseInt("" + sp);
-      return isNaN(n) ? 16 : n;
-    },
-    getTouchPoint(e = null) {
-      const event = e;
-      const touches = event["touches"];
-      if (touches == null || touches.length == 0)
-        return null;
-      const touch = touches[0];
-      let x = touch["clientX"];
-      let y = touch["clientY"];
-      if (x == null)
-        x = touch["pageX"];
-      if (y == null)
-        y = touch["pageY"];
-      return new TouchPoint(x == null ? 0 : x, y == null ? 0 : y);
-    },
-    onTouchStart(e = null) {
-      if (!this.draggable) {
-        this.onClick();
-        return null;
-      }
-      const point = this.getTouchPoint(e);
-      if (point == null)
-        return null;
-      this.touchStartX = point.x;
-      this.touchStartY = point.y;
-      this.touchStartLeft = this.dragLeftPx;
-      this.touchStartTop = this.dragTopPx;
-      this.hasMoved = false;
-      this.moveDistance = 0;
-      if (this.clickTimer !== -1) {
-        clearTimeout(this.clickTimer);
-        this.clickTimer = -1;
-      }
-    },
-    onTouchMove(e = null) {
-      if (!this.draggable)
-        return null;
-      const point = this.getTouchPoint(e);
-      if (point == null)
-        return null;
-      const deltaX = point.x - this.touchStartX;
-      const deltaY = point.y - this.touchStartY;
-      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      if (distance > 10) {
-        if (!this.hasMoved) {
-          this.hasMoved = true;
-          this.isDragging = true;
-        }
-        this.moveDistance = distance;
-        let newLeft = this.touchStartLeft + deltaX;
-        let newTop = this.touchStartTop + deltaY;
-        const pad = common_vendor.index.rpx2px(this.snapPaddingRpx());
-        const w = this.wrapWpx > 0 ? this.wrapWpx : common_vendor.index.rpx2px(parseInt(this.width));
-        const h_1 = this.wrapHpx > 0 ? this.wrapHpx : common_vendor.index.rpx2px(parseInt(this.height));
-        newLeft = Math.max(pad, Math.min(newLeft, this.winW - w - pad));
-        newTop = Math.max(pad, Math.min(newTop, this.winH - h_1 - pad));
-        this.dragLeftPx = newLeft;
-        this.dragTopPx = newTop;
-      }
-    },
-    onTouchEnd(e = null) {
-      if (!this.draggable)
-        return null;
-      if (this.hasMoved && this.moveDistance > 10) {
-        this.isDragging = false;
-        this.applySnap();
-        this.$emit("dragend", new common_vendor.UTSJSONObject({
-          leftPx: this.dragLeftPx,
-          topPx: this.dragTopPx
-        }));
-      } else if (!this.hasMoved || this.moveDistance <= 10) {
-        const timer = setTimeout(() => {
-          this.onClick();
-          this.clickTimer = -1;
-        }, 50);
-        this.clickTimer = timer;
-      }
-      setTimeout(() => {
-        this.hasMoved = false;
-        this.moveDistance = 0;
-        this.isDragging = false;
-      }, 100);
-    },
-    onTouchCancel(e = null) {
-      if (this.clickTimer !== -1) {
-        clearTimeout(this.clickTimer);
-        this.clickTimer = -1;
-      }
-      this.hasMoved = false;
-      this.moveDistance = 0;
-      this.isDragging = false;
-    },
-    onClick() {
-      const list = this.btnList;
-      if (list.length > 0) {
-        this.expanded = !this.expanded;
-        this.$emit("click", new common_vendor.UTSJSONObject({ index: 0 }));
-        return null;
-      }
-      this.$emit("click", new common_vendor.UTSJSONObject({ index: 0 }));
-    },
-    onSubTap(idx) {
-      this.$emit("click", new common_vendor.UTSJSONObject({ index: idx + 1 }));
-      this.expanded = false;
-    },
-    collapse() {
-      this.expanded = false;
-    },
-    subText(btn) {
-      const k = this.textField;
-      const v = btn[k];
+    tabLabel(tab) {
+      const k = this.field;
+      const v = tab[k];
       return v == null ? "" : "" + v;
     },
-    subImg(btn) {
-      const k = this.imgField;
-      const v = btn[k];
-      return v == null ? "" : "" + v;
-    },
-    subColor(btn) {
-      const c = btn["color"];
-      return c == null ? "#ffffff" : "" + c;
-    },
-    subFontSize(btn) {
-      const fs = btn["fontSize"];
-      if (fs != null) {
-        const n = typeof fs === "number" ? fs : parseInt("" + fs);
-        if (!isNaN(n))
-          return n;
+    badgeText(tab) {
+      const k = this.badgeField;
+      const v = tab[k];
+      if (v == null) {
+        return "";
       }
-      const d = this.size;
-      return typeof d === "number" ? d : parseInt("" + d);
+      const s = "" + v;
+      if (s === "0" || s === "") {
+        return "";
+      }
+      return s;
     },
-    subStyle(btn) {
+    tabDot(tab) {
+      return tab["isDot"] === true;
+    },
+    tabDisabled(tab) {
+      return tab["disabled"] === true;
+    },
+    textStyle(idx, tab) {
       const st = new common_vendor.UTSJSONObject({});
-      const bg = btn["bgColor"];
-      st["backgroundColor"] = bg == null ? "#16c2c2" : "" + bg;
+      const sel = this.currentTab === idx;
+      const dis = this.tabDisabled(tab);
+      st["color"] = dis ? "#cccccc" : sel ? this.selectedColor : this.color;
+      st["font-size"] = this.size + "rpx";
+      if (this.bold && sel) {
+        st["font-weight"] = "bold";
+      }
       return st;
+    },
+    onTabTap(idx, tab) {
+      if (this.tabDisabled(tab)) {
+        return null;
+      }
+      this.$emit("change", new common_vendor.UTSJSONObject({ index: idx, item: tab }));
     }
   }
 });
-if (!Array) {
-  const _easycom_m_icon2 = common_vendor.resolveComponent("m-icon");
-  _easycom_m_icon2();
-}
-const _easycom_m_icon = () => "../m-icon/m-icon.js";
-if (!Math) {
-  _easycom_m_icon();
-}
+const __injectCSSVars__ = () => {
+  common_vendor.useCssVars((_ctx = null) => {
+    return new common_vendor.UTSJSONObject({
+      "269605bc": _ctx.inactiveBgColor,
+      "566d4b9b": _ctx.inactiveBorderColor,
+      "370975e7": _ctx.activeBgColor,
+      "06c44c40": _ctx.activeBorderColor
+    });
+  });
+};
+const __setup__ = __default__.setup;
+__default__.setup = __setup__ ? (props, ctx) => {
+  __injectCSSVars__();
+  return __setup__(props, ctx);
+} : __injectCSSVars__;
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   "raw js";
   return common_vendor.e({
-    a: $data.expanded && $props.maskClosable
-  }, $data.expanded && $props.maskClosable ? {
-    b: $options.maskZIndex,
-    c: common_vendor.o((...args) => $options.collapse && $options.collapse(...args), "5b")
-  } : {}, {
-    d: $options.safeBtnList.length > 0
-  }, $options.safeBtnList.length > 0 ? {
-    e: common_vendor.f($options.safeBtnList, (btn, idx, i0) => {
+    a: common_vendor.f($props.tabs, (tab, idx, i0) => {
       return common_vendor.e({
-        a: $options.subImg(btn) !== ""
-      }, $options.subImg(btn) !== "" ? {
-        b: $options.subImg(btn)
+        a: common_vendor.t($options.tabLabel(tab)),
+        b: common_vendor.s($options.textStyle(idx, tab)),
+        c: $options.badgeText(tab) !== ""
+      }, $options.badgeText(tab) !== "" ? {
+        d: common_vendor.t($options.badgeText(tab)),
+        e: $props.badgeColor,
+        f: $props.badgeBgColor
+      } : $options.tabDot(tab) ? {
+        h: $props.badgeBgColor
       } : {}, {
-        c: common_vendor.t($options.subText(btn)),
-        d: $options.subColor(btn),
-        e: $options.subFontSize(btn) + "rpx",
-        f: idx,
-        g: common_vendor.s($options.subStyle(btn)),
-        h: common_vendor.o(($event) => $options.onSubTap(idx), idx)
+        g: $options.tabDot(tab),
+        i: idx,
+        j: $props.currentTab === idx ? 1 : "",
+        k: $options.tabDisabled(tab) ? 1 : "",
+        l: common_vendor.o(($event) => $options.onTabTap(idx, tab), idx)
       });
     }),
-    f: $data.expanded
-  } : {}, {
-    g: $props.custom
-  }, $props.custom ? {} : $options.iconName !== "" ? {
-    i: common_vendor.p({
-      name: $options.iconName,
-      size: $props.iconSize,
-      color: $props.color
+    b: $options.itemWidthComputed,
+    c: $props.height + "rpx",
+    d: $props.padding + "rpx",
+    e: $props.padding + "rpx",
+    f: $props.backgroundColor,
+    g: $props.gap + "rpx",
+    h: !$props.unlined
+  }, !$props.unlined ? {} : {}, {
+    i: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+    j: $props.isFixed ? 1 : "",
+    k: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
+    l: common_vendor.s($options.rootStyle),
+    m: common_vendor.s(_ctx.__cssVars()),
+    n: common_vendor.s({
+      "--status-bar-height": `${_ctx.u_s_b_h}px`,
+      "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
     })
-  } : {
-    j: $props.color
-  }, {
-    h: $options.iconName !== "",
-    k: common_vendor.n($options.mainDragClass),
-    l: common_vendor.s($options.mainStyle),
-    m: common_vendor.o((...args) => $options.onTouchStart && $options.onTouchStart(...args), "34"),
-    n: common_vendor.o((...args) => $options.onTouchMove && $options.onTouchMove(...args), "4b"),
-    o: common_vendor.o((...args) => $options.onTouchEnd && $options.onTouchEnd(...args), "3b"),
-    p: common_vendor.o((...args) => $options.onTouchCancel && $options.onTouchCancel(...args), "e1"),
-    q: common_vendor.s($options.wrapStyle),
-    r: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-    s: `${_ctx.u_s_b_h}px`,
-    t: `${_ctx.u_s_a_i_b}px`,
-    v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
   });
 }
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(__default__, [["render", _sfc_render], ["__scopeId", "data-v-33d4227b"]]);
 wx.createComponent(Component);
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/m-unix/components/m-tabs/m-tabs.js.map

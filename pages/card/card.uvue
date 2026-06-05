@@ -4,7 +4,7 @@
 		
 		<view class="card-box mb-24">
 			<view class="card-label">卡号查询</view>
-			<view class="search-value mt-24 mb-24">
+			<view class="search-value mt-24">
 				<input
 					v-model="card_number"
 					placeholder="请输入 ICCID / MSISDN"
@@ -26,15 +26,18 @@
 				<m-button type="primary" width="120rpx" @click="handleQuery">查询</m-button>
 				<!-- #endif -->
 			</view>
-			<!-- #ifdef APP-ANDROID -->
-			<m-segmented-control :values="tabs" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'72rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
-			<!-- #endif -->
-			<!-- #ifndef APP-ANDROID -->
-			<m-segmented-control :values="tabs" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
-			<!-- #endif -->
+			
 		</view>
 		
 		<view class="card-box">
+			<view class="card-tabs">
+				<!-- #ifdef APP-ANDROID -->
+				<m-segmented-control :values="tabs" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'72rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
+				<!-- #endif -->
+				<!-- #ifndef APP-ANDROID -->
+				<m-segmented-control :values="tabs" :nums="tabNumbers" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'auto',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
+				<!-- #endif -->
+			</view>
 			<!-- #ifdef APP-ANDROID -->
 			<scroll-view 
 				class="card-list android-card-scroll" 
@@ -45,7 +48,7 @@
 			<!-- #ifndef APP-ANDROID -->
 			<view class="card-list">
 			<!-- #endif -->
-				<view class="card-item" v-for="(card, index) in filteredCardList" :key="index">
+				<view class="card-item" v-for="(card, index) in filteredCardList" :key="index" @click="handleDetail(card)">
 					<view class="item-head">
 						<view class="item-head-label">
 							<text class="card-item-title">{{ getCardText(card, 'cardNumber') }}</text>
@@ -101,6 +104,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { getPageParams } from '@/utils/routerParams'
+import { CardItem } from '@/api/types.uts'
 
 const card_number = ref('')
 const queryKeyword = ref('')
@@ -108,22 +112,8 @@ const tabs = ref(['全部', '在用', '异常'])
 const current = ref(0)
 const scrollViewHeight = ref(0)
 
-// 卡片数据类型
-interface CardItem {
-	id: number
-	cardNumber: string
-	iccid: string
-	tag: string
-	status: string // '正常' 或 '异常'
-	currentPackage: string
-	expireDate: string
-	usedTraffic: string
-	totalTraffic: string
-	currentCycle: string
-}
-
 // 完整的卡片列表数据
-const allCardList = ref<any[]>([
+const allCardList = ref<CardItem[]>([
 	{
 		id: 1,
 		cardNumber: '1064916585160',
@@ -186,13 +176,28 @@ const allCardList = ref<any[]>([
 	}
 ])
 
+// 计算每个 tab 对应的卡片数量
+const tabNumbers = computed<number[]>(() => {
+	const total = allCardList.value.length
+	const inUse = allCardList.value.filter((card: CardItem) => card.status === '在用').length
+	const abnormal = allCardList.value.filter((card: CardItem) => card.status !== '在用').length
+	return [total, inUse, abnormal]
+})
+
+const handleDetail = (card: CardItem) => {
+	console.log(card)
+	uni.navigateTo({
+		url: '/pages/cardDetail/cardDetail?cardNumber=' + card.cardNumber
+	})
+}
+
 // 根据选中的 tab 和查询卡号过滤卡片列表
-const filteredCardList = computed<any[]>(() : any[] => {
+const filteredCardList = computed<CardItem[]>(() : CardItem[] => {
 	const currentStatus = tabs.value[current.value]
 	let list = allCardList.value
 	if (currentStatus !== '全部') {
-		list = list.filter((card: any) : boolean => {
-			const status = '' + (card as UTSJSONObject)['status']
+		list = list.filter((card: CardItem) : boolean => {
+			const status = '' + card.status
 			if (currentStatus === '异常') {
 				return status !== '在用'
 			}
@@ -200,7 +205,7 @@ const filteredCardList = computed<any[]>(() : any[] => {
 		})
 	}
 	if (queryKeyword.value !== '') {
-		list = list.filter((card: any) : boolean => {
+		list = list.filter((card: CardItem) : boolean => {
 			const cardNumber = '' + (card as UTSJSONObject)['cardNumber']
 			return cardNumber.indexOf(queryKeyword.value) !== -1
 		})
@@ -208,8 +213,8 @@ const filteredCardList = computed<any[]>(() : any[] => {
 	return list
 })
 
-const getCardText = (card: any, key: string): string => {
-	const value = (card as UTSJSONObject)[key]
+const getCardText = (card: CardItem, key: string): string => {
+	const value = card[key]
 	return value == null ? '' : '' + value
 }
 
@@ -228,7 +233,6 @@ const getStatusClass = (status: string): string => {
 }
 
 const handleClick = (e: UTSJSONObject) => {
-	console.log(e.index)
 	if(e.index != null){
 		current.value = e.index as number
 	}
@@ -239,6 +243,7 @@ const scanCode = () => {
 		url: '/pages/scanCode/scanCode'
 	})
 }
+
 
 const handleInput = () => {
 	if (card_number.value.trim() === '') {
@@ -258,6 +263,22 @@ const handleQuery = () => {
 	queryKeyword.value = keyword
 }
 
+// 接收扫码结果
+const onScanResult = (data: UTSJSONObject) => {
+	console.log(data)
+	const result = data.getString('result') ?? ''
+	console.log(result)
+	if (result.length > 0) {
+		card_number.value = result
+		uni.showToast({
+			title: '扫码成功',
+			icon: 'success'
+		})
+		// 自动查询
+		// handleQuery()
+	}
+}
+
 // 计算 scroll-view 的高度
 const calculateScrollHeight = () => {
 	// #ifdef APP-ANDROID
@@ -265,9 +286,6 @@ const calculateScrollHeight = () => {
 		const systemInfo = uni.getSystemInfoSync()
 		const windowHeight = systemInfo.windowHeight
 		const statusBarHeight = systemInfo.statusBarHeight || 0
-		
-		// 获取顶部导航栏高度（假设 topNavBar 高度为 44px + 状态栏高度）
-		// 或者使用 uni.createSelectorQuery 动态获取
 		uni.createSelectorQuery().select('.container').boundingClientRect((rect) => {
 			if (rect) {
 				// 获取顶部搜索框区域高度
@@ -291,11 +309,18 @@ onLoad((options) => {
 	if(type != null){
 		current.value = parseInt('' + type)
 	}
+
+	uni.$on('scanResult', onScanResult)
 })
 
 onMounted(() => {
 	calculateScrollHeight()
 })
+
+onUnload(() => {
+		// 移除事件监听
+		uni.$off('scanResult', onScanResult)
+	})
 </script>
 
 <style lang="scss" scoped>
@@ -313,6 +338,10 @@ onMounted(() => {
 			border:1rpx solid #e7edf5;
 			border-radius: 24rpx;
 			padding: 24rpx;
+
+			.card-tabs{
+				margin-bottom: 30rpx;
+			}
 			
 			.search-value{
 				display: flex;

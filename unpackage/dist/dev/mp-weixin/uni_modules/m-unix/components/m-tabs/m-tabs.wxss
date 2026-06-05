@@ -24,64 +24,74 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.m-fab__mask {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.2);
-  z-index: 996;
+.m-tabs.data-v-33d4227b {
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
 }
-.m-fab__subs {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-bottom: 24rpx;
-}
-.m-fab__sub {
+.m-tabs__inner.data-v-33d4227b {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 16rpx 28rpx;
-  border-radius: 40rpx;
-  margin-bottom: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
 }
-.m-fab__sub:active {
-  transform: scale(0.95);
+.m-tabs__item.data-v-33d4227b {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+  border-radius: 24rpx;
+  transition: all 0.28s ease;
+  background-color: var(--269605bc);
+  border: 2rpx solid var(--566d4b9b);
 }
-.m-fab__sub-img {
-  width: 40rpx;
-  height: 40rpx;
-  margin-right: 12rpx;
+.m-tabs__item--active.data-v-33d4227b {
+  background-color: var(--370975e7);
+  border-color: var(--06c44c40);
 }
-.m-fab__sub-text {
-  font-size: 28rpx;
+.m-tabs__item--disabled.data-v-33d4227b {
+  opacity: 0.5;
 }
-.m-fab__main {
+.m-tabs__item-inner.data-v-33d4227b {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: transform 0.1s ease;
+  position: relative;
+  padding: 22rpx 0;
+  flex: 1;
 }
-.m-fab__main:active {
-  transform: scale(0.95);
+.m-tabs__text.data-v-33d4227b {
+  line-height: 1.2;
+  transition: color 0.28s ease;
 }
-.m-fab__main--dragging {
-  opacity: 0.9;
-  transition: none;
+.m-tabs__badge-wrap.data-v-33d4227b {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
 }
-.m-fab__main--dragging:active {
-  transform: none;
+.m-tabs__badge.data-v-33d4227b {
+  font-size: 20rpx;
+  padding: 2rpx 8rpx;
+  border-radius: 20rpx;
+  min-width: 28rpx;
+  text-align: center;
 }
-.m-fab__main-child {
-  pointer-events: none;
+.m-tabs__dot.data-v-33d4227b {
+  position: absolute;
+  top: 0;
+  right: -6rpx;
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
 }
-.m-fab__plus {
-  font-size: 64rpx;
-  line-height: 1;
+.m-tabs__line.data-v-33d4227b {
+  height: 1rpx;
+  background-color: #eeeeee;
+  width: 100%;
+  margin-top: 16rpx;
 }

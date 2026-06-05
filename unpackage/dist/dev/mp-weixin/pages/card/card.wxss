@@ -40,6 +40,9 @@ page .container .card-box.data-v-a89086b7 {
   border-radius: 24rpx;
   padding: 24rpx;
 }
+page .container .card-box .card-tabs.data-v-a89086b7 {
+  margin-bottom: 30rpx;
+}
 page .container .card-box .search-value.data-v-a89086b7 {
   display: flex;
   flex-direction: row;

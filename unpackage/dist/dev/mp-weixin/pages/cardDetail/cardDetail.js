@@ -96,8 +96,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onLoad((options) => {
       var _a;
-      const cardNumber = (_a = options.getString("card_number")) !== null && _a !== void 0 ? _a : "";
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:312", cardNumber);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:311", options);
+      const cardNumber = (_a = options.cardNumber) !== null && _a !== void 0 ? _a : "";
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:313", cardNumber);
       card_number.value = cardNumber;
     });
     return (_ctx, _cache) => {

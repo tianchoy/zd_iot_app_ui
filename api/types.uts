@@ -42,3 +42,17 @@ export type CardListSumData = {
   inUse: number
   inNotUse: number
 }
+
+// 卡片数据类型
+export type  CardItem = {
+	id: number
+	cardNumber: string
+	iccid: string
+	tag: string
+	status: string // '正常' 或 '异常'
+	currentPackage: string
+	expireDate: string
+	usedTraffic: string
+	totalTraffic: string
+	currentCycle: string
+}

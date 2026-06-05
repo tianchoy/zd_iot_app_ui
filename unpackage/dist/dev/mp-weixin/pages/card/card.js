@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_types = require("../../api/types.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
@@ -25,7 +26,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const current = common_vendor.ref(0);
     common_vendor.ref(0);
     const allCardList = common_vendor.ref([
-      new common_vendor.UTSJSONObject({
+      new api_types.CardItem({
         id: 1,
         cardNumber: "1064916585160",
         iccid: "89860421123456789012",
@@ -37,7 +38,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         totalTraffic: "20GB",
         currentCycle: "第1期 / 共12期"
       }),
-      new common_vendor.UTSJSONObject({
+      new api_types.CardItem({
         id: 2,
         cardNumber: "1064916585161",
         iccid: "89860421123456789013",
@@ -49,7 +50,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         totalTraffic: "10GB",
         currentCycle: "第2期 / 共6期"
       }),
-      new common_vendor.UTSJSONObject({
+      new api_types.CardItem({
         id: 3,
         cardNumber: "1064916585162",
         iccid: "89860421123456789014",
@@ -61,7 +62,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         totalTraffic: "1GB",
         currentCycle: "第1期 / 共1期"
       }),
-      new common_vendor.UTSJSONObject({
+      new api_types.CardItem({
         id: 4,
         cardNumber: "1064916585163",
         iccid: "89860421123456789015",
@@ -73,7 +74,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         totalTraffic: "5GB",
         currentCycle: "第1期 / 共3期"
       }),
-      new common_vendor.UTSJSONObject({
+      new api_types.CardItem({
         id: 5,
         cardNumber: "1064916585164",
         iccid: "89860421123456789016",
@@ -86,12 +87,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         currentCycle: "第1期 / 共1期"
       })
     ]);
+    const tabNumbers = common_vendor.computed(() => {
+      const total = allCardList.value.length;
+      const inUse = allCardList.value.filter((card) => {
+        return card.status === "在用";
+      }).length;
+      const abnormal = allCardList.value.filter((card) => {
+        return card.status !== "在用";
+      }).length;
+      return [total, inUse, abnormal];
+    });
+    const handleDetail = (card) => {
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:188", card);
+      common_vendor.index.navigateTo({
+        url: "/pages/cardDetail/cardDetail?cardNumber=" + card.cardNumber
+      });
+    };
     const filteredCardList = common_vendor.computed(() => {
       const currentStatus = tabs.value[current.value];
       let list = allCardList.value;
       if (currentStatus !== "全部") {
-        list = list.filter((card = null) => {
-          const status = "" + card["status"];
+        list = list.filter((card) => {
+          const status = "" + card.status;
           if (currentStatus === "异常") {
             return status !== "在用";
           }
@@ -99,14 +116,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
       if (queryKeyword.value !== "") {
-        list = list.filter((card = null) => {
+        list = list.filter((card) => {
           const cardNumber = "" + card["cardNumber"];
           return cardNumber.indexOf(queryKeyword.value) !== -1;
         });
       }
       return list;
     });
-    const getCardText = (card = null, key) => {
+    const getCardText = (card, key) => {
       const value = card[key];
       return value == null ? "" : "" + value;
     };
@@ -123,7 +140,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:231", e.index);
       if (e.index != null) {
         current.value = e.index;
       }
@@ -149,14 +165,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       queryKeyword.value = keyword;
     };
+    const onScanResult = (data) => {
+      var _a;
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:268", data);
+      const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:270", result);
+      if (result.length > 0) {
+        card_number.value = result;
+        common_vendor.index.showToast({
+          title: "扫码成功",
+          icon: "success"
+        });
+      }
+    };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:289", options);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:307", options);
       const type = options["type"];
       if (type != null) {
         current.value = parseInt("" + type);
       }
+      common_vendor.index.$on("scanResult", onScanResult);
     });
     common_vendor.onMounted(() => {
+    });
+    common_vendor.onUnload(() => {
+      common_vendor.index.$off("scanResult", onScanResult);
     });
     return (_ctx, _cache) => {
       "raw js";
@@ -178,26 +211,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "40rpx",
           class: "data-v-a89086b7"
         }),
-        e: common_vendor.o(scanCode, "81"),
+        e: common_vendor.o(scanCode, "c5"),
         f: common_vendor.p({
           type: "white",
           plain: true,
           width: "90rpx",
           class: "scan-btn data-v-a89086b7"
         }),
-        g: common_vendor.o(handleQuery, "5a"),
+        g: common_vendor.o(handleQuery, "d2"),
         h: common_vendor.p({
           type: "primary",
           width: "120rpx",
           class: "data-v-a89086b7"
         }),
-        i: common_vendor.o(handleClick, "98"),
+        i: common_vendor.o(handleClick, "dd"),
         j: common_vendor.p({
           values: tabs.value,
+          nums: tabNumbers.value,
           current: current.value,
           textActiveColor: "#2563eb",
           customStyle: {
-            height: "unset",
+            height: "auto",
             padding: "5rpx 10rpx",
             border: "1rpx solid #e5edf6"
           },
@@ -216,7 +250,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             i: common_vendor.t(getCardText(card, "totalTraffic")),
             j: common_vendor.t(getCardText(card, "currentCycle")),
             k: "a89086b7-6-" + i0,
-            l: index
+            l: index,
+            m: common_vendor.o(($event) => {
+              return handleDetail(card);
+            }, index)
           };
         }),
         l: common_vendor.p({

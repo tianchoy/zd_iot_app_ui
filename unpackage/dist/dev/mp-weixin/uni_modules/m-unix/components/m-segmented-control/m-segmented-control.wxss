@@ -41,7 +41,7 @@
   align-items: stretch;
   position: relative;
   box-sizing: border-box;
-  padding: 20rpx 0;
+  padding: 24rpx 0;
   width: 100%;
   min-height: 0;
 }
@@ -71,9 +71,23 @@
   border-color: transparent;
   background-color: transparent;
 }
+.m-segmented-control__content.data-v-74c1432a {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8rpx;
+}
 .m-segmented-control__text.data-v-74c1432a {
   line-height: 1.2;
   position: relative;
   z-index: 2;
-  color: #334155;
+}
+.m-segmented-control__number.data-v-74c1432a {
+  padding: 2rpx 10rpx;
+  border-radius: 28rpx;
+  line-height: 1.2;
+  font-weight: normal;
+  position: relative;
+  z-index: 2;
 }
