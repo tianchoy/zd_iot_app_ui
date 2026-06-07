@@ -6,10 +6,10 @@
 	>
 		<view
 			class="m-tabs__inner"
-			:style="{ 
-				height: height + 'rpx', 
-				paddingLeft: padding + 'rpx', 
-				paddingRight: padding + 'rpx', 
+			:style="{
+				height: height + 'rpx',
+				paddingLeft: padding + 'rpx',
+				paddingRight: padding + 'rpx',
 				backgroundColor: backgroundColor,
 				gap: gap + 'rpx'
 			}"
@@ -22,7 +22,7 @@
 					'm-tabs__item--active': currentTab === idx,
 					'm-tabs__item--disabled': tabDisabled(tab)
 				}"
-				:style="{ width: itemWidthComputed }"
+				:style="itemStyleComputed"
 				@tap="onTabTap(idx, tab)"
 			>
 				<view class="m-tabs__item-inner">
@@ -78,7 +78,7 @@ export default {
 		},
 		backgroundColor: {
 			type: String,
-			default: '#FFFFFF'
+			default: ''
 		},
 		isFixed: {
 			type: Boolean,
@@ -169,20 +169,22 @@ export default {
 		tabCount(): number {
 			return (this.tabs as any[]).length
 		},
-		itemWidthComputed(): string {
-			const iw = this.itemWidth as string
-			if (iw != null && iw.length > 0) {
-				return iw
-			}
-			const n = this.tabCount
-			if (n <= 0) {
-				return '25%'
-			}
-			// 如果有 gap，需要减去 gap 的总宽度
-			const gapTotal = (this.gap as number) * (n - 1)
-			return `calc((100% - ${gapTotal}rpx) / ${n})`
-		},
-		rootStyle(): UTSJSONObject {
+			itemWidthComputed(): string {
+				const iw = this.itemWidth as string
+				if (iw != null && iw.length > 0) {
+					return iw
+				}
+				return ''
+			},
+			itemStyleComputed(): UTSJSONObject {
+				const st = {} as UTSJSONObject
+				const w = this.itemWidthComputed
+				if (w !== '') {
+					st['width'] = w
+				}
+				return st
+			},
+rootStyle(): UTSJSONObject {
 			const st = {} as UTSJSONObject
 			const z = this.zIndex
 			st['zIndex'] = typeof z === 'number' ? z : parseInt('' + z)
@@ -268,17 +270,18 @@ export default {
 	position: relative;
 	border-radius: 24rpx;
 	transition: all 0.28s ease;
-	
+	flex: 1;
+
 	// 默认样式（未选中）
 	background-color: v-bind(inactiveBgColor);
 	border: 2rpx solid v-bind(inactiveBorderColor);
-	
+
 	// 选中样式
 	&--active {
 		background-color: v-bind(activeBgColor);
 		border-color: v-bind(activeBorderColor);
 	}
-	
+
 	// 禁用样式
 	&--disabled {
 		opacity: 0.5;

@@ -32,7 +32,7 @@ const __default__ = common_vendor.defineComponent({
     },
     backgroundColor: {
       type: String,
-      default: "#FFFFFF"
+      default: ""
     },
     isFixed: {
       type: Boolean,
@@ -130,12 +130,15 @@ const __default__ = common_vendor.defineComponent({
       if (iw != null && iw.length > 0) {
         return iw;
       }
-      const n = this.tabCount;
-      if (n <= 0) {
-        return "25%";
+      return "";
+    },
+    itemStyleComputed() {
+      const st = new common_vendor.UTSJSONObject({});
+      const w = this.itemWidthComputed;
+      if (w !== "") {
+        st["width"] = w;
       }
-      const gapTotal = this.gap * (n - 1);
-      return `calc((100% - ${gapTotal}rpx) / ${n})`;
+      return st;
     },
     rootStyle() {
       const st = new common_vendor.UTSJSONObject({});
@@ -233,7 +236,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         l: common_vendor.o(($event) => $options.onTabTap(idx, tab), idx)
       });
     }),
-    b: $options.itemWidthComputed,
+    b: common_vendor.s($options.itemStyleComputed),
     c: $props.height + "rpx",
     d: $props.padding + "rpx",
     e: $props.padding + "rpx",
