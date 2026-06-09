@@ -2,38 +2,13 @@
 import { ApiUrl } from './url'
 import { request, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
 import { config } from '@/common/config.uts'
-
-
-
-export type LoginData = {
-  id: number
-  token: string
-  access_token: string
-  refreshToken: string
-  userId: number
-  nickname: string
-}
-
-export type CountryData = {
-  fullName: string
-  letterCode: string
-}
-
-export type TenantInfoData = {
-  rechargeTip: string
-  servicePhone: string
-  serviceQrcode: string
-  wxAuditHide: string
-  wxAuditHideNo: string
-  wxGetPhoneLogin: string
-  wxMiniPayType: string
-  wxPayClass: string
-  h5IsPullMini: string;
-  h5PayType: string;
-  serviceJumpUrl: string; 
-}
-
-
+import type {
+  LoginData,
+  CountryData,
+  TenantInfoData,
+  QueryCardListParams,
+  CardListSumData
+} from './types'
 
 // 查询国家列表
 export function getCountryList(withToken: boolean = false): Promise<ApiResponse<CountryData[]>> {
@@ -64,7 +39,7 @@ export function login(data: UTSJSONObject, withToken: boolean = true): Promise<A
   return request<LoginData>({
     url: ApiUrl.login as string,
     method: 'POST',
-    data:{
+    data: {
       ...data,
       tenantId: config.api.auth.tenantId,
       clientId: config.api.auth.clientId,
@@ -73,7 +48,6 @@ export function login(data: UTSJSONObject, withToken: boolean = true): Promise<A
     withToken
   })
 }
-
 
 // 获取租户页面配置（自动适配平台）
 export function getTenantInfo(tenantId: string, withToken: boolean = true): Promise<ApiResponse<TenantInfoData>> {
@@ -94,5 +68,24 @@ export function getTenantInfo(tenantId: string, withToken: boolean = true): Prom
     url: url,
     method: 'GET',
     withToken
+  })
+}
+
+// 查询卡列表
+export function queryCardList(params: QueryCardListParams, withToken: boolean = true): Promise<ApiResponse<LoginData[]>> {
+  return request<LoginData[]>({
+    url: ApiUrl.queryCardList as string,
+    method: 'GET',
+    data: params,
+    withToken: withToken
+  })
+}
+
+// 查询卡列表统计
+export function queryCardListSum(withToken: boolean = true): Promise<ApiResponse<CardListSumData>> {
+  return request<CardListSumData>({
+    url: ApiUrl.queryCardListSum as string,
+    method: 'GET',
+    withToken: withToken
   })
 }

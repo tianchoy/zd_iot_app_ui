@@ -20,7 +20,7 @@
 						class="search-input"
 					/>
 					<view class="scan-btn" @click="handleScan">
-						<m-icon name="scanning" size="40rpx" color="#666"></m-icon>
+						<rice-icon name="scan" size="40rpx" color="#666"></rice-icon>
 					</view>
 				</view>
 				
@@ -53,22 +53,13 @@
 	</view>
 	
 	<!-- 底部弹窗 -->
-	<m-bottom-popup
-		:show="showCountryPopup"
-		<!-- #ifdef MP-WEIXIN -->
-		:height="'50%'"
-		<!-- #endif -->
-		<!-- #ifndef MP-WEIXIN -->
-		:height="'75%'"
-		<!-- #endif -->
-		:radius="true"
+	<rice-popup
+		v-model:show="showCountryPopup"
+		position="bottom"
 		@close="onPopupClose"
 	>
 		<view class="popup-header">
 			<text class="popup-title">选择国家/地区</text>
-			<view class="popup-close" @tap="onPopupClose">
-				<m-icon name="close-bold" size="40rpx" ></m-icon>
-			</view>
 		</view>
 		
 		<SearchSelect
@@ -78,13 +69,14 @@
 			search-placeholder="搜索国家/地区名称"
 			@change="onCountryChange"
 		/>
-	</m-bottom-popup>
+	</rice-popup>
 </template>
 
 <script setup lang="uts">
 	import { ref, computed, onMounted, onUnmounted } from 'vue'
 	import SearchSelect from '@/components/selectCountry.uvue'
-	import { getCountryList, type CountryData } from '@/api/http.uts'
+	import { getCountryList } from '@/api/http.uts'
+	import type { CountryData } from '@/api/types.uts'
 	
 	const cardNumber = ref<string>('1064916585160')
 	
@@ -384,6 +376,7 @@
 		justify-content: space-between;
 		padding: 32rpx 32rpx 16rpx;
 		border-bottom: 2rpx solid #f0f0f0;
+		background-color: #ffffff;
 		
 		.popup-title {
 			font-size: 32rpx;

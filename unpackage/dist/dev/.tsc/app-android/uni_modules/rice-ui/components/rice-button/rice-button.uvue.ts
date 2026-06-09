@@ -1,0 +1,323 @@
+import _easycom_rice_loading from '@/uni_modules/rice-ui/components/rice-loading/rice-loading.uvue'
+import _easycom_rice_icon from '@/uni_modules/rice-ui/components/rice-icon/rice-icon.uvue'
+import { addUnit, debugWarn, hasStrValue, isGradientColor, isThemeColor } from '../../libs/utils';
+	import { Coloruts } from "../../libs/plugin";
+	import { useNamespace } from '../../libs/use';
+	import { isDark } from "../../libs/store";
+	import { ButtonProps, ButtonType } from './type.uts';
+	import { iconSizeTypes, loadingSizeTypes } from "./utils"
+
+	
+const __sfc__ = defineComponent({
+  __name: 'rice-button',
+
+		name: 'rice-button',
+		styleIsolation: 'app-and-page'
+	,
+  props: {
+    type: { type: String, required: false },
+    size: { type: String, required: false },
+    text: { type: [String, Number], required: false },
+    color: { type: String, required: false },
+    darkColor: { type: String, required: false },
+    textColor: { type: String, required: false },
+    textSize: { type: [String, Number], required: false },
+    icon: { type: [String, Number], required: false },
+    iconSize: { type: [String, Number], required: false },
+    iconColor: { type: String, required: false },
+    iconFontFamily: { type: String, required: false },
+    plainFill: { type: Boolean, required: false, default: false },
+    plain: { type: Boolean, required: false, default: false },
+    disabled: { type: Boolean, required: false, default: false },
+    loading: { type: Boolean, required: false, default: false },
+    loadingSize: { type: [String, Number], required: false },
+    loadingText: { type: [String, Number], required: false },
+    loadingMode: { type: String, required: false },
+    shape: { type: String, required: false },
+    width: { type: [String, Number], required: false },
+    height: { type: [String, Number], required: false },
+    openType: { type: String, required: false },
+    formType: { type: String, required: false },
+    lang: { type: String, required: false },
+    sessionFrom: { type: String, required: false },
+    sendMessageTitle: { type: String, required: false },
+    sendMessageImg: { type: String, required: false },
+    sendMessagePath: { type: String, required: false },
+    showMessageCard: { type: String, required: false },
+    appParameter: { type: String, required: false },
+    to: { type: String, required: false },
+    customStyle: { type: UTSJSONObject, required: false, default: () : UTSJSONObject => ({}) }
+  },
+  emits: ['click', 'getphonenumber', 'getrealtimephonenumber', 'getuserinfo', 'chooseavatar', 'launchapp',
+		'agreeprivacyauthorization', 'opensetting', 'error', 'contact'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	
+
+	const ns = useNamespace('button')
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+	const props = __props
+
+	const btnText = computed(() => props.loading && hasStrValue(props.loadingText) ? props.loadingText : props.text)
+	const isPlain = computed(() => props.plain || props.plainFill)
+	const buttonColor = computed<string | null>(() => isDark.value ? (props.darkColor ?? props.color) : props.color)
+
+	const emitClick = (e : UniPointerEvent) => {
+		e.stopPropagation()
+		if (props.disabled || props.loading) return
+		if (hasStrValue(props.to)) {
+			uni.navigateTo({
+				url: props.to!,
+				fail: err => {
+					debugWarn('Button', err.errMsg)
+				}
+			})
+		}
+		emit('click')
+	}
+
+	const _iconSize = computed<string | number>(() => {
+		if (hasStrValue(props.iconSize)) return props.iconSize!
+		return iconSizeTypes[props.size ?? 'default'] ?? '16px'
+	})
+
+
+	const _loadingSize = computed<string | number>(() => {
+		if (hasStrValue(props.loadingSize)) return props.loadingSize!
+		return loadingSizeTypes[props.size ?? 'default'] ?? '18px'
+	})
+
+	const buttonType = computed<string>(() => {
+		if (hasStrValue(buttonColor.value)) return ''
+		if (props.type == 'info') return 'info'
+		return isThemeColor(props.type) ? props.type! : 'default'
+	})
+
+	const getTextColor = () : string => {
+		if (hasStrValue(props.textColor)) return props.textColor!
+		//buttonColor 有值说明用户传了按钮的颜色
+		if (hasStrValue(buttonColor.value)) {
+			return (isPlain.value && !isGradientColor(buttonColor.value!))
+				? buttonColor.value!
+				: ""
+		}
+		return ""
+
+	}
+
+	//图标、loading的颜色
+	const themeColor = ref("")
+	const _iconColor = computed<string>(() => {
+		if (hasStrValue(props.iconColor)) {
+			return props.iconColor!
+		}
+		const textColor = getTextColor()
+		if (textColor != "") return textColor
+
+		const baseColor = 'var(--rice-text-color)'
+		if (isPlain.value || buttonType.value == 'info' || buttonType.value == 'default') return themeColor.value == "" ? baseColor : themeColor.value
+		return '#f5f5f5'
+
+
+
+
+
+	})
+
+	function darken(color : Coloruts, amount = 20) {
+		return color.mix('#141414', amount).toHexString()
+	}
+
+	const btnStyle = computed(() => {
+		const css = new Map<string, any>()
+
+		//自定义颜色
+		if (hasStrValue(buttonColor.value)) {
+			const color = buttonColor.value!
+			if (isGradientColor(color)) {
+				css.set('background', color)
+				css.set('border-style', 'none')
+			} else {
+				const colorUts = new Coloruts(color)
+				css.set('border-color', color)
+
+				if (!isPlain.value) {
+					css.set('background', color)
+				} else if (props.plainFill) {
+					css.set('background', isDark.value ? darken(colorUts, 90) : colorUts.tint(90).toHexString())
+				}
+
+			}
+		}
+
+
+
+
+		if (props.height != null) css.set('height', addUnit(props.height!))
+		if (props.width != null) css.set('width', addUnit(props.width!))
+		return css
+	})
+
+
+	const buttonClass = computed<string[]>(() => {
+
+		const basic = [
+			ns.b(''),
+			ns.theme(),
+			ns.m(props.size),
+			ns.m(props.shape),
+			ns.is('disabled', props.disabled),
+		]
+		if (buttonType.value != "") {
+			const theme = ns.m(props.plainFill ? `${buttonType.value}--plain-fill` : buttonType.value)
+			basic.push(theme)
+		}
+		basic.push(ns.is("plain", props.plain))
+		return basic
+	})
+
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		const textColor = getTextColor()
+		if (textColor != "") css.set('color', textColor)
+		if (props.textSize != null) css.set('font-size', addUnit(props.textSize!))
+		if (hasStrValue(props.icon) || props.loading) css.set('margin-left', '4px')
+		return css
+	})
+
+	const textClass = computed(() => {
+		const basic = [ns.e("text")]
+		if (buttonType.value != "") {
+			const theme = ns.m(isPlain.value ? `${buttonType.value}--plain__text` : `${buttonType.value}__text`)
+			basic.push(theme)
+		}
+		if (props.size != null) basic.push(ns.m(`${props.size}__text`))
+		return basic
+	})
+
+	const hoverClass = computed(() => {
+		if (props.disabled || props.loading) return 'none'
+		if (isPlain.value || buttonType.value == "") return 'rice-button--hover'
+		return `rice-button--${buttonType.value}--hover`
+
+	})
+
+
+	const buttonRef = shallowRef<UniElement | null>(null)
+	const getCssVar = async () => {
+		await nextTick()
+		if (buttonType.value == 'default' || buttonType.value == 'info') {
+			themeColor.value = buttonRef.value?.style.getPropertyValue(`--rice-text-color`) ?? ""
+		} else if (isThemeColor(buttonType.value)) {
+			themeColor.value = buttonRef.value?.style.getPropertyValue(`--rice-${buttonType.value}-color`) ?? ""
+		} else {
+			themeColor.value = buttonRef.value?.style.getPropertyValue(`--rice-text-color-white`) ?? ""
+		}
+	}
+
+
+	watch([buttonType, () : boolean => isDark.value], () => {
+		getCssVar()
+	})
+
+	onMounted(() => {
+		getCssVar()
+	})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+return (): any | null => {
+
+const _component_rice_loading = resolveEasyComponent("rice-loading",_easycom_rice_loading)
+const _component_rice_icon = resolveEasyComponent("rice-icon",_easycom_rice_icon)
+
+  return _cE("view", _uM({
+    class: _nC(unref(buttonClass)),
+    style: _nS([unref(btnStyle),_ctx.customStyle]),
+    "hover-stay-time": 100,
+    "hover-class": unref(hoverClass),
+    ref_key: "buttonRef",
+    ref: buttonRef,
+    onClick: withModifiers(emitClick, ["stop"])
+  }), [
+    isTrue(_ctx.loading)
+      ? _cV(_component_rice_loading, _uM({
+          key: 0,
+          color: unref(_iconColor),
+          size: unref(_loadingSize),
+          mode: _ctx.loadingMode
+        }), null, 8 /* PROPS */, ["color", "size", "mode"])
+      : _cC("v-if", true),
+    isTrue(_ctx.icon)
+      ? _cV(_component_rice_icon, _uM({
+          key: 1,
+          name: _ctx.icon,
+          color: unref(_iconColor),
+          size: unref(_iconSize),
+          "font-family": _ctx.iconFontFamily
+        }), null, 8 /* PROPS */, ["name", "color", "size", "font-family"])
+      : _cC("v-if", true),
+    renderSlot(_ctx.$slots, "default", {}, (): any[] => [
+      isTrue(unref(hasStrValue)(_ctx.text))
+        ? _cE("text", _uM({
+            key: 0,
+            class: _nC(unref(textClass)),
+            style: _nS(unref(textStyle))
+          }), _tD(unref(btnText)), 7 /* TEXT, CLASS, STYLE */)
+        : _cC("v-if", true)
+    ])
+  ], 14 /* CLASS, STYLE, PROPS */, ["hover-class"])
+}
+}
+
+})
+export default __sfc__
+export type RiceButtonComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesRiceUiComponentsRiceButtonRiceButtonStyles = [_uM([["rice-button", _pS(_uM([["position", "relative"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["height", 42], ["paddingTop", 0], ["paddingRight", 15], ["paddingBottom", 0], ["paddingLeft", 15], ["boxSizing", "border-box"], ["opacity", 1], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "var(--rice-button-default-border)"], ["borderRightColor", "var(--rice-button-default-border)"], ["borderBottomColor", "var(--rice-button-default-border)"], ["borderLeftColor", "var(--rice-button-default-border)"]]))], ["rice-button__text", _pS(_uM([["color", "var(--rice-text-color-white)"], ["fontSize", 14]]))], ["rice-button--square", _pS(_uM([["borderTopLeftRadius", 0], ["borderTopRightRadius", 0], ["borderBottomRightRadius", 0], ["borderBottomLeftRadius", 0]]))], ["rice-button--round", _pS(_uM([["borderTopLeftRadius", 990], ["borderTopRightRadius", 990], ["borderBottomRightRadius", 990], ["borderBottomLeftRadius", 990]]))], ["rice-button--hover", _pS(_uM([["opacity", 0.6]]))], ["rice-button--default-hover", _pS(_uM([["backgroundColor", "var(--rice-button-default-hover-background)"]]))], ["rice-button--disabled", _pS(_uM([["opacity", 0.6]]))], ["rice-button--large", _pS(_uM([["height", 50], ["paddingTop", 0], ["paddingRight", 20], ["paddingBottom", 0], ["paddingLeft", 20]]))], ["rice-button--large__text", _pS(_uM([["fontSize", 14]]))], ["rice-button--small", _pS(_uM([["height", 32], ["paddingTop", 0], ["paddingRight", 10], ["paddingBottom", 0], ["paddingLeft", 10]]))], ["rice-button--small__text", _pS(_uM([["fontSize", 12]]))], ["rice-button--mini", _pS(_uM([["height", 26], ["paddingTop", 0], ["paddingRight", 4], ["paddingBottom", 0], ["paddingLeft", 4]]))], ["rice-button--mini__text", _pS(_uM([["fontSize", 10]]))], ["rice-button--primary", _pS(_uM([["backgroundColor", "var(--rice-primary-color)"], ["borderTopColor", "var(--rice-primary-color)"], ["borderRightColor", "var(--rice-primary-color)"], ["borderBottomColor", "var(--rice-primary-color)"], ["borderLeftColor", "var(--rice-primary-color)"]]))], ["rice-button--primary--plain-fill", _pS(_uM([["backgroundColor", "var(--rice-primary-color-1)"], ["borderTopColor", "var(--rice-primary-color)"], ["borderRightColor", "var(--rice-primary-color)"], ["borderBottomColor", "var(--rice-primary-color)"], ["borderLeftColor", "var(--rice-primary-color)"]]))], ["rice-button--primary--plain__text", _pS(_uM([["color", "var(--rice-primary-color)"]]))], ["rice-button--primary--hover", _pS(_uM([["backgroundColor", "var(--rice-primary-color-7)"], ["borderTopColor", "var(--rice-primary-color-7)"], ["borderRightColor", "var(--rice-primary-color-7)"], ["borderBottomColor", "var(--rice-primary-color-7)"], ["borderLeftColor", "var(--rice-primary-color-7)"]]))], ["rice-button--success", _pS(_uM([["backgroundColor", "var(--rice-success-color)"], ["borderTopColor", "var(--rice-success-color)"], ["borderRightColor", "var(--rice-success-color)"], ["borderBottomColor", "var(--rice-success-color)"], ["borderLeftColor", "var(--rice-success-color)"]]))], ["rice-button--success--plain-fill", _pS(_uM([["backgroundColor", "var(--rice-success-color-1)"], ["borderTopColor", "var(--rice-success-color)"], ["borderRightColor", "var(--rice-success-color)"], ["borderBottomColor", "var(--rice-success-color)"], ["borderLeftColor", "var(--rice-success-color)"]]))], ["rice-button--success--plain__text", _pS(_uM([["color", "var(--rice-success-color)"]]))], ["rice-button--success--hover", _pS(_uM([["backgroundColor", "var(--rice-success-color-7)"], ["borderTopColor", "var(--rice-success-color-7)"], ["borderRightColor", "var(--rice-success-color-7)"], ["borderBottomColor", "var(--rice-success-color-7)"], ["borderLeftColor", "var(--rice-success-color-7)"]]))], ["rice-button--warning", _pS(_uM([["backgroundColor", "var(--rice-warning-color)"], ["borderTopColor", "var(--rice-warning-color)"], ["borderRightColor", "var(--rice-warning-color)"], ["borderBottomColor", "var(--rice-warning-color)"], ["borderLeftColor", "var(--rice-warning-color)"]]))], ["rice-button--warning--plain-fill", _pS(_uM([["backgroundColor", "var(--rice-warning-color-1)"], ["borderTopColor", "var(--rice-warning-color)"], ["borderRightColor", "var(--rice-warning-color)"], ["borderBottomColor", "var(--rice-warning-color)"], ["borderLeftColor", "var(--rice-warning-color)"]]))], ["rice-button--warning--plain__text", _pS(_uM([["color", "var(--rice-warning-color)"]]))], ["rice-button--warning--hover", _pS(_uM([["backgroundColor", "var(--rice-warning-color-7)"], ["borderTopColor", "var(--rice-warning-color-7)"], ["borderRightColor", "var(--rice-warning-color-7)"], ["borderBottomColor", "var(--rice-warning-color-7)"], ["borderLeftColor", "var(--rice-warning-color-7)"]]))], ["rice-button--error", _pS(_uM([["backgroundColor", "var(--rice-error-color)"], ["borderTopColor", "var(--rice-error-color)"], ["borderRightColor", "var(--rice-error-color)"], ["borderBottomColor", "var(--rice-error-color)"], ["borderLeftColor", "var(--rice-error-color)"]]))], ["rice-button--error--plain-fill", _pS(_uM([["backgroundColor", "var(--rice-error-color-1)"], ["borderTopColor", "var(--rice-error-color)"], ["borderRightColor", "var(--rice-error-color)"], ["borderBottomColor", "var(--rice-error-color)"], ["borderLeftColor", "var(--rice-error-color)"]]))], ["rice-button--error--plain__text", _pS(_uM([["color", "var(--rice-error-color)"]]))], ["rice-button--error--hover", _pS(_uM([["backgroundColor", "var(--rice-error-color-7)"], ["borderTopColor", "var(--rice-error-color-7)"], ["borderRightColor", "var(--rice-error-color-7)"], ["borderBottomColor", "var(--rice-error-color-7)"], ["borderLeftColor", "var(--rice-error-color-7)"]]))], ["rice-button--default", _pS(_uM([["backgroundColor", "var(--rice-button-default-background)"], ["borderTopColor", "var(--rice-button-default-border)"], ["borderRightColor", "var(--rice-button-default-border)"], ["borderBottomColor", "var(--rice-button-default-border)"], ["borderLeftColor", "var(--rice-button-default-border)"]]))], ["rice-button--default--plain-fill", _pS(_uM([["backgroundColor", "rgba(0,0,0,0)"]]))], ["rice-button--default--plain__text", _pS(_uM([["color", "var(--rice-text-color)"]]))], ["rice-button--default--hover", _pS(_uM([["backgroundColor", "var(--rice-button-default-hover-background)"], ["borderTopColor", "var(--rice-button-default-hover-background)"], ["borderRightColor", "var(--rice-button-default-hover-background)"], ["borderBottomColor", "var(--rice-button-default-hover-background)"], ["borderLeftColor", "var(--rice-button-default-hover-background)"]]))], ["rice-button--default__text", _pS(_uM([["color", "var(--rice-text-color)"]]))], ["rice-button--info", _pS(_uM([["backgroundColor", "var(--rice-button-info-background)"], ["borderTopColor", "var(--rice-button-info-background)"], ["borderRightColor", "var(--rice-button-info-background)"], ["borderBottomColor", "var(--rice-button-info-background)"], ["borderLeftColor", "var(--rice-button-info-background)"]]))], ["rice-button--info--plain-fill", _pS(_uM([["backgroundColor", "rgba(0,0,0,0)"]]))], ["rice-button--info--plain__text", _pS(_uM([["color", "var(--rice-text-color)"]]))], ["rice-button--info--hover", _pS(_uM([["backgroundColor", "var(--rice-button-info-hover-background)"], ["borderTopColor", "var(--rice-button-info-hover-background)"], ["borderRightColor", "var(--rice-button-info-hover-background)"], ["borderBottomColor", "var(--rice-button-info-hover-background)"], ["borderLeftColor", "var(--rice-button-info-hover-background)"]]))], ["rice-button--info__text", _pS(_uM([["color", "var(--rice-text-color)"]]))], ["rice-button--plain", _pS(_uM([["backgroundImage", "none"], ["backgroundColor", "rgba(0,0,0,0)"]]))]])]

@@ -1,30 +1,37 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_types = require("../../api/types.js");
+require("../../api/Request.js");
+require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
-  const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
-  const _easycom_m_button_1 = common_vendor.resolveComponent("m-button");
-  const _easycom_m_segmented_control_1 = common_vendor.resolveComponent("m-segmented-control");
-  const _easycom_m_div_1 = common_vendor.resolveComponent("m-div");
-  (_easycom_topNavBar_1 + _easycom_m_icon_1 + _easycom_m_button_1 + _easycom_m_segmented_control_1 + _easycom_m_div_1)();
+  const _easycom_rice_input_1 = common_vendor.resolveComponent("rice-input");
+  const _easycom_rice_icon_1 = common_vendor.resolveComponent("rice-icon");
+  const _easycom_rice_button_1 = common_vendor.resolveComponent("rice-button");
+  const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
+  const _easycom_rice_divider_1 = common_vendor.resolveComponent("rice-divider");
+  const _easycom_customService_1 = common_vendor.resolveComponent("customService");
+  (_easycom_topNavBar_1 + _easycom_rice_input_1 + _easycom_rice_icon_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1 + _easycom_rice_divider_1 + _easycom_customService_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
-const _easycom_m_icon = () => "../../uni_modules/m-unix/components/m-icon/m-icon.js";
-const _easycom_m_button = () => "../../uni_modules/m-unix/components/m-button/m-button.js";
-const _easycom_m_segmented_control = () => "../../uni_modules/m-unix/components/m-segmented-control/m-segmented-control.js";
-const _easycom_m_div = () => "../../uni_modules/m-unix/components/m-div/m-div.js";
+const _easycom_rice_input = () => "../../uni_modules/rice-ui/components/rice-input/rice-input.js";
+const _easycom_rice_icon = () => "../../uni_modules/rice-ui/components/rice-icon/rice-icon.js";
+const _easycom_rice_button = () => "../../uni_modules/rice-ui/components/rice-button/rice-button.js";
+const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
+const _easycom_rice_divider = () => "../../uni_modules/rice-ui/components/rice-divider/rice-divider.js";
+const _easycom_customService = () => "../../components/customService/customService.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_m_icon + _easycom_m_button + _easycom_m_segmented_control + _easycom_m_div)();
+  (_easycom_topNavBar + _easycom_rice_input + _easycom_rice_icon + _easycom_rice_button + _easycom_rice_tabs + _easycom_rice_divider + _easycom_customService)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "card",
   setup(__props) {
     const card_number = common_vendor.ref("");
     const queryKeyword = common_vendor.ref("");
-    const tabs = common_vendor.ref(["全部", "在用", "异常"]);
+    const tabs = common_vendor.ref([new common_vendor.UTSJSONObject({ name: "全部" }), new common_vendor.UTSJSONObject({ name: "在用" }), new common_vendor.UTSJSONObject({ name: "异常" })]);
     const current = common_vendor.ref(0);
-    common_vendor.ref(0);
+    const scrollViewHeight = common_vendor.ref(0);
+    common_vendor.ref(false);
     const allCardList = common_vendor.ref([
       new api_types.CardItem({
         id: 1,
@@ -87,7 +94,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         currentCycle: "第1期 / 共1期"
       })
     ]);
-    const tabNumbers = common_vendor.computed(() => {
+    common_vendor.computed(() => {
       const total = allCardList.value.length;
       const inUse = allCardList.value.filter((card) => {
         return card.status === "在用";
@@ -98,13 +105,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return [total, inUse, abnormal];
     });
     const handleDetail = (card) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:188", card);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:170", card);
       common_vendor.index.navigateTo({
         url: "/pages/cardDetail/cardDetail?cardNumber=" + card.cardNumber
       });
     };
     const filteredCardList = common_vendor.computed(() => {
-      const currentStatus = tabs.value[current.value];
+      const currentStatus = tabs.value[current.value].name;
       let list = allCardList.value;
       if (currentStatus !== "全部") {
         list = list.filter((card) => {
@@ -167,9 +174,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const onScanResult = (data) => {
       var _a;
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:268", data);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:250", data);
       const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:270", result);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:252", result);
       if (result.length > 0) {
         card_number.value = result;
         common_vendor.index.showToast({
@@ -179,13 +186,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:307", options);
-      const type = options["type"];
-      if (type != null) {
-        current.value = parseInt("" + type);
-      }
       common_vendor.index.$on("scanResult", onScanResult);
     });
+    const handleConnectService = () => {
+      common_vendor.index.showToast({
+        title: "连接客服",
+        icon: "none"
+      });
+    };
     common_vendor.onMounted(() => {
     });
     common_vendor.onUnload(() => {
@@ -202,77 +210,88 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-a89086b7"
         }),
-        b: common_vendor.o([($event) => {
-          return card_number.value = $event.detail.value;
-        }, handleInput], "85"),
-        c: card_number.value,
+        b: common_vendor.o(handleInput, "f9"),
+        c: common_vendor.o(($event) => {
+          return card_number.value = $event;
+        }, "2c"),
         d: common_vendor.p({
-          name: "scanning",
+          placeholder: "请输入 ICCID / MSISDN",
+          modelValue: card_number.value,
+          class: "search-input data-v-a89086b7"
+        }),
+        e: common_vendor.p({
+          name: "scan",
           size: "40rpx",
           class: "data-v-a89086b7"
         }),
-        e: common_vendor.o(scanCode, "c5"),
-        f: common_vendor.p({
-          type: "white",
-          plain: true,
-          width: "90rpx",
+        f: common_vendor.o(scanCode, "7a"),
+        g: common_vendor.p({
+          height: "100%",
           class: "scan-btn data-v-a89086b7"
         }),
-        g: common_vendor.o(handleQuery, "d2"),
-        h: common_vendor.p({
+        h: common_vendor.o(handleQuery, "77"),
+        i: common_vendor.p({
           type: "primary",
-          width: "120rpx",
+          color: "#1989fa",
+          textColor: "#ffffff",
+          height: "100%",
           class: "data-v-a89086b7"
         }),
-        i: common_vendor.o(handleClick, "dd"),
-        j: common_vendor.p({
-          values: tabs.value,
-          nums: tabNumbers.value,
-          current: current.value,
-          textActiveColor: "#2563eb",
+        j: common_vendor.o(handleClick, "29"),
+        k: common_vendor.o(($event) => {
+          return current.value = $event;
+        }, "9f"),
+        l: common_vendor.p({
+          ["line-color"]: "#ffffff",
+          list: tabs.value,
+          ["line-width"]: 0,
+          ["title-active-color"]: "#2563eb",
           customStyle: {
-            height: "auto",
-            padding: "5rpx 10rpx",
+            height: "85rpx",
+            padding: "10rpx",
             border: "1rpx solid #e5edf6"
           },
+          modelValue: current.value,
           class: "data-v-a89086b7"
         }),
-        k: common_vendor.f(filteredCardList.value, (card, index, i0) => {
+        m: common_vendor.f(filteredCardList.value, (card, index, i0) => {
           return {
             a: common_vendor.t(getCardText(card, "cardNumber")),
             b: common_vendor.t(getCardText(card, "iccid")),
             c: common_vendor.t(getCardText(card, "status")),
             d: common_vendor.n(getStatusClass(getCardText(card, "status"))),
             e: common_vendor.t(getCardText(card, "currentPackage")),
-            f: "a89086b7-5-" + i0,
+            f: "a89086b7-6-" + i0,
             g: common_vendor.t(getCardText(card, "expireDate")),
             h: common_vendor.t(getCardText(card, "usedTraffic")),
             i: common_vendor.t(getCardText(card, "totalTraffic")),
             j: common_vendor.t(getCardText(card, "currentCycle")),
-            k: "a89086b7-6-" + i0,
+            k: "a89086b7-7-" + i0,
             l: index,
             m: common_vendor.o(($event) => {
               return handleDetail(card);
             }, index)
           };
         }),
-        l: common_vendor.p({
+        n: common_vendor.p({
           backgroundColor: "#f1f5f9",
           textClass: "divider",
           class: "data-v-a89086b7"
         }),
-        m: common_vendor.p({
+        o: common_vendor.p({
           type: "primary",
-          width: "200rpx",
-          btnSize: "mini",
-          size: "25rpx",
-          shape: "circle",
+          size: "small",
           class: "data-v-a89086b7"
         }),
-        n: filteredCardList.value.length === 0
+        p: scrollViewHeight.value + "px",
+        q: filteredCardList.value.length === 0
       }, filteredCardList.value.length === 0 ? {} : {}, {
-        o: `${_ctx.u_s_b_h}px`,
-        p: `${_ctx.u_s_a_i_b}px`
+        r: common_vendor.o(handleConnectService, "63"),
+        s: common_vendor.p({
+          class: "data-v-a89086b7"
+        }),
+        t: `${_ctx.u_s_b_h}px`,
+        v: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

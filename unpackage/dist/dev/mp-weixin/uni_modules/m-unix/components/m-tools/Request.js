@@ -398,7 +398,6 @@ new common_vendor.UTSJSONObject({
   loading: loadingRequest,
   http
 });
-exports.RequestOptions = RequestOptions;
 exports.http = http;
 exports.request = request;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/m-unix/components/m-tools/Request.js.map

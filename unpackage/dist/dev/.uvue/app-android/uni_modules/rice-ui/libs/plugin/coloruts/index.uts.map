@@ -1,0 +1,1 @@
+{"version":3,"file":"index.uts","sourceRoot":"","sources":["uni_modules/rice-ui/libs/plugin/coloruts/index.uts"],"names":[],"mappings":"AAAA,cAAc,cAAc,CAAA;AAC5B,cAAc,YAAY,CAAA;AAC1B,cAAc,YAAY,CAAA","sourcesContent":["export * from \"./conversion\"\r\nexport * from \"./generate\"\r\nexport * from \"./type.uts\""]}

@@ -29,6 +29,7 @@ page .container.data-v-722cdacb {
   display: flex;
   flex-direction: column;
   background-color: #f4f7fb;
+  height: 100%;
 }
 page .container .card-info.data-v-722cdacb {
   background: #ffffff;
@@ -92,8 +93,11 @@ page .container .card-info .card-bottom.data-v-722cdacb {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   margin-top: 24rpx;
+}
+page .container .card-info .card-bottom .btn.data-v-722cdacb {
+  flex: 1;
 }
 page .container .pkg-box.data-v-722cdacb {
   background: #ffffff;
@@ -189,17 +193,20 @@ page .container .pkg-card-selected.data-v-722cdacb {
   box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.08);
 }
 page .bottom-box.data-v-722cdacb {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   background: #ffffff;
-  padding: 20rpx 0;
+  padding: 24rpx;
 }
 page .bottom-box .price-box.data-v-722cdacb {
   display: flex;
   flex-direction: column;
-  margin-left: 24rpx;
 }
 page .bottom-box .price-box .price-label.data-v-722cdacb {
   font-size: 24rpx;

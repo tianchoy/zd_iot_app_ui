@@ -2,21 +2,19 @@
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
-  const _easycom_m_tabs_1 = common_vendor.resolveComponent("m-tabs");
-  const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
-  const _easycom_m_tag_1 = common_vendor.resolveComponent("m-tag");
-  const _easycom_m_segmented_control_1 = common_vendor.resolveComponent("m-segmented-control");
-  const _easycom_m_button_1 = common_vendor.resolveComponent("m-button");
-  (_easycom_topNavBar_1 + _easycom_m_tabs_1 + _easycom_m_icon_1 + _easycom_m_tag_1 + _easycom_m_segmented_control_1 + _easycom_m_button_1)();
+  const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
+  const _easycom_rice_icon_1 = common_vendor.resolveComponent("rice-icon");
+  const _easycom_rice_tag_1 = common_vendor.resolveComponent("rice-tag");
+  const _easycom_rice_button_1 = common_vendor.resolveComponent("rice-button");
+  (_easycom_topNavBar_1 + _easycom_rice_tabs_1 + _easycom_rice_icon_1 + _easycom_rice_tag_1 + _easycom_rice_button_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
-const _easycom_m_tabs = () => "../../uni_modules/m-unix/components/m-tabs/m-tabs.js";
-const _easycom_m_icon = () => "../../uni_modules/m-unix/components/m-icon/m-icon.js";
-const _easycom_m_tag = () => "../../uni_modules/m-unix/components/m-tag/m-tag.js";
-const _easycom_m_segmented_control = () => "../../uni_modules/m-unix/components/m-segmented-control/m-segmented-control.js";
-const _easycom_m_button = () => "../../uni_modules/m-unix/components/m-button/m-button.js";
+const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
+const _easycom_rice_icon = () => "../../uni_modules/rice-ui/components/rice-icon/rice-icon.js";
+const _easycom_rice_tag = () => "../../uni_modules/rice-ui/components/rice-tag/rice-tag.js";
+const _easycom_rice_button = () => "../../uni_modules/rice-ui/components/rice-button/rice-button.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_m_tabs + _easycom_m_icon + _easycom_m_tag + _easycom_m_segmented_control + _easycom_m_button)();
+  (_easycom_topNavBar + _easycom_rice_tabs + _easycom_rice_icon + _easycom_rice_tag + _easycom_rice_button)();
 }
 class CardDetailTabItem extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -98,12 +96,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const active = common_vendor.ref(0);
     const activeName = common_vendor.ref("基本信息");
     const pkgMore = common_vendor.ref(false);
+    const statusBarHeight = common_vendor.ref(20);
+    const navBarHeight = common_vendor.ref(44);
+    const fixedTabsStyle = common_vendor.computed(() => {
+      const css = /* @__PURE__ */ new Map();
+      css.set("top", statusBarHeight.value + navBarHeight.value + "px");
+      return css;
+    });
     const tabs = common_vendor.ref([
       new common_vendor.UTSJSONObject({ name: "基本信息" }),
       new common_vendor.UTSJSONObject({ name: "卡片套餐" }),
       new common_vendor.UTSJSONObject({ name: "卡片订单" })
     ]);
-    const pkgTabs = common_vendor.ref(["全部", "在用套餐", "待生效", "已失效"]);
+    const pkgTabs = common_vendor.ref([new common_vendor.UTSJSONObject({ name: "全部" }), new common_vendor.UTSJSONObject({ name: "在用套餐" }), new common_vendor.UTSJSONObject({ name: "待生效" }), new common_vendor.UTSJSONObject({ name: "已失效" })]);
     const orderDates = common_vendor.ref(["2026-03-25", "2026-02-25", "2026-01-25"]);
     const packageList = common_vendor.ref([
       new PackageItem({ name: "车联网月包20G", status: "active", statusText: "在用", tagType: "success", startTime: "2026-04-01", totalFlow: "20GB", usedFlow: "11.34GB", leftFlow: "8.66GB" }),
@@ -129,12 +134,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return packageList.value;
     });
     const handleClick = (e) => {
-      var _a;
-      current.value = (_a = e.getNumber("index")) !== null && _a !== void 0 ? _a : 0;
+      current.value = e.index;
     };
     const changeTab = (e) => {
       active.value = e.index;
-      activeName.value = e.item.name;
+      activeName.value = e.name;
     };
     const showMore = () => {
       pkgMore.value = !pkgMore.value;
@@ -144,6 +148,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         delta: 1
       }));
     };
+    const getNavBarInfo = () => {
+      try {
+        const systemInfo = common_vendor.index.getSystemInfoSync();
+        statusBarHeight.value = systemInfo.statusBarHeight || 20;
+        const menuButtonInfo = common_vendor.index.getMenuButtonBoundingClientRect();
+        if (menuButtonInfo) {
+          const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height;
+          navBarHeight.value = navHeight > 0 ? navHeight : 44;
+        }
+      } catch (e) {
+        common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:192", "获取导航栏信息失败", e);
+      }
+    };
+    const handleRecharge = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/recharge/recharge?cardNumber=" + card_number.value
+      });
+    };
+    common_vendor.onMounted(() => {
+      getNavBarInfo();
+    });
     common_vendor.onLoad((options) => {
       var _a;
       const cardNumber = (_a = options.cardNumber) !== null && _a !== void 0 ? _a : "";
@@ -152,49 +177,55 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(goBack, "19"),
+        a: common_vendor.o(goBack, "1c"),
         b: common_vendor.p({
-          title: "卡片详情",
+          title: common_vendor.unref(card_number),
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
           class: "data-v-2bc48812"
         }),
-        c: common_vendor.o(changeTab, "b7"),
-        d: common_vendor.p({
-          tabs: common_vendor.unref(tabs),
-          itemWidth: "auto",
-          padding: 0,
-          currentTab: common_vendor.unref(active),
-          unlined: true,
-          bold: true,
-          activeBgColor: "#eff6ff",
-          activeBorderColor: "#bfdbfe",
+        c: common_vendor.o(changeTab, "20"),
+        d: common_vendor.o(($event) => {
+          return common_vendor.isRef(active) ? active.value = $event : null;
+        }, "ab"),
+        e: common_vendor.p({
+          ["line-color"]: "#ffffff",
+          list: common_vendor.unref(tabs),
+          ["line-width"]: 0,
+          ["title-active-color"]: "#2563eb",
+          customStyle: {
+            height: "85rpx",
+            padding: "10rpx",
+            border: "1rpx solid #e5edf6"
+          },
+          modelValue: common_vendor.unref(active),
           class: "data-v-2bc48812"
         }),
-        e: common_vendor.t(common_vendor.unref(activeName)),
-        f: common_vendor.unref(activeName) == "基本信息"
+        f: common_vendor.s(common_vendor.unref(fixedTabsStyle)),
+        g: common_vendor.t(common_vendor.unref(activeName)),
+        h: common_vendor.unref(activeName) == "基本信息"
       }, common_vendor.unref(activeName) == "基本信息" ? common_vendor.e({
-        g: common_vendor.t(common_vendor.unref(card_number)),
-        h: !common_vendor.unref(pkgMore)
+        i: common_vendor.t(common_vendor.unref(card_number)),
+        j: !common_vendor.unref(pkgMore)
       }, !common_vendor.unref(pkgMore) ? {
-        i: common_vendor.p({
+        k: common_vendor.p({
           name: "arrow-down-filling",
           size: "20rpx",
           class: "data-v-2bc48812"
         })
       } : {
-        j: common_vendor.p({
+        l: common_vendor.p({
           name: "arrow-up-filling",
           size: "20rpx",
           class: "data-v-2bc48812"
         })
       }, {
-        k: common_vendor.o(showMore, "e9"),
-        l: common_vendor.unref(pkgMore)
+        m: common_vendor.o(showMore, "62"),
+        n: common_vendor.unref(pkgMore)
       }, common_vendor.unref(pkgMore) ? {
-        m: common_vendor.p({
+        o: common_vendor.p({
           text: "标签",
           round: true,
           plain: true,
@@ -203,21 +234,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-2bc48812"
         })
       } : {}) : {}, {
-        n: common_vendor.unref(activeName) == "卡片套餐"
+        p: common_vendor.unref(activeName) == "卡片套餐"
       }, common_vendor.unref(activeName) == "卡片套餐" ? {
-        o: common_vendor.o(handleClick, "da"),
-        p: common_vendor.p({
-          values: common_vendor.unref(pkgTabs),
-          current: common_vendor.unref(current),
-          textActiveColor: "#2563eb",
+        q: common_vendor.o(handleClick, "be"),
+        r: common_vendor.o(($event) => {
+          return common_vendor.isRef(current) ? current.value = $event : null;
+        }, "c3"),
+        s: common_vendor.p({
+          ["line-color"]: "#ffffff",
+          list: common_vendor.unref(pkgTabs),
+          ["line-width"]: 0,
+          ["title-active-color"]: "#2563eb",
           customStyle: {
-            height: "unset",
+            height: "85rpx",
             padding: "5rpx 10rpx",
             border: "1rpx solid #e5edf6"
           },
+          modelValue: common_vendor.unref(current),
           class: "data-v-2bc48812"
         }),
-        q: common_vendor.f(common_vendor.unref(filteredPackageList), (item, index, i0) => {
+        t: common_vendor.f(common_vendor.unref(filteredPackageList), (item, index, i0) => {
           return {
             a: common_vendor.t(item.name),
             b: "2bc48812-6-" + i0,
@@ -237,16 +273,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       } : {}, {
-        r: common_vendor.unref(activeName) == "卡片订单"
+        v: common_vendor.unref(activeName) == "卡片订单"
       }, common_vendor.unref(activeName) == "卡片订单" ? {
-        s: common_vendor.f(common_vendor.unref(orderDates), (date, k0, i0) => {
+        w: common_vendor.f(common_vendor.unref(orderDates), (date, k0, i0) => {
           return {
             a: "2bc48812-7-" + i0,
             b: common_vendor.t(date),
             c: date
           };
         }),
-        t: common_vendor.p({
+        x: common_vendor.p({
           text: "已完成",
           round: true,
           plain: true,
@@ -254,42 +290,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           type: "success",
           class: "data-v-2bc48812"
         }),
-        v: common_vendor.t(common_vendor.unref(card_number))
+        y: common_vendor.t(common_vendor.unref(card_number))
       } : {}, {
-        w: common_vendor.p({
-          type: "black",
-          plain: true,
-          margin: "0 20rpx",
-          height: "70rpx",
-          shape: "circle",
+        z: common_vendor.p({
           bold: true,
-          class: "data-v-2bc48812"
+          customStyle: {
+            border: "none"
+          },
+          class: "btn data-v-2bc48812"
         }),
-        x: common_vendor.p({
-          type: "black",
-          plain: true,
-          margin: "0 20rpx",
-          height: "70rpx",
-          shape: "circle",
+        A: common_vendor.p({
           bold: true,
-          disabledGray: true,
           disabled: true,
-          class: "data-v-2bc48812"
+          customStyle: {
+            border: "none"
+          },
+          class: "btn data-v-2bc48812"
         }),
-        y: common_vendor.p({
+        B: common_vendor.o(handleRecharge, "94"),
+        C: common_vendor.p({
           type: "primary",
-          plain: false,
-          margin: "0 20rpx",
-          height: "70rpx",
-          shape: "circle",
+          color: "#1989fa",
+          textColor: "#ffffff",
           bold: true,
           shadow: true,
-          class: "data-v-2bc48812"
+          customStyle: {
+            border: "none"
+          },
+          class: "btn data-v-2bc48812"
         }),
-        z: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        A: `${_ctx.u_s_b_h}px`,
-        B: `${_ctx.u_s_a_i_b}px`,
-        C: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        D: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        E: `${_ctx.u_s_b_h}px`,
+        F: `${_ctx.u_s_a_i_b}px`,
+        G: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

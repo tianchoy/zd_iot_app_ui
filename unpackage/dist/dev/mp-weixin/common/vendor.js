@@ -1478,6 +1478,10 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
   }
   resetScheduling();
 }
+function getDepFromReactive(object, key) {
+  var _a;
+  return (_a = targetMap.get(object)) == null ? void 0 : _a.get(key);
+}
 const isNonTrackableKeys = /* @__PURE__ */ makeMap(`__proto__,__v_isRef,__isVue`);
 const builtInSymbols = new Set(
   /* @__PURE__ */ Object.getOwnPropertyNames(Symbol).filter((key) => key !== "arguments" && key !== "caller").map((key) => Symbol[key]).filter(isSymbol)
@@ -2149,6 +2153,9 @@ function isRef(r2) {
 function ref(value) {
   return createRef(value, false);
 }
+function shallowRef(value) {
+  return createRef(value, true);
+}
 function createRef(rawValue, shallow) {
   if (isRef(rawValue)) {
     return rawValue;
@@ -2180,6 +2187,9 @@ class RefImpl {
 function unref(ref2) {
   return isRef(ref2) ? ref2.value : ref2;
 }
+function toValue(source) {
+  return isFunction(source) ? source() : unref(source);
+}
 const shallowUnwrapHandlers = {
   get: (target, key, receiver) => unref(Reflect.get(target, key, receiver)),
   set: (target, key, value, receiver) => {
@@ -2194,6 +2204,70 @@ const shallowUnwrapHandlers = {
 };
 function proxyRefs(objectWithRefs) {
   return isReactive(objectWithRefs) ? objectWithRefs : new Proxy(objectWithRefs, shallowUnwrapHandlers);
+}
+class CustomRefImpl {
+  constructor(factory) {
+    this.dep = void 0;
+    this.__v_isRef = true;
+    const { get: get2, set: set2 } = factory(
+      () => trackRefValue(this),
+      () => triggerRefValue(this)
+    );
+    this._get = get2;
+    this._set = set2;
+  }
+  get value() {
+    return this._get();
+  }
+  set value(newVal) {
+    this._set(newVal);
+  }
+}
+function customRef(factory) {
+  return new CustomRefImpl(factory);
+}
+class ObjectRefImpl {
+  constructor(_object, _key, _defaultValue) {
+    this._object = _object;
+    this._key = _key;
+    this._defaultValue = _defaultValue;
+    this.__v_isRef = true;
+  }
+  get value() {
+    const val = this._object[this._key];
+    return val === void 0 ? this._defaultValue : val;
+  }
+  set value(newVal) {
+    this._object[this._key] = newVal;
+  }
+  get dep() {
+    return getDepFromReactive(toRaw(this._object), this._key);
+  }
+}
+class GetterRefImpl {
+  constructor(_getter) {
+    this._getter = _getter;
+    this.__v_isRef = true;
+    this.__v_isReadonly = true;
+  }
+  get value() {
+    return this._getter();
+  }
+}
+function toRef(source, key, defaultValue) {
+  if (isRef(source)) {
+    return source;
+  } else if (isFunction(source)) {
+    return new GetterRefImpl(source);
+  } else if (isObject(source) && arguments.length > 1) {
+    return propertyToRef(source, key, defaultValue);
+  } else {
+    return ref(source);
+  }
+}
+function propertyToRef(source, key, defaultValue) {
+  const val = source[key];
+  return isRef(val) ? val : new ObjectRefImpl(source, key, defaultValue);
 }
 const stack = [];
 function pushWarningContext(vnode) {
@@ -2861,6 +2935,13 @@ If this is a native custom element, make sure to exclude it from component resol
 }
 function resolve(registry, name) {
   return registry && (registry[name] || registry[camelize(name)] || registry[capitalize(camelize(name))]);
+}
+function watchSyncEffect(effect2, options) {
+  return doWatch(
+    effect2,
+    null,
+    extend({}, options, { flush: "sync" })
+  );
 }
 const INITIAL_WATCHER_VALUE = {};
 function watch(source, cb, options) {
@@ -3599,11 +3680,28 @@ function exposeSetupStateOnRenderContext(instance) {
     }
   });
 }
+function useSlots() {
+  return getContext().slots;
+}
+function getContext() {
+  const i = getCurrentInstance();
+  if (!i) {
+    warn$1(`useContext() called without active instance.`);
+  }
+  return i.setupContext || (i.setupContext = createSetupContext(i));
+}
 function normalizePropsOrEmits(props) {
   return isArray(props) ? props.reduce(
     (normalized, p2) => (normalized[p2] = null, normalized),
     {}
   ) : props;
+}
+function mergeModels(a, b) {
+  if (!a || !b)
+    return a || b;
+  if (isArray(a) && isArray(b))
+    return a.concat(b);
+  return extend({}, normalizePropsOrEmits(a), normalizePropsOrEmits(b));
 }
 function createDuplicateChecker() {
   const cache = /* @__PURE__ */ Object.create(null);
@@ -4940,6 +5038,58 @@ const computed = (getterOrOptions, debugOptions) => {
   }
   return c2;
 };
+function useModel(props, name, options = EMPTY_OBJ) {
+  const i = getCurrentInstance();
+  if (!i) {
+    warn$1(`useModel() called without active instance.`);
+    return ref();
+  }
+  if (!i.propsOptions[0][name]) {
+    warn$1(`useModel() called with prop "${name}" which is not declared.`);
+    return ref();
+  }
+  const camelizedName = camelize(name);
+  const hyphenatedName = hyphenate(name);
+  const res = customRef((track2, trigger2) => {
+    let localValue;
+    watchSyncEffect(() => {
+      const propValue = props[name];
+      if (hasChanged(localValue, propValue)) {
+        localValue = propValue;
+        trigger2();
+      }
+    });
+    return {
+      get() {
+        track2();
+        return options.get ? options.get(localValue) : localValue;
+      },
+      set(value) {
+        const rawProps = i.vnode.props;
+        if (!(rawProps && // check if parent has passed v-model
+        (name in rawProps || camelizedName in rawProps || hyphenatedName in rawProps) && (`onUpdate:${name}` in rawProps || `onUpdate:${camelizedName}` in rawProps || `onUpdate:${hyphenatedName}` in rawProps)) && hasChanged(value, localValue)) {
+          localValue = value;
+          trigger2();
+        }
+        i.emit(`update:${name}`, options.set ? options.set(value) : value);
+      }
+    };
+  });
+  const modifierKey = name === "modelValue" ? "modelModifiers" : `${name}Modifiers`;
+  res[Symbol.iterator] = () => {
+    let i2 = 0;
+    return {
+      next() {
+        if (i2 < 2) {
+          return { value: i2++ ? props[modifierKey] || {} : res, done: false };
+        } else {
+          return { done: true };
+        }
+      }
+    };
+  };
+  return res;
+}
 const version = "3.4.21";
 const warn = warn$1;
 function unwrapper(target) {
@@ -8763,9 +8913,9 @@ function isConsoleWritable() {
   return isWritable;
 }
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.3.229";
+  const hosts = "127.0.0.1,192.168.1.2";
   const port = "8090";
-  const id = "mp-weixin_C5L7Ei";
+  const id = "mp-weixin_iA4noF";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -9853,6 +10003,46 @@ const createSubpackageApp = initCreateSubpackageApp();
   wx.createPluginApp = global.createPluginApp = createPluginApp;
   wx.createSubpackageApp = global.createSubpackageApp = createSubpackageApp;
 }
+const createLifeCycleHook = (lifecycle, flag = 0) => (hook, target = getCurrentInstance()) => {
+  !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
+};
+const onShow = /* @__PURE__ */ createLifeCycleHook(
+  ON_SHOW,
+  1 | 2
+  /* HookFlags.PAGE */
+);
+const onHide = /* @__PURE__ */ createLifeCycleHook(
+  ON_HIDE,
+  1 | 2
+  /* HookFlags.PAGE */
+);
+const onLaunch = /* @__PURE__ */ createLifeCycleHook(
+  ON_LAUNCH,
+  1
+  /* HookFlags.APP */
+);
+const onLoad = /* @__PURE__ */ createLifeCycleHook(
+  ON_LOAD,
+  2
+  /* HookFlags.PAGE */
+);
+const onReady = /* @__PURE__ */ createLifeCycleHook(
+  ON_READY,
+  2
+  /* HookFlags.PAGE */
+);
+const onUnload = /* @__PURE__ */ createLifeCycleHook(
+  ON_UNLOAD,
+  2
+  /* HookFlags.PAGE */
+);
+const onBackPress = /* @__PURE__ */ createLifeCycleHook(
+  ON_BACK_PRESS,
+  2
+  /* HookFlags.PAGE */
+);
+const onAppHide = onHide;
+const onAppShow = onShow;
 function __awaiter(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve2) {
@@ -9884,36 +10074,6 @@ typeof SuppressedError === "function" ? SuppressedError : function(error, suppre
   var e2 = new Error(message);
   return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
 };
-const createLifeCycleHook = (lifecycle, flag = 0) => (hook, target = getCurrentInstance()) => {
-  !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
-};
-const onShow = /* @__PURE__ */ createLifeCycleHook(
-  ON_SHOW,
-  1 | 2
-  /* HookFlags.PAGE */
-);
-const onHide = /* @__PURE__ */ createLifeCycleHook(
-  ON_HIDE,
-  1 | 2
-  /* HookFlags.PAGE */
-);
-const onLaunch = /* @__PURE__ */ createLifeCycleHook(
-  ON_LAUNCH,
-  1
-  /* HookFlags.APP */
-);
-const onLoad = /* @__PURE__ */ createLifeCycleHook(
-  ON_LOAD,
-  2
-  /* HookFlags.PAGE */
-);
-const onUnload = /* @__PURE__ */ createLifeCycleHook(
-  ON_UNLOAD,
-  2
-  /* HookFlags.PAGE */
-);
-const onAppHide = onHide;
-const onAppShow = onShow;
 exports.UTS = UTS;
 exports.UTSJSONObject = UTSJSONObject;
 exports.__awaiter = __awaiter;
@@ -9924,24 +10084,39 @@ exports.defineComponent = defineComponent;
 exports.e = e;
 exports.f = f;
 exports.gei = gei;
+exports.getCurrentInstance = getCurrentInstance;
 exports.index = index;
+exports.inject = inject;
+exports.isRef = isRef;
+exports.mergeModels = mergeModels;
 exports.n = n;
+exports.nextTick$1 = nextTick$1;
+exports.normalizeStyle = normalizeStyle$1;
 exports.o = o;
 exports.onAppHide = onAppHide;
 exports.onAppShow = onAppShow;
+exports.onBackPress = onBackPress;
 exports.onLaunch = onLaunch;
 exports.onLoad = onLoad;
 exports.onMounted = onMounted;
+exports.onReady = onReady;
 exports.onUnload = onUnload;
 exports.onUnmounted = onUnmounted;
 exports.p = p;
 exports.pvhc = pvhc;
+exports.reactive = reactive;
 exports.ref = ref;
 exports.resolveComponent = resolveComponent;
 exports.s = s;
 exports.sei = sei;
+exports.shallowRef = shallowRef;
 exports.sr = sr;
 exports.t = t;
+exports.toRef = toRef;
+exports.toValue = toValue;
 exports.unref = unref;
 exports.useCssVars = useCssVars;
+exports.useModel = useModel;
+exports.useSlots = useSlots;
+exports.watch = watch;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/vendor.js.map

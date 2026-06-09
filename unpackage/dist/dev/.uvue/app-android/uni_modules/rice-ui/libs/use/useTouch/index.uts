@@ -1,0 +1,104 @@
+import type { Ref } from "vue";
+const MIN_DISTANCE = 10;
+const LOCK_DIRECTION_DISTANCE = 10;
+const TAP_OFFSET = 5;
+type SlideDirection = '' | 'vertical' | 'horizontal';
+type UseTouch = {
+    startX: Ref<number>;
+    startY: Ref<number>;
+    deltaX: Ref<number>;
+    deltaY: Ref<number>;
+    offsetX: Ref<number>;
+    offsetY: Ref<number>;
+    direction: Ref<SlideDirection>;
+    isTap: Ref<boolean>;
+    skipMove: Ref<boolean>;
+    dragging: Ref<boolean>;
+    start: (e: UniTouchEvent) => void;
+    move: (e: UniTouchEvent) => void;
+    end: () => void;
+    changeDragging: (flag: boolean) => void;
+};
+/**
+ * 获取滑动的方向
+ */
+function getSlideDirection(x: number, y: number): SlideDirection {
+    if (x > y && x > MIN_DISTANCE) {
+        return 'horizontal'; //水平
+    }
+    if (y > x && y > MIN_DISTANCE) {
+        return 'vertical'; //垂直
+    }
+    return '';
+}
+export function useTouch(): UseTouch {
+    const startX = ref(0);
+    const startY = ref(0);
+    const deltaX = ref(0);
+    const deltaY = ref(0);
+    const offsetX = ref(0);
+    const offsetY = ref(0);
+    const direction = ref<SlideDirection>('');
+    const isTap = ref(false);
+    const dragging = ref(false);
+    const skipMove = ref(false);
+    const reset = () => {
+        deltaX.value = 0;
+        deltaY.value = 0;
+        offsetX.value = 0;
+        offsetY.value = 0;
+        direction.value = '';
+        isTap.value = true;
+        dragging.value = true;
+        skipMove.value = false;
+    };
+    // app端没有 UniMouseEvent 事件
+    const start = (e: UniTouchEvent) => {
+        const touches = e.touches[0];
+        reset();
+        startX.value = touches.clientX;
+        startY.value = touches.clientY;
+    };
+    // app端没有 UniMouseEvent 事件
+    const move = (e: UniTouchEvent) => {
+        const touches = e.touches[0];
+        deltaX.value = touches.clientX - startX.value;
+        deltaY.value = touches.clientY - startY.value;
+        offsetX.value = Math.abs(deltaX.value);
+        offsetY.value = Math.abs(deltaY.value);
+        if (direction.value == "" ||
+            (offsetX.value < LOCK_DIRECTION_DISTANCE &&
+                offsetY.value < LOCK_DIRECTION_DISTANCE)) {
+            direction.value = getSlideDirection(offsetX.value, offsetY.value);
+        }
+        if (isTap.value && (offsetX.value > TAP_OFFSET || offsetY.value > TAP_OFFSET)) {
+            isTap.value = false;
+        }
+        if (direction.value == 'vertical') {
+            skipMove.value = true;
+        }
+    };
+    const end = () => {
+        dragging.value = false;
+    };
+    const changeDragging = (flag: boolean) => {
+        dragging.value = flag;
+    };
+    return {
+        startX,
+        startY,
+        deltaX,
+        deltaY,
+        offsetX,
+        offsetY,
+        direction,
+        isTap,
+        dragging,
+        skipMove,
+        start,
+        move,
+        end,
+        changeDragging,
+    } as UseTouch;
+}
+//# sourceMappingURL=index.uts.map

@@ -4,7 +4,7 @@
 		<view class="card-info">
 			<view class="card-title">
 				<text class="title">卡片信息</text>
-				<m-tag text="标签" :round="true" :plain="true" size="small" type="primary"></m-tag>
+				<rice-tag text="标签" :round="true" :plain="true" size="small" type="primary"></rice-tag>
 			</view>
 			<view class="card-number">
 				<text>1234567890123456</text>
@@ -20,25 +20,25 @@
 				</view>
 			</view>
 			<view class="flow-box">
-				<view class="flow-label">充值成功</view>
-				<LinearProgress :value="progress1" />
+				<view class="flow-label">流量信息</view>
+				<rice-progress :percentage="percentage" show-text />
 			</view>
 			<view class="card-bottom">
-				<m-button type="white" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true" @click="toMyPackage">卡片套餐</m-button>
-				<m-button type="white" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true" @click="toOrderRecord">订单记录</m-button>
+				<rice-button class="btn mr-24" @click="toMyPackage">卡片套餐</rice-button>
+				<rice-button class="btn" @click="toOrderRecord">订单记录</rice-button>
 			</view>
 		</view>
 		<view class="pkg-box">
-			<m-tabs 
-			:tabs="tabs" 
-			width="100rpx" 
-			:padding="0"
-			:isSlider="true" 
-			:currentTab="active" 
-			@change="changeTab" 
-			:unlined="false" 
-			:bold="true"
-			/>
+			<rice-tabs
+				  v-model="active"
+				  line-color="#ffffff" 
+				  :list="tabs" 
+				  :line-width="0" 
+				  :title-active-color="'#2563eb'" 
+				  @change="changeTab" 
+				  :customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
+				  >
+			</rice-tabs>
 			<view class="pkg-content">
 				<!-- 套餐包列表 -->
 				<block v-if="active === 0">
@@ -103,32 +103,24 @@
 			</view>
 		</view>
 	</view>
-	<m-bottom-popup
-		:show="showPopup"
-		<!-- #ifdef MP-WEIXIN -->
-		:height="'50%'"
-		<!-- #endif -->
-		<!-- #ifndef MP-WEIXIN -->
-		:height="'75%'"
-		<!-- #endif -->
-		:radius="true"
-		@close="showPopup = false"
+	<rice-popup
+		v-model:show="showPopup"
+		position="bottom"
+		@close="onPopupClose"
 	>
 		<Payment 
 			:amount="currentPrice" 
 			@cancel="handleCancelPayment"
 			@confirm="handleConfirmPayment"
 		/>
-	</m-bottom-popup>
-	<m-sticky-bottom>
-		<view class="bottom-box">
-			<view class="price-box">
-				<text class="price-label">当前套餐金额</text>
-				<text class="price-value">¥{{ currentPrice }}</text>
-			</view>
-			<m-button type="primary" @click="choosePayment" :plain="false" :margin="'0 20rpx'" width="200rpx" height="70rpx" shape="circle" :bold="true" :shadow="false">去支付</m-button>
+	</rice-popup>
+	<view class="bottom-box">
+		<view class="price-box">
+			<text class="price-label">当前套餐金额</text>
+			<text class="price-value">¥{{ currentPrice }}</text>
 		</view>
-	</m-sticky-bottom>
+		<rice-button type="primary" @click="choosePayment" class="btn">去支付</rice-button>
+	</view>
 </template>
 
 <script setup lang="uts">
@@ -157,7 +149,7 @@
 	};
 	
 	const showPopup = ref<boolean>(false);
-	const progress1 = ref<number>(80);
+	const percentage = ref<number>(60);
 	
 	const active = ref<number>(0);
 	const tabs = ref<Array<TabItem>>([
@@ -296,6 +288,7 @@
 		display: flex;
 		flex-direction: column;
 		background-color: #f4f7fb;
+		height: 100%;
 		.card-info{
 			background: #ffffff;
 			border: 1rpx solid #e7edf5;
@@ -357,8 +350,11 @@
 				display: flex;
 				flex-direction: row;
 				align-items: center;
-				justify-content: center;
+				justify-content: space-between;
 				margin-top: 24rpx;
+				.btn{
+					flex: 1;
+				}
 			}
 		}
 		.pkg-box{
@@ -457,16 +453,19 @@
 		}
 	}
 	.bottom-box{
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
 		background: #ffffff;
-		padding: 20rpx 0;
+		padding: 24rpx;
 		.price-box{
 			display: flex;
 			flex-direction: column;
-			margin-left: 24rpx;
 			.price-label{
 				font-size: 24rpx;
 				color: #64748b;

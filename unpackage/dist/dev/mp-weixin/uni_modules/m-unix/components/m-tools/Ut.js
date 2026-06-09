@@ -180,23 +180,6 @@ function toCssLength(value) {
   }
   return s;
 }
-function parseCssNumber(value) {
-  if (typeof value === "number") {
-    return value;
-  }
-  const s = trimCompat(value);
-  if (s.length === 0) {
-    return 0;
-  }
-  const len = s.length;
-  if (len >= 3 && s.substring(len - 3) === "rpx") {
-    return parseFloat(s.substring(0, len - 3));
-  }
-  if (len >= 2 && s.substring(len - 2) === "px") {
-    return parseFloat(s.substring(0, len - 2));
-  }
-  return parseFloat(s);
-}
 const mConfigInfo = () => {
   const c = uni_modules_mUnix_config.getMUiConfig();
   return new common_vendor.UTSJSONObject({
@@ -787,6 +770,5 @@ new common_vendor.UTSJSONObject({
     return uni_modules_mUnix_components_mTools_useAuth.useAuth();
   }
 });
-exports.parseCssNumber = parseCssNumber;
 exports.toCssLength = toCssLength;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/m-unix/components/m-tools/Ut.js.map

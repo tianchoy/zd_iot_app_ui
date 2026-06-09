@@ -1,0 +1,1 @@
+{"version":3,"file":"index.uts","sourceRoot":"","sources":["uni_modules/rice-ui/libs/use/useRelation/index.uts"],"names":[],"mappings":"AAAA,cAAc,eAAe,CAAA;AAC7B,cAAc,aAAa,CAAA","sourcesContent":["export * from \"./useChildren\"\r\nexport * from \"./useParent\""]}

@@ -1,0 +1,141 @@
+import _easycom_rice_dialog from '@/uni_modules/rice-ui/components/rice-dialog/rice-dialog.uvue';
+import { DialogProps, DialogBusEvent } from '../../components/rice-dialog/index';
+const __sfc__ = defineComponent({
+    __name: 'dialog',
+    name: 'rice-dialog-page',
+    setup(__props, __setupCtx: SetupContext) {
+        const __expose = __setupCtx.expose;
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const show = ref(false);
+        const params = ref<DialogProps>({} as DialogProps);
+        let busEventName: string | null = null;
+        let optionsEventName: string | null = null;
+        let readyEventName: string | null = null;
+        let closeTimer: number | null = null;
+        const dialogPageIns = ref<UniPage | null>(null);
+        const handleBusEvent = (event: DialogBusEvent) => {
+            if (busEventName != null) {
+                uni.$emit(busEventName!, event);
+            }
+        };
+        const onConfirm = () => {
+            handleBusEvent({ type: 'confirm' } as DialogBusEvent);
+        };
+        const onCancel = () => {
+            handleBusEvent({ type: 'cancel' } as DialogBusEvent);
+        };
+        const onOpen = () => {
+            handleBusEvent({ type: 'open' } as DialogBusEvent);
+        };
+        const onClose = () => {
+            show.value = false;
+        };
+        const onOpened = () => {
+            handleBusEvent({ type: 'opened' } as DialogBusEvent);
+        };
+        const onClosed = () => {
+            handleBusEvent({ type: 'closed' } as DialogBusEvent);
+            uni.closeDialogPage({
+                dialogPage: dialogPageIns.value
+            });
+        };
+        const clickOverlay = () => {
+            handleBusEvent({ type: 'clickOverlay' } as DialogBusEvent);
+        };
+        const updateParams = (data: DialogProps) => {
+            for (let key in data) {
+                if (data[key] != null) {
+                    params.value[key] = data[key];
+                }
+            }
+        };
+        watch(show, (newVal: boolean) => {
+            if (!newVal) {
+                handleBusEvent({ type: 'close' } as DialogBusEvent);
+            }
+        });
+        const close = () => {
+            show.value = false;
+        };
+        onLoad((options) => {
+            readyEventName = options['readyEventName'];
+            optionsEventName = options['optionsEventName'];
+            busEventName = options['busEventName'];
+            if (readyEventName != null && optionsEventName != null) {
+                uni.$on(optionsEventName!, (data: DialogProps) => {
+                    params.value = data;
+                });
+                uni.$emit(readyEventName!, {});
+            }
+        });
+        onReady(() => {
+            show.value = true;
+            dialogPageIns.value = getCurrentInstance()?.proxy?.$page;
+            handleBusEvent({
+                type: 'ready',
+                pageIns: dialogPageIns.value!
+            } as DialogBusEvent);
+        });
+        onBackPress((_options): boolean | null => {
+            close();
+            return true;
+        });
+        onUnload(() => {
+            if (busEventName != null)
+                uni.$off(busEventName!, null);
+            if (optionsEventName != null)
+                uni.$off(optionsEventName!, null);
+            if (readyEventName != null)
+                uni.$off(readyEventName!, null);
+            if (closeTimer != null)
+                clearTimeout(closeTimer!);
+        });
+        __expose({
+            updateParams,
+            close,
+        });
+        return (): any | null => {
+            const _component_rice_dialog = resolveEasyComponent("rice-dialog", _easycom_rice_dialog);
+            return _cV(_component_rice_dialog, _uM({
+                show: unref(show),
+                "onUpdate:show": ($event: boolean) => { trySetRefValue(show, $event); },
+                title: unref(params).title,
+                width: unref(params).width,
+                duration: unref(params).duration,
+                message: unref(params).message,
+                "message-align": unref(params).messageAlign,
+                "button-theme": unref(params).buttonTheme,
+                "button-layout": unref(params).buttonLayout,
+                "show-confirm-button": unref(params).showConfirmButton,
+                "confirm-button-text": unref(params).confirmButtonText,
+                "confirm-button-color": unref(params).confirmButtonColor,
+                "confirm-button-disabled": unref(params).confirmButtonDisabled,
+                "show-cancel-button": unref(params).showCancelButton,
+                "cancel-button-text": unref(params).cancelButtonText,
+                "cancel-button-color": unref(params).cancelButtonColor,
+                "cancel-button-disabled": unref(params).cancelButtonDisabled,
+                overlay: unref(params).overlay,
+                "overlay-bg-color": unref(params).overlayBgColor,
+                "close-on-click-overlay": unref(params).closeOnClickOverlay,
+                "bg-color": unref(params).bgColor,
+                "z-index": unref(params).zIndex,
+                marginTop: unref(params).marginTop,
+                "before-close": unref(params).beforeClose,
+                "use-dialog-page": false,
+                "custom-style": unref(params).customStyle,
+                onConfirm: onConfirm,
+                onCancel: onCancel,
+                onOpen: onOpen,
+                onClose: onClose,
+                onOpened: onOpened,
+                onClosed: onClosed,
+                onClickOverlay: clickOverlay
+            }), null, 8 /* PROPS */, ["show", "title", "width", "duration", "message", "message-align", "button-theme", "button-layout", "show-confirm-button", "confirm-button-text", "confirm-button-color", "confirm-button-disabled", "show-cancel-button", "cancel-button-text", "cancel-button-color", "cancel-button-disabled", "overlay", "overlay-bg-color", "close-on-click-overlay", "bg-color", "z-index", "marginTop", "before-close", "custom-style"]);
+        };
+    }
+});
+export default __sfc__;
+const GenUniModulesRiceUiPagesDialogDialogStyles = [];
+//# sourceMappingURL=dialog.uvue.map

@@ -10,20 +10,21 @@
 						placeholder="请输入 ICCID / MSISDN"
 						class="search-input"
 					/>
-					<m-button type="white" :plain="true" class="scan-btn" width="90rpx">
-						<m-icon name="scanning" size="40rpx"></m-icon>
-					</m-button>
-					<m-button type="primary" width="120rpx" @click="handleSearch">查询</m-button>
+					<rice-button class="scan-btn" height="100%" @click="scanCode">
+						<rice-icon name="scan" size="40rpx"></rice-icon>
+					</rice-button>
+					<rice-button type="primary" color="#1989fa" textColor="#ffffff" height="100%" @click="handleSearch">查询</rice-button>
 				</view>
-				
-				<!-- Tab 选项卡 -->
-				<m-segmented-control 
-					:values="tabs" 
-					:current="current" 
-					:textActiveColor="'#2563eb'" 
-					@click="handleTabClick" 
-					:customStyle="{height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" 
-				/>
+				<rice-tabs
+				  v-model="current"
+				  line-color="#ffffff" 
+				  :list="tabs" 
+				  :line-width="0" 
+				  :title-active-color="'#2563eb'" 
+				  @click="handleTabClick" 
+				  :customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
+				  >
+				</rice-tabs>
 			</view>
 			
 			<!-- 订单列表 -->
@@ -92,7 +93,7 @@
 	}
 	
 	// Tab 列表
-	const tabs = ref<OrderStatus[]>(['全部', '待支付', '已完成', '已退款', '已取消'])
+	const tabs = ref<OrderStatus[]>([{name:'全部'}, {name:'待支付'}, {name:'已完成'}, {name:'已退款'}, {name:'已取消'}])
 	const current = ref<number>(0)
 	const card_number = ref<string>('')
 	
@@ -155,7 +156,7 @@
 		let result = orders.value
 
 		// 按Tab筛选
-		const currentStatus = tabs.value[current.value]
+		const currentStatus = tabs.value[current.value].name
 		if (currentStatus !== '全部') {
 			result = result.filter((order: any) : boolean => getOrderText(order, 'status') === currentStatus)
 		}

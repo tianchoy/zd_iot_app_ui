@@ -21,8 +21,8 @@ const _cache = __ins.renderCache;
 		if(res.code == 200){
 			console.log('登录成功:', res.data.access_token, " at pages/login/login.uvue:33")
 			setToken(res.data.access_token, res.data.refreshToken)
-			uni.navigateBack({
-				delta: 1,
+			uni.reLaunch({
+				url: '/pages/index/index'
 			})
 		}
 	}

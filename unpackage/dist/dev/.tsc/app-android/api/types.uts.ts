@@ -1,0 +1,58 @@
+/** 登录响应数据 */
+export type LoginData = {
+  id: number
+  token: string
+  access_token: string
+  refreshToken: string
+  userId: number
+  nickname: string
+}
+
+/** 国家数据 */
+export type CountryData = {
+  fullName: string
+  letterCode: string
+}
+
+/** 租户配置数据 */
+export type TenantInfoData = {
+  rechargeTip: string
+  servicePhone: string
+  serviceQrcode: string
+  wxAuditHide: string
+  wxAuditHideNo: string
+  wxGetPhoneLogin: string
+  wxMiniPayType: string
+  wxPayClass: string
+  h5IsPullMini: string
+  h5PayType: string
+  serviceJumpUrl: string
+}
+
+/** 查询卡列表参数 */
+export type QueryCardListParams = {
+  rechargeNo: string
+  status: string
+  isSort: boolean
+}
+
+/** 卡列表统计数据 */
+export type CardListSumData = {
+  all: number
+  inUse: number
+  inNotUse: number
+}
+
+// 卡片数据类型
+export type  CardItem = {
+	id: number
+	cardNumber: string
+	iccid: string
+	tag: string
+	status: string // '正常' 或 '异常'
+	currentPackage: string
+	expireDate: string
+	usedTraffic: string
+	totalTraffic: string
+	currentCycle: string
+}

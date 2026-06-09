@@ -6,13 +6,16 @@
 			<view class="info-value">1064916585160</view>
 		</view>
 		<view class="pkg-box">
-			<m-segmented-control 
-				:values="pkgTabs" 
-				:current="current" 
-				:textActiveColor="'#2563eb'" 
-				@click="handleClick" 
-				:customStyle="{height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" 
-			/>
+			<rice-tabs
+				v-model="current"
+				line-color="#ffffff" 
+				:list="pkgTabs" 
+				:line-width="0" 
+				:title-active-color="'#2563eb'" 
+				@change="handleClick" 
+				:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
+				>
+			</rice-tabs>
 			<!-- 套餐列表 -->
 		<scroll-view class="package-list" scroll-y :enhanced="true">
 			<view v-if="filteredPackages.length === 0" class="empty-state">
@@ -61,6 +64,9 @@
 	
 	// 套餐状态类型
 	type PackageStatus = '全部' | '在用套餐' | '待生效' | '已失效'
+	interface PackageTab {
+		name: PackageStatus
+	}
 	type PackageItemStatus = '在用套餐' | '待生效' | '已失效'
 
 	// 套餐数据结构
@@ -74,7 +80,7 @@
 	}
 	
 	// Tab 列表
-	const pkgTabs = ref<PackageStatus[]>(['全部', '在用套餐', '待生效', '已失效'])
+	const pkgTabs = ref<PackageTab[]>([{name:'全部'}, {name:'在用套餐'}, {name:'待生效'}, {name:'已失效'}])
 	const current = ref<number>(0)
 	
 	// 套餐数据
@@ -120,7 +126,8 @@
 
 	// 根据 Tab 筛选套餐
 	const filteredPackages = computed<any[]>(() : any[] => {
-		const currentStatus = pkgTabs.value[current.value]
+		const currentTab = pkgTabs.value[current.value]
+		const currentStatus = currentTab == null ? '全部' : currentTab.name
 		if (currentStatus === '全部') {
 			return packageList.value
 		}
@@ -190,7 +197,7 @@
 		// 套餐列表
 		.package-list {
 			flex: 1;
-			margin: 24rpx 0;
+			margin: 24rpx 0 0;
 		}
 		
 		.package-card {
@@ -201,6 +208,10 @@
 			border: 1rpx solid #e2e8f0;
 			box-shadow: 0 4rpx 12rpx rgba(15, 23, 42, 0.04);
 
+		}
+
+		.package-card:last-child {
+			margin-bottom: 0;
 		}
 		
 		// 套餐头部

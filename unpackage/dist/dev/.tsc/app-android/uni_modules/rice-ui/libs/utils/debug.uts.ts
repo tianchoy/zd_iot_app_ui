@@ -1,0 +1,6 @@
+export function debugWarn(scope : string, mess : string) {
+	if (process.env.NODE_ENV != 'production') {
+		const err = `[RiceUI] ${scope}` + ':' + mess
+		__f__('warn','at uni_modules/rice-ui/libs/utils/debug.uts:4',err)
+	}
+}

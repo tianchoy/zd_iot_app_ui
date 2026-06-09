@@ -21,20 +21,20 @@
 		<view class="card-box">
 			<view class="item"  @click="toOrder">
 				<text class="order-label">我的订单</text>
-				<m-icon name="arrow-right-bold" size="20rpx"></m-icon>
+				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
 			</view>
 			<view class="item">
 				<text class="order-label">绑定卡片</text>
-				<m-icon name="arrow-right-bold" size="20rpx"></m-icon>
+				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
 			</view>
 			<view class="item">
 				<text class="order-label">常见问题</text>
-				<m-icon name="arrow-right-bold" size="20rpx"></m-icon>
+				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
 			</view>
 		</view>
 		<view class="btn-box">
-			<m-button v-if="!isLogin()" type="primary" shape="circle" @click="handleLogin">登录</m-button>
-			<m-button v-else type="warning" shape="circle"  @click="handleLogout">退出登录</m-button>
+			<rice-button v-if="!isLogin()" type="primary" width="100%" shape="round" @click="handleLogin">登录</rice-button>
+			<rice-button v-else type="error" width="100%" shape="round"  @click="handleLogout">退出登录</rice-button>
 		</view>
 	</view>
 </template>

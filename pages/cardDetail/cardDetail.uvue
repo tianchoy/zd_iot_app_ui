@@ -1,9 +1,18 @@
 <template>
 	<view class="page-container">
-		<topNavBar title="卡片详情" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+		<topNavBar :title="card_number" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 
-		<view class="fixed-tabs">
-			<m-tabs :tabs="tabs" :itemWidth="'auto'" :padding="0" :currentTab="active" @change="changeTab" :unlined="true" :bold="true" :activeBgColor="'#eff6ff'" :activeBorderColor="'#bfdbfe'" />
+		<view class="fixed-tabs" :style="fixedTabsStyle">
+			<rice-tabs
+				  v-model="active"
+				  line-color="#ffffff" 
+				  :list="tabs" 
+				  :line-width="0" 
+				  :title-active-color="'#2563eb'" 
+				  @change="changeTab" 
+				  :customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
+				  >
+			</rice-tabs>
 		</view>
 
 		<view class="container">
@@ -28,9 +37,9 @@
 							<view class="pkg-item"><text class="pkg-label">套餐有效期:</text><text class="pkg-value">2026-04-30</text></view>
 							<view class="pkg-item">
 								<text class="pkg-label">待生效期数:</text>
-								<view class="pkg-value"><text>11</text><text class="pkg-icon" @click="showMore"><m-icon v-if="!pkgMore" name="arrow-down-filling" size="20rpx"></m-icon><m-icon v-else name="arrow-up-filling" size="20rpx"></m-icon></text></view>
+								<view class="pkg-value"><text>11</text><text class="pkg-icon" @click="showMore"><rice-icon v-if="!pkgMore" name="arrow-down-filling" size="20rpx"></rice-icon><rice-icon v-else name="arrow-up-filling" size="20rpx"></rice-icon></text></view>
 							</view>
-							<view class="pkg-date" v-if="pkgMore"><view class="date-list"><text class="date-label"><text class="date-period">第 1 期</text><text>2026-04-30</text></text><m-tag text="标签" :round="true" :plain="true" size="small" type="primary"></m-tag></view></view>
+							<view class="pkg-date" v-if="pkgMore"><view class="date-list"><text class="date-label"><text class="date-period">第 1 期</text><text>2026-04-30</text></text><rice-tag text="标签" :round="true" :plain="true" size="small" type="primary"></rice-tag></view></view>
 							<view class="pkg-item"><text class="pkg-label">下期开始时间:</text><text class="pkg-value">2026-04-30</text></view>
 							<view class="pkg-item"><text class="pkg-label">当前期次:</text><text class="pkg-value">第 1 期</text></view>
 							<view class="pkg-item"><text class="pkg-label">当前期有效期:</text><text class="pkg-value">2026-04-30</text></view>
@@ -46,10 +55,19 @@
 					</view>
 
 					<view class="section-content" v-if="activeName == '卡片套餐'">
-						<m-segmented-control :values="pkgTabs" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
+						<rice-tabs
+							v-model="current"
+							line-color="#ffffff" 
+							:list="pkgTabs" 
+							:line-width="0" 
+							:title-active-color="'#2563eb'" 
+							@change="handleClick" 
+							:customStyle="{height:'85rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}"
+							>
+						</rice-tabs>
 						<view class="card-pkg-box">
 							<view class="item" v-for="(item, index) in filteredPackageList" :key="index">
-								<view class="item-head"><text class="item-label">{{ item.name }}</text><m-tag :text="item.statusText" :round="true" :plain="true" size="small" :type="item.tagType"></m-tag></view>
+								<view class="item-head"><text class="item-label">{{ item.name }}</text><rice-tag :text="item.statusText" :round="true" :plain="true" size="small" :type="item.tagType"></rice-tag></view>
 								<view class="item-sub-title">生效时间：{{ item.startTime }}</view>
 								<view class="item-data">
 									<view class="item-data-item"><text class="item-data-label">套餐流量</text><text class="item-data-value">{{ item.totalFlow }}</text></view>
@@ -62,7 +80,7 @@
 
 					<view class="section-content card-order" v-if="activeName == '卡片订单'">
 						<view class="item" v-for="date in orderDates" :key="date">
-							<view class="item-head"><text class="item-label">车联网月包20G</text><m-tag text="已完成" :round="true" :plain="true" size="small" type="success"></m-tag></view>
+							<view class="item-head"><text class="item-label">车联网月包20G</text><rice-tag text="已完成" :round="true" :plain="true" size="small" type="success"></rice-tag></view>
 							<view class="item-sub-title">订单号: {{card_number}}</view>
 							<view class="item-data"><text>{{ date }}</text><text class="total-value">¥200</text></view>
 						</view>
@@ -72,9 +90,9 @@
 		</view>
 
 		<view class="fixed-bottom-buttons">
-			<m-button type="black" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true">诊断</m-button>
-			<m-button type="black" :plain="true" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true" :disabledGray="true" :disabled="true">已绑定</m-button>
-			<m-button type="primary" :plain="false" :margin="'0 20rpx'" height="70rpx" shape="circle" :bold="true" :shadow="true">去充值</m-button>
+			<rice-button class="btn" :bold="true" :customStyle="{border:'none'}">诊断</rice-button>
+			<rice-button class="btn" :bold="true" :disabled="true" :customStyle="{border:'none'}">已绑定</rice-button>
+			<rice-button class="btn" type="primary" color="#1989fa" textColor="#ffffff" :bold="true" :shadow="true" :customStyle="{border:'none'}" @click="handleRecharge">去充值</rice-button>
 		</view>
 	</view>
 </template>
@@ -93,6 +111,15 @@
 	const active = ref(0)
 	const activeName = ref('基本信息')
 	const pkgMore = ref(false)
+	const statusBarHeight = ref(20)
+	const navBarHeight = ref(44)
+	const fixedTabsHeight = 109
+
+	const fixedTabsStyle = computed(() => {
+		const css = new Map<string, string>()
+		css.set('top', statusBarHeight.value + navBarHeight.value + 'px')
+		return css
+	})
 
 	const tabs = ref([
 		{ name: '基本信息'},
@@ -100,7 +127,7 @@
 		{ name: '卡片订单' }
 	])
 
-	const pkgTabs = ref(['全部', '在用套餐', '待生效', '已失效'])
+	const pkgTabs = ref([{ name: '全部' }, { name: '在用套餐' }, { name: '待生效' }, { name: '已失效' }])
 	const orderDates = ref(['2026-03-25', '2026-02-25', '2026-01-25'])
 
 	type PackageStatus = 'active' | 'pending' | 'expired'
@@ -133,12 +160,12 @@
 	})
 
 	const handleClick = (e: UTSJSONObject) => {
-		current.value = e.getNumber('index') ?? 0
+		current.value = e.index
 	}
 
 	const changeTab = (e: CardDetailTabEvent) => {
 		active.value = e.index
-		activeName.value = e.item.name
+		activeName.value = e.name
 	}
 
 	const showMore = () => {
@@ -150,6 +177,37 @@
 			delta: 1
 		})
 	}
+
+	const getNavBarInfo = () => {
+		// #ifdef MP-WEIXIN
+		try {
+			const systemInfo = uni.getSystemInfoSync()
+			statusBarHeight.value = systemInfo.statusBarHeight || 20
+			const menuButtonInfo = uni.getMenuButtonBoundingClientRect()
+			if (menuButtonInfo) {
+				const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height
+				navBarHeight.value = navHeight > 0 ? navHeight : 44
+			}
+		} catch (e) {
+			console.error('获取导航栏信息失败', e)
+		}
+		// #endif
+
+		// #ifdef H5
+		statusBarHeight.value = 0
+		navBarHeight.value = 44
+		// #endif
+	}
+
+	const handleRecharge = () => {
+		uni.navigateTo({
+			url: '/pages/recharge/recharge?cardNumber=' + card_number.value
+		})
+	}
+
+	onMounted(() => {
+		getNavBarInfo()
+	})
 
 	onLoad((options) => {
 		const cardNumber = options.cardNumber ?? ''
@@ -166,6 +224,10 @@
 }
 
 .fixed-tabs {
+	position: fixed;
+	left: 0;
+	right: 0;
+	z-index: 99;
 	flex-shrink: 0;
 	background-color: #f4f7fb;
 	padding: 12rpx 24rpx 0 24rpx;
@@ -173,7 +235,7 @@
 .container {
 	display: flex;
 	flex-direction: column;
-	padding: 20rpx 0 190rpx 0;
+	padding: 120rpx 0;
 }
 
 .card-box {
@@ -306,6 +368,7 @@
 			border-radius: 25rpx;
 			padding: 20rpx 20rpx 10rpx;
 			flex: 1;
+			text-align: center;
 
 			.total-label {
 				font-size: 20rpx;
@@ -414,5 +477,9 @@
 	border-top: 1rpx solid #e7edf5;
 	box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.04);
 	z-index: 100;
+
+	.btn{
+		flex:1
+	}
 }
 </style>

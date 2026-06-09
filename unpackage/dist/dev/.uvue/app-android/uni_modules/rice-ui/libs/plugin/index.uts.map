@@ -1,0 +1,1 @@
+{"version":3,"file":"index.uts","sourceRoot":"","sources":["uni_modules/rice-ui/libs/plugin/index.uts"],"names":[],"mappings":"AAAA,cAAc,YAAY,CAAA;AAC1B,cAAc,WAAW,CAAA","sourcesContent":["export * from \"./coloruts\"\r\nexport * from \"./dateuts\""]}

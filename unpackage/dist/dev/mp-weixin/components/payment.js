@@ -1,5 +1,13 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+if (!Array) {
+  const _easycom_rice_button_1 = common_vendor.resolveComponent("rice-button");
+  _easycom_rice_button_1();
+}
+const _easycom_rice_button = () => "../uni_modules/rice-ui/components/rice-button/rice-button.js";
+if (!Math) {
+  _easycom_rice_button();
+}
 class PaymentMethod extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -65,12 +73,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(common_vendor.unref(traffic)),
         d: common_vendor.t(common_vendor.unref(validityPeriod)),
         e: common_vendor.t(common_vendor.unref(formattedAmount)),
-        f: common_vendor.o(handleCancel, "f4"),
-        g: common_vendor.o(handleConfirm, "87"),
-        h: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        i: `${_ctx.u_s_b_h}px`,
-        j: `${_ctx.u_s_a_i_b}px`,
-        k: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        f: common_vendor.o(handleCancel, "29"),
+        g: common_vendor.p({
+          class: "btn cancel-btn mr-24 data-v-0c94e3a5"
+        }),
+        h: common_vendor.o(handleConfirm, "f9"),
+        i: common_vendor.p({
+          textColor: "#fff",
+          class: "btn confirm-btn ml-24 data-v-0c94e3a5"
+        }),
+        j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        k: `${_ctx.u_s_b_h}px`,
+        l: `${_ctx.u_s_a_i_b}px`,
+        m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

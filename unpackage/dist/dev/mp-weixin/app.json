@@ -1,7 +1,6 @@
 {
   "pages": [
     "pages/card/card",
-    "pages/index/index",
     "pages/mine/mine",
     "pages/cardDetail/cardDetail",
     "pages/recharge/recharge",
@@ -13,7 +12,9 @@
     "pages/h5Search/h5Search",
     "pages/orderRecord/orderRecord",
     "pages/myPkg/myPkg",
-    "pages/login/login"
+    "pages/login/login",
+    "uni_modules/rice-ui/pages/action-sheet/action-sheet",
+    "uni_modules/rice-ui/pages/dialog/dialog"
   ],
   "window": {
     "navigationStyle": "custom",

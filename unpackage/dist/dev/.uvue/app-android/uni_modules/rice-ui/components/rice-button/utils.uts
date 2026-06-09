@@ -1,0 +1,13 @@
+export const iconSizeTypes = {
+    large: '18px',
+    default: '16px',
+    small: '14px',
+    mini: '12px',
+} as UTSJSONObject;
+export const loadingSizeTypes = {
+    large: '20px',
+    default: '18px',
+    small: '16px',
+    mini: '14px'
+} as UTSJSONObject;
+//# sourceMappingURL=utils.uts.map

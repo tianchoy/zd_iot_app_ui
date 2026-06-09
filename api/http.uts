@@ -1,6 +1,6 @@
 // api/http.uts
 import { ApiUrl } from './url'
-import { request, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
+import { request, type ApiResponse } from './Request.uts'
 import { config } from '@/common/config.uts'
 import type {
   LoginData,

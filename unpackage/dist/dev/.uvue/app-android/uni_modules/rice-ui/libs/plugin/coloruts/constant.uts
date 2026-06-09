@@ -1,0 +1,209 @@
+function __uts_large_presetColors_fill_fill_1(__obj: UTSJSONObject): void {
+    __obj["aliceblue"] = '9ehhb';
+    __obj["antiquewhite"] = '9sgk7';
+    __obj["aqua"] = '1ekf';
+    __obj["aquamarine"] = '4zsno';
+    __obj["azure"] = '9eiv3';
+    __obj["beige"] = '9lhp8';
+    __obj["bisque"] = '9zg04';
+    __obj["black"] = '0';
+    __obj["blanchedalmond"] = '9zhe5';
+    __obj["blue"] = '73';
+    __obj["blueviolet"] = '5e31e';
+    __obj["brown"] = '6g016';
+    __obj["burlywood"] = '8ouiv';
+    __obj["cadetblue"] = '3qba8';
+    __obj["chartreuse"] = '4zshs';
+    __obj["chocolate"] = '87k0u';
+    __obj["coral"] = '9yvyo';
+    __obj["cornflowerblue"] = '3xael';
+    __obj["cornsilk"] = '9zjz0';
+    __obj["crimson"] = '8l4xo';
+    __obj["cyan"] = '1ekf';
+    __obj["darkblue"] = '3v';
+    __obj["darkcyan"] = 'rkb';
+    __obj["darkgoldenrod"] = '776yz';
+    __obj["darkgray"] = '6mbhl';
+    __obj["darkgreen"] = 'jr4';
+    __obj["darkgrey"] = '6mbhl';
+    __obj["darkkhaki"] = '7ehkb';
+    __obj["darkmagenta"] = '5f91n';
+    __obj["darkolivegreen"] = '3bzfz';
+    __obj["darkorange"] = '9yygw';
+    __obj["darkorchid"] = '5z6x8';
+    __obj["darkred"] = '5f8xs';
+    __obj["darksalmon"] = '9441m';
+    __obj["darkseagreen"] = '5lwgf';
+    __obj["darkslateblue"] = '2th1n';
+    __obj["darkslategray"] = '1ugcv';
+    __obj["darkslategrey"] = '1ugcv';
+    __obj["darkturquoise"] = '14up';
+    __obj["darkviolet"] = '5rw7n';
+    __obj["deeppink"] = '9yavn';
+    __obj["deepskyblue"] = '11xb';
+    __obj["dimgray"] = '442g9';
+    __obj["dimgrey"] = '442g9';
+    __obj["dodgerblue"] = '16xof';
+    __obj["firebrick"] = '6y7tu';
+    __obj["floralwhite"] = '9zkds';
+    __obj["forestgreen"] = '1cisi';
+}
+function __uts_large_presetColors_fill_fill_2(__obj: UTSJSONObject): void {
+    __obj["fuchsia"] = '9y70f';
+    __obj["gainsboro"] = '8m8kc';
+    __obj["ghostwhite"] = '9pq0v';
+    __obj["goldenrod"] = '8j4f4';
+    __obj["gold"] = '9zda8';
+    __obj["gray"] = '50i2o';
+    __obj["green"] = 'pa8';
+    __obj["greenyellow"] = '6senj';
+    __obj["grey"] = '50i2o';
+    __obj["honeydew"] = '9eiuo';
+    __obj["hotpink"] = '9yrp0';
+    __obj["indianred"] = '80gnw';
+    __obj["indigo"] = '2xcoy';
+    __obj["ivory"] = '9zldc';
+    __obj["khaki"] = '9edu4';
+    __obj["lavenderblush"] = '9ziet';
+    __obj["lavender"] = '90c8q';
+    __obj["lawngreen"] = '4vk74';
+    __obj["lemonchiffon"] = '9zkct';
+    __obj["lightblue"] = '6s73a';
+    __obj["lightcoral"] = '9dtog';
+    __obj["lightcyan"] = '8s1rz';
+    __obj["lightgoldenrodyellow"] = '9sjiq';
+    __obj["lightgray"] = '89jo3';
+    __obj["lightgreen"] = '5nkwg';
+    __obj["lightgrey"] = '89jo3';
+    __obj["lightpink"] = '9z6wx';
+    __obj["lightsalmon"] = '9z2ii';
+    __obj["lightseagreen"] = '19xgq';
+    __obj["lightskyblue"] = '5arju';
+    __obj["lightslategray"] = '4nwk9';
+    __obj["lightslategrey"] = '4nwk9';
+    __obj["lightsteelblue"] = '6wau6';
+    __obj["lightyellow"] = '9zlcw';
+    __obj["lime"] = '1edc';
+    __obj["limegreen"] = '1zcxe';
+    __obj["linen"] = '9shk6';
+    __obj["magenta"] = '9y70f';
+    __obj["maroon"] = '4zsow';
+    __obj["mediumaquamarine"] = '40eju';
+    __obj["mediumblue"] = '5p';
+    __obj["mediumorchid"] = '79qkz';
+    __obj["mediumpurple"] = '5r3rv';
+    __obj["mediumseagreen"] = '2d9ip';
+    __obj["mediumslateblue"] = '4tcku';
+    __obj["mediumspringgreen"] = '1di2';
+    __obj["mediumturquoise"] = '2uabw';
+    __obj["mediumvioletred"] = '7rn9h';
+}
+function __uts_large_presetColors_fill_fill_3(__obj: UTSJSONObject): void {
+    __obj["midnightblue"] = 'z980';
+    __obj["mintcream"] = '9ljp6';
+    __obj["mistyrose"] = '9zg0x';
+    __obj["moccasin"] = '9zfzp';
+    __obj["navajowhite"] = '9zest';
+    __obj["navy"] = '3k';
+    __obj["oldlace"] = '9wq92';
+    __obj["olive"] = '50hz4';
+    __obj["olivedrab"] = '472ub';
+    __obj["orange"] = '9z3eo';
+    __obj["orangered"] = '9ykg0';
+    __obj["orchid"] = '8iu3a';
+    __obj["palegoldenrod"] = '9bl4a';
+    __obj["palegreen"] = '5yw0o';
+    __obj["paleturquoise"] = '6v4ku';
+    __obj["palevioletred"] = '8k8lv';
+    __obj["papayawhip"] = '9zi6t';
+    __obj["peachpuff"] = '9ze0p';
+    __obj["peru"] = '80oqn';
+    __obj["pink"] = '9z8wb';
+    __obj["plum"] = '8nba5';
+    __obj["powderblue"] = '6wgdi';
+    __obj["purple"] = '4zssg';
+    __obj["rebeccapurple"] = '3zk49';
+    __obj["red"] = '9y6tc';
+    __obj["rosybrown"] = '7cv4f';
+    __obj["royalblue"] = '2jvtt';
+    __obj["saddlebrown"] = '5fmkz';
+    __obj["salmon"] = '9rvci';
+    __obj["sandybrown"] = '9jn1c';
+    __obj["seagreen"] = '1tdnb';
+    __obj["seashell"] = '9zje6';
+    __obj["sienna"] = '6973h';
+    __obj["silver"] = '7ir40';
+    __obj["skyblue"] = '5arjf';
+    __obj["slateblue"] = '45e4t';
+    __obj["slategray"] = '4e100';
+    __obj["slategrey"] = '4e100';
+    __obj["snow"] = '9zke2';
+    __obj["springgreen"] = '1egv';
+    __obj["steelblue"] = '2r1kk';
+    __obj["tan"] = '87yx8';
+    __obj["teal"] = 'pds';
+    __obj["thistle"] = '8ggk8';
+    __obj["tomato"] = '9yqfb';
+    __obj["turquoise"] = '2j4r4';
+    __obj["violet"] = '9b10u';
+    __obj["wheat"] = '9ld4j';
+}
+function __uts_large_presetColors_fill_fill_4(__obj: UTSJSONObject): void {
+    __obj["white"] = '9zldr';
+    __obj["whitesmoke"] = '9lhpx';
+    __obj["yellow"] = '9zl6o';
+    __obj["yellowgreen"] = '61fzm';
+}
+function __uts_large_presetColors_build_0(): UTSJSONObject {
+    const __obj = {} as UTSJSONObject;
+    __uts_large_presetColors_fill_fill_1(__obj);
+    __uts_large_presetColors_fill_fill_2(__obj);
+    __uts_large_presetColors_fill_fill_3(__obj);
+    __uts_large_presetColors_fill_fill_4(__obj);
+    return __obj;
+}
+export const hueStep = 2; // 色相阶梯
+export const saturationStep = 0.16; // 饱和度阶梯，浅色部分
+export const saturationStep2 = 0.05; // 饱和度阶梯，深色部分
+export const brightnessStep1 = 0.05; // 亮度阶梯，浅色部分
+export const brightnessStep2 = 0.15; // 亮度阶梯，深色部分
+export const lightColorCount = 5; // 浅色数量，主色上
+export const darkColorCount = 4; // 深色数量，主色下
+// 暗色主题颜色映射关系表
+type DarkColorMap = {
+    index: number;
+    amount: number;
+};
+export const darkColorMap = [{
+        index: 7,
+        amount: 15
+    } as DarkColorMap, {
+        index: 6,
+        amount: 25
+    } as DarkColorMap, {
+        index: 5,
+        amount: 30
+    } as DarkColorMap, {
+        index: 5,
+        amount: 45
+    } as DarkColorMap, {
+        index: 5,
+        amount: 65
+    } as DarkColorMap, {
+        index: 5,
+        amount: 85
+    } as DarkColorMap, {
+        index: 4,
+        amount: 90
+    } as DarkColorMap, {
+        index: 3,
+        amount: 95
+    } as DarkColorMap, {
+        index: 2,
+        amount: 97
+    } as DarkColorMap, {
+        index: 1,
+        amount: 98
+    } as DarkColorMap] as DarkColorMap[];
+export const presetColors = __uts_large_presetColors_build_0();
+//# sourceMappingURL=constant.uts.map

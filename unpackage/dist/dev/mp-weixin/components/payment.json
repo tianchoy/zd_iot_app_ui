@@ -1,4 +1,6 @@
 {
   "component": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "rice-button": "../uni_modules/rice-ui/components/rice-button/rice-button"
+  }
 }

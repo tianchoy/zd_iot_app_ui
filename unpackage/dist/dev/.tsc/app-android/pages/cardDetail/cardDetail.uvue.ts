@@ -1,17 +1,28 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
-import _easycom_m_tag from '@/uni_modules/m-unix/components/m-tag/m-tag.uvue'
-import _easycom_m_div from '@/uni_modules/m-unix/components/m-div/m-div.uvue'
-import _easycom_m_button from '@/uni_modules/m-unix/components/m-button/m-button.uvue'
 import _easycom_m_tabs from '@/uni_modules/m-unix/components/m-tabs/m-tabs.uvue'
 import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue'
+import _easycom_m_tag from '@/uni_modules/m-unix/components/m-tag/m-tag.uvue'
 import _easycom_m_segmented_control from '@/uni_modules/m-unix/components/m-segmented-control/m-segmented-control.uvue'
-type CardDetailTabItem = { __$originalPosition?: UTSSourceMapPosition<"CardDetailTabItem", "pages/cardDetail/cardDetail.uvue", 264, 7>;
+import _easycom_m_button from '@/uni_modules/m-unix/components/m-button/m-button.uvue'
+type CardDetailTabItem = { __$originalPosition?: UTSSourceMapPosition<"CardDetailTabItem", "pages/cardDetail/cardDetail.uvue", 83, 7>;
 		name: string
 	}
 
-	type CardDetailTabEvent = { __$originalPosition?: UTSSourceMapPosition<"CardDetailTabEvent", "pages/cardDetail/cardDetail.uvue", 268, 7>;
+	type CardDetailTabEvent = { __$originalPosition?: UTSSourceMapPosition<"CardDetailTabEvent", "pages/cardDetail/cardDetail.uvue", 87, 7>;
 		index: number
 		item: CardDetailTabItem
+	}
+
+	type PackageStatus = 'active' | 'pending' | 'expired'
+	type PackageItem = { __$originalPosition?: UTSSourceMapPosition<"PackageItem", "pages/cardDetail/cardDetail.uvue", 107, 7>;
+		name: string
+		status: PackageStatus
+		statusText: string
+		tagType: string
+		startTime: string
+		totalFlow: string
+		usedFlow: string
+		leftFlow: string
 	}
 
 	
@@ -26,15 +37,33 @@ const _cache = __ins.renderCache;
 	const active = ref(0)
 	const activeName = ref('基本信息')
 	const pkgMore = ref(false)
-	const tabs = ref([
-        { name: '基本信息'},
-        { name: '卡片套餐' },
-        { name: '卡片订单' }
-      ])
 
-	const pkgTabs = ref(['全部', '在用套餐','待生效','已失效'])
+	const tabs = ref([
+		{ name: '基本信息'},
+		{ name: '卡片套餐' },
+		{ name: '卡片订单' }
+	])
+
+	const pkgTabs = ref(['全部', '在用套餐', '待生效', '已失效'])
+	const orderDates = ref(['2026-03-25', '2026-02-25', '2026-01-25'])
+
+	const packageList = ref<PackageItem[]>([
+		{ name: '车联网月包20G', status: 'active', statusText: '在用', tagType: 'success', startTime: '2026-04-01', totalFlow: '20GB', usedFlow: '11.34GB', leftFlow: '8.66GB' },
+		{ name: '车联网月包20G', status: 'pending', statusText: '待生效', tagType: 'warning', startTime: '2026-05-01', totalFlow: '20GB', usedFlow: '0GB', leftFlow: '20GB' },
+		{ name: '车联网月包20G', status: 'pending', statusText: '待生效', tagType: 'warning', startTime: '2026-06-01', totalFlow: '20GB', usedFlow: '0GB', leftFlow: '20GB' },
+		{ name: '车联网月包20G', status: 'expired', statusText: '已失效', tagType: 'danger', startTime: '2025-03-01', totalFlow: '20GB', usedFlow: '20GB', leftFlow: '0GB' },
+		{ name: '车联网月包20G', status: 'expired', statusText: '已失效', tagType: 'danger', startTime: '2025-02-01', totalFlow: '20GB', usedFlow: '20GB', leftFlow: '0GB' }
+	])
 
 	const current = ref(0)
+
+	const filteredPackageList = computed<PackageItem[]>(() => {
+		if (current.value == 1) return packageList.value.filter((item) => item.status == 'active')
+		if (current.value == 2) return packageList.value.filter((item) => item.status == 'pending')
+		if (current.value == 3) return packageList.value.filter((item) => item.status == 'expired')
+		return packageList.value
+	})
+
 	const handleClick = (e: UTSJSONObject) => {
 		current.value = e.getNumber('index') ?? 0
 	}
@@ -45,37 +74,30 @@ const _cache = __ins.renderCache;
 	}
 
 	const showMore = () => {
-		console.log(pkgMore.value, " at pages/cardDetail/cardDetail.uvue:296")
 		pkgMore.value = !pkgMore.value
 	}
 
-	const cardDetail = (cardNumber: string) => {
-		card_number.value = cardNumber
+	const goBack = () => {
+		uni.navigateBack({
+			delta: 1
+		})
 	}
 
-	const goBack = () => {
-			uni.navigateBack({
-				delta: 1
-			})
-		}
-
 	onLoad((options) => {
-		const cardNumber = options.getString('card_number') ?? ''
-		console.log(cardNumber, " at pages/cardDetail/cardDetail.uvue:312")
+		const cardNumber = options.cardNumber ?? ''
 		card_number.value = cardNumber
 	})
 
 return (): any | null => {
 
 const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar)
-const _component_m_tag = resolveEasyComponent("m-tag",_easycom_m_tag)
-const _component_m_div = resolveEasyComponent("m-div",_easycom_m_div)
-const _component_m_button = resolveEasyComponent("m-button",_easycom_m_button)
 const _component_m_tabs = resolveEasyComponent("m-tabs",_easycom_m_tabs)
 const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
+const _component_m_tag = resolveEasyComponent("m-tag",_easycom_m_tag)
 const _component_m_segmented_control = resolveEasyComponent("m-segmented-control",_easycom_m_segmented_control)
+const _component_m_button = resolveEasyComponent("m-button",_easycom_m_button)
 
-  return _cE(Fragment, null, [
+  return _cE("view", _uM({ class: "page-container" }), [
     _cV(_component_topNavBar, _uM({
       title: "卡片详情",
       "show-back": true,
@@ -84,100 +106,21 @@ const _component_m_segmented_control = resolveEasyComponent("m-segmented-control
       textColor: "#333",
       showCapsule: false
     })),
+    _cE("view", _uM({ class: "fixed-tabs" }), [
+      _cV(_component_m_tabs, _uM({
+        tabs: unref(tabs),
+        itemWidth: 'auto',
+        padding: 0,
+        currentTab: unref(active),
+        onChange: changeTab,
+        unlined: true,
+        bold: true,
+        activeBgColor: '#eff6ff',
+        activeBorderColor: '#bfdbfe'
+      }), null, 8 /* PROPS */, ["tabs", "currentTab"])
+    ]),
     _cE("view", _uM({ class: "container" }), [
-      _cE("view", _uM({ class: "card-box" }), [
-        _cE("view", _uM({
-          class: "card-item",
-          onClick: () => {cardDetail('1064916585160')}
-        }), [
-          _cE("view", _uM({ class: "item-head" }), [
-            _cE("view", _uM({ class: "item-head-label" }), [
-              _cE("text", _uM({ class: "card-item-title" }), "1064916585160"),
-              _cE("text", _uM({ class: "card-item-content" }), "ICCID: 89860421123456789012")
-            ]),
-            _cV(_component_m_tag, _uM({
-              text: "标签",
-              round: true,
-              plain: true,
-              size: "small",
-              type: "primary"
-            }))
-          ]),
-          _cE("view", _uM({ class: "item-package" }), [
-            _cE("text", _uM({ class: "package-label" }), "当前套餐:"),
-            _cE("text", _uM({ class: "package-value" }), "车联网月包20G")
-          ]),
-          _cV(_component_m_div, _uM({
-            backgroundColor: "#f1f5f9",
-            textClass: "divider"
-          })),
-          _cE("view", _uM({ class: "card-metrics" }), [
-            _cE("view", _uM({ class: "metric-box" }), [
-              _cE("view", _uM({ class: "metric-label" }), "到期时间"),
-              _cE("view", _uM({ class: "metric-value" }), "2026-04-30")
-            ]),
-            _cE("view", _uM({ class: "metric-box" }), [
-              _cE("view", _uM({ class: "metric-label" }), "本月流量"),
-              _cE("view", _uM({ class: "metric-value" }), "11.34GB / 20GB")
-            ])
-          ]),
-          _cE("view", _uM({ class: "card-bottom" }), [
-            _cE("text", _uM({ class: "cycle-label" }), "总流量 20GB")
-          ])
-        ], 8 /* PROPS */, ["onClick"]),
-        _cE("view", _uM({ class: "card-botton" }), [
-          _cV(_component_m_button, _uM({
-            type: "black",
-            plain: true,
-            margin: '0 20rpx',
-            height: "70rpx",
-            shape: "circle",
-            bold: true
-          }), _uM({
-            default: withSlotCtx((): any[] => ["诊断"]),
-            _: 1 /* STABLE */
-          })),
-          _cV(_component_m_button, _uM({
-            type: "black",
-            plain: true,
-            margin: '0 20rpx',
-            height: "70rpx",
-            shape: "circle",
-            bold: true,
-            disabledGray: true,
-            disabled: true
-          }), _uM({
-            default: withSlotCtx((): any[] => ["已绑定"]),
-            _: 1 /* STABLE */
-          })),
-          _cV(_component_m_button, _uM({
-            type: "primary",
-            plain: false,
-            margin: '0 20rpx',
-            height: "70rpx",
-            shape: "circle",
-            bold: true,
-            shadow: true
-          }), _uM({
-            default: withSlotCtx((): any[] => ["去充值"]),
-            _: 1 /* STABLE */
-          }))
-        ])
-      ]),
-      _cE("view", _uM({ class: "card-box" }), [
-        _cV(_component_m_tabs, _uM({
-          tabs: unref(tabs),
-          width: "auto",
-          padding: 0,
-          isSlider: false,
-          currentTab: unref(active),
-          onChange: changeTab,
-          unlined: true,
-          bold: true,
-          itemStyle: {backgroundColor:'#fff',borderRadius:'24rpx',padding:'0 40rpx',border:'1rpx solid #e7edf5'},
-          selectedBgColor: '#eff6ff',
-          selectedBorderColor: '#bfdbfe'
-        }), null, 8 /* PROPS */, ["tabs", "currentTab"]),
+      _cE("view", _uM({ class: "card-box content-card" }), [
         _cE("view", _uM({ class: "card-content" }), [
           _cE("view", _uM({ class: "section-title" }), _tD(unref(activeName)), 1 /* TEXT */),
           unref(activeName) == '基本信息'
@@ -193,15 +136,15 @@ const _component_m_segmented_control = resolveEasyComponent("m-segmented-control
                     ]),
                     _cE("view", _uM({ class: "info-item" }), [
                       _cE("text", _uM({ class: "info-label" }), "ICCID"),
-                      _cE("text", _uM({ class: "info-value" }), _tD(unref(card_number)), 1 /* TEXT */)
+                      _cE("text", _uM({ class: "info-value" }), "89860421123456789012")
                     ]),
                     _cE("view", _uM({ class: "info-item" }), [
                       _cE("text", _uM({ class: "info-label" }), "IMSI"),
-                      _cE("text", _uM({ class: "info-value" }), _tD(unref(card_number)), 1 /* TEXT */)
+                      _cE("text", _uM({ class: "info-value" }), "460011234567890")
                     ]),
                     _cE("view", _uM({ class: "info-item" }), [
                       _cE("text", _uM({ class: "info-label" }), "最近使用"),
-                      _cE("text", _uM({ class: "info-value" }), _tD(unref(card_number)), 1 /* TEXT */)
+                      _cE("text", _uM({ class: "info-value" }), "2026-06-05")
                     ])
                   ])
                 ]),
@@ -282,11 +225,11 @@ const _component_m_segmented_control = resolveEasyComponent("m-segmented-control
                 _cE("view", _uM({ class: "data-total" }), [
                   _cE("view", _uM({ class: "total-item" }), [
                     _cE("text", _uM({ class: "total-label" }), "本月已用:"),
-                    _cE("text", _uM({ class: "total-value" }), "20GB")
+                    _cE("text", _uM({ class: "total-value" }), "11.34GB")
                   ]),
                   _cE("view", _uM({ class: "total-item" }), [
                     _cE("text", _uM({ class: "total-label" }), "剩余流量:"),
-                    _cE("text", _uM({ class: "total-value" }), "20GB")
+                    _cE("text", _uM({ class: "total-value" }), "8.66GB")
                   ]),
                   _cE("view", _uM({ class: "total-item" }), [
                     _cE("text", _uM({ class: "total-label" }), "总流量:"),
@@ -308,142 +251,38 @@ const _component_m_segmented_control = resolveEasyComponent("m-segmented-control
                   customStyle: {height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}
                 }), null, 8 /* PROPS */, ["values", "current"]),
                 _cE("view", _uM({ class: "card-pkg-box" }), [
-                  unref(current) == 0
-                    ? _cE("view", _uM({
-                        key: 0,
-                        class: "card-pkg-all-box"
-                      }), [
-                        _cE("view", _uM({ class: "item" }), [
-                          _cE("view", _uM({ class: "item-head" }), [
-                            _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
-                            _cV(_component_m_tag, _uM({
-                              text: "全部",
-                              round: true,
-                              plain: true,
-                              size: "small",
-                              type: "primary"
-                            }))
-                          ]),
-                          _cE("view", _uM({ class: "item-sub-title" }), "生效时间：待生效"),
-                          _cE("view", _uM({ class: "item-data" }), [
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ]),
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ]),
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ])
-                          ])
+                  _cE(Fragment, null, RenderHelpers.renderList(unref(filteredPackageList), (item, index, __index, _cached): any => {
+                    return _cE("view", _uM({
+                      class: "item",
+                      key: index
+                    }), [
+                      _cE("view", _uM({ class: "item-head" }), [
+                        _cE("text", _uM({ class: "item-label" }), _tD(item.name), 1 /* TEXT */),
+                        _cV(_component_m_tag, _uM({
+                          text: item.statusText,
+                          round: true,
+                          plain: true,
+                          size: "small",
+                          type: item.tagType
+                        }), null, 8 /* PROPS */, ["text", "type"])
+                      ]),
+                      _cE("view", _uM({ class: "item-sub-title" }), "生效时间：" + _tD(item.startTime), 1 /* TEXT */),
+                      _cE("view", _uM({ class: "item-data" }), [
+                        _cE("view", _uM({ class: "item-data-item" }), [
+                          _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                          _cE("text", _uM({ class: "item-data-value" }), _tD(item.totalFlow), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "item-data-item" }), [
+                          _cE("text", _uM({ class: "item-data-label" }), "已用流量"),
+                          _cE("text", _uM({ class: "item-data-value" }), _tD(item.usedFlow), 1 /* TEXT */)
+                        ]),
+                        _cE("view", _uM({ class: "item-data-item" }), [
+                          _cE("text", _uM({ class: "item-data-label" }), "剩余流量"),
+                          _cE("text", _uM({ class: "item-data-value" }), _tD(item.leftFlow), 1 /* TEXT */)
                         ])
                       ])
-                    : _cC("v-if", true),
-                  unref(current) == 1
-                    ? _cE("view", _uM({
-                        key: 1,
-                        class: "card-pkg-active-box"
-                      }), [
-                        _cE("view", _uM({ class: "item" }), [
-                          _cE("view", _uM({ class: "item-head" }), [
-                            _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
-                            _cV(_component_m_tag, _uM({
-                              text: "在用",
-                              round: true,
-                              plain: true,
-                              size: "small",
-                              type: "primary"
-                            }))
-                          ]),
-                          _cE("view", _uM({ class: "item-sub-title" }), "生效时间：待生效"),
-                          _cE("view", _uM({ class: "item-data" }), [
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ]),
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ]),
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ])
-                          ])
-                        ])
-                      ])
-                    : _cC("v-if", true),
-                  unref(current) == 2
-                    ? _cE("view", _uM({
-                        key: 2,
-                        class: "card-pkg-exp-box"
-                      }), [
-                        _cE("view", _uM({ class: "item" }), [
-                          _cE("view", _uM({ class: "item-head" }), [
-                            _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
-                            _cV(_component_m_tag, _uM({
-                              text: "待生效",
-                              round: true,
-                              plain: true,
-                              size: "small",
-                              type: "primary"
-                            }))
-                          ]),
-                          _cE("view", _uM({ class: "item-sub-title" }), "生效时间：待生效"),
-                          _cE("view", _uM({ class: "item-data" }), [
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ]),
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ]),
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ])
-                          ])
-                        ])
-                      ])
-                    : _cC("v-if", true),
-                  unref(current) == 3
-                    ? _cE("view", _uM({
-                        key: 3,
-                        class: "card-pkg-fail-box"
-                      }), [
-                        _cE("view", _uM({ class: "item" }), [
-                          _cE("view", _uM({ class: "item-head" }), [
-                            _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
-                            _cV(_component_m_tag, _uM({
-                              text: "已失效",
-                              round: true,
-                              plain: true,
-                              size: "small",
-                              type: "primary"
-                            }))
-                          ]),
-                          _cE("view", _uM({ class: "item-sub-title" }), "生效时间：待生效"),
-                          _cE("view", _uM({ class: "item-data" }), [
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ]),
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ]),
-                            _cE("view", _uM({ class: "item-data-item" }), [
-                              _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                              _cE("text", _uM({ class: "item-data-value" }), "20GB")
-                            ])
-                          ])
-                        ])
-                      ])
-                    : _cC("v-if", true)
+                    ])
+                  }), 128 /* KEYED_FRAGMENT */)
                 ])
               ])
             : _cC("v-if", true),
@@ -452,32 +291,75 @@ const _component_m_segmented_control = resolveEasyComponent("m-segmented-control
                 key: 2,
                 class: "section-content card-order"
               }), [
-                _cE("view", _uM({ class: "item" }), [
-                  _cE("view", _uM({ class: "item-head" }), [
-                    _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
-                    _cV(_component_m_tag, _uM({
-                      text: "已失效",
-                      round: true,
-                      plain: true,
-                      size: "small",
-                      type: "primary"
-                    }))
-                  ]),
-                  _cE("view", _uM({ class: "item-sub-title" }), "订单号: " + _tD(unref(card_number)), 1 /* TEXT */),
-                  _cE("view", _uM({ class: "item-data" }), [
-                    _cE("text", null, "2023-01-01"),
-                    _cE("text", _uM({ class: "total-value" }), "¥200")
+                _cE(Fragment, null, RenderHelpers.renderList(unref(orderDates), (date, __key, __index, _cached): any => {
+                  return _cE("view", _uM({
+                    class: "item",
+                    key: date
+                  }), [
+                    _cE("view", _uM({ class: "item-head" }), [
+                      _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
+                      _cV(_component_m_tag, _uM({
+                        text: "已完成",
+                        round: true,
+                        plain: true,
+                        size: "small",
+                        type: "success"
+                      }))
+                    ]),
+                    _cE("view", _uM({ class: "item-sub-title" }), "订单号: " + _tD(unref(card_number)), 1 /* TEXT */),
+                    _cE("view", _uM({ class: "item-data" }), [
+                      _cE("text", null, _tD(date), 1 /* TEXT */),
+                      _cE("text", _uM({ class: "total-value" }), "¥200")
+                    ])
                   ])
-                ])
+                }), 128 /* KEYED_FRAGMENT */)
               ])
             : _cC("v-if", true)
         ])
       ])
+    ]),
+    _cE("view", _uM({ class: "fixed-bottom-buttons" }), [
+      _cV(_component_m_button, _uM({
+        type: "black",
+        plain: true,
+        margin: '0 20rpx',
+        height: "70rpx",
+        shape: "circle",
+        bold: true
+      }), _uM({
+        default: withSlotCtx((): any[] => ["诊断"]),
+        _: 1 /* STABLE */
+      })),
+      _cV(_component_m_button, _uM({
+        type: "black",
+        plain: true,
+        margin: '0 20rpx',
+        height: "70rpx",
+        shape: "circle",
+        bold: true,
+        disabledGray: true,
+        disabled: true
+      }), _uM({
+        default: withSlotCtx((): any[] => ["已绑定"]),
+        _: 1 /* STABLE */
+      })),
+      _cV(_component_m_button, _uM({
+        type: "primary",
+        plain: false,
+        margin: '0 20rpx',
+        height: "70rpx",
+        shape: "circle",
+        bold: true,
+        shadow: true
+      }), _uM({
+        default: withSlotCtx((): any[] => ["去充值"]),
+        _: 1 /* STABLE */
+      }))
     ])
-  ], 64 /* STABLE_FRAGMENT */)
+  ])
 }
 }
 
 })
 export default __sfc__
-const GenPagesCardDetailCardDetailStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"]]))], ["card-box", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]])]])], ["card-item", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["item-head", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "flex-start"], ["justifyContent", "space-between"]])], [".container .card-box .card-content .card-pkg-box .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["color", "#334155"], ["marginBottom", "12rpx"]])], [".container .card-box .card-content .card-order .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["color", "#334155"], ["marginBottom", "12rpx"]])]])], ["card-item-title", _uM([[".container .card-box .card-item .item-head ", _uM([["fontSize", "32rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.25]])]])], ["card-item-content", _uM([[".container .card-box .card-item .item-head ", _uM([["marginTop", 5], ["fontSize", 12], ["color", "#94a3b8"], ["lineHeight", 1.45]])]])], ["item-package", _uM([[".container .card-box .card-item ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["minWidth", 0]])]])], ["package-label", _uM([[".container .card-box .card-item .item-package ", _uM([["fontSize", 12], ["color", "#64748b"], ["lineHeight", 1.4]])]])], ["package-value", _uM([[".container .card-box .card-item .item-package ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "25rpx"], ["fontWeight", 700], ["color", "#334155"], ["lineHeight", 1.45], ["whiteSpace", "nowrap"], ["overflow", "hidden"], ["textOverflow", "ellipsis"]])]])], ["card-metrics", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0]])]])], ["metric-box", _uM([[".container .card-box .card-item .card-metrics ", _uM([["width", "48%"], ["boxSizing", "border-box"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["minWidth", 0]])]])], ["metric-label", _uM([[".container .card-box .card-item .card-metrics .metric-box ", _uM([["fontSize", "25rpx"], ["color", "#94a3b8"], ["lineHeight", 1.4]])]])], ["metric-value", _uM([[".container .card-box .card-item .card-metrics .metric-box ", _uM([["marginTop", "15rpx"], ["fontSize", "25rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.4]])]])], ["card-bottom", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["cycle-label", _uM([[".container .card-box .card-item .card-bottom ", _uM([["fontSize", "25rpx"], ["color", "#64748b"], ["lineHeight", 1.45]])]])], ["card-botton", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0]])]])], ["card-content", _uM([[".container .card-box ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", "20rpx"]])]])], ["section-title", _uM([[".container .card-box .card-content ", _uM([["fontSize", "28rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["marginBottom", "20rpx"]])]])], ["base-info-box", _uM([[".container .card-box .card-content ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["base-info", _uM([[".container .card-box .card-content .base-info-box ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingBottom", "24rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eef2f7"], ["marginBottom", "24rpx"]])]])], ["info-item", _uM([[".container .card-box .card-content .base-info-box .base-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0]])]])], ["info-label", _uM([[".container .card-box .card-content .base-info-box .base-info .info-item ", _uM([["color", "#64748b"]])]])], ["info-value", _uM([[".container .card-box .card-content .base-info-box .base-info .info-item ", _uM([["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["pkg-content", _uM([[".container .card-box .card-content ", _uM([["display", "flex"], ["flexDirection", "column"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "20rpx"]])]])], ["pkg-item", _uM([[".container .card-box .card-content .pkg-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["marginBottom", "12rpx"]])]])], ["pkg-label", _uM([[".container .card-box .card-content .pkg-content .pkg-item ", _uM([["color", "#64748b"]])]])], ["pkg-value", _uM([[".container .card-box .card-content .pkg-content .pkg-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["pkg-icon", _uM([[".container .card-box .card-content .pkg-content .pkg-item .pkg-value ", _uM([["backgroundColor", "#ffffff"], ["width", "40rpx"], ["height", "40rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["marginLeft", "25rpx"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["lineHeight", "15rpx"]])]])], ["pkg-date", _uM([[".container .card-box .card-content .pkg-content ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eef2f7"], ["paddingTop", "20rpx"]])]])], ["date-list", _uM([[".container .card-box .card-content .pkg-content .pkg-date ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0], ["fontSize", "26rpx"], ["color", "#334155"]])]])], ["date-period", _uM([[".container .card-box .card-content .pkg-content .pkg-date .date-list ", _uM([["marginRight", "10rpx"]])]])], ["data-total", _uM([[".container .card-box .card-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["color", "#334155"]])]])], ["total-item", _uM([[".container .card-box .card-content .data-total ", _uM([["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["marginTop", 0], ["marginRight", "10rpx"], ["marginBottom", 0], ["marginLeft", "10rpx"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["total-label", _uM([[".container .card-box .card-content .data-total .total-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["lineHeight", 1.4], ["marginBottom", "10rpx"]])]])], ["total-value", _uM([[".container .card-box .card-content .data-total .total-item ", _uM([["fontSize", "25rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.4]])], [".container .card-box .card-content .card-order .item-data ", _uM([["fontSize", "30rpx"], ["fontWeight", 900], ["color", "#ef4444"]])]])], ["item", _uM([[".container .card-box .card-content .card-pkg-box ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"]])], [".container .card-box .card-content .card-order ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"]])]])], ["item-label", _uM([[".container .card-box .card-content .card-pkg-box .item .item-head ", _uM([["color", "#64748b"], ["fontWeight", "bold"]])], [".container .card-box .card-content .card-order .item .item-head ", _uM([["color", "#64748b"], ["fontWeight", "bold"]])]])], ["item-sub-title", _uM([[".container .card-box .card-content .card-pkg-box .item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])], [".container .card-box .card-content .card-order .item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])]])], ["item-data", _uM([[".container .card-box .card-content .card-pkg-box .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["marginTop", "20rpx"], ["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])], [".container .card-box .card-content .card-order .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["marginTop", "20rpx"], ["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])], [".container .card-box .card-content .card-order ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["item-data-item", _uM([[".container .card-box .card-content .card-pkg-box .item .item-data ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "10rpx"], ["marginRight", "10rpx"], ["marginBottom", "10rpx"], ["marginLeft", "10rpx"]])], [".container .card-box .card-content .card-order .item .item-data ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "10rpx"], ["marginRight", "10rpx"], ["marginBottom", "10rpx"], ["marginLeft", "10rpx"]])]])]])]
+const GenPagesCardDetailCardDetailStyles = [_uM([["page-container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"]]))], ["fixed-tabs", _pS(_uM([["flexShrink", 0], ["backgroundColor", "#f4f7fb"], ["paddingTop", "12rpx"], ["paddingRight", "24rpx"], ["paddingBottom", 0], ["paddingLeft", "24rpx"]]))], ["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "190rpx"], ["paddingLeft", 0]]))], ["card-box", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]]))], ["content-card", _pS(_uM([["marginTop", 0]]))], ["card-content", _pS(_uM([["marginTop", 0], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0]]))], ["section-title", _uM([[".card-content ", _uM([["fontSize", "28rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["marginBottom", "20rpx"]])]])], ["base-info-box", _uM([[".card-content ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["base-info", _uM([[".card-content .base-info-box ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingBottom", "24rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eef2f7"], ["marginBottom", "24rpx"]])]])], ["info-item", _uM([[".card-content .base-info-box .base-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0]])]])], ["info-label", _uM([[".card-content .base-info-box .base-info .info-item ", _uM([["color", "#64748b"]])]])], ["info-value", _uM([[".card-content .base-info-box .base-info .info-item ", _uM([["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["pkg-content", _uM([[".card-content ", _uM([["display", "flex"], ["flexDirection", "column"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "20rpx"]])]])], ["pkg-item", _uM([[".card-content .pkg-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["marginBottom", "12rpx"]])]])], ["pkg-label", _uM([[".card-content .pkg-content .pkg-item ", _uM([["color", "#64748b"]])]])], ["pkg-value", _uM([[".card-content .pkg-content .pkg-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["pkg-icon", _uM([[".card-content .pkg-content .pkg-item .pkg-value ", _uM([["backgroundColor", "#ffffff"], ["width", "40rpx"], ["height", "40rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["marginLeft", "25rpx"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"]])]])], ["pkg-date", _uM([[".card-content .pkg-content ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eef2f7"], ["paddingTop", "20rpx"]])]])], ["date-list", _uM([[".card-content .pkg-content .pkg-date ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0], ["fontSize", "26rpx"], ["color", "#334155"]])]])], ["date-period", _uM([[".card-content .pkg-content .pkg-date .date-list ", _uM([["marginRight", "10rpx"]])]])], ["data-total", _uM([[".card-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["gap", "12rpx"]])]])], ["total-item", _uM([[".card-content .data-total ", _uM([["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"]])]])], ["total-label", _uM([[".card-content .data-total .total-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["lineHeight", 1.4], ["marginBottom", "10rpx"]])]])], ["total-value", _uM([[".card-content .data-total .total-item ", _uM([["fontSize", "25rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.4]])], [".card-content .card-order .item-data ", _uM([["fontSize", "30rpx"], ["fontWeight", 900], ["color", "#ef4444"]])]])], ["item", _uM([[".card-content .card-pkg-box ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"]])], [".card-content .card-order ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"]])]])], ["item-head", _uM([[".card-content .card-pkg-box .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginBottom", "12rpx"]])], [".card-content .card-order .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginBottom", "12rpx"]])]])], ["item-label", _uM([[".card-content .card-pkg-box .item .item-head ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])], [".card-content .card-order .item .item-head ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["item-sub-title", _uM([[".card-content .card-pkg-box .item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])], [".card-content .card-order .item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])]])], ["item-data", _uM([[".card-content .card-pkg-box .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["marginTop", "20rpx"], ["gap", "12rpx"]])], [".card-content .card-order .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["marginTop", "20rpx"], ["gap", "12rpx"]])], [".card-content .card-order ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["item-data-item", _uM([[".card-content .card-pkg-box .item .item-data ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "16rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "10rpx"]])], [".card-content .card-order .item .item-data ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "16rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "10rpx"]])]])], ["item-data-label", _uM([[".card-content .card-pkg-box .item .item-data .item-data-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["marginBottom", "8rpx"]])], [".card-content .card-order .item .item-data .item-data-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["marginBottom", "8rpx"]])]])], ["item-data-value", _uM([[".card-content .card-pkg-box .item .item-data .item-data-item ", _uM([["fontSize", "24rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])], [".card-content .card-order .item .item-data .item-data-item ", _uM([["fontSize", "24rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["fixed-bottom-buttons", _pS(_uM([["position", "fixed"], ["bottom", 0], ["left", 0], ["right", 0], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "20rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#e7edf5"], ["boxShadow", "0 -4rpx 12rpx rgba(0, 0, 0, 0.04)"], ["zIndex", 100]]))]])]

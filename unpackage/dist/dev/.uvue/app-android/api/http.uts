@@ -3,31 +3,7 @@ import { RequestOptions } from "../uni_modules/m-unix/components/m-tools/Request
 import { ApiUrl } from './url';
 import { request, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts';
 import { config } from '@/common/config.uts';
-export type LoginData = {
-    id: number;
-    token: string;
-    access_token: string;
-    refreshToken: string;
-    userId: number;
-    nickname: string;
-};
-export type CountryData = {
-    fullName: string;
-    letterCode: string;
-};
-export type TenantInfoData = {
-    rechargeTip: string;
-    servicePhone: string;
-    serviceQrcode: string;
-    wxAuditHide: string;
-    wxAuditHideNo: string;
-    wxGetPhoneLogin: string;
-    wxMiniPayType: string;
-    wxPayClass: string;
-    h5IsPullMini: string;
-    h5PayType: string;
-    serviceJumpUrl: string;
-};
+import type { LoginData, CountryData, TenantInfoData, QueryCardListParams, CardListSumData } from './types';
 // 查询国家列表
 export function getCountryList(withToken: boolean = false): Promise<ApiResponse<CountryData[]>> {
     return request<CountryData[]>({
@@ -72,6 +48,23 @@ export function getTenantInfo(tenantId: string, withToken: boolean = true): Prom
         url: url,
         method: 'GET',
         withToken
+    } as RequestOptions);
+}
+// 查询卡列表
+export function queryCardList(params: QueryCardListParams, withToken: boolean = true): Promise<ApiResponse<LoginData[]>> {
+    return request<LoginData[]>({
+        url: ApiUrl["queryCardList"] as string,
+        method: 'GET',
+        data: params,
+        withToken: withToken
+    } as RequestOptions);
+}
+// 查询卡列表统计
+export function queryCardListSum(withToken: boolean = true): Promise<ApiResponse<CardListSumData>> {
+    return request<CardListSumData>({
+        url: ApiUrl["queryCardListSum"] as string,
+        method: 'GET',
+        withToken: withToken
     } as RequestOptions);
 }
 //# sourceMappingURL=http.uts.map

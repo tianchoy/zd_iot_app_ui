@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "rice-action-sheet": "../../components/rice-action-sheet/rice-action-sheet"
+  }
+}

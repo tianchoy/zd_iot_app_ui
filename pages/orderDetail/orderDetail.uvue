@@ -88,23 +88,17 @@
 			</view>
 		</view>
 	</view>
-	<m-bottom-popup
-		:show="showPopup"
-		<!-- #ifdef MP-WEIXIN -->
-		:height="'50%'"
-		<!-- #endif -->
-		<!-- #ifndef MP-WEIXIN -->
-		:height="'75%'"
-		<!-- #endif -->
-		:radius="true"
-		@close="showPopup = false"
+	<rice-popup
+		v-model:show="showPopup"
+		position="bottom"
+		@close="onPopupClose"
 	>
 		<Payment 
 			:amount="currentPrice" 
 			@cancel="handleCancelPayment"
 			@confirm="handleConfirmPayment"
 		/>
-	</m-bottom-popup>
+	</rice-popup>
 </template>
 
 <script setup lang="uts">

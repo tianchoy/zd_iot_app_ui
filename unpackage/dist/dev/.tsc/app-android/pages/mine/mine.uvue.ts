@@ -1,6 +1,12 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
 import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue'
+import _easycom_m_button from '@/uni_modules/m-unix/components/m-button/m-button.uvue'
+import { login,getTenantInfo,queryCardListSum} from '@/api/http.uts'
+	import type { CardListSumData } from '@/api/types.uts'
+	import { setStorageSync,getTenantId,getToken ,clearToken} from '@/common/config.uts'
 
+
+	
 const __sfc__ = defineComponent({
   __name: 'mine',
   setup(__props) {
@@ -9,25 +15,129 @@ const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
 	const title = ref('用户');
+	const wxGetPhoneLogin = ref<string>('')
 
 	// 卡片类型切换
 	const cardType = (type: number) => {
-		console.log(type, " at pages/mine/mine.uvue:44")
+		if (!isLogin()) return 
 		uni.reLaunch({
 			url: '/pages/card/card?type=' + type
 		})
 	}
 	// 跳转订单记录
 	const toOrder = () => {
+		if (!isLogin()) return 
 		uni.navigateTo({
 			url: '/pages/myOrder/myOrder'
 		})
 	}
 
+	//登录
+	const userId = ref<string>('')
+	const userLoginByOpenid = async (codes: string) => {
+		const res = await login({
+			xcxCode: codes,
+			isLogin: '1',
+		})
+		
+		if(res.code == 200){
+			userId.value = '' + res.data.id
+			uni.navigateTo({
+				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value
+			})
+		}
+	}
+
+	//获取 code
+	const code = ref<string>('')
+	const getCode = () => {
+		uni.login({
+			success: (res) => {
+				code.value = res.code
+				userLoginByOpenid(res.code);
+			}
+		})
+	}
+
+		// 获取租户页面配置
+	const getTenantInfos = async () => {
+		const res = await getTenantInfo(getTenantId(),false)
+		if(res.code == 200){
+			const tenantInfo = res.data
+			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
+			// setStorageSync('tenant_infos', tenantInfo)
+		}
+	}
+
+	const handleLogin = () => {
+		const token = getToken()
+		if(!token){
+			getTenantInfos().then(() => {
+				getCode()
+			})
+		}
+	}
+
+	// 退出登录
+	const handleLogout = () => {
+		clearToken()
+		uni.showToast({
+			title: '退出登录成功',
+			icon: 'none'
+		})
+		uni.reLaunch({
+			url: '/pages/index/index'
+		})
+	}
+
+	// 查询卡列表统计
+	const cardListSum = ref<CardListSumData>({})
+	const getCardListSum = async () => {
+		try {
+			const res = await queryCardListSum()
+			if (res.code === 200) {
+				cardListSum.value = res.data
+				console.log('查询卡列表统计成功:', res.data, " at pages/mine/mine.uvue:131")
+			} else {
+				console.log('查询卡列表统计失败:', res.msg, " at pages/mine/mine.uvue:133")
+			}
+		} catch (error) {
+			console.error('查询卡列表统计异常:', error, " at pages/mine/mine.uvue:136")
+		}
+	}
+
+	// 检查token状态
+	const checkToken = (): boolean => {
+		const token = getToken()
+		return !!token
+	}
+
+	// 检查是否登录
+	const isLogin = (): boolean => {
+		if (!checkToken()) {
+			uni.showToast({
+				title: '请先登录',
+				icon: 'none'
+			})
+			return false
+		}
+		return true
+	}
+
+
+	onLoad(() => {
+		// 检查token状态
+		if (checkToken()) {
+			//加载统计数据
+			getCardListSum()
+		}
+	})
+
 return (): any | null => {
 
 const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar)
 const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
+const _component_m_button = resolveEasyComponent("m-button",_easycom_m_button)
 
   return _cE(Fragment, null, [
     _cV(_component_topNavBar, _uM({
@@ -39,28 +149,27 @@ const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
     })),
     _cE("view", _uM({ class: "container" }), [
       _cE("view", _uM({ class: "card-info mb-24" }), [
-        _cE("text", _uM({ class: "persion-name" }), "Hi," + _tD(unref(title)), 1 /* TEXT */),
         _cE("view", _uM({ class: "persion-card" }), [
           _cE("view", _uM({
             class: "persion-card-item",
             onClick: () => {cardType(0)}
           }), [
             _cE("text", _uM({ class: "persion-card-item-title" }), "我的卡片"),
-            _cE("text", _uM({ class: "persion-card-item-content" }), " 12")
+            _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).all || 0), 1 /* TEXT */)
           ], 8 /* PROPS */, ["onClick"]),
           _cE("view", _uM({
             class: "persion-card-item",
             onClick: () => {cardType(1)}
           }), [
             _cE("text", _uM({ class: "persion-card-item-title" }), "在用卡片"),
-            _cE("text", _uM({ class: "persion-card-item-content" }), " 12")
+            _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).inUse || 0), 1 /* TEXT */)
           ], 8 /* PROPS */, ["onClick"]),
           _cE("view", _uM({
             class: "persion-card-item",
             onClick: () => {cardType(2)}
           }), [
             _cE("text", _uM({ class: "persion-card-item-title" }), "异常卡片"),
-            _cE("text", _uM({ class: "persion-card-item-content" }), " 12")
+            _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).inNotUse || 0), 1 /* TEXT */)
           ], 8 /* PROPS */, ["onClick"])
         ])
       ]),
@@ -89,6 +198,27 @@ const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
             size: "20rpx"
           }))
         ])
+      ]),
+      _cE("view", _uM({ class: "btn-box" }), [
+        isTrue(!isLogin())
+          ? _cV(_component_m_button, _uM({
+              key: 0,
+              type: "primary",
+              shape: "circle",
+              onClick: handleLogin
+            }), _uM({
+              default: withSlotCtx((): any[] => ["登录"]),
+              _: 1 /* STABLE */
+            }))
+          : _cV(_component_m_button, _uM({
+              key: 1,
+              type: "warning",
+              shape: "circle",
+              onClick: handleLogout
+            }), _uM({
+              default: withSlotCtx((): any[] => ["退出登录"]),
+              _: 1 /* STABLE */
+            }))
       ])
     ])
   ], 64 /* STABLE_FRAGMENT */)
@@ -97,4 +227,4 @@ const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
 
 })
 export default __sfc__
-const GenPagesMineMineStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"]]))], ["card-info", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["backgroundImage", "linear-gradient(135deg, #2f6de8 0%, #4d88f5 65%, #67a4ff 100%)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#ffffff"], ["boxShadow", "0 8rpx 18rpx rgba(37, 99, 235, 0.14)"]])]])], ["persion-name", _uM([[".container .card-info ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#ffffff"]])]])], ["persion-card", _uM([[".container .card-info ", _uM([["marginTop", "30rpx"], ["display", "flex"], ["flexDirection", "row"]])]])], ["persion-card-item", _uM([[".container .card-info .persion-card ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["marginTop", 0], ["marginRight", "10rpx"], ["marginBottom", 0], ["marginLeft", "10rpx"], ["minHeight", "120rpx"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "rgba(255,255,255,0.12)"], ["boxShadow", "inset 0 1px 0 rgba(255, 255, 255, 0.18)"]])]])], ["persion-card-item-title", _uM([[".container .card-info .persion-card ", _uM([["fontSize", "22rpx"], ["lineHeight", 1.4], ["color", "#ffffff"]])]])], ["persion-card-item-content", _uM([[".container .card-info .persion-card ", _uM([["marginTop", "20rpx"], ["fontSize", "40rpx"], ["fontWeight", 800], ["lineHeight", 1]])]])], ["card-box", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"]])]])], ["item", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#e7edf5"]])]])], ["order-label", _uM([[".container .card-box .item ", _uM([["fontWeight", "bold"]])]])]])]
+const GenPagesMineMineStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"], ["height", "100%"]]))], ["card-info", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["backgroundImage", "linear-gradient(135deg, #2f6de8 0%, #4d88f5 65%, #67a4ff 100%)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#ffffff"], ["boxShadow", "0 8rpx 18rpx rgba(37, 99, 235, 0.14)"]])]])], ["persion-name", _uM([[".container .card-info ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#ffffff"]])]])], ["persion-card", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "row"]])]])], ["persion-card-item", _uM([[".container .card-info .persion-card ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["marginTop", 0], ["marginRight", "10rpx"], ["marginBottom", 0], ["marginLeft", "10rpx"], ["minHeight", "120rpx"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "rgba(255,255,255,0.12)"], ["boxShadow", "inset 0 1px 0 rgba(255, 255, 255, 0.18)"]])]])], ["persion-card-item-title", _uM([[".container .card-info .persion-card ", _uM([["fontSize", "22rpx"], ["lineHeight", 1.4], ["color", "#ffffff"]])]])], ["persion-card-item-content", _uM([[".container .card-info .persion-card ", _uM([["marginTop", "20rpx"], ["fontSize", "40rpx"], ["fontWeight", 800], ["lineHeight", 1]])]])], ["card-box", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"]])]])], ["item", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#e7edf5"]])]])], ["order-label", _uM([[".container .card-box .item ", _uM([["fontWeight", "bold"]])]])], ["btn-box", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["marginTop", "30rpx"], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"]])]])]])]

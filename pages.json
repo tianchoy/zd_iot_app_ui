@@ -1,19 +1,10 @@
 {
-	"easycom": {
-		"autoscan": true,
-		"custom": {
-			"^m-(.*)": "@/uni_modules/m-unix/components/m-$1/m-$1.uvue"
-		}
-	},
 	"pages": [
 		{
 			"path": "pages/card/card",
 			"style": {
 				"navigationBarTitleText": ""
 			}
-		},
-		{
-			"path": "pages/index/index"
 		},
 		{
 			"path": "pages/mine/mine",
@@ -86,6 +77,12 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
+		},
+		{
+			"path": "uni_modules/rice-ui/pages/action-sheet/action-sheet"
+		},
+		{
+			"path": "uni_modules/rice-ui/pages/dialog/dialog"
 		}
 	],
 	"tabBar": {

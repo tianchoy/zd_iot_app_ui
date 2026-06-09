@@ -11,6 +11,13 @@ const __sfc__ = defineComponent({
 				return []
 			}
 		},
+		// 数字数组，与 values 一一对应
+		nums: {
+			type: Array,
+			default(): any[] {
+				return []
+			}
+		},
 		current: {
 			type: Number,
 			default: 0
@@ -21,7 +28,7 @@ const __sfc__ = defineComponent({
 		},
 		activeColor: {
 			type: String,
-			default: '#e5edf6	'
+			default: '#e5edf6'
 		},
 		height: {
 			type: String,
@@ -50,6 +57,27 @@ const __sfc__ = defineComponent({
 		customStyle: {
 			type: Object as PropType<UTSJSONObject>,
 			default: () => ({})
+		},
+		// 数字样式配置
+		numberColor: {
+			type: String,
+			default: '#999999'
+		},
+		numberActiveColor: {
+			type: String,
+			default: '#334155'
+		},
+		numberBgColor: {
+			type: String,
+			default: '#e8e8e8'
+		},
+		numberActiveBgColor: {
+			type: String,
+			default: '#d4e2f0'
+		},
+		numberSize: {
+			type: String,
+			default: '22rpx'
 		}
 	},
 	computed: {
@@ -81,7 +109,7 @@ const __sfc__ = defineComponent({
 			return c
 		},
 		rootStyle(): UTSJSONObject {
-			const st = { __$originalPosition: new UTSSourceMapPosition("st", "uni_modules/m-unix/components/m-segmented-control/m-segmented-control.uvue", 108, 10), 
+			const st = { __$originalPosition: new UTSSourceMapPosition("st", "uni_modules/m-unix/components/m-segmented-control/m-segmented-control.uvue", 144, 10), 
 				height: this.height,
 				borderRadius: this.radius,
 				backgroundColor: this.backgroundColor
@@ -108,12 +136,31 @@ const __sfc__ = defineComponent({
 		}
 	},
 	methods: {
+		itemNumber(idx: number): string | null {
+			const numsArr = this.nums as any[]
+			if (!numsArr || numsArr.length === 0) return null
+			if (idx >= numsArr.length) return null
+			const v = numsArr[idx]
+			if (v === null || v === undefined) return null
+			const num = Number(v)
+			if (isNaN(num)) return null
+			return String(num)
+		},
 		textStyle(idx: number): UTSJSONObject {
 			const active = idx === this.innerCurrent
 			return {
 				'font-size': this.size,
 				color: active ? this.textActiveColor : this.inactiveColor,
 				transition: 'color 0.28s ease'
+			}
+		},
+		numberStyle(idx: number): UTSJSONObject {
+			const active = idx === this.innerCurrent
+			return {
+				'font-size': this.numberSize,
+				color: active ? this.numberActiveColor : this.numberColor,
+				backgroundColor: active ? this.numberActiveBgColor : this.numberBgColor,
+				transition: 'all 0.28s ease'
 			}
 		},
 		onItemTap(idx: number) {
@@ -149,14 +196,23 @@ const _cache = this.$.renderCache
           class: "m-segmented-control__item",
           onClick: () => {_ctx.onItemTap(idx)}
         }), [
-          _cE("text", _uM({
-            class: "m-segmented-control__text",
-            style: _nS(_ctx.textStyle(idx))
-          }), _tD(item), 5 /* TEXT, STYLE */)
+          _cE("view", _uM({ class: "m-segmented-control__content" }), [
+            _cE("text", _uM({
+              class: "m-segmented-control__text",
+              style: _nS(_ctx.textStyle(idx))
+            }), _tD(item), 5 /* TEXT, STYLE */),
+            _ctx.itemNumber(idx) !== null
+              ? _cE("text", _uM({
+                  key: 0,
+                  class: _nC(["m-segmented-control__number", _uM({ 'm-segmented-control__number--active': idx === _ctx.innerCurrent })]),
+                  style: _nS(_ctx.numberStyle(idx))
+                }), _tD(_ctx.itemNumber(idx)), 7 /* TEXT, CLASS, STYLE */)
+              : _cC("v-if", true)
+          ])
         ], 8 /* PROPS */, ["onClick"])
       }), 128 /* KEYED_FRAGMENT */)
     ])
   ], 6 /* CLASS, STYLE */)
 }
 export type MSegmentedControlComponentPublicInstance = InstanceType<typeof __sfc__>;
-const GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControlStyles = [_uM([["m-segmented-control", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "stretch"], ["boxSizing", "border-box"], ["overflow", "hidden"]]))], ["m-segmented-control--disabled", _pS(_uM([["opacity", 0.5]]))], ["m-segmented-control__inner", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "stretch"], ["position", "relative"], ["boxSizing", "border-box"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0], ["width", "100%"], ["minHeight", 0]]))], ["m-segmented-control__thumb", _pS(_uM([["position", "absolute"], ["top", "4rpx"], ["bottom", "4rpx"], ["left", 0], ["zIndex", 0], ["boxSizing", "border-box"], ["backgroundColor", "#ffffff"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["pointerEvents", "none"]]))], ["m-segmented-control__item", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["boxSizing", "border-box"], ["position", "relative"], ["zIndex", 1], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "rgba(0,0,0,0)"], ["borderRightColor", "rgba(0,0,0,0)"], ["borderBottomColor", "rgba(0,0,0,0)"], ["borderLeftColor", "rgba(0,0,0,0)"], ["backgroundColor", "rgba(0,0,0,0)"]]))], ["m-segmented-control__text", _pS(_uM([["lineHeight", 1.2], ["position", "relative"], ["zIndex", 2], ["color", "#334155"]]))]])]
+const GenUniModulesMUnixComponentsMSegmentedControlMSegmentedControlStyles = [_uM([["m-segmented-control", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "stretch"], ["boxSizing", "border-box"], ["overflow", "hidden"]]))], ["m-segmented-control--disabled", _pS(_uM([["opacity", 0.5]]))], ["m-segmented-control__inner", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "stretch"], ["position", "relative"], ["boxSizing", "border-box"], ["paddingTop", "24rpx"], ["paddingRight", 0], ["paddingBottom", "24rpx"], ["paddingLeft", 0], ["width", "100%"], ["minHeight", 0]]))], ["m-segmented-control__thumb", _pS(_uM([["position", "absolute"], ["top", "4rpx"], ["bottom", "4rpx"], ["left", 0], ["zIndex", 0], ["boxSizing", "border-box"], ["backgroundColor", "#ffffff"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["pointerEvents", "none"]]))], ["m-segmented-control__item", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["boxSizing", "border-box"], ["position", "relative"], ["zIndex", 1], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "rgba(0,0,0,0)"], ["borderRightColor", "rgba(0,0,0,0)"], ["borderBottomColor", "rgba(0,0,0,0)"], ["borderLeftColor", "rgba(0,0,0,0)"], ["backgroundColor", "rgba(0,0,0,0)"]]))], ["m-segmented-control__content", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "center"], ["gap", "8rpx"]]))], ["m-segmented-control__text", _pS(_uM([["lineHeight", 1.2], ["position", "relative"], ["zIndex", 2]]))], ["m-segmented-control__number", _pS(_uM([["paddingTop", "2rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "2rpx"], ["paddingLeft", "10rpx"], ["borderTopLeftRadius", "28rpx"], ["borderTopRightRadius", "28rpx"], ["borderBottomRightRadius", "28rpx"], ["borderBottomLeftRadius", "28rpx"], ["lineHeight", 1.2], ["fontWeight", "normal"], ["position", "relative"], ["zIndex", 2]]))]])]

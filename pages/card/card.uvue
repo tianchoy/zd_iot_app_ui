@@ -5,49 +5,39 @@
 		<view class="card-box mb-24">
 			<view class="card-label">卡号查询</view>
 			<view class="search-value mt-24">
-				<input
+				<rice-input
 					v-model="card_number"
 					placeholder="请输入 ICCID / MSISDN"
 					class="search-input"
 					@input="handleInput"
-				/>
-				<!-- #ifdef APP-ANDROID -->
-				<view class="android-scan-btn" @click="scanCode">
-					<m-icon name="scanning" size="40rpx" color="#334155"></m-icon>
-				</view>
-				<view class="android-query-btn" @click="handleQuery">
-					<text class="android-btn-text">查询</text>
-				</view>
-				<!-- #endif -->
-				<!-- #ifndef APP-ANDROID -->
-				<m-button type="white" :plain="true" class="scan-btn" width="90rpx" @click="scanCode">
-					<m-icon name="scanning" size="40rpx"></m-icon>
-				</m-button>
-				<m-button type="primary" width="120rpx" @click="handleQuery">查询</m-button>
-				<!-- #endif -->
+				>
+				</rice-input>
+				<rice-button class="scan-btn" height="100%" @click="scanCode">
+					<rice-icon name="scan" size="40rpx"></rice-icon>
+				</rice-button>
+				<rice-button type="primary" color="#1989fa" textColor="#ffffff" height="100%" @click="handleQuery">查询</rice-button>
 			</view>
 			
 		</view>
 		
 		<view class="card-box">
 			<view class="card-tabs">
-				<!-- #ifdef APP-ANDROID -->
-				<m-segmented-control :values="tabs" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'72rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
-				<!-- #endif -->
-				<!-- #ifndef APP-ANDROID -->
-				<m-segmented-control :values="tabs" :nums="tabNumbers" :current="current" :textActiveColor="'#2563eb'" @click="handleClick" :customStyle="{height:'auto',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}" />
-				<!-- #endif -->
+				<rice-tabs
+				  v-model="current"
+				  line-color="#ffffff" 
+				  :list="tabs" 
+				  :line-width="0" 
+				  :title-active-color="'#2563eb'" 
+				  @click="handleClick" 
+				  :customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
+				  >
+				</rice-tabs>
 			</view>
-			<!-- #ifdef APP-ANDROID -->
 			<scroll-view 
-				class="card-list android-card-scroll" 
+				class="card-list" 
 				scroll-y="true"
 				:style="{ height: scrollViewHeight + 'px' }"
 			>
-			<!-- #endif -->
-			<!-- #ifndef APP-ANDROID -->
-			<view class="card-list">
-			<!-- #endif -->
 				<view class="card-item" v-for="(card, index) in filteredCardList" :key="index" @click="handleDetail(card)">
 					<view class="item-head">
 						<view class="item-head-label">
@@ -60,7 +50,7 @@
 						<text class="package-label">当前套餐:</text>
 						<text class="package-value">{{ getCardText(card, 'currentPackage') }}</text>
 					</view>
-					<m-div backgroundColor="#f1f5f9" textClass="divider"></m-div>
+					<rice-divider backgroundColor="#f1f5f9" textClass="divider"></rice-divider>
 					<view class="card-metrics">
 						<view class="metric-box mr-24">
 							<view class="metric-label">到期时间</view>
@@ -76,41 +66,33 @@
 							<text class="cycle-label">当前周期：</text>
 							<text class="cycle-value">{{ getCardText(card, 'currentCycle') }}</text>
 						</view>
-						<!-- #ifdef APP-ANDROID -->
-						<view class="android-recharge-btn">
-							<text class="android-btn-text android-recharge-text">去充值</text>
-						</view>
-						<!-- #endif -->
-						<!-- #ifndef APP-ANDROID -->
-						<m-button type="primary" width="200rpx" btnSize="mini" size="25rpx" shape="circle">去充值</m-button>
-						<!-- #endif -->
+						<rice-button type="primary" size="small" >去充值</rice-button>
 					</view>
 				</view>
-			<!-- #ifdef APP-ANDROID -->
 			</scroll-view>
-			<!-- #endif -->
-			<!-- #ifndef APP-ANDROID -->
-			</view>
-			<!-- #endif -->
 		</view>
 
 		<!-- 空状态 -->
 		<view v-if="filteredCardList.length === 0" class="empty-state">
 			<text class="empty-text">暂无卡片数据</text>
 		</view>
+		<customService @connect_service="handleConnectService"></customService>
 	</view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
+import { queryCardList } from '@/api/http.uts'
 import { getPageParams } from '@/utils/routerParams'
+import { getToken } from '@/common/config.uts'
 import { CardItem } from '@/api/types.uts'
 
 const card_number = ref('')
 const queryKeyword = ref('')
-const tabs = ref(['全部', '在用', '异常'])
+const tabs = ref([{name:'全部',},{name:'在用',},{name:'异常'}])
 const current = ref(0)
 const scrollViewHeight = ref(0)
+const loading = ref<boolean>(false)
 
 // 完整的卡片列表数据
 const allCardList = ref<CardItem[]>([
@@ -193,7 +175,7 @@ const handleDetail = (card: CardItem) => {
 
 // 根据选中的 tab 和查询卡号过滤卡片列表
 const filteredCardList = computed<CardItem[]>(() : CardItem[] => {
-	const currentStatus = tabs.value[current.value]
+	const currentStatus = tabs.value[current.value].name
 	let list = allCardList.value
 	if (currentStatus !== '全部') {
 		list = list.filter((card: CardItem) : boolean => {
@@ -303,15 +285,81 @@ const calculateScrollHeight = () => {
 	// #endif
 }
 
-onLoad((options) => {
-	console.log(options)
-	const type = options['type']
-	if(type != null){
-		current.value = parseInt('' + type)
+// 查询卡列表
+const getCardList = async () => {
+	loading.value = true
+	try {
+		const res = await queryCardList({
+			rechargeNo: '',
+			status: '',
+			isSort: true
+		})
+		if (res.code === 200) {
+			console.log('查询卡列表成功:', res.data)
+			// 假设返回的数据结构是 res.data.list 或 res.data 直接为数组，根据实际情况调整
+			if (Array.isArray(res.data)) {
+				allCardList.value = res.data
+			} else if (res.data && Array.isArray(res.data.list)) {
+				allCardList.value = res.data.list
+			} else {
+				allCardList.value = []
+			}
+		} else {
+			console.log('查询卡列表失败:', res.msg)
+			allCardList.value = []
+			uni.showToast({
+				title: res.msg || '查询失败',
+				icon: 'none'
+			})
+		}
+	} catch (error) {
+		console.error('查询卡列表异常:', error)
+		allCardList.value = []
+		uni.showToast({
+			title: '网络异常，请稍后重试',
+			icon: 'none'
+		})
+	} finally {
+		loading.value = false
 	}
+}
 
+// 检查token状态
+const checkToken = (): boolean => {
+	const token = getToken()
+	return !!token
+}
+
+// 检查是否登录
+const isLogin = (): boolean => {
+	if (!checkToken()) {
+		uni.showToast({
+			title: '请先登录',
+			icon: 'none'
+		})
+		return false
+	}
+	return true
+}
+
+onLoad((options) => {
+	// // 检查token状态
+	// if (checkToken()) {
+	// 	//加载列表数据
+	// 	getCardList()
+	// }
 	uni.$on('scanResult', onScanResult)
 })
+
+// 处理连接客服事件
+const handleConnectService = () => {
+	uni.showToast({
+		title: '连接客服',
+		icon: 'none'
+	})
+}
+
+
 
 onMounted(() => {
 	calculateScrollHeight()
@@ -329,6 +377,7 @@ onUnload(() => {
 		flex-direction: column;
 		background-color: #f4f7fb;
 		padding-bottom: 40rpx;
+		min-height: 100%;
 		
 		.card-box{
 			display: flex;
@@ -502,11 +551,6 @@ onUnload(() => {
 			flex: 1;
 			width: 100%;
 			overflow: auto;
-		}
-		
-		.android-card-scroll {
-			flex: 1;
-			width: 100%;
 		}
 		
 		.empty-state {

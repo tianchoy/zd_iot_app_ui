@@ -1,5 +1,10 @@
-import './utils/inject-m-unix'
+// import './utils/inject-m-unix'
 import App from './App.uvue'
+// #ifdef WEB
+import "@/uni_modules/rice-ui/libs/style/index.css";
+/* 自定义主题色示例 */
+// import "./style/theme.css";
+// #endif
 import { createSSRApp } from 'vue'
 export function createApp() {
 	const app = createSSRApp(App)

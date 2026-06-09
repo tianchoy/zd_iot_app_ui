@@ -32,6 +32,10 @@ page .page-container.data-v-2bc48812 {
   background-color: #f4f7fb;
 }
 page .fixed-tabs.data-v-2bc48812 {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 99;
   flex-shrink: 0;
   background-color: #f4f7fb;
   padding: 12rpx 24rpx 0 24rpx;
@@ -39,7 +43,7 @@ page .fixed-tabs.data-v-2bc48812 {
 page .container.data-v-2bc48812 {
   display: flex;
   flex-direction: column;
-  padding: 20rpx 0 190rpx 0;
+  padding: 120rpx 0;
 }
 page .card-box.data-v-2bc48812 {
   display: flex;
@@ -155,6 +159,7 @@ page .card-content .data-total .total-item.data-v-2bc48812 {
   border-radius: 25rpx;
   padding: 20rpx 20rpx 10rpx;
   flex: 1;
+  text-align: center;
 }
 page .card-content .data-total .total-item .total-label.data-v-2bc48812 {
   font-size: 20rpx;
@@ -244,4 +249,7 @@ page .fixed-bottom-buttons.data-v-2bc48812 {
   border-top: 1rpx solid #e7edf5;
   box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.04);
   z-index: 100;
+}
+page .fixed-bottom-buttons .btn.data-v-2bc48812 {
+  flex: 1;
 }

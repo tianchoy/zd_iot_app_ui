@@ -1,4 +1,4 @@
-import _easycom_m_fab from '@/uni_modules/m-unix/components/m-fab/m-fab.uvue'
+import _easycom_rice_float_fab from '@/uni_modules/rice-ui/components/rice-float-fab/rice-float-fab.uvue'
 
 const __sfc__ = defineComponent({
   __name: 'customService',
@@ -17,13 +17,13 @@ __ins.emit(event, ...do_not_transform_spread)
 
 return (): any | null => {
 
-const _component_m_fab = resolveEasyComponent("m-fab",_easycom_m_fab)
+const _component_rice_float_fab = resolveEasyComponent("rice-float-fab",_easycom_rice_float_fab)
 
-  return _cV(_component_m_fab, _uM({
-    type: "primary",
-    size: "40rpx",
-    icon: "customer-service",
-    draggable: true,
+  return _cV(_component_rice_float_fab, _uM({
+    "default-position": "bottom-right",
+    icon: "chat-fill",
+    "gap-bottom": "200rpx",
+    "gap-right": "50rpx",
     onClick: handleClick
   }))
 }

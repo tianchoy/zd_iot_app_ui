@@ -2,7 +2,7 @@
   "navigationBarTitleText": "",
   "usingComponents": {
     "top-nav-bar": "../../components/topNavBar/topNavBar",
-    "m-icon": "../../uni_modules/m-unix/components/m-icon/m-icon",
-    "m-button": "../../uni_modules/m-unix/components/m-button/m-button"
+    "rice-icon": "../../uni_modules/rice-ui/components/rice-icon/rice-icon",
+    "rice-button": "../../uni_modules/rice-ui/components/rice-button/rice-button"
   }
 }

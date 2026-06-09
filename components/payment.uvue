@@ -73,8 +73,8 @@
 
 		<!-- 按钮区域 -->
 		<view class="action-buttons">
-			<button class="btn cancel-btn" @click="handleCancel">取消</button>
-			<button class="btn confirm-btn" @click="handleConfirm">确认支付</button>
+			<rice-button class="btn cancel-btn mr-24" @click="handleCancel">取消</rice-button>
+			<rice-button class="btn confirm-btn ml-24" textColor="#fff" @click="handleConfirm">确认支付</rice-button>
 		</view>
 	</view>
 </template>

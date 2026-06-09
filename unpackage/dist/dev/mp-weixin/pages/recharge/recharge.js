@@ -2,23 +2,22 @@
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
-  const _easycom_m_tag_1 = common_vendor.resolveComponent("m-tag");
-  const _easycom_m_button_1 = common_vendor.resolveComponent("m-button");
-  const _easycom_m_tabs_1 = common_vendor.resolveComponent("m-tabs");
-  const _easycom_m_bottom_popup_1 = common_vendor.resolveComponent("m-bottom-popup");
-  const _easycom_m_sticky_bottom_1 = common_vendor.resolveComponent("m-sticky-bottom");
-  (_easycom_topNavBar_1 + _easycom_m_tag_1 + _easycom_m_button_1 + _easycom_m_tabs_1 + _easycom_m_bottom_popup_1 + _easycom_m_sticky_bottom_1)();
+  const _easycom_rice_tag_1 = common_vendor.resolveComponent("rice-tag");
+  const _easycom_rice_progress_1 = common_vendor.resolveComponent("rice-progress");
+  const _easycom_rice_button_1 = common_vendor.resolveComponent("rice-button");
+  const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
+  const _easycom_rice_popup_1 = common_vendor.resolveComponent("rice-popup");
+  (_easycom_topNavBar_1 + _easycom_rice_tag_1 + _easycom_rice_progress_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1 + _easycom_rice_popup_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
-const _easycom_m_tag = () => "../../uni_modules/m-unix/components/m-tag/m-tag.js";
-const _easycom_m_button = () => "../../uni_modules/m-unix/components/m-button/m-button.js";
-const _easycom_m_tabs = () => "../../uni_modules/m-unix/components/m-tabs/m-tabs.js";
-const _easycom_m_bottom_popup = () => "../../uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup.js";
-const _easycom_m_sticky_bottom = () => "../../uni_modules/m-unix/components/m-sticky-bottom/m-sticky-bottom.js";
+const _easycom_rice_tag = () => "../../uni_modules/rice-ui/components/rice-tag/rice-tag.js";
+const _easycom_rice_progress = () => "../../uni_modules/rice-ui/components/rice-progress/rice-progress.js";
+const _easycom_rice_button = () => "../../uni_modules/rice-ui/components/rice-button/rice-button.js";
+const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
+const _easycom_rice_popup = () => "../../uni_modules/rice-ui/components/rice-popup/rice-popup.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_m_tag + common_vendor.unref(LinearProgress) + _easycom_m_button + _easycom_m_tabs + common_vendor.unref(Payment) + _easycom_m_bottom_popup + _easycom_m_sticky_bottom)();
+  (_easycom_topNavBar + _easycom_rice_tag + _easycom_rice_progress + _easycom_rice_button + _easycom_rice_tabs + common_vendor.unref(Payment) + _easycom_rice_popup)();
 }
-const LinearProgress = () => "../../components/progress.js";
 const Payment = () => "../../components/payment.js";
 class TabItem extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -91,7 +90,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "recharge",
   setup(__props) {
     const showPopup = common_vendor.ref(false);
-    const progress1 = common_vendor.ref(80);
+    const percentage = common_vendor.ref(60);
     const active = common_vendor.ref(0);
     const tabs = common_vendor.ref([
       new TabItem({
@@ -180,7 +179,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleConfirmPayment = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:267", e);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:259", e);
       showPopup.value = false;
     };
     const goBack = () => {
@@ -219,43 +218,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-722cdacb"
         }),
         d: common_vendor.p({
-          value: progress1.value,
+          percentage: percentage.value,
+          ["show-text"]: true,
           class: "data-v-722cdacb"
         }),
-        e: common_vendor.o(toMyPackage, "50"),
+        e: common_vendor.o(toMyPackage, "1d"),
         f: common_vendor.p({
-          type: "white",
-          plain: true,
-          margin: "0 20rpx",
-          height: "70rpx",
-          shape: "circle",
-          bold: true,
-          class: "data-v-722cdacb"
+          class: "btn mr-24 data-v-722cdacb"
         }),
-        g: common_vendor.o(toOrderRecord, "a5"),
+        g: common_vendor.o(toOrderRecord, "df"),
         h: common_vendor.p({
-          type: "white",
-          plain: true,
-          margin: "0 20rpx",
-          height: "70rpx",
-          shape: "circle",
-          bold: true,
+          class: "btn data-v-722cdacb"
+        }),
+        i: common_vendor.o(changeTab, "1f"),
+        j: common_vendor.o(($event) => {
+          return active.value = $event;
+        }, "b1"),
+        k: common_vendor.p({
+          ["line-color"]: "#ffffff",
+          list: tabs.value,
+          ["line-width"]: 0,
+          ["title-active-color"]: "#2563eb",
+          customStyle: {
+            height: "85rpx",
+            padding: "10rpx",
+            border: "1rpx solid #e5edf6"
+          },
+          modelValue: active.value,
           class: "data-v-722cdacb"
         }),
-        i: common_vendor.o(changeTab, "be"),
-        j: common_vendor.p({
-          tabs: tabs.value,
-          width: "100rpx",
-          padding: 0,
-          isSlider: true,
-          currentTab: active.value,
-          unlined: false,
-          bold: true,
-          class: "data-v-722cdacb"
-        }),
-        k: active.value === 0
+        l: active.value === 0
       }, active.value === 0 ? {
-        l: common_vendor.f(packageList.value, (item, index, i0) => {
+        m: common_vendor.f(packageList.value, (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.name),
             b: item.tag
@@ -277,7 +271,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       } : {
-        m: common_vendor.f(refillList.value, (item, index, i0) => {
+        n: common_vendor.f(refillList.value, (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.name),
             b: item.tag
@@ -299,39 +293,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }, {
-        n: `${_ctx.u_s_b_h}px`,
-        o: `${_ctx.u_s_a_i_b}px`,
-        p: common_vendor.o(handleCancelPayment, "68"),
-        q: common_vendor.o(handleConfirmPayment, "06"),
-        r: common_vendor.p({
+        o: `${_ctx.u_s_b_h}px`,
+        p: `${_ctx.u_s_a_i_b}px`,
+        q: common_vendor.o(handleCancelPayment, "ff"),
+        r: common_vendor.o(handleConfirmPayment, "b0"),
+        s: common_vendor.p({
           amount: currentPrice.value,
           class: "data-v-722cdacb"
         }),
-        s: common_vendor.o(($event) => {
-          return showPopup.value = false;
-        }, "d0"),
-        t: common_vendor.p({
+        t: common_vendor.o(_ctx.onPopupClose, "ad"),
+        v: common_vendor.o(($event) => {
+          return showPopup.value = $event;
+        }, "e9"),
+        w: common_vendor.p({
+          position: "bottom",
           show: showPopup.value,
-          height: "50%",
-          radius: true,
           class: "data-v-722cdacb"
         }),
-        v: common_vendor.t(currentPrice.value),
-        w: common_vendor.o(choosePayment, "ed"),
-        x: common_vendor.p({
+        x: common_vendor.t(currentPrice.value),
+        y: common_vendor.o(choosePayment, "26"),
+        z: common_vendor.p({
           type: "primary",
-          plain: false,
-          margin: "0 20rpx",
-          width: "200rpx",
-          height: "70rpx",
-          shape: "circle",
-          bold: true,
-          shadow: false,
-          class: "data-v-722cdacb"
+          class: "btn data-v-722cdacb"
         }),
-        y: common_vendor.p({
-          class: "data-v-722cdacb"
-        })
+        A: `${_ctx.u_s_b_h}px`,
+        B: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

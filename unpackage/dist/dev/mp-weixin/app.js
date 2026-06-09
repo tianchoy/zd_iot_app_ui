@@ -1,10 +1,8 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
-require("./utils/inject-m-unix.js");
 if (!Math) {
   "./pages/card/card.js";
-  "./pages/index/index.js";
   "./pages/mine/mine.js";
   "./pages/cardDetail/cardDetail.js";
   "./pages/recharge/recharge.js";
@@ -17,6 +15,8 @@ if (!Math) {
   "./pages/orderRecord/orderRecord.js";
   "./pages/myPkg/myPkg.js";
   "./pages/login/login.js";
+  "./uni_modules/rice-ui/pages/action-sheet/action-sheet.js";
+  "./uni_modules/rice-ui/pages/dialog/dialog.js";
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App",

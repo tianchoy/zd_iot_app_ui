@@ -1,0 +1,398 @@
+import _easycom_rice_icon from '@/uni_modules/rice-ui/components/rice-icon/rice-icon.uvue'
+import { useNamespace, useTouch } from "../../libs/use"
+	import { addUnit, clamp, closeto, hasStrValue, getPxNum } from "../../libs/utils"
+	import { FloatFabProps, FloatFabOffset, FloatFabBoundary, FloatFabWindowSize, FloatFabState } from './type.uts';
+
+	
+const __sfc__ = defineComponent({
+  __name: 'rice-float-fab',
+
+		name: 'rice-float-fab',
+		styleIsolation: "app-and-page"
+	,
+  props: /*#__PURE__*/mergeModels({
+    axis: { type: String, required: false, default: 'xy' },
+    adsorption: { type: String, required: false },
+    gap: { type: [Number, String], required: false, default: '24px' },
+    gapTop: { type: [Number, String], required: false },
+    gapBottom: { type: [Number, String], required: false },
+    gapLeft: { type: [Number, String], required: false },
+    gapRight: { type: [Number, String], required: false },
+    overGap: { type: Boolean, required: false, default: true },
+    defaultPosition: { type: String, required: false, default: 'bottom-right' },
+    duration: { type: Number, required: false, default: 300 },
+    icon: { type: String, required: false },
+    iconColor: { type: String, required: false, default: '#fff' },
+    iconSize: { type: [String, Number], required: false, default: '30px' },
+    height: { type: [String, Number], required: false, default: '52px' },
+    width: { type: [String, Number], required: false, default: '52px' },
+    radius: { type: [String, Number], required: false },
+    bgColor: { type: String, required: false },
+    disabled: { type: Boolean, required: false, default: false },
+    zIndex: { type: Number, required: false },
+    customStyle: { type: UTSJSONObject, required: false, default: () : UTSJSONObject => ({}) }
+  }, {
+    "offset": {
+		type: null as unknown as PropType<FloatFabOffset>,
+		default: () => ({ x: -1, y: -1 } as FloatFabOffset)
+	},
+  }),
+  emits: /*#__PURE__*/mergeModels(["click", "offsetChange"], ["update:offset"]),
+  setup(__props, __setupCtx: SetupContext) {
+const __expose = __setupCtx.expose
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	
+	const ns = useNamespace('float-fab')
+	const touch = useTouch()
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+	const props = __props
+
+	//@ts-ignore
+	const offset = useModel<FloatFabOffset>(__ins.props, "offset")
+
+	const windowSize = reactive<FloatFabWindowSize>({
+		width: 0,
+		height: 0,
+	})
+
+	const state = reactive<FloatFabState>({
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0,
+	})
+
+	const lastOffset = {
+		x: 0,
+		y: 0
+	} as FloatFabOffset
+
+	let initialized = false
+	let timer : number | null = null
+	let initTimer : number | null = null
+	const fabRef = shallowRef<UniElement | null>(null)
+	const boundaryBottom = computed(() => getPxNum(props.gapBottom ?? props.gap))
+	const boundaryRight = computed(() => getPxNum(props.gapRight ?? props.gap))
+
+
+	//边界值
+	const boundary = computed(() => {
+		return {
+			top: getPxNum(props.gapTop ?? props.gap),
+			bottom: windowSize.height - state.height - boundaryBottom.value,
+			left: getPxNum(props.gapLeft ?? props.gap),
+			right: windowSize.width - state.width - boundaryRight.value,
+		} as FloatFabBoundary
+	})
+
+
+	const setTransform = (x : number, y : number) => {
+		fabRef.value?.style.setProperty('transform', `translate(${x}px,${y}px)`)
+		fabRef.value?.style.setProperty('opacity', `1`)
+	}
+
+	const updateOffset = () => {
+		offset.value = {
+			x: state.x,
+			y: state.y
+		} as FloatFabOffset
+	}
+
+	const setPosition = () => {
+		const duration = (touch.dragging.value || !initialized) ? 0 : props.duration;
+		fabRef.value?.style.setProperty('transition-duration', `${duration}ms`)
+		setTransform(state.x, state.y)
+	}
+
+	const getFabSize = async () => {
+		const rect = await fabRef.value!.getBoundingClientRectAsync()!
+		state.height = rect.height
+		state.width = rect.width
+	}
+
+	function setDefPosition(position ?: string, isInit = false) {
+		if (position == 'top-left') {
+			state.x = boundary.value.left
+			state.y = boundary.value.top
+		} else if (position == 'top-right') {
+			state.x = boundary.value.right
+			state.y = boundary.value.top
+		} else if (position == 'bottom-left') {
+			state.x = boundary.value.left
+			state.y = boundary.value.bottom
+		} else {
+			state.x = boundary.value.right
+			state.y = boundary.value.bottom
+		}
+		setPosition()
+		if (!isInit) {
+			updateOffset()
+		}
+	}
+
+	const updateState = (x : number, y : number) => {
+		if (props.adsorption == 'x') {
+			x = closeto([boundary.value.left, boundary.value.right], x)
+		} else if (props.adsorption == 'y') {
+			y = closeto([boundary.value.top, boundary.value.bottom], y)
+		}
+		x = clamp(x, boundary.value.left, boundary.value.right)
+		y = clamp(y, boundary.value.top, boundary.value.bottom)
+		state.x = x
+		state.y = y
+		setPosition()
+	}
+
+	function updatePosition(isInit = false) {
+
+
+
+
+
+		let x = offset.value!.x
+		let y = offset.value!.y
+
+
+		//设置初始的默认位置,只有第一次加载且offset的x或y的值小于0时才生效
+		if (isInit && (x < 0 || y < 0)) {
+			const position = props.defaultPosition
+			if (position == 'top-left') {
+				setTransform(-state.width, boundary.value.top)
+			} else if (position == 'top-right') {
+				setTransform(windowSize.width + state.width, boundary.value.top)
+			} else if (position == 'bottom-left') {
+				setTransform(-state.width, boundary.value.bottom)
+			} else {
+				setTransform(windowSize.width + state.width, boundary.value.bottom)
+			}
+			initTimer = setTimeout(() => {
+				initialized = true
+				setDefPosition(position, isInit)
+			}, 20)
+		} else {
+			updateState(x, y)
+			updateOffset()
+		}
+		initialized = true
+	}
+
+	async function init(isInit = false) {
+		await nextTick()
+		const windowInfo = uni.getWindowInfo()
+		windowSize.height = windowInfo.windowHeight
+		windowSize.width = windowInfo.windowWidth
+		await getFabSize()
+		updatePosition(isInit)
+	}
+
+	watch(offset, () => {
+		const isSame = offset.value!.x == state.x && offset.value!.y == state.y
+		if (isSame || touch.dragging.value) return
+		updatePosition()
+	}, {
+		deep: true,
+	})
+
+	watch(() : (any | null)[] =>
+		[props.gap, props.gapTop, props.gapBottom, props.gapLeft, props.gapRight, props.overGap],
+		() => {
+			if (touch.dragging.value) return
+			updateState(state.x, state.y)
+		}, {
+		deep: true,
+	})
+
+	watch(() : (string | number)[] => [props.height, props.width], async () => {
+		if (touch.dragging.value) return
+		await nextTick()
+		await getFabSize()
+		updateState(state.x, state.y)
+	}, {
+		deep: true
+	})
+
+
+
+
+	const onTouchstart = (e : UniTouchEvent) => {
+		touch.start(e)
+		if (props.disabled) return
+		fabRef.value!.style.setProperty('transition-duration', '0ms')
+		lastOffset.x = state.x
+		lastOffset.y = state.y
+		getFabSize()
+	}
+
+	const onTouchmove = (e : UniTouchEvent) => {
+		touch.move(e)
+		if (props.disabled || touch.isTap.value) return
+		let nextX = lastOffset.x + touch.deltaX.value
+		let nextY = lastOffset.y + touch.deltaY.value
+		const axis = props.axis
+		if (axis == 'x' || axis == 'xy') {
+			if (props.overGap) {
+				nextX = clamp(nextX, 0, boundary.value.right + boundaryRight.value)
+			} else {
+				nextX = clamp(nextX, boundary.value.left, boundary.value.right)
+			}
+			state.x = nextX
+		}
+		if (axis == 'y' || axis == 'xy') {
+			if (props.overGap) {
+				nextY = clamp(nextY, 0, boundary.value.bottom + boundaryBottom.value)
+			} else {
+				nextY = clamp(nextY, boundary.value.top, boundary.value.bottom)
+			}
+			state.y = nextY
+		}
+		updateOffset()
+		setPosition()
+		e.preventDefault()
+	}
+
+	const onTouchend = () => {
+		touch.end()
+		//App端手指按下后在组件区域内移动不会取消tap/click事件的触发，移动到组件区域外才会取消tap/click事件的触发。
+		//为了区分 touchmove事件和click事件，使用touchmove移动的距离阈值来判断是否为点击
+		if (touch.isTap.value) {
+			emit('click')
+		} else {
+			if (props.disabled) return
+			updateState(state.x, state.y)
+			updateOffset()
+			if (lastOffset.x != state.x || lastOffset.y != state.y) {
+				emit('offsetChange', { x: state.x, y: state.y } as FloatFabOffset)
+			}
+		}
+	}
+
+
+
+	const floatFabStyle = computed(() => {
+		const css = new Map<string, string | number>()
+		css.set('height', addUnit(props.height))
+		css.set('width', addUnit(props.width))
+		//android 如果在css里面设置border-radius，这里设置的radius会无效，统一在这里设置radius值
+		css.set('border-radius', props.radius == null ? '999px' : addUnit(props.radius!))
+		if (props.zIndex != null) css.set('z-index', props.zIndex!)
+		if (props.bgColor != null) css.set('background', props.bgColor!)
+
+		return css
+	})
+
+	const fabClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+		]
+	})
+
+	const resize = async () => {
+		init(true)
+	}
+
+
+	onMounted(() => {
+		timer = setTimeout(() => {
+			init(true)
+		}, 200)
+
+
+
+	})
+
+
+	onUnmounted(() => {
+		if (timer != null) clearTimeout(timer!)
+		if (initTimer != null) clearTimeout(initTimer!)
+
+
+
+	})
+
+
+	const setDefaultPosition = (position : string) => {
+		setDefPosition(position, false)
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	__expose({
+		resize,
+		setDefaultPosition,
+
+
+
+
+
+	})
+
+return (): any | null => {
+
+const _component_rice_icon = resolveEasyComponent("rice-icon",_easycom_rice_icon)
+
+  return _cE("view", _uM({
+    class: _nC(unref(fabClass)),
+    style: _nS([unref(floatFabStyle),_ctx.customStyle]),
+    ref_key: "fabRef",
+    ref: fabRef,
+    onTouchstart: onTouchstart,
+    onTouchmove: onTouchmove,
+    onTouchend: onTouchend,
+    onTouchcancel: onTouchend
+  }), [
+    renderSlot(_ctx.$slots, "default", {}, (): any[] => [
+      isTrue(unref(hasStrValue)(_ctx.icon))
+        ? _cV(_component_rice_icon, _uM({
+            key: 0,
+            name: _ctx.icon,
+            color: _ctx.iconColor,
+            size: _ctx.iconSize
+          }), null, 8 /* PROPS */, ["name", "color", "size"])
+        : _cC("v-if", true)
+    ])
+  ], 38 /* CLASS, STYLE, NEED_HYDRATION */)
+}
+}
+
+})
+export default __sfc__
+export type RiceFloatFabComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesRiceUiComponentsRiceFloatFabRiceFloatFabStyles = [_uM([["rice-float-fab", _pS(_uM([["position", "fixed"], ["left", 0], ["top", 0], ["zIndex", 998], ["alignItems", "center"], ["justifyContent", "center"], ["transitionProperty", "all"], ["transform", "translate(0, 0)"], ["backgroundImage", "none"], ["backgroundColor", "var(--rice-primary-color)"], ["pointerEvents", "auto"], ["opacity", 0]]))], ["@TRANSITION", _uM([["rice-float-fab", _uM([["property", "all"]])]])]])]

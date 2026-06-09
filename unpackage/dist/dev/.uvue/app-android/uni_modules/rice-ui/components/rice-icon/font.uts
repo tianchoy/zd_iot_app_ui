@@ -1,0 +1,372 @@
+export type FontData = {
+    name: string;
+    code: string;
+};
+export const fontData: FontData[] = [{
+        name: 'arrow-up',
+        code: '\ueaa4'
+    } as FontData, {
+        name: 'arrow-down',
+        code: '\ueaa1'
+    } as FontData, {
+        name: 'arrow-left',
+        code: '\ueaa2'
+    } as FontData, {
+        name: 'arrow-right',
+        code: '\ueaa3'
+    } as FontData, {
+        name: 'up',
+        code: '\ueab1'
+    } as FontData, {
+        name: 'down',
+        code: '\ueaa5'
+    } as FontData, {
+        name: 'left',
+        code: '\ueaa9'
+    } as FontData, {
+        name: 'right',
+        code: '\ueaab'
+    } as FontData, {
+        name: 'back-top',
+        code: '\ueaae'
+    } as FontData, {
+        name: 'back-bottom',
+        code: '\ueaad'
+    } as FontData, {
+        name: 'double-right',
+        code: '\ueaa0'
+    } as FontData, {
+        name: 'double-left',
+        code: '\ueaa7'
+    } as FontData, {
+        name: 'minus',
+        code: '\uea7e',
+    } as FontData, {
+        name: 'plus',
+        code: '\uea7d'
+    } as FontData, {
+        name: 'search',
+        code: '\uea8c'
+    } as FontData, {
+        name: 'search-fill',
+        code: '\uea89'
+    } as FontData, {
+        name: 'scan',
+        code: '\uea67'
+    } as FontData, {
+        name: 'qr',
+        code: '\ue6d8'
+    } as FontData, {
+        name: 'sort',
+        code: '\ue6e2'
+    } as FontData, {
+        name: 'sort-menu',
+        code: '\ueaac'
+    } as FontData, {
+        name: 'bars',
+        code: '\ue69f'
+    } as FontData, {
+        name: 'remind-disabled',
+        code: '\uea95'
+    } as FontData, {
+        name: 'remind',
+        code: '\uea96'
+    } as FontData, {
+        name: 'volume',
+        code: '\uea7c'
+    } as FontData, {
+        name: 'volume-fill',
+        code: '\uea6f'
+    } as FontData, {
+        name: 'volume-up',
+        code: '\uea78'
+    } as FontData, {
+        name: 'volume-up-fill',
+        code: '\uea70'
+    } as FontData, {
+        name: 'volume-down',
+        code: '\uea79'
+    } as FontData, {
+        name: 'volume-down-fill',
+        code: '\uea73'
+    } as FontData, {
+        name: 'volume-mute',
+        code: '\uea7a'
+    } as FontData, {
+        name: 'volume-mute-fill',
+        code: '\uea72'
+    } as FontData, {
+        name: 'voice',
+        code: '\uea77'
+    } as FontData, {
+        name: 'voice-off',
+        code: '\uea7b'
+    } as FontData, {
+        name: 'play',
+        code: '\uea76'
+    } as FontData, {
+        name: 'play-fill',
+        code: '\uea71'
+    } as FontData, {
+        name: 'pause',
+        code: '\uea75'
+    } as FontData, {
+        name: 'pause-fill',
+        code: '\uea6e'
+    } as FontData, {
+        name: 'headset',
+        code: '\uea74'
+    } as FontData, {
+        name: 'headset-fill',
+        code: '\uea6d'
+    } as FontData, {
+        name: 'user',
+        code: '\ueb30'
+    } as FontData, {
+        name: 'peoples',
+        code: '\ueb2f'
+    } as FontData, {
+        name: 'peoples-fill',
+        code: '\ueb2c'
+    } as FontData, {
+        name: 'trophy',
+        code: '\ueb35'
+    } as FontData, {
+        name: 'trophy-fill',
+        code: '\ueb33'
+    } as FontData, {
+        name: 'add',
+        code: '\uea84'
+    } as FontData, {
+        name: 'add-fill',
+        code: '\uea7f'
+    } as FontData, {
+        name: 'reduce',
+        code: '\uea87'
+    } as FontData, {
+        name: 'reduce-fill',
+        code: '\uea81'
+    } as FontData, {
+        name: 'checked-circle',
+        code: '\uea86'
+    } as FontData, {
+        name: 'checked-circle-fill',
+        code: '\uea80'
+    } as FontData, {
+        name: 'help',
+        code: '\uea8a'
+    } as FontData, {
+        name: 'help-fill',
+        code: '\uea82'
+    } as FontData, {
+        name: 'info',
+        code: '\uea88'
+    } as FontData, {
+        name: 'info-fill',
+        code: '\uea83'
+    } as FontData, {
+        name: 'cross',
+        code: '\uea85'
+    } as FontData, {
+        name: 'checked',
+        code: '\ue659'
+    } as FontData, {
+        name: 'camera',
+        code: '\uea8f'
+    } as FontData, {
+        name: 'camera-fill',
+        code: '\uea8b'
+    } as FontData, {
+        name: 'app',
+        code: '\uea91'
+    } as FontData, {
+        name: 'app-fill',
+        code: '\uea8d'
+    } as FontData, {
+        name: 'like',
+        code: '\uea90'
+    } as FontData, {
+        name: 'like-fill',
+        code: '\uea8e'
+    } as FontData, {
+        name: 'eyes',
+        code: '\uea92'
+    } as FontData, {
+        name: 'eyes-close',
+        code: '\uea94'
+    } as FontData, {
+        name: 'sleep',
+        code: '\uea93'
+    } as FontData, {
+        name: 'sun',
+        code: '\ueafe'
+    } as FontData, {
+        name: 'menu-fold',
+        code: '\uea9e'
+    } as FontData, {
+        name: 'menu-unfold',
+        code: '\uea9f'
+    } as FontData, {
+        name: 'upload',
+        code: '\ueab2'
+    } as FontData, {
+        name: 'download',
+        code: '\ueaa6'
+    } as FontData, {
+        name: 'full-screen',
+        code: '\ueaa8'
+    } as FontData, {
+        name: 'off-screen',
+        code: '\ueaaa'
+    } as FontData, {
+        name: 'switch',
+        code: '\ueaaf'
+    } as FontData, {
+        name: 'revoke',
+        code: '\ueab0'
+    } as FontData, {
+        name: 'comments',
+        code: '\ueac3'
+    } as FontData, {
+        name: 'comments-fill',
+        code: '\ueac2'
+    } as FontData, {
+        name: 'phone-call',
+        code: '\ueaba'
+    } as FontData, {
+        name: 'phone-call-fill',
+        code: '\ueab4'
+    } as FontData, {
+        name: 'phone-in',
+        code: '\ueabc'
+    } as FontData, {
+        name: 'phone-in-fill',
+        code: '\ueab5'
+    } as FontData, {
+        name: 'phone-out',
+        code: '\ueabb'
+    } as FontData, {
+        name: 'phone-out-fill',
+        code: '\ueab6'
+    } as FontData, {
+        name: 'phone',
+        code: '\ueabd'
+    } as FontData, {
+        name: 'phone-fill',
+        code: '\ueab7'
+    } as FontData, {
+        name: 'phone-missed',
+        code: '\ueabe'
+    } as FontData, {
+        name: 'phone-missed-fill',
+        code: '\ueab8'
+    } as FontData, {
+        name: 'location',
+        code: '\ueac0'
+    } as FontData, {
+        name: 'location-fill',
+        code: '\ueabf'
+    } as FontData, {
+        name: 'bluetooth',
+        code: '\ueacb'
+    } as FontData, {
+        name: 'calendar',
+        code: '\uead4'
+    } as FontData, {
+        name: 'calendar-fill',
+        code: '\uead2'
+    } as FontData, {
+        name: 'clear',
+        code: '\ueb34'
+    } as FontData, {
+        name: 'clear-fill',
+        code: '\ueb32'
+    } as FontData, {
+        name: 'share',
+        code: '\uea4e'
+    } as FontData, {
+        name: 'share-fill',
+        code: '\uea3d'
+    } as FontData, {
+        name: 'edit',
+        code: '\uea48'
+    } as FontData, {
+        name: 'delete',
+        code: '\uea45'
+    } as FontData, {
+        name: 'delete-fill',
+        code: '\uea37'
+    } as FontData, {
+        name: 'shopping',
+        code: '\uea68'
+    } as FontData, {
+        name: 'shopping-fill',
+        code: '\uea62'
+    } as FontData, {
+        name: 'wallet',
+        code: '\uea69'
+    } as FontData, {
+        name: 'bag',
+        code: '\uea6a'
+    } as FontData, {
+        name: 'set',
+        code: '\ue6dc'
+    } as FontData, {
+        name: 'set-fill',
+        code: '\ue6db'
+    } as FontData, {
+        name: 'replay',
+        code: '\ue6dd'
+    } as FontData, {
+        name: 'home',
+        code: '\ue6e9'
+    } as FontData, {
+        name: 'home-fill',
+        code: '\ue6e8'
+    } as FontData, {
+        name: 'chat',
+        code: '\ue6aa'
+    } as FontData, {
+        name: 'chat-fill',
+        code: '\ue6a3'
+    } as FontData, {
+        name: 'good',
+        code: '\ue6c3'
+    } as FontData, {
+        name: 'good-fill',
+        code: '\ue6c2'
+    } as FontData, {
+        name: 'gift',
+        code: '\ue6d4'
+    } as FontData, {
+        name: 'gift-fill',
+        code: '\ue6d3'
+    } as FontData, {
+        name: 'loading',
+        code: '\ue670'
+    } as FontData, {
+        name: 'photo',
+        code: '\ue6cf'
+    } as FontData, {
+        name: 'photo-fail',
+        code: '\ue6cd'
+    } as FontData, {
+        name: 'star',
+        code: '\ue6ec'
+    } as FontData, {
+        name: 'star-fill',
+        code: '\ue6ed'
+    } as FontData, {
+        name: 'trend',
+        code: '\uea6b'
+    } as FontData, {
+        name: 'trend-fill',
+        code: '\uea63'
+    } as FontData, {
+        name: 'file-success-fill',
+        code: '\uea25'
+    } as FontData, {
+        name: 'file-success',
+        code: '\uea2d'
+    } as FontData];
+//# sourceMappingURL=font.uts.map

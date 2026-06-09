@@ -4,7 +4,7 @@
 	<!-- 导航栏（固定定位） -->
 	<view v-if="isShowStyle" class="navbar" :style="navBarStyle">
 		<view class="back-btn" :style="{ visibility: showBack ? 'visible' : 'hidden' }">
-			<m-icon v-if="showBack" name="arrow-left-bold" size="35rpx" class="icon" @click="handleBack"></m-icon>
+			<rice-icon v-if="showBack" name="arrow-left" size="35rpx" color="#333" class="icon" @click="handleBack"></rice-icon>
 		</view>
 		<view class="title" :style="{ color: textColor, 'line-height': navBarHeight + 'px' }">
 			<slot name="title">{{ title }}</slot>
@@ -12,7 +12,7 @@
 		<view class="capsule">
 			<view class="capsule-item">
 				<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
-					<m-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></m-icon>
+					<rice-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></rice-icon>
 					<text v-else>{{rightText}}</text>
 				</view>
 			</view>
@@ -24,7 +24,7 @@
 		<view :style="{ height: statusBarHeight + 'px', backgroundColor: backgroundColor }"></view>
 		<view class="navbar" :style="{ height: navBarHeight + 'px', backgroundColor: backgroundColor }">
 			<view class="back-btn" :style="{ visibility: showBack ? 'visible' : 'hidden' }">
-				<m-icon v-if="showBack" name="arrow-left-bold" size="40rpx" class="icon" @click="handleBack"></m-icon>
+				<rice-icon v-if="showBack" name="arrow-left" size="40rpx" class="icon" @click="handleBack"></rice-icon>
 			</view>
 			<view class="title" :style="{ color: textColor, 'line-height': navBarHeight + 'px' }">
 				<slot name="title">{{ title }}</slot>
@@ -32,7 +32,7 @@
 			<view class="capsule">
 				<view class="capsule-item">
 					<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
-						<m-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></m-icon>
+						<rice-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></rice-icon>
 						<text v-else>{{rightText}}</text>
 					</view>
 				</view>

@@ -1,6 +1,6 @@
 {
   "component": true,
   "usingComponents": {
-    "m-fab": "../../uni_modules/m-unix/components/m-fab/m-fab"
+    "rice-float-fab": "../../uni_modules/rice-ui/components/rice-float-fab/rice-float-fab"
   }
 }

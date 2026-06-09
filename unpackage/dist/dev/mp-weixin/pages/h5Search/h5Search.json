@@ -2,8 +2,8 @@
   "navigationBarTitleText": "",
   "usingComponents": {
     "top-nav-bar": "../../components/topNavBar/topNavBar",
-    "m-icon": "../../uni_modules/m-unix/components/m-icon/m-icon",
-    "m-bottom-popup": "../../uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup",
+    "rice-icon": "../../uni_modules/rice-ui/components/rice-icon/rice-icon",
+    "rice-popup": "../../uni_modules/rice-ui/components/rice-popup/rice-popup",
     "search-select": "../../components/selectCountry"
   }
 }

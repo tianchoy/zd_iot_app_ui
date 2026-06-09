@@ -30,6 +30,7 @@ page .container.data-v-a89086b7 {
   flex-direction: column;
   background-color: #f4f7fb;
   padding-bottom: 40rpx;
+  min-height: 100%;
 }
 page .container .card-box.data-v-a89086b7 {
   display: flex;
@@ -186,10 +187,6 @@ page .container .card-list.data-v-a89086b7 {
   flex: 1;
   width: 100%;
   overflow: auto;
-}
-page .container .android-card-scroll.data-v-a89086b7 {
-  flex: 1;
-  width: 100%;
 }
 page .container .empty-state.data-v-a89086b7 {
   display: flex;

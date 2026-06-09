@@ -2,12 +2,11 @@
   "navigationBarTitleText": "",
   "usingComponents": {
     "top-nav-bar": "../../components/topNavBar/topNavBar",
-    "m-tag": "../../uni_modules/m-unix/components/m-tag/m-tag",
-    "m-button": "../../uni_modules/m-unix/components/m-button/m-button",
-    "m-tabs": "../../uni_modules/m-unix/components/m-tabs/m-tabs",
-    "m-bottom-popup": "../../uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup",
-    "m-sticky-bottom": "../../uni_modules/m-unix/components/m-sticky-bottom/m-sticky-bottom",
-    "linear-progress": "../../components/progress",
+    "rice-tag": "../../uni_modules/rice-ui/components/rice-tag/rice-tag",
+    "rice-progress": "../../uni_modules/rice-ui/components/rice-progress/rice-progress",
+    "rice-button": "../../uni_modules/rice-ui/components/rice-button/rice-button",
+    "rice-tabs": "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs",
+    "rice-popup": "../../uni_modules/rice-ui/components/rice-popup/rice-popup",
     "payment": "../../components/payment"
   }
 }

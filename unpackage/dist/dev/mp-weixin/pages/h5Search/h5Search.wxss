@@ -178,6 +178,7 @@ page .popup-header.data-v-9fa4edd6 {
   justify-content: space-between;
   padding: 32rpx 32rpx 16rpx;
   border-bottom: 2rpx solid #f0f0f0;
+  background-color: #ffffff;
 }
 page .popup-header .popup-title.data-v-9fa4edd6 {
   font-size: 32rpx;

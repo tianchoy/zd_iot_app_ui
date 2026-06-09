@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "rice-dialog": "../../components/rice-dialog/rice-dialog"
+  }
+}

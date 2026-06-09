@@ -174,5 +174,4 @@ class CardItem extends common_vendor.UTS.UTSType {
 }
 exports.CardItem = CardItem;
 exports.CardListSumData = CardListSumData;
-exports.QueryCardListParams = QueryCardListParams;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/types.js.map

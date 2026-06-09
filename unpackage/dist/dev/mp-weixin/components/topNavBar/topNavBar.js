@@ -1,12 +1,12 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
-  const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
-  _easycom_m_icon_1();
+  const _easycom_rice_icon_1 = common_vendor.resolveComponent("rice-icon");
+  _easycom_rice_icon_1();
 }
-const _easycom_m_icon = () => "../../uni_modules/m-unix/components/m-icon/m-icon.js";
+const _easycom_rice_icon = () => "../../uni_modules/rice-ui/components/rice-icon/rice-icon.js";
 if (!Math) {
-  _easycom_m_icon();
+  _easycom_rice_icon();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "topNavBar",
@@ -91,10 +91,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, __props.isShowStyle ? common_vendor.e({
         e: __props.showBack
       }, __props.showBack ? {
-        f: common_vendor.o(handleBack, "60"),
+        f: common_vendor.o(handleBack, "4b"),
         g: common_vendor.p({
-          name: "arrow-left-bold",
+          name: "arrow-left",
           size: "35rpx",
+          color: "#333",
           class: "icon data-v-83d0d8fa"
         })
       } : {}, {
@@ -117,7 +118,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         p: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        }, "c6")
+        }, "a5")
       }) : {}, {
         q: common_vendor.s(navBarStyle.value),
         r: common_vendor.s({
@@ -135,9 +136,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         v: __props.showBack
       }, __props.showBack ? {
-        w: common_vendor.o(handleBack, "2a"),
+        w: common_vendor.o(handleBack, "f6"),
         x: common_vendor.p({
-          name: "arrow-left-bold",
+          name: "arrow-left",
           size: "40rpx",
           class: "icon data-v-83d0d8fa"
         })
@@ -161,7 +162,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         G: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        }, "8d")
+        }, "05")
       }) : {}, {
         H: common_vendor.s({
           height: common_vendor.unref(navBarHeight) + "px",

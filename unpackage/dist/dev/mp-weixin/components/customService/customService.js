@@ -1,12 +1,12 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
-  const _easycom_m_fab_1 = common_vendor.resolveComponent("m-fab");
-  _easycom_m_fab_1();
+  const _easycom_rice_float_fab_1 = common_vendor.resolveComponent("rice-float-fab");
+  _easycom_rice_float_fab_1();
 }
-const _easycom_m_fab = () => "../../uni_modules/m-unix/components/m-fab/m-fab.js";
+const _easycom_rice_float_fab = () => "../../uni_modules/rice-ui/components/rice-float-fab/rice-float-fab.js";
 if (!Math) {
-  _easycom_m_fab();
+  _easycom_rice_float_fab();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "customService",
@@ -21,12 +21,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       const __returned__ = {
         a: common_vendor.gei(_ctx, ""),
-        b: common_vendor.o(handleClick, "57"),
+        b: common_vendor.o(handleClick, "22"),
         c: common_vendor.p({
-          type: "primary",
-          size: "40rpx",
-          icon: "customer-service",
-          draggable: true,
+          ["default-position"]: "bottom-right",
+          icon: "chat-fill",
+          width: "80rpx",
+          height: "80rpx",
+          ["icon-size"]: "50rpx",
+          ["gap-bottom"]: "200rpx",
+          ["gap-right"]: "50rpx",
           id: common_vendor.gei(_ctx, "")
         }),
         d: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)

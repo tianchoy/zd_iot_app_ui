@@ -2,22 +2,22 @@
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
-  const _easycom_m_icon_1 = common_vendor.resolveComponent("m-icon");
-  const _easycom_m_button_1 = common_vendor.resolveComponent("m-button");
-  const _easycom_m_segmented_control_1 = common_vendor.resolveComponent("m-segmented-control");
-  (_easycom_topNavBar_1 + _easycom_m_icon_1 + _easycom_m_button_1 + _easycom_m_segmented_control_1)();
+  const _easycom_rice_icon_1 = common_vendor.resolveComponent("rice-icon");
+  const _easycom_rice_button_1 = common_vendor.resolveComponent("rice-button");
+  const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
+  (_easycom_topNavBar_1 + _easycom_rice_icon_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
-const _easycom_m_icon = () => "../../uni_modules/m-unix/components/m-icon/m-icon.js";
-const _easycom_m_button = () => "../../uni_modules/m-unix/components/m-button/m-button.js";
-const _easycom_m_segmented_control = () => "../../uni_modules/m-unix/components/m-segmented-control/m-segmented-control.js";
+const _easycom_rice_icon = () => "../../uni_modules/rice-ui/components/rice-icon/rice-icon.js";
+const _easycom_rice_button = () => "../../uni_modules/rice-ui/components/rice-button/rice-button.js";
+const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_m_icon + _easycom_m_button + _easycom_m_segmented_control)();
+  (_easycom_topNavBar + _easycom_rice_icon + _easycom_rice_button + _easycom_rice_tabs)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "myOrder",
   setup(__props) {
-    const tabs = common_vendor.ref(["全部", "待支付", "已完成", "已退款", "已取消"]);
+    const tabs = common_vendor.ref([{ name: "全部" }, { name: "待支付" }, { name: "已完成" }, { name: "已退款" }, { name: "已取消" }]);
     const current = common_vendor.ref(0);
     const card_number = common_vendor.ref("");
     const orders = common_vendor.ref([
@@ -73,7 +73,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const filteredOrders = common_vendor.computed(() => {
       let result = orders.value;
-      const currentStatus = tabs.value[current.value];
+      const currentStatus = tabs.value[current.value].name;
       if (currentStatus !== "全部") {
         result = result.filter((order = null) => {
           return getOrderText(order, "status") === currentStatus;
@@ -92,7 +92,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       current.value = index;
     };
     const handleSearch = () => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:183", "搜索关键词:", card_number.value);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:184", "搜索关键词:", card_number.value);
     };
     const getStatusClass = (status) => {
       switch (status) {
@@ -115,7 +115,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handlePay = (order = null) => {
       const orderNo = getOrderText(order, "orderNo");
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:212", "去支付:", orderNo);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:213", "去支付:", orderNo);
       common_vendor.index.showToast({
         title: `支付订单 ${orderNo}`,
         icon: "none"
@@ -138,37 +138,43 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return card_number.value = $event.detail.value;
         }, "4d"),
         e: common_vendor.p({
-          name: "scanning",
+          name: "scan",
           size: "40rpx",
           class: "data-v-87fe8731"
         }),
-        f: common_vendor.p({
-          type: "white",
-          plain: true,
-          width: "90rpx",
+        f: common_vendor.o(_ctx.scanCode, "ca"),
+        g: common_vendor.p({
+          height: "100%",
           class: "scan-btn data-v-87fe8731"
         }),
-        g: common_vendor.o(handleSearch, "50"),
-        h: common_vendor.p({
+        h: common_vendor.o(handleSearch, "e8"),
+        i: common_vendor.p({
           type: "primary",
-          width: "120rpx",
+          color: "#1989fa",
+          textColor: "#ffffff",
+          height: "100%",
           class: "data-v-87fe8731"
         }),
-        i: common_vendor.o(handleTabClick, "9c"),
-        j: common_vendor.p({
-          values: tabs.value,
-          current: current.value,
-          textActiveColor: "#2563eb",
+        j: common_vendor.o(handleTabClick, "29"),
+        k: common_vendor.o(($event) => {
+          return current.value = $event;
+        }, "41"),
+        l: common_vendor.p({
+          ["line-color"]: "#ffffff",
+          list: tabs.value,
+          ["line-width"]: 0,
+          ["title-active-color"]: "#2563eb",
           customStyle: {
-            height: "unset",
-            padding: "5rpx 10rpx",
+            height: "85rpx",
+            padding: "10rpx",
             border: "1rpx solid #e5edf6"
           },
+          modelValue: current.value,
           class: "data-v-87fe8731"
         }),
-        k: filteredOrders.value.length === 0
+        m: filteredOrders.value.length === 0
       }, filteredOrders.value.length === 0 ? {} : {
-        l: common_vendor.f(filteredOrders.value, (order, index, i0) => {
+        n: common_vendor.f(filteredOrders.value, (order, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(getOrderText(order, "packageName")),
             b: common_vendor.t(getOrderText(order, "status")),
@@ -188,10 +194,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }, {
-        m: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        n: `${_ctx.u_s_b_h}px`,
-        o: `${_ctx.u_s_a_i_b}px`,
-        p: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        p: `${_ctx.u_s_b_h}px`,
+        q: `${_ctx.u_s_a_i_b}px`,
+        r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

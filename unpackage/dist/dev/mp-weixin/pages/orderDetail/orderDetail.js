@@ -2,13 +2,13 @@
 const common_vendor = require("../../common/vendor.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
-  const _easycom_m_bottom_popup_1 = common_vendor.resolveComponent("m-bottom-popup");
-  (_easycom_topNavBar_1 + _easycom_m_bottom_popup_1)();
+  const _easycom_rice_popup_1 = common_vendor.resolveComponent("rice-popup");
+  (_easycom_topNavBar_1 + _easycom_rice_popup_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
-const _easycom_m_bottom_popup = () => "../../uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup.js";
+const _easycom_rice_popup = () => "../../uni_modules/rice-ui/components/rice-popup/rice-popup.js";
 if (!Math) {
-  (_easycom_topNavBar + common_vendor.unref(Payment) + _easycom_m_bottom_popup)();
+  (_easycom_topNavBar + common_vendor.unref(Payment) + _easycom_rice_popup)();
 }
 const Payment = () => "../../components/payment.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -37,7 +37,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleConfirmPayment = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:142", e);
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:136", e);
       showPopup.value = false;
     };
     return (_ctx, _cache) => {
@@ -55,19 +55,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.o(choosePayment, "ee"),
         d: `${_ctx.u_s_b_h}px`,
         e: `${_ctx.u_s_a_i_b}px`,
-        f: common_vendor.o(handleCancelPayment, "e3"),
-        g: common_vendor.o(handleConfirmPayment, "14"),
+        f: common_vendor.o(handleCancelPayment, "2b"),
+        g: common_vendor.o(handleConfirmPayment, "c4"),
         h: common_vendor.p({
           amount: common_vendor.unref(currentPrice),
           class: "data-v-6ec85291"
         }),
-        i: common_vendor.o(($event) => {
-          return showPopup.value = false;
-        }, "b0"),
-        j: common_vendor.p({
+        i: common_vendor.o(_ctx.onPopupClose, "f7"),
+        j: common_vendor.o(($event) => {
+          return common_vendor.isRef(showPopup) ? showPopup.value = $event : null;
+        }, "1d"),
+        k: common_vendor.p({
+          position: "bottom",
           show: common_vendor.unref(showPopup),
-          height: "50%",
-          radius: true,
           class: "data-v-6ec85291"
         })
       };
