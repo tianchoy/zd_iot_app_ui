@@ -14,10 +14,29 @@ const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs
 if (!Math) {
   (_easycom_topNavBar + _easycom_rice_icon + _easycom_rice_button + _easycom_rice_tabs)();
 }
+class OrderStatusTab extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: "Unknown", optional: false }
+        };
+      },
+      name: "OrderStatusTab"
+    };
+  }
+  constructor(options, metadata = OrderStatusTab.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "myOrder",
   setup(__props) {
-    const tabs = common_vendor.ref([{ name: "全部" }, { name: "待支付" }, { name: "已完成" }, { name: "已退款" }, { name: "已取消" }]);
+    const tabs = common_vendor.ref([new OrderStatusTab({ name: "全部" }), new OrderStatusTab({ name: "待支付" }), new OrderStatusTab({ name: "已完成" }), new OrderStatusTab({ name: "已退款" }), new OrderStatusTab({ name: "已取消" })]);
     const current = common_vendor.ref(0);
     const card_number = common_vendor.ref("");
     const orders = common_vendor.ref([
@@ -92,7 +111,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       current.value = index;
     };
     const handleSearch = () => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:184", "搜索关键词:", card_number.value);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:187", "搜索关键词:", card_number.value);
     };
     const getStatusClass = (status) => {
       switch (status) {
@@ -115,7 +134,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handlePay = (order = null) => {
       const orderNo = getOrderText(order, "orderNo");
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:213", "去支付:", orderNo);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:216", "去支付:", orderNo);
       common_vendor.index.showToast({
         title: `支付订单 ${orderNo}`,
         icon: "none"

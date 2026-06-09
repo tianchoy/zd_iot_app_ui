@@ -134,7 +134,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return packageList.value;
     });
     const handleClick = (e) => {
-      current.value = e.index;
+      if (e.index != null) {
+        current.value = e.index;
+      }
     };
     const changeTab = (e) => {
       active.value = e.index;
@@ -158,7 +160,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = navHeight > 0 ? navHeight : 44;
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:192", "获取导航栏信息失败", e);
+        common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:194", "获取导航栏信息失败", e);
       }
     };
     const handleRecharge = () => {
@@ -222,7 +224,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-2bc48812"
         })
       }, {
-        m: common_vendor.o(showMore, "62"),
+        m: common_vendor.o(showMore, "e2"),
         n: common_vendor.unref(pkgMore)
       }, common_vendor.unref(pkgMore) ? {
         o: common_vendor.p({
@@ -236,10 +238,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}) : {}, {
         p: common_vendor.unref(activeName) == "卡片套餐"
       }, common_vendor.unref(activeName) == "卡片套餐" ? {
-        q: common_vendor.o(handleClick, "be"),
+        q: common_vendor.o(handleClick, "20"),
         r: common_vendor.o(($event) => {
           return common_vendor.isRef(current) ? current.value = $event : null;
-        }, "c3"),
+        }, "f8"),
         s: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: common_vendor.unref(pkgTabs),
@@ -292,14 +294,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         y: common_vendor.t(common_vendor.unref(card_number))
       } : {}, {
-        z: common_vendor.p({
+        z: common_vendor.o(_ctx.handleUnbind, "37"),
+        A: common_vendor.p({
+          type: "error",
+          plain: true,
+          text: "解绑卡片",
+          customStyle: {
+            backgroundColor: "#ffffff"
+          },
+          class: "ml-24 mr-24 mt-24 mb-24 data-v-2bc48812"
+        }),
+        B: common_vendor.p({
           bold: true,
           customStyle: {
             border: "none"
           },
           class: "btn data-v-2bc48812"
         }),
-        A: common_vendor.p({
+        C: common_vendor.p({
           bold: true,
           disabled: true,
           customStyle: {
@@ -307,8 +319,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           class: "btn data-v-2bc48812"
         }),
-        B: common_vendor.o(handleRecharge, "94"),
-        C: common_vendor.p({
+        D: common_vendor.o(handleRecharge, "70"),
+        E: common_vendor.p({
           type: "primary",
           color: "#1989fa",
           textColor: "#ffffff",
@@ -319,10 +331,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           class: "btn data-v-2bc48812"
         }),
-        D: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        E: `${_ctx.u_s_b_h}px`,
-        F: `${_ctx.u_s_a_i_b}px`,
-        G: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        F: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        G: `${_ctx.u_s_b_h}px`,
+        H: `${_ctx.u_s_a_i_b}px`,
+        I: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

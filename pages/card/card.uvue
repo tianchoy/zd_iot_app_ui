@@ -76,7 +76,7 @@
 		<view v-if="filteredCardList.length === 0" class="empty-state">
 			<text class="empty-text">暂无卡片数据</text>
 		</view>
-		<customService @connect_service="handleConnectService"></customService>
+		<customService></customService>
 	</view>
 </template>
 
@@ -188,7 +188,7 @@ const filteredCardList = computed<CardItem[]>(() : CardItem[] => {
 	}
 	if (queryKeyword.value !== '') {
 		list = list.filter((card: CardItem) : boolean => {
-			const cardNumber = '' + (card as UTSJSONObject)['cardNumber']
+			const cardNumber = '' + card.cardNumber
 			return cardNumber.indexOf(queryKeyword.value) !== -1
 		})
 	}
@@ -296,14 +296,7 @@ const getCardList = async () => {
 		})
 		if (res.code === 200) {
 			console.log('查询卡列表成功:', res.data)
-			// 假设返回的数据结构是 res.data.list 或 res.data 直接为数组，根据实际情况调整
-			if (Array.isArray(res.data)) {
-				allCardList.value = res.data
-			} else if (res.data && Array.isArray(res.data.list)) {
-				allCardList.value = res.data.list
-			} else {
-				allCardList.value = []
-			}
+			allCardList.value = res.data.list as CardItem[]
 		} else {
 			console.log('查询卡列表失败:', res.msg)
 			allCardList.value = []

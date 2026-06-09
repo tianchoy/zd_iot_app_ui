@@ -124,7 +124,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       if (queryKeyword.value !== "") {
         list = list.filter((card) => {
-          const cardNumber = "" + card["cardNumber"];
+          const cardNumber = "" + card.cardNumber;
           return cardNumber.indexOf(queryKeyword.value) !== -1;
         });
       }
@@ -286,12 +286,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         p: scrollViewHeight.value + "px",
         q: filteredCardList.value.length === 0
       }, filteredCardList.value.length === 0 ? {} : {}, {
-        r: common_vendor.o(_ctx.handleConnectService, "f6"),
-        s: common_vendor.p({
+        r: common_vendor.p({
           class: "data-v-a89086b7"
         }),
-        t: `${_ctx.u_s_b_h}px`,
-        v: `${_ctx.u_s_a_i_b}px`
+        s: `${_ctx.u_s_b_h}px`,
+        t: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

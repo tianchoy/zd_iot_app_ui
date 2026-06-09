@@ -85,11 +85,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/index/index"
       });
     };
-    const cardListSum = common_vendor.ref(new api_types.CardListSumData({
-      all: null,
-      inUse: null,
-      inNotUse: null
-    }));
+    const cardListSum = common_vendor.ref(new api_types.CardListSumData({ all: 0, inUse: 0, inNotUse: 0 }));
     const getCardListSum = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {

@@ -172,6 +172,25 @@ class CardItem extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class QueryCardListData extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          list: { type: common_vendor.UTS.UTSType.withGenerics(Array, [CardItem]), optional: false }
+        };
+      },
+      name: "QueryCardListData"
+    };
+  }
+  constructor(options, metadata = QueryCardListData.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.list = this.__props__.list;
+    delete this.__props__;
+  }
+}
 exports.CardItem = CardItem;
 exports.CardListSumData = CardListSumData;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/types.js.map

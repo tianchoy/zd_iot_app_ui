@@ -122,7 +122,7 @@
 	}
 
 	// 查询卡列表统计
-	const cardListSum = ref<CardListSumData>({})
+	const cardListSum = ref<CardListSumData>({ all: 0, inUse: 0, inNotUse: 0 })
 	const getCardListSum = async () => {
 		try {
 			const res = await queryCardListSum()

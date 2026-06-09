@@ -93,7 +93,10 @@
 	}
 	
 	// Tab 列表
-	const tabs = ref<OrderStatus[]>([{name:'全部'}, {name:'待支付'}, {name:'已完成'}, {name:'已退款'}, {name:'已取消'}])
+	type OrderStatusTab = {
+			name: OrderStatus
+		}
+		const tabs = ref<OrderStatusTab[]>([{name:'全部'}, {name:'待支付'}, {name:'已完成'}, {name:'已退款'}, {name:'已取消'}])
 	const current = ref<number>(0)
 	const card_number = ref<string>('')
 	

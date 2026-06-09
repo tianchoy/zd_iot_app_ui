@@ -19,7 +19,6 @@
 			<view class="card-box content-card">
 				<view class="card-content">
 					<view class="section-title">{{activeName}}</view>
-
 					<view class="section-content" v-if="activeName == '基本信息'">
 						<view class="base-info-box">
 							<view class="base-info">
@@ -87,6 +86,7 @@
 					</view>
 				</view>
 			</view>
+			<rice-button class="ml-24 mr-24 mt-24 mb-24" type="error" plain text="解绑卡片" :customStyle="{backgroundColor:'#ffffff'}" @click="handleUnbind"></rice-button>
 		</view>
 
 		<view class="fixed-bottom-buttons">
@@ -160,7 +160,9 @@
 	})
 
 	const handleClick = (e: UTSJSONObject) => {
-		current.value = e.index
+		if (e.index != null) {
+			current.value = e.index as number
+		}
 	}
 
 	const changeTab = (e: CardDetailTabEvent) => {
@@ -251,6 +253,7 @@
 .content-card {
 	margin-top: 0;
 }
+
 
 .card-content {
 	margin: 0;

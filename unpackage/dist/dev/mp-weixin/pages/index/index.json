@@ -1,6 +1,0 @@
-{
-  "usingComponents": {
-    "top-nav-bar": "../../components/topNavBar/topNavBar",
-    "custom-service": "../../components/customService/customService"
-  }
-}

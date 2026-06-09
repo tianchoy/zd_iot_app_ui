@@ -7,7 +7,9 @@ import type {
   CountryData,
   TenantInfoData,
   QueryCardListParams,
-  CardListSumData
+  QueryCardListData,
+  CardListSumData,
+  CardItem,
 } from './types'
 
 // 查询国家列表
@@ -72,11 +74,11 @@ export function getTenantInfo(tenantId: string, withToken: boolean = true): Prom
 }
 
 // 查询卡列表
-export function queryCardList(params: QueryCardListParams, withToken: boolean = true): Promise<ApiResponse<LoginData[]>> {
-  return request<LoginData[]>({
+export function queryCardList(params: QueryCardListParams, withToken: boolean = true): Promise<ApiResponse<QueryCardListData>> {
+  return request<QueryCardListData>({
     url: ApiUrl.queryCardList as string,
     method: 'GET',
-    data: params,
+    data: params as unknown as UTSJSONObject,
     withToken: withToken
   })
 }
