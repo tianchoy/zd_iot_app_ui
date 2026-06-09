@@ -221,8 +221,238 @@ const BUILTIN_DEFAULT = new MUnixHostProjectConfig({
   }),
   mUi: null
 });
+let _hostOverride = null;
+function readValue(source = null, key) {
+  if (source == null) {
+    return null;
+  }
+  const obj = source;
+  return obj[key];
+}
+function readString(source = null, key) {
+  const value = readValue(source, key);
+  if (value == null) {
+    return null;
+  }
+  return "" + value;
+}
+function readObject(source = null, key) {
+  const value = readValue(source, key);
+  if (value != null && typeof value === "object") {
+    return value;
+  }
+  return null;
+}
+function mergeStorage(base, p = null) {
+  const out = new HostStorageConfig({
+    token: base.token,
+    userInfo: base.userInfo
+  });
+  const pt = readString(p, "token");
+  if (pt != null && pt.length > 0) {
+    out.token = pt;
+  }
+  const pu = readString(p, "userInfo");
+  if (pu != null && pu.length > 0) {
+    out.userInfo = pu;
+  }
+  return out;
+}
+function mergeApi(base, p = null) {
+  const out = new HostApiConfig({
+    login: new HostApiLoginConfig(Object.assign({ tokenLogin: null, codeGetOpenIdLogin: null, codeGetPhoneRegisterOrLogin: null }, base.login)),
+    update: new HostApiUpdateConfig(Object.assign({ checkUpdate: null }, base.update)),
+    upload: new HostApiUploadConfig(Object.assign({ image: null }, base.upload)),
+    qrCodeImageApiBase: base.qrCodeImageApiBase
+  });
+  const loginConfig = readObject(p, "login");
+  if (loginConfig != null) {
+    const t1 = readString(loginConfig, "tokenLogin");
+    if (t1 != null) {
+      out.login.tokenLogin = t1;
+    }
+    const t2 = readString(loginConfig, "codeGetOpenIdLogin");
+    if (t2 != null) {
+      out.login.codeGetOpenIdLogin = t2;
+    }
+    const t3 = readString(loginConfig, "codeGetPhoneRegisterOrLogin");
+    if (t3 != null) {
+      out.login.codeGetPhoneRegisterOrLogin = t3;
+    }
+  }
+  const authConfig = readObject(p, "auth");
+  if (authConfig != null) {
+    const authLogin = readString(authConfig, "login");
+    if (authLogin != null && authLogin.length > 0) {
+      out.login.tokenLogin = authLogin;
+    }
+  }
+  const updateConfig = readObject(p, "update");
+  if (updateConfig != null) {
+    const c = readString(updateConfig, "checkUpdate");
+    if (c != null) {
+      out.update.checkUpdate = c;
+    }
+  }
+  const uploadConfig = readObject(p, "upload");
+  if (uploadConfig != null) {
+    const im = readString(uploadConfig, "image");
+    if (im != null) {
+      out.upload.image = im;
+    }
+  }
+  const pq = readString(p, "qrCodeImageApiBase");
+  if (pq != null) {
+    out.qrCodeImageApiBase = pq;
+  }
+  return out;
+}
+function mergeConfigInfo(base, p = null) {
+  const out = new HostConfigInfo({
+    appDownloadUrl: null,
+    appDownloadUrlAndroid: null,
+    userAgreementArticleId: null,
+    privacyPolicyArticleId: null,
+    name: base.name,
+    logo: base.logo,
+    desc: base.desc,
+    versionCode: base.versionCode,
+    versionName: base.versionName
+  });
+  const n = readString(p, "name");
+  if (n != null) {
+    out.name = n;
+  }
+  const l = readString(p, "logo");
+  if (l != null) {
+    out.logo = l;
+  }
+  const d = readString(p, "desc");
+  if (d != null) {
+    out.desc = d;
+  }
+  const vc = readString(p, "versionCode");
+  if (vc != null) {
+    const num = parseInt(vc, 10);
+    if (!isNaN(num)) {
+      out.versionCode = num;
+    }
+  }
+  const vn = readString(p, "versionName");
+  if (vn != null) {
+    out.versionName = vn;
+  }
+  const ad = readString(p, "appDownloadUrl");
+  if (ad != null) {
+    out.appDownloadUrl = ad;
+  }
+  const ada = readString(p, "appDownloadUrlAndroid");
+  if (ada != null) {
+    out.appDownloadUrlAndroid = ada;
+  }
+  const ua = readString(p, "userAgreementArticleId");
+  if (ua != null) {
+    out.userAgreementArticleId = ua;
+  }
+  const pp = readString(p, "privacyPolicyArticleId");
+  if (pp != null) {
+    out.privacyPolicyArticleId = pp;
+  }
+  return out;
+}
+function mergeHostPatch(patch = null) {
+  const base = BUILTIN_DEFAULT;
+  const out = new MUnixHostProjectConfig({
+    env: base.env,
+    localBaseUrl: base.localBaseUrl,
+    devBaseUrl: base.devBaseUrl,
+    prodBaseUrl: base.prodBaseUrl,
+    baseUrl: base.baseUrl,
+    storage: new HostStorageConfig(Object.assign({ token: null, userInfo: null }, base.storage)),
+    loginRequiredPaths: [],
+    loginPagePath: base.loginPagePath,
+    api: new HostApiConfig({
+      login: new HostApiLoginConfig({
+        tokenLogin: base.api.login.tokenLogin,
+        codeGetOpenIdLogin: base.api.login.codeGetOpenIdLogin,
+        codeGetPhoneRegisterOrLogin: base.api.login.codeGetPhoneRegisterOrLogin
+      }),
+      update: new HostApiUpdateConfig({
+        checkUpdate: base.api.update.checkUpdate
+      }),
+      upload: new HostApiUploadConfig({
+        image: base.api.upload.image
+      }),
+      qrCodeImageApiBase: base.api.qrCodeImageApiBase
+    }),
+    configInfo: new HostConfigInfo({
+      appDownloadUrl: null,
+      appDownloadUrlAndroid: null,
+      userAgreementArticleId: null,
+      privacyPolicyArticleId: null,
+      name: base.configInfo.name,
+      logo: base.configInfo.logo,
+      desc: base.configInfo.desc,
+      versionCode: base.configInfo.versionCode,
+      versionName: base.configInfo.versionName
+    }),
+    mUi: base.mUi
+  });
+  if (patch == null) {
+    return out;
+  }
+  const e = readString(patch, "env");
+  if (e != null) {
+    out.env = e;
+  }
+  const lb = readString(patch, "localBaseUrl");
+  if (lb != null) {
+    out.localBaseUrl = lb;
+  }
+  const db = readString(patch, "devBaseUrl");
+  if (db != null) {
+    out.devBaseUrl = db;
+  }
+  const pb = readString(patch, "prodBaseUrl");
+  if (pb != null) {
+    out.prodBaseUrl = pb;
+  }
+  const bu = readString(patch, "baseUrl");
+  if (bu != null) {
+    out.baseUrl = bu;
+  }
+  out.storage = mergeStorage(base.storage, readObject(patch, "storage"));
+  const paths = readValue(patch, "loginRequiredPaths");
+  if (paths != null && common_vendor.UTS.isInstanceOf(paths, Array)) {
+    const arr = [];
+    const pa = paths;
+    for (let i = 0; i < pa.length; i++) {
+      arr.push("" + pa[i]);
+    }
+    out.loginRequiredPaths = arr;
+  }
+  const lp = readString(patch, "loginPagePath");
+  if (lp != null && lp.length > 0) {
+    out.loginPagePath = lp;
+  }
+  out.api = mergeApi(base.api, readObject(patch, "api"));
+  out.configInfo = mergeConfigInfo(base.configInfo, readObject(patch, "configInfo"));
+  const mui = readValue(patch, "mUi");
+  if (mui != null) {
+    out.mUi = mui;
+  }
+  return out;
+}
+function injectMUnixHostProjectConfig(hostConfig = null) {
+  _hostOverride = mergeHostPatch(hostConfig);
+}
 function getHostProjectConfig() {
+  const hostOverride = _hostOverride;
+  if (hostOverride != null) {
+    return hostOverride;
+  }
   return BUILTIN_DEFAULT;
 }
 exports.getHostProjectConfig = getHostProjectConfig;
+exports.injectMUnixHostProjectConfig = injectMUnixHostProjectConfig;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/ProjectConfig.js.map

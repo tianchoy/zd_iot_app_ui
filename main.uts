@@ -1,4 +1,4 @@
-// import './utils/inject-m-unix'
+import './utils/inject-m-unix'
 import App from './App.uvue'
 // #ifdef WEB
 import "@/uni_modules/rice-ui/libs/style/index.css";

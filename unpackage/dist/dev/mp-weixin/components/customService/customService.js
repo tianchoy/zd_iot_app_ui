@@ -12,10 +12,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "customService",
   emits: ["connect_service"],
   setup(__props, _a) {
-    var __emit = _a.emit;
-    const emit = __emit;
+    _a.emit;
     const handleClick = (e = null) => {
-      emit("connect_service");
+      common_vendor.index.showToast({
+        title: "连接客服",
+        icon: "none"
+      });
     };
     return (_ctx, _cache) => {
       "raw js";

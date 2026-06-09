@@ -2,7 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_types = require("../../api/types.js");
 require("../../api/Request.js");
-require("../../common/config.js");
+const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_input_1 = common_vendor.resolveComponent("rice-input");
@@ -185,15 +185,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
     };
+    const checkToken = () => {
+      const token = common_config.getToken();
+      return !!token;
+    };
     common_vendor.onLoad((options) => {
+      if (checkToken())
+        ;
       common_vendor.index.$on("scanResult", onScanResult);
     });
-    const handleConnectService = () => {
-      common_vendor.index.showToast({
-        title: "连接客服",
-        icon: "none"
-      });
-    };
     common_vendor.onMounted(() => {
     });
     common_vendor.onUnload(() => {
@@ -286,7 +286,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         p: scrollViewHeight.value + "px",
         q: filteredCardList.value.length === 0
       }, filteredCardList.value.length === 0 ? {} : {}, {
-        r: common_vendor.o(handleConnectService, "63"),
+        r: common_vendor.o(_ctx.handleConnectService, "f6"),
         s: common_vendor.p({
           class: "data-v-a89086b7"
         }),

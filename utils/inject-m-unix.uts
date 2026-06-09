@@ -1,6 +1,6 @@
 // utils/inject-config.uts
 import { config } from '@/common/config.uts'
-import { injectMUnixHostProjectConfig, getHostProjectConfig } from '@/uni_modules/m-unix/components/m-tools/ProjectConfig.uts'
+import { injectMUnixHostProjectConfig, getHostProjectConfig } from '@/api/ProjectConfig.uts'
 
 const mUnixConfig = {
 	env: config.env,

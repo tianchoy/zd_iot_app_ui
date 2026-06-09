@@ -343,23 +343,13 @@ const isLogin = (): boolean => {
 }
 
 onLoad((options) => {
-	// // 检查token状态
-	// if (checkToken()) {
-	// 	//加载列表数据
-	// 	getCardList()
-	// }
+	// 检查token状态
+	if (checkToken()) {
+		//加载列表数据
+		// getCardList()
+	}
 	uni.$on('scanResult', onScanResult)
 })
-
-// 处理连接客服事件
-const handleConnectService = () => {
-	uni.showToast({
-		title: '连接客服',
-		icon: 'none'
-	})
-}
-
-
 
 onMounted(() => {
 	calculateScrollHeight()

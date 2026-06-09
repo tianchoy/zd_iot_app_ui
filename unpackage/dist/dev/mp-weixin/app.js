@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
+require("./utils/inject-m-unix.js");
 if (!Math) {
   "./pages/card/card.js";
   "./pages/mine/mine.js";

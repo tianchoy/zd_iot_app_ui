@@ -5,7 +5,11 @@
 <script setup lang="uts">
 	const emit = defineEmits(['connect_service']);
 	const handleClick = (e: any) => {
-		emit('connect_service');
+		// emit('connect_service');
+		uni.showToast({
+			title: '连接客服',
+			icon: 'none'
+		})
 	}
 </script>
 
