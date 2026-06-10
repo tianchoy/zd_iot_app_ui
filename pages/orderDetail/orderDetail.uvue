@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<topNavBar title="订单详情" :show-back="true" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+		<topNavBar title="订单详情" @back="handleBack" :show-back="true" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 		<scroll-view class="container" scroll-y :enhanced="true">
 			<!-- 套餐名称卡片 -->
 			<view class="package-card">
@@ -136,6 +136,13 @@
 		console.log(e);
 		// 处理确认逻辑
 		showPopup.value = false;
+	}
+
+	// 返回上一页
+	const handleBack = () => {
+		uni.navigateBack({
+			delta: 1
+		})
 	}
 </script>
 

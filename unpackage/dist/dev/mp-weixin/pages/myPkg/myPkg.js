@@ -66,6 +66,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handleClick = (e) => {
       current.value = e.index;
     };
+    const handlePkgDetail = (item = null) => {
+      common_vendor.index.navigateTo({
+        url: "/pages/orderDetail/orderDetail?item=" + common_vendor.UTS.JSON.stringify(item)
+      });
+    };
     const getStatusClass = (status) => {
       switch (status) {
         case "在用套餐":
@@ -123,7 +128,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: common_vendor.t(getPackageText(item, "totalTraffic")),
             f: common_vendor.t(getPackageText(item, "remainingTraffic")),
             g: common_vendor.t(getPackageText(item, "expireDate")),
-            h: index
+            h: index,
+            i: common_vendor.o(($event) => {
+              return handlePkgDetail(item);
+            }, index)
           };
         }),
         h: `${_ctx.u_s_b_h}px`,

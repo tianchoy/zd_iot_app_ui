@@ -40,10 +40,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:136", e);
       showPopup.value = false;
     };
+    const handleBack = () => {
+      common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
+        delta: 1
+      }));
+    };
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.p({
+        a: common_vendor.o(handleBack, "d9"),
+        b: common_vendor.p({
           title: "订单详情",
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
@@ -51,21 +57,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-6ec85291"
         }),
-        b: common_vendor.n(getStatusClass("待支付")),
-        c: common_vendor.o(choosePayment, "ee"),
-        d: `${_ctx.u_s_b_h}px`,
-        e: `${_ctx.u_s_a_i_b}px`,
-        f: common_vendor.o(handleCancelPayment, "2b"),
-        g: common_vendor.o(handleConfirmPayment, "c4"),
-        h: common_vendor.p({
+        c: common_vendor.n(getStatusClass("待支付")),
+        d: common_vendor.o(choosePayment, "20"),
+        e: `${_ctx.u_s_b_h}px`,
+        f: `${_ctx.u_s_a_i_b}px`,
+        g: common_vendor.o(handleCancelPayment, "05"),
+        h: common_vendor.o(handleConfirmPayment, "c5"),
+        i: common_vendor.p({
           amount: common_vendor.unref(currentPrice),
           class: "data-v-6ec85291"
         }),
-        i: common_vendor.o(_ctx.onPopupClose, "f7"),
-        j: common_vendor.o(($event) => {
+        j: common_vendor.o(_ctx.onPopupClose, "f6"),
+        k: common_vendor.o(($event) => {
           return common_vendor.isRef(showPopup) ? showPopup.value = $event : null;
-        }, "1d"),
-        k: common_vendor.p({
+        }, "9c"),
+        l: common_vendor.p({
           position: "bottom",
           show: common_vendor.unref(showPopup),
           class: "data-v-6ec85291"

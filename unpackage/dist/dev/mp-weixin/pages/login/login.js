@@ -5,11 +5,13 @@ const api_http = require("../../api/http.js");
 const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
-  _easycom_topNavBar_1();
+  const _easycom_rice_divider_1 = common_vendor.resolveComponent("rice-divider");
+  (_easycom_topNavBar_1 + _easycom_rice_divider_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
+const _easycom_rice_divider = () => "../../uni_modules/rice-ui/components/rice-divider/rice-divider.js";
 if (!Math) {
-  _easycom_topNavBar();
+  (_easycom_topNavBar + _easycom_rice_divider)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "login",
@@ -24,7 +26,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isLogin: wxGetPhoneLogin.value
         }));
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:33", "登录成功:", res.data.access_token);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:34", "登录成功:", res.data.access_token);
           common_config.setToken(res.data.access_token, res.data.refreshToken);
           common_vendor.index.reLaunch({
             url: "/pages/index/index"
@@ -37,7 +39,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       getLogin(detail["code"]);
     };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:48", "登录参数:", options);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:49", "登录参数:", options);
       if (options["wxGetPhoneLogin"] != null) {
         wxGetPhoneLogin.value = options["wxGetPhoneLogin"];
         userId.value = options["userId"];
@@ -56,8 +58,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_assets._imports_0,
         c: common_vendor.o(handleGetPhoneNumber, "6d"),
-        d: `${_ctx.u_s_b_h}px`,
-        e: `${_ctx.u_s_a_i_b}px`
+        d: common_vendor.p({
+          backgroundColor: "#f1f5f9",
+          class: "data-v-27a30816"
+        }),
+        e: `${_ctx.u_s_b_h}px`,
+        f: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

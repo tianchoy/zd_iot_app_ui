@@ -25,6 +25,7 @@
 				v-for="(item, index) in filteredPackages" 
 				:key="index"
 				class="package-card"
+				@click="handlePkgDetail(item)"
 			>
 				<!-- 套餐头部 -->
 				<view class="package-header">
@@ -137,6 +138,13 @@
 	// Tab 切换处理
 	const handleClick = (e: UTSJSONObject) => {
 		current.value = e.index as number
+	}
+
+	// 套餐详情点击处理
+	const handlePkgDetail = (item: any) => {
+		uni.navigateTo({
+			url: '/pages/orderDetail/orderDetail?item=' + JSON.stringify(item)
+		})
 	}
 	
 	// 获取状态样式类

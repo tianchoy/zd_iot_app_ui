@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_types = require("../../api/types.js");
-require("../../api/Request.js");
+const api_http = require("../../api/http.js");
 const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
@@ -28,7 +28,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const card_number = common_vendor.ref("");
     const queryKeyword = common_vendor.ref("");
-    const tabs = common_vendor.ref([new common_vendor.UTSJSONObject({ name: "全部" }), new common_vendor.UTSJSONObject({ name: "在用" }), new common_vendor.UTSJSONObject({ name: "异常" })]);
+    const tabs = common_vendor.computed(() => {
+      const numbers = tabNumbers.value;
+      return [
+        new common_vendor.UTSJSONObject({ name: `全部 ${numbers[0]}` }),
+        new common_vendor.UTSJSONObject({ name: `在用 ${numbers[1]}` }),
+        new common_vendor.UTSJSONObject({ name: `异常 ${numbers[2]}` })
+      ];
+    });
+    const tabStatuses = ["全部", "在用", "异常"];
     const current = common_vendor.ref(0);
     const scrollViewHeight = common_vendor.ref(0);
     common_vendor.ref(false);
@@ -94,7 +102,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         currentCycle: "第1期 / 共1期"
       })
     ]);
-    common_vendor.computed(() => {
+    const tabNumbers = common_vendor.computed(() => {
       const total = allCardList.value.length;
       const inUse = allCardList.value.filter((card) => {
         return card.status === "在用";
@@ -105,13 +113,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return [total, inUse, abnormal];
     });
     const handleDetail = (card) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:170", card);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:178", card);
       common_vendor.index.navigateTo({
         url: "/pages/cardDetail/cardDetail?cardNumber=" + card.cardNumber
       });
     };
     const filteredCardList = common_vendor.computed(() => {
-      const currentStatus = tabs.value[current.value].name;
+      const currentStatus = tabStatuses[current.value];
       let list = allCardList.value;
       if (currentStatus !== "全部") {
         list = list.filter((card) => {
@@ -174,9 +182,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const onScanResult = (data) => {
       var _a;
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:250", data);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:258", data);
       const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:252", result);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:260", result);
       if (result.length > 0) {
         card_number.value = result;
         common_vendor.index.showToast({
@@ -189,9 +197,47 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const token = common_config.getToken();
       return !!token;
     };
+    const userId = common_vendor.ref("");
+    const userLoginByOpenid = (codes) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_http.login(new common_vendor.UTSJSONObject({
+          xcxCode: codes,
+          isLogin: "1"
+        }));
+        if (res.code == 200) {
+          userId.value = "" + res.data.id;
+          common_vendor.index.navigateTo({
+            url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value
+          });
+        }
+      });
+    };
+    const code = common_vendor.ref("");
+    const getCode = () => {
+      common_vendor.index.login(new common_vendor.UTSJSONObject({
+        success: (res) => {
+          code.value = res.code;
+          userLoginByOpenid(res.code);
+        }
+      }));
+    };
+    const getTenantInfos = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_http.getTenantInfo(common_config.getTenantId(), false);
+        if (res.code == 200) {
+          const tenantInfo = res.data;
+          wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
+        }
+      });
+    };
     common_vendor.onLoad((options) => {
       if (checkToken())
         ;
+      else {
+        getTenantInfos().then(() => {
+          getCode();
+        });
+      }
       common_vendor.index.$on("scanResult", onScanResult);
     });
     common_vendor.onMounted(() => {
@@ -275,7 +321,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         n: common_vendor.p({
           backgroundColor: "#f1f5f9",
-          textClass: "divider",
+          dashed: true,
+          customStyle: {
+            margin: "0"
+          },
           class: "data-v-a89086b7"
         }),
         o: common_vendor.p({
