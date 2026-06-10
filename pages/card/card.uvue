@@ -50,7 +50,7 @@
 						<text class="package-label">当前套餐:</text>
 						<text class="package-value">{{ getCardText(card, 'currentPackage') }}</text>
 					</view>
-					<rice-divider backgroundColor="#f1f5f9" dashed :customStyle="{margin:'0'}"></rice-divider>
+					<rice-divider dashed :customStyle="{margin:'0'}"></rice-divider>
 					<view class="card-metrics">
 						<view class="metric-box mr-24">
 							<view class="metric-label">到期时间</view>
@@ -84,10 +84,10 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { queryCardList,login,getTenantInfo } from '@/api/http.uts'
 import { getPageParams } from '@/utils/routerParams'
-import { getToken,getTenantId } from '@/common/config.uts'
+import { getToken,getTenantId,isWechat,isH5 } from '@/common/config.uts'
 import { CardItem } from '@/api/types.uts'
 
-const card_number = ref('')
+const card_number = ref('gn20260603164757')
 const queryKeyword = ref('')
 const tabs = computed(() => {
 	const numbers = tabNumbers.value
@@ -251,11 +251,13 @@ const handleQuery = () => {
 		return
 	}
 	queryKeyword.value = keyword
+	uni.navigateTo({
+		url: '/pages/cardDetail/cardDetail?cardNumber=' + keyword
+	})
 }
 
 // 接收扫码结果
-const onScanResult = (data: UTSJSONObject) => {
-	console.log(data)
+const onScanResult = async (data: UTSJSONObject) => {
 	const result = data.getString('result') ?? ''
 	console.log(result)
 	if (result.length > 0) {
@@ -265,7 +267,7 @@ const onScanResult = (data: UTSJSONObject) => {
 			icon: 'success'
 		})
 		// 自动查询
-		// handleQuery()
+		await handleQuery()
 	}
 }
 
@@ -298,9 +300,7 @@ const getCardList = async () => {
 	loading.value = true
 	try {
 		const res = await queryCardList({
-			rechargeNo: '',
-			status: '',
-			isSort: true
+			status: '0'
 		})
 		if (res.code === 200) {
 			console.log('查询卡列表成功:', res.data)
@@ -345,6 +345,7 @@ const isLogin = (): boolean => {
 
 //登录
 const userId = ref<string>('')
+const wxGetPhoneLogin = ref<string>('')
 const userLoginByOpenid = async (codes: string) => {
 	const res = await login({
 		xcxCode: codes,
@@ -379,17 +380,26 @@ const getTenantInfos = async () => {
 	}
 }
 
-onLoad((options) => {
-	// 检查token状态
-	if (checkToken()) {
-		//加载列表数据
-		// getCardList()
-	}else{
-		// 获取租户页面配置
-		getTenantInfos().then(() => {
-			getCode()
-		})
+//根据平台不一致，请求的方式不一致
+const platform = () => {
+	if(isWechat()){
+		// 检查token状态
+		if (checkToken()) {
+			//加载列表数据
+			getCardList()
+		}else{
+			// 获取租户页面配置
+			getTenantInfos().then(() => {
+				getCode()
+			})
+		}
+	}else if(isH5()){
+		getCardList()
 	}
+}
+
+onLoad((options) => {
+	platform()
 	uni.$on('scanResult', onScanResult)
 })
 

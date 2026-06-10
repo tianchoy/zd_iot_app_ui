@@ -1,9 +1,10 @@
 "use strict";
-const ApiUrl = {
+const common_vendor = require("../common/vendor.js");
+const ApiUrl = new common_vendor.UTSJSONObject({
   getTenantPageConfigXcx: "/system/tenantPageConfig/getTenantPageConfigXcx",
   getTenantPageConfigH: "/system/tenantPageConfig/getTenantPageConfigH",
   login: "/auth/login",
-  queryCardList: "/app/card/list",
+  queryXcxCardList: "/card/pkgInfo/xcxList",
   queryCardListSum: "/app/card/listSum",
   card_detail: "/app/card/info/",
   countries: "/app/card/getH5CountryList",
@@ -14,8 +15,11 @@ const ApiUrl = {
   queryPkgInfoList: "/card/pkgInfo/list",
   queryPkgInfoDetail: "/card/pkgInfo/info/",
   queryOrderList: "/order/pkgOrder/list",
-  queryOrderPackInfo: "/order/pkgOrder/getOrderPackInfo/"
-  // 查询订单套餐信息
-};
+  queryOrderPackInfo: "/order/pkgOrder/getOrderPackInfo/",
+  queryCardList: "/app/card/list",
+  queryCardDetailXcx: "/app/card/infoXcx/",
+  userBindCard: "/system/appUserCard/bind"
+  // 绑定卡
+});
 exports.ApiUrl = ApiUrl;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/url.js.map

@@ -103,7 +103,7 @@ class QuickRequestParams extends common_vendor.UTS.UTSType {
 const DEFAULT_TIMEOUT = 3e4;
 const DEFAULT_SUCCESS_CODES = [0, 200];
 const DEFAULT_UNAUTHORIZED_CODES = [401, 403];
-const DEFAULT_LOGIN_PAGE = "/pages_Me/login/login";
+const DEFAULT_LOGIN_PAGE = "/pages/login/login";
 function buildUrl(url, baseUrl) {
   if (url.startsWith("http://") || url.startsWith("https://")) {
     return url;

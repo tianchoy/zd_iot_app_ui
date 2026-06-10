@@ -1,103 +1,98 @@
 <template>
 	<view class="page-container">
 		<topNavBar :title="card_number" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+		<view v-if="cardDetail">
+			<view class="card-box fixed-tabs" :style="fixedTabsStyle">
+				<rice-tabs
+					v-model="active"
+					line-color="#ffffff" 
+					:list="tabs" 
+					:line-width="0" 
+					:title-active-color="'#2563eb'" 
+					@change="changeTab" 
+					:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
+					>
+				</rice-tabs>
+			</view>
 
-		<view class="fixed-tabs" :style="fixedTabsStyle">
-			<rice-tabs
-				  v-model="active"
-				  line-color="#ffffff" 
-				  :list="tabs" 
-				  :line-width="0" 
-				  :title-active-color="'#2563eb'" 
-				  @change="changeTab" 
-				  :customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
-				  >
-			</rice-tabs>
-		</view>
+			<view class="container">
+				<view class="card-box content-card">
+					<view class="card-content">
+						<view class="section-title">{{activeName}}</view>
+						<view class="section-content" v-if="activeName == '基本信息'">
+							<view class="base-info-box">
+								<view class="base-info">
+									<view class="info-item" v-if="cardDetail.rechargeNo"><text class="info-label">充值号</text><text class="info-value">{{cardDetail.rechargeNo}}</text></view>
+									<view class="info-item" v-if="cardDetail.pkgName"><text class="info-label">套餐名称</text><text class="info-value">{{cardDetail.pkgName}}</text></view>
+									<view class="info-item" v-if="cardDetail.effectiveTime"><text class="info-label">生效时间</text><text class="info-value">{{cardDetail.effectiveTime}}</text></view>
+									<view class="info-item" v-if="cardDetail.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail.expirationTime}}</text></view>
 
-		<view class="container">
-			<view class="card-box content-card">
-				<view class="card-content">
-					<view class="section-title">{{activeName}}</view>
-					<view class="section-content" v-if="activeName == '基本信息'">
-						<view class="base-info-box">
-							<view class="base-info">
-								<view class="info-item"><text class="info-label">卡片号</text><text class="info-value">{{card_number}}</text></view>
-								<view class="info-item"><text class="info-label">ICCID</text><text class="info-value">89860421123456789012</text></view>
-								<view class="info-item"><text class="info-label">IMSI</text><text class="info-value">460011234567890</text></view>
-								<view class="info-item"><text class="info-label">最近使用</text><text class="info-value">2026-06-05</text></view>
+									<view class="info-item" v-if="cardDetail.usedPeriod && cardDetail.totalPeriod"><text class="info-label">周期</text><text class="info-value">{{cardDetail.usedPeriod}} / {{cardDetail.totalPeriod}}</text></view>
+									<view class="info-item" v-if="cardDetail.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail.expirationTime}}</text></view>
+								</view>
+							</view>
+							<view class="section-title">流量使用</view>
+							<view class="data-total">
+								<view class="total-item"><text class="total-label">已用流量:</text><text class="total-value">{{cardDetail.usedFlow || '0'}}</text></view>
+								<view class="total-item"><text class="total-label">剩余流量:</text><text class="total-value">{{cardDetail.unUsedFlow || '0'}}</text></view>
+								<view class="total-item"><text class="total-label">总流量:</text><text class="total-value">{{cardDetail.pkgFlow || '0'}}</text></view>
 							</view>
 						</view>
 
-						<view class="section-title">套餐状态</view>
-						<view class="pkg-content">
-							<view class="pkg-item"><text class="pkg-label">当前套餐:</text><text class="pkg-value">车联网月包20G</text></view>
-							<view class="pkg-item"><text class="pkg-label">套餐流量:</text><text class="pkg-value">20GB</text></view>
-							<view class="pkg-item"><text class="pkg-label">套餐有效期:</text><text class="pkg-value">2026-04-30</text></view>
-							<view class="pkg-item">
-								<text class="pkg-label">待生效期数:</text>
-								<view class="pkg-value"><text>11</text><text class="pkg-icon" @click="showMore"><rice-icon v-if="!pkgMore" name="arrow-down-filling" size="20rpx"></rice-icon><rice-icon v-else name="arrow-up-filling" size="20rpx"></rice-icon></text></view>
-							</view>
-							<view class="pkg-date" v-if="pkgMore"><view class="date-list"><text class="date-label"><text class="date-period">第 1 期</text><text>2026-04-30</text></text><rice-tag text="标签" :round="true" :plain="true" size="small" type="primary"></rice-tag></view></view>
-							<view class="pkg-item"><text class="pkg-label">下期开始时间:</text><text class="pkg-value">2026-04-30</text></view>
-							<view class="pkg-item"><text class="pkg-label">当前期次:</text><text class="pkg-value">第 1 期</text></view>
-							<view class="pkg-item"><text class="pkg-label">当前期有效期:</text><text class="pkg-value">2026-04-30</text></view>
-							<view class="pkg-item"><text class="pkg-label">计费方式:</text><text class="pkg-value">按月计费</text></view>
-						</view>
-
-						<view class="section-title">流量使用</view>
-						<view class="data-total">
-							<view class="total-item"><text class="total-label">本月已用:</text><text class="total-value">11.34GB</text></view>
-							<view class="total-item"><text class="total-label">剩余流量:</text><text class="total-value">8.66GB</text></view>
-							<view class="total-item"><text class="total-label">总流量:</text><text class="total-value">20GB</text></view>
-						</view>
-					</view>
-
-					<view class="section-content" v-if="activeName == '卡片套餐'">
-						<rice-tabs
-							v-model="current"
-							line-color="#ffffff" 
-							:list="pkgTabs" 
-							:line-width="0" 
-							:title-active-color="'#2563eb'" 
-							@change="handleClick" 
-							:customStyle="{height:'85rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}"
-							>
-						</rice-tabs>
-						<view class="card-pkg-box">
-							<view class="item" v-for="(item, index) in filteredPackageList" :key="index">
-								<view class="item-head"><text class="item-label">{{ item.name }}</text><rice-tag :text="item.statusText" :round="true" :plain="true" size="small" :type="item.tagType"></rice-tag></view>
-								<view class="item-sub-title">生效时间：{{ item.startTime }}</view>
-								<view class="item-data">
-									<view class="item-data-item"><text class="item-data-label">套餐流量</text><text class="item-data-value">{{ item.totalFlow }}</text></view>
-									<view class="item-data-item"><text class="item-data-label">已用流量</text><text class="item-data-value">{{ item.usedFlow }}</text></view>
-									<view class="item-data-item"><text class="item-data-label">剩余流量</text><text class="item-data-value">{{ item.leftFlow }}</text></view>
+						<view class="section-content" v-if="activeName == '卡片套餐'">
+							<rice-tabs
+								v-model="current"
+								line-color="#ffffff" 
+								:list="pkgTabs" 
+								:line-width="0" 
+								:title-active-color="'#2563eb'" 
+								@change="handleClick" 
+								:customStyle="{height:'85rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}"
+								>
+							</rice-tabs>
+							<view class="card-pkg-box">
+								<view class="item" v-for="(item, index) in filteredPackageList" :key="index">
+									<view class="item-head"><text class="item-label">{{ item.name }}</text><rice-tag :text="item.statusText" :round="true" :plain="true" size="small" :type="item.tagType"></rice-tag></view>
+									<view class="item-sub-title">生效时间：{{ item.startTime }}</view>
+									<view class="item-data">
+										<view class="item-data-item"><text class="item-data-label">套餐流量</text><text class="item-data-value">{{ item.totalFlow }}</text></view>
+										<view class="item-data-item"><text class="item-data-label">已用流量</text><text class="item-data-value">{{ item.usedFlow }}</text></view>
+										<view class="item-data-item"><text class="item-data-label">剩余流量</text><text class="item-data-value">{{ item.leftFlow }}</text></view>
+									</view>
 								</view>
 							</view>
 						</view>
-					</view>
 
-					<view class="section-content card-order" v-if="activeName == '卡片订单'">
-						<view class="item" v-for="date in orderDates" :key="date">
-							<view class="item-head"><text class="item-label">车联网月包20G</text><rice-tag text="已完成" :round="true" :plain="true" size="small" type="success"></rice-tag></view>
-							<view class="item-sub-title">订单号: {{card_number}}</view>
-							<view class="item-data"><text>{{ date }}</text><text class="total-value">¥200</text></view>
+						<view class="section-content card-order" v-if="activeName == '卡片订单'">
+							<view class="item" v-for="date in orderDates" :key="date">
+								<view class="item-head"><text class="item-label">车联网月包20G</text><rice-tag text="已完成" :round="true" :plain="true" size="small" type="success"></rice-tag></view>
+								<view class="item-sub-title">订单号: {{card_number}}</view>
+								<view class="item-data"><text>{{ date }}</text><text class="total-value">¥200</text></view>
+							</view>
 						</view>
 					</view>
 				</view>
+				<rice-button class="ml-24 mr-24 mt-24 mb-24" type="error" plain text="解绑卡片" :customStyle="{backgroundColor:'#ffffff'}" @click="handleUnbind"></rice-button>
 			</view>
-			<rice-button class="ml-24 mr-24 mt-24 mb-24" type="error" plain text="解绑卡片" :customStyle="{backgroundColor:'#ffffff'}" @click="handleUnbind"></rice-button>
-		</view>
 
-		<view class="fixed-bottom-buttons">
-			<rice-button class="btn" :bold="true" :customStyle="{border:'none'}">诊断</rice-button>
-			<rice-button class="btn" :bold="true" :disabled="true" :customStyle="{border:'none'}">已绑定</rice-button>
-			<rice-button class="btn" type="primary" color="#1989fa" textColor="#ffffff" :bold="true" :shadow="true" :customStyle="{border:'none'}" @click="handleRecharge">去充值</rice-button>
+			<view class="fixed-bottom-buttons">
+				<!-- <rice-button class="btn" :bold="true" :customStyle="{border:'none'}">诊断</rice-button> -->
+				<rice-button v-if="cardDetail.isBind || isBinded" class="btn" :bold="true" :disabled="true" :customStyle="{border:'none'}">已绑定</rice-button>
+				<rice-button v-else class="btn" :bold="true" :customStyle="{border:'none'}" @click="handleBindCard">去绑定</rice-button>
+				<rice-button class="btn" type="primary" color="#1989fa" textColor="#ffffff" :bold="true" :shadow="true" :customStyle="{border:'none'}" @click="handleRecharge">去充值</rice-button>
+			</view>
+		</view>
+		<view class="empty-state" v-else>
+			<text class="empty-text">暂无卡片详情</text>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+	import {queryCardDetail,userBindCard} from '@/api/http'
+	import type {CardDetail,BindCard} from '@/api/types'
+
+
 	type CardDetailTabItem = {
 		name: string
 	}
@@ -110,10 +105,10 @@
 	const card_number = ref('')
 	const active = ref(0)
 	const activeName = ref('基本信息')
-	const pkgMore = ref(false)
 	const statusBarHeight = ref(20)
 	const navBarHeight = ref(44)
 	const fixedTabsHeight = 109
+	const cardDetail = ref<CardDetail>()
 
 	const fixedTabsStyle = computed(() => {
 		const css = new Map<string, string>()
@@ -170,10 +165,6 @@
 		activeName.value = e.name
 	}
 
-	const showMore = () => {
-		pkgMore.value = !pkgMore.value
-	}
-
 	const goBack = () => {
 		uni.navigateBack({
 			delta: 1
@@ -207,6 +198,37 @@
 		})
 	}
 
+	const getCardDetail = async () => {
+		const res = await queryCardDetail(card_number.value)
+		console.log(res)
+		if(res.code == 200){
+			cardDetail.value = res.data
+		}else{
+			cardDetail.value = {}
+		}
+	}
+
+	/** 绑定卡 */
+	const isBinded = ref(false)
+	const handleBindCard = async () => {
+		const res = await userBindCard({
+			rechargeNo: cardDetail.value?.rechargeNo ?? ''
+		})
+		console.log(res)
+		if(res.code == 200){
+			uni.showToast({
+				title: '绑定成功',
+				icon: 'success'
+			})
+			isBinded.value = true
+		}else{
+			uni.showToast({
+				title: res.msg ?? '绑定失败',
+				icon: 'none'
+			})
+		}
+	}
+
 	onMounted(() => {
 		getNavBarInfo()
 	})
@@ -214,6 +236,7 @@
 	onLoad((options) => {
 		const cardNumber = options.cardNumber ?? ''
 		card_number.value = cardNumber
+		getCardDetail()
 	})
 </script>
 
@@ -237,7 +260,7 @@
 .container {
 	display: flex;
 	flex-direction: column;
-	padding: 120rpx 0;
+	padding: 150rpx 0;
 }
 
 .card-box {
@@ -483,6 +506,22 @@
 
 	.btn{
 		flex:1
+	}
+}
+
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 120rpx 32rpx;
+	background-color: #ffffff;
+	margin: 0 24rpx;
+	border-radius: 24rpx;
+	
+	.empty-text {
+		font-size: 28rpx;
+		color: #9ca3af;
 	}
 }
 </style>

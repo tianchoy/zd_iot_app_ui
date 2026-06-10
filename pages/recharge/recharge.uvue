@@ -4,7 +4,7 @@
 		<view class="card-info">
 			<view class="card-title">
 				<text class="title">卡片信息</text>
-				<rice-tag text="标签" :round="true" :plain="true" size="small" type="primary"></rice-tag>
+				<rice-tag text="标签" :round="true" plain-fill size="small" type="success"></rice-tag>
 			</view>
 			<view class="card-number">
 				<text>1234567890123456</text>
@@ -12,7 +12,7 @@
 			<view class="info-list">
 				<view class="info-item">
 					<text class="label">当前套餐</text>
-					<text class="value">车联网月包20G（名称较长时自动换行展示）</text>
+					<text class="value">车联网月包20G(名称较长时自动换行展示)</text>
 				</view>
 				<view class="info-item">
 					<text class="label">卡片余额</text>
@@ -321,16 +321,17 @@
 					flex-direction: row;
 					align-items: center;
 					justify-content: space-between;
-					font-size: 26rpx;
 					padding: 14rpx 0;
 					.label{
 						color: #64748b;
 						margin-right: 20rpx;
+						font-size: 24rpx;
 					}
 					.value{
 						font-weight: bold;
 						white-space: pre-wrap;
 						line-height: 1.5;
+						font-size: 24rpx;
 					}
 				}
 			}

@@ -31,9 +31,9 @@ export type TenantInfoData = {
 
 /** 查询卡列表参数 */
 export type QueryCardListParams = {
-  rechargeNo: string
+  rechargeNo?: string
   status: string
-  isSort: boolean
+  isSort?: boolean
 }
 
 /** 卡列表统计数据 */
@@ -60,4 +60,25 @@ export type CardItem = {
 /** 查询卡列表返回数据 */
 export type QueryCardListData = {
 	list: CardItem[]
+}
+
+export type CardDetail = {
+	currentPeriodEndTime: string
+  currentPeriodStartTime: string
+  effectiveTime: string
+  expirationTime: string
+  pkgFlow: string
+  pkgName: string
+  rechargeNo: string
+  status: string
+  totalPeriod: string
+  unUsedFlow: string
+  usedFlow: string
+  usedPeriod: string
+  isBind: boolean
+}
+
+/** 绑定卡参数 */
+export type BindCard = {
+  rechargeNo: string
 }

@@ -26,7 +26,7 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "card",
   setup(__props) {
-    const card_number = common_vendor.ref("");
+    const card_number = common_vendor.ref("gn20260603164757");
     const queryKeyword = common_vendor.ref("");
     const tabs = common_vendor.computed(() => {
       const numbers = tabNumbers.value;
@@ -39,7 +39,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const tabStatuses = ["全部", "在用", "异常"];
     const current = common_vendor.ref(0);
     const scrollViewHeight = common_vendor.ref(0);
-    common_vendor.ref(false);
+    const loading = common_vendor.ref(false);
     const allCardList = common_vendor.ref([
       new api_types.CardItem({
         id: 1,
@@ -179,25 +179,63 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       }
       queryKeyword.value = keyword;
+      common_vendor.index.navigateTo({
+        url: "/pages/cardDetail/cardDetail?cardNumber=" + keyword
+      });
     };
     const onScanResult = (data) => {
-      var _a;
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:258", data);
-      const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:260", result);
-      if (result.length > 0) {
-        card_number.value = result;
-        common_vendor.index.showToast({
-          title: "扫码成功",
-          icon: "success"
-        });
-      }
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a;
+        const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
+        common_vendor.index.__f__("log", "at pages/card/card.uvue:262", result);
+        if (result.length > 0) {
+          card_number.value = result;
+          common_vendor.index.showToast({
+            title: "扫码成功",
+            icon: "success"
+          });
+          yield handleQuery();
+        }
+      });
+    };
+    const getCardList = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        loading.value = true;
+        try {
+          const res = yield api_http.queryCardList(new api_types.QueryCardListParams({
+            rechargeNo: null,
+            isSort: null,
+            status: "0"
+          }));
+          if (res.code === 200) {
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:306", "查询卡列表成功:", res.data);
+            allCardList.value = res.data.list;
+          } else {
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:309", "查询卡列表失败:", res.msg);
+            allCardList.value = [];
+            common_vendor.index.showToast({
+              title: res.msg || "查询失败",
+              icon: "none"
+            });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/card/card.uvue:317", "查询卡列表异常:", error);
+          allCardList.value = [];
+          common_vendor.index.showToast({
+            title: "网络异常，请稍后重试",
+            icon: "none"
+          });
+        } finally {
+          loading.value = false;
+        }
+      });
     };
     const checkToken = () => {
       const token = common_config.getToken();
       return !!token;
     };
     const userId = common_vendor.ref("");
+    const wxGetPhoneLogin = common_vendor.ref("");
     const userLoginByOpenid = (codes) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.login(new common_vendor.UTSJSONObject({
@@ -230,14 +268,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    common_vendor.onLoad((options) => {
-      if (checkToken())
-        ;
-      else {
-        getTenantInfos().then(() => {
-          getCode();
-        });
+    const platform = () => {
+      {
+        if (checkToken()) {
+          getCardList();
+        } else {
+          getTenantInfos().then(() => {
+            getCode();
+          });
+        }
       }
+    };
+    common_vendor.onLoad((options) => {
+      platform();
       common_vendor.index.$on("scanResult", onScanResult);
     });
     common_vendor.onMounted(() => {
@@ -320,7 +363,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         }),
         n: common_vendor.p({
-          backgroundColor: "#f1f5f9",
           dashed: true,
           customStyle: {
             margin: "0"

@@ -95,9 +95,9 @@ class QueryCardListParams extends common_vendor.UTS.UTSType {
       kind: 2,
       get fields() {
         return {
-          rechargeNo: { type: String, optional: false },
+          rechargeNo: { type: String, optional: true },
           status: { type: String, optional: false },
-          isSort: { type: Boolean, optional: false }
+          isSort: { type: Boolean, optional: true }
         };
       },
       name: "QueryCardListParams"
@@ -191,6 +191,70 @@ class QueryCardListData extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class CardDetail extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          currentPeriodEndTime: { type: String, optional: false },
+          currentPeriodStartTime: { type: String, optional: false },
+          effectiveTime: { type: String, optional: false },
+          expirationTime: { type: String, optional: false },
+          pkgFlow: { type: String, optional: false },
+          pkgName: { type: String, optional: false },
+          rechargeNo: { type: String, optional: false },
+          status: { type: String, optional: false },
+          totalPeriod: { type: String, optional: false },
+          unUsedFlow: { type: String, optional: false },
+          usedFlow: { type: String, optional: false },
+          usedPeriod: { type: String, optional: false },
+          isBind: { type: Boolean, optional: false }
+        };
+      },
+      name: "CardDetail"
+    };
+  }
+  constructor(options, metadata = CardDetail.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.currentPeriodEndTime = this.__props__.currentPeriodEndTime;
+    this.currentPeriodStartTime = this.__props__.currentPeriodStartTime;
+    this.effectiveTime = this.__props__.effectiveTime;
+    this.expirationTime = this.__props__.expirationTime;
+    this.pkgFlow = this.__props__.pkgFlow;
+    this.pkgName = this.__props__.pkgName;
+    this.rechargeNo = this.__props__.rechargeNo;
+    this.status = this.__props__.status;
+    this.totalPeriod = this.__props__.totalPeriod;
+    this.unUsedFlow = this.__props__.unUsedFlow;
+    this.usedFlow = this.__props__.usedFlow;
+    this.usedPeriod = this.__props__.usedPeriod;
+    this.isBind = this.__props__.isBind;
+    delete this.__props__;
+  }
+}
+class BindCard extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          rechargeNo: { type: String, optional: false }
+        };
+      },
+      name: "BindCard"
+    };
+  }
+  constructor(options, metadata = BindCard.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.rechargeNo = this.__props__.rechargeNo;
+    delete this.__props__;
+  }
+}
+exports.BindCard = BindCard;
 exports.CardItem = CardItem;
 exports.CardListSumData = CardListSumData;
+exports.QueryCardListParams = QueryCardListParams;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/types.js.map

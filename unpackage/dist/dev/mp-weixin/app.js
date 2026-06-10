@@ -4,9 +4,9 @@ const common_vendor = require("./common/vendor.js");
 require("./utils/inject-m-unix.js");
 if (!Math) {
   "./pages/card/card.js";
+  "./pages/recharge/recharge.js";
   "./pages/mine/mine.js";
   "./pages/cardDetail/cardDetail.js";
-  "./pages/recharge/recharge.js";
   "./pages/paySuccess/paySuccess.js";
   "./pages/payFailed/payFailed.js";
   "./pages/myOrder/myOrder.js";

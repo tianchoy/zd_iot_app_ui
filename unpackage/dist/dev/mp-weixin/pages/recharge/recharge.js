@@ -212,9 +212,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.p({
           text: "标签",
           round: true,
-          plain: true,
+          ["plain-fill"]: true,
           size: "small",
-          type: "primary",
+          type: "success",
           class: "data-v-722cdacb"
         }),
         d: common_vendor.p({
@@ -222,18 +222,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-text"]: true,
           class: "data-v-722cdacb"
         }),
-        e: common_vendor.o(toMyPackage, "1d"),
+        e: common_vendor.o(toMyPackage, "4d"),
         f: common_vendor.p({
           class: "btn mr-24 data-v-722cdacb"
         }),
-        g: common_vendor.o(toOrderRecord, "df"),
+        g: common_vendor.o(toOrderRecord, "19"),
         h: common_vendor.p({
           class: "btn data-v-722cdacb"
         }),
-        i: common_vendor.o(changeTab, "1f"),
+        i: common_vendor.o(changeTab, "c8"),
         j: common_vendor.o(($event) => {
           return active.value = $event;
-        }, "b1"),
+        }, "26"),
         k: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
@@ -295,23 +295,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         o: `${_ctx.u_s_b_h}px`,
         p: `${_ctx.u_s_a_i_b}px`,
-        q: common_vendor.o(handleCancelPayment, "ff"),
-        r: common_vendor.o(handleConfirmPayment, "b0"),
+        q: common_vendor.o(handleCancelPayment, "cb"),
+        r: common_vendor.o(handleConfirmPayment, "f6"),
         s: common_vendor.p({
           amount: currentPrice.value,
           class: "data-v-722cdacb"
         }),
-        t: common_vendor.o(_ctx.onPopupClose, "ad"),
+        t: common_vendor.o(_ctx.onPopupClose, "0f"),
         v: common_vendor.o(($event) => {
           return showPopup.value = $event;
-        }, "e9"),
+        }, "2f"),
         w: common_vendor.p({
           position: "bottom",
           show: showPopup.value,
           class: "data-v-722cdacb"
         }),
         x: common_vendor.t(currentPrice.value),
-        y: common_vendor.o(choosePayment, "26"),
+        y: common_vendor.o(choosePayment, "68"),
         z: common_vendor.p({
           type: "primary",
           class: "btn data-v-722cdacb"

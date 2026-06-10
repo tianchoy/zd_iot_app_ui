@@ -65,17 +65,18 @@ page .container .card-info .info-list .info-item.data-v-722cdacb {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  font-size: 26rpx;
   padding: 14rpx 0;
 }
 page .container .card-info .info-list .info-item .label.data-v-722cdacb {
   color: #64748b;
   margin-right: 20rpx;
+  font-size: 24rpx;
 }
 page .container .card-info .info-list .info-item .value.data-v-722cdacb {
   font-weight: bold;
   white-space: pre-wrap;
   line-height: 1.5;
+  font-size: 24rpx;
 }
 page .container .card-info .flow-box.data-v-722cdacb {
   margin-top: 24rpx;

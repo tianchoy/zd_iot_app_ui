@@ -1,9 +1,9 @@
 {
   "pages": [
     "pages/card/card",
+    "pages/recharge/recharge",
     "pages/mine/mine",
     "pages/cardDetail/cardDetail",
-    "pages/recharge/recharge",
     "pages/paySuccess/paySuccess",
     "pages/payFailed/payFailed",
     "pages/myOrder/myOrder",

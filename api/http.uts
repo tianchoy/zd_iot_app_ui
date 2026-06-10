@@ -10,6 +10,7 @@ import type {
   QueryCardListData,
   CardListSumData,
   CardItem,
+  BindCard,
 } from './types'
 
 // 查询国家列表
@@ -55,10 +56,12 @@ export function login(data: UTSJSONObject, withToken: boolean = true): Promise<A
 export function getTenantInfo(tenantId: string, withToken: boolean = true): Promise<ApiResponse<TenantInfoData>> {
   // #ifdef MP-WEIXIN
   const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + config.api.auth.tenantId
+  const tk = true
   // #endif
   
   // #ifdef H5
   const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
+  const tk = false
   // #endif
   
   // #ifndef MP-WEIXIN || H5
@@ -69,7 +72,7 @@ export function getTenantInfo(tenantId: string, withToken: boolean = true): Prom
   return request<TenantInfoData>({
     url: url,
     method: 'GET',
-    withToken
+    withToken: tk
   })
 }
 
@@ -88,6 +91,41 @@ export function queryCardListSum(withToken: boolean = true): Promise<ApiResponse
   return request<CardListSumData>({
     url: ApiUrl.queryCardListSum as string,
     method: 'GET',
+    withToken: withToken
+  })
+}
+
+// 查询卡详情Xcx
+export function queryCardDetail(id: string, countryCode?: string, withToken: boolean = true): Promise<ApiResponse<CardDetail>> {
+  // #ifdef MP-WEIXIN
+  const url = (ApiUrl.queryCardDetailXcx as string) + id
+  const tk = true
+  // #endif
+  
+  // #ifdef H5
+  const url = (ApiUrl.queryCardDetail as string) + id + '/' + countryCode
+  const tk = false
+  // #endif
+  
+  // #ifndef MP-WEIXIN || H5
+  // 其他平台默认使用H5配置
+  const url = (ApiUrl.queryCardDetail as string) +  id + '/' + countryCode
+  // #endif
+  
+  return request<CardDetail>({
+    url: url,
+    method: 'GET',
+    withToken: tk
+  })
+}
+
+
+// 绑定卡
+export function userBindCard(data: BindCard, withToken: boolean = true): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: ApiUrl.userBindCard as string,
+    method: 'POST',
+    data: data,
     withToken: withToken
   })
 }

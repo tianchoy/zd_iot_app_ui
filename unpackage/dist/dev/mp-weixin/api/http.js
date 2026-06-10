@@ -44,6 +44,7 @@ function login(data, withToken = true) {
 }
 function getTenantInfo(tenantId, withToken = true) {
   const url = api_url.ApiUrl.getTenantPageConfigXcx + "/" + common_config.config.api.auth.tenantId;
+  const tk = true;
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,
@@ -59,6 +60,25 @@ function getTenantInfo(tenantId, withToken = true) {
     onErrorCode: null,
     url,
     method: "GET",
+    withToken: tk
+  }));
+}
+function queryCardList(params, withToken = true) {
+  return api_Request.request(new api_Request.RequestOptions({
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.queryCardList,
+    method: "GET",
+    data: params,
     withToken
   }));
 }
@@ -81,8 +101,51 @@ function queryCardListSum(withToken = true) {
     withToken
   }));
 }
+function queryCardDetail(id, countryCode = null, withToken = true) {
+  const url = api_url.ApiUrl.queryCardDetailXcx + id;
+  const tk = true;
+  return api_Request.request(new api_Request.RequestOptions({
+    data: null,
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url,
+    method: "GET",
+    withToken: tk
+  }));
+}
+function userBindCard(data, withToken = true) {
+  return api_Request.request(new api_Request.RequestOptions({
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.userBindCard,
+    method: "POST",
+    data,
+    withToken
+  }));
+}
 exports.getCountryList = getCountryList;
 exports.getTenantInfo = getTenantInfo;
 exports.login = login;
+exports.queryCardDetail = queryCardDetail;
+exports.queryCardList = queryCardList;
 exports.queryCardListSum = queryCardListSum;
+exports.userBindCard = userBindCard;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map
