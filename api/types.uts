@@ -85,5 +85,17 @@ export type BindCard = {
 
 /** 查询套餐信息列表参数 */
 export type PkgInfoListParams = {
-  rechargeNo: string
+  rechargeNo: string,
+  status: string
+}
+
+export type PackageItem = {
+		name: string
+		status: 'active' | 'pending' | 'expired'
+		statusText: string
+		tagType: string
+		startTime: string
+		totalFlow: string
+		usedFlow: string
+		leftFlow: string
 }

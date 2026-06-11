@@ -150,7 +150,8 @@ function userBindCard(data, withToken = true) {
 function queryPkgInfoList(data, withToken = true) {
   const url = api_url.ApiUrl.queryXcxCardList;
   const body = new common_vendor.UTSJSONObject({
-    rechargeNo: data.rechargeNo
+    rechargeNo: data.rechargeNo,
+    status: data.status
   });
   return api_Request.request(new api_Request.RequestOptions({
     header: null,

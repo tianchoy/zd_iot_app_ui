@@ -206,11 +206,13 @@ page .card-content .card-pkg-box .item .item-data.data-v-2bc48812,page  .card-co
 }
 page .card-content .card-pkg-box .item .item-data .item-data-item.data-v-2bc48812,page  .card-content .card-order .item .item-data .item-data-item.data-v-2bc48812 {
   flex: 1;
-  text-align: center;
   background: #f8fbff;
   border: 1rpx solid #e8eef7;
   border-radius: 24rpx;
   padding: 16rpx 10rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 page .card-content .card-pkg-box .item .item-data .item-data-item .item-data-label.data-v-2bc48812,page  .card-content .card-order .item .item-data .item-data-item .item-data-label.data-v-2bc48812 {
   display: block;
@@ -222,6 +224,9 @@ page .card-content .card-pkg-box .item .item-data .item-data-item .item-data-val
   font-size: 24rpx;
   font-weight: bold;
   color: #0f172a;
+}
+page .card-content .card-pkg-box .item .item-data .date-label.data-v-2bc48812,page  .card-content .card-order .item .item-data .date-label.data-v-2bc48812 {
+  font-size: 24rpx;
 }
 page .card-content .card-order .item-data.data-v-2bc48812 {
   display: flex;

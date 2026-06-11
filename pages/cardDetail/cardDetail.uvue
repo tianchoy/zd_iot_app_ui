@@ -9,6 +9,7 @@
 					:list="tabs" 
 					:line-width="0" 
 					:title-active-color="'#2563eb'" 
+					:title-inactive-color="'#334155'"
 					@change="changeTab" 
 					:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
 					>
@@ -46,13 +47,14 @@
 								:list="pkgTabs" 
 								:line-width="0" 
 								:title-active-color="'#2563eb'" 
+								:title-inactive-color="'#334155'"
 								@change="handleClick" 
 								:customStyle="{height:'85rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}"
 								>
 							</rice-tabs>
 							<view class="card-pkg-box">
 								<view class="item" v-for="(item, index) in filteredPackageList" :key="index">
-									<view class="item-head"><text class="item-label">{{ item.name }}</text><rice-tag :text="item.statusText" :round="true" :plain="true" size="small" :type="item.tagType"></rice-tag></view>
+									<view class="item-head"><text class="item-label">{{ item.name }}</text><rice-tag :text="item.statusText" :round="true" plain-fill size="small" :type="item.tagType"></rice-tag></view>
 									<view class="item-sub-title">生效时间：{{ item.startTime }}</view>
 									<view class="item-data">
 										<view class="item-data-item"><text class="item-data-label">套餐流量</text><text class="item-data-value">{{ item.totalFlow }}</text></view>
@@ -65,9 +67,9 @@
 
 						<view class="section-content card-order" v-if="activeName == '卡片订单'">
 							<view class="item" v-for="date in orderDates" :key="date">
-								<view class="item-head"><text class="item-label">车联网月包20G</text><rice-tag text="已完成" :round="true" :plain="true" size="small" type="success"></rice-tag></view>
+								<view class="item-head"><text class="item-label">车联网月包20G</text><rice-tag text="已完成" :round="true" plain-fill size="small" type="success"></rice-tag></view>
 								<view class="item-sub-title">订单号: {{card_number}}</view>
-								<view class="item-data"><text>{{ date }}</text><text class="total-value">¥200</text></view>
+								<view class="item-data"><text class="date-label">{{ date }}</text><text class="total-value">¥200</text></view>
 							</view>
 						</view>
 					</view>
@@ -90,7 +92,7 @@
 
 <script setup lang="uts">
 	import {queryCardDetail,userBindCard,queryPkgInfoList} from '@/api/http'
-	import type {CardDetail,BindCard} from '@/api/types'
+	import type {CardDetail,BindCard,PackageItem} from '@/api/types'
 
 
 	type CardDetailTabItem = {
@@ -110,7 +112,7 @@
 	const statusBarHeight = ref(20)
 	const navBarHeight = ref(44)
 	const fixedTabsHeight = 109
-		const cardDetail = ref<CardDetail>({} as CardDetail)
+	const cardDetail = ref<CardDetail>({} as CardDetail)
 
 	const fixedTabsStyle = computed(() => {
 		const css = new Map<string, string>()
@@ -127,24 +129,14 @@
 	const pkgTabs = ref([{ name: '全部' }, { name: '在用套餐' }, { name: '待生效' }, { name: '已失效' }])
 	const orderDates = ref(['2026-03-25', '2026-02-25', '2026-01-25'])
 
-	type PackageStatus = 'active' | 'pending' | 'expired'
-	type PackageItem = {
-		name: string
-		status: PackageStatus
-		statusText: string
-		tagType: string
-		startTime: string
-		totalFlow: string
-		usedFlow: string
-		leftFlow: string
-	}
+	
 
 	const packageList = ref<PackageItem[]>([
 		{ name: '车联网月包20G', status: 'active', statusText: '在用', tagType: 'success', startTime: '2026-04-01', totalFlow: '20GB', usedFlow: '11.34GB', leftFlow: '8.66GB' },
-		{ name: '车联网月包20G', status: 'pending', statusText: '待生效', tagType: 'warning', startTime: '2026-05-01', totalFlow: '20GB', usedFlow: '0GB', leftFlow: '20GB' },
-		{ name: '车联网月包20G', status: 'pending', statusText: '待生效', tagType: 'warning', startTime: '2026-06-01', totalFlow: '20GB', usedFlow: '0GB', leftFlow: '20GB' },
-		{ name: '车联网月包20G', status: 'expired', statusText: '已失效', tagType: 'danger', startTime: '2025-03-01', totalFlow: '20GB', usedFlow: '20GB', leftFlow: '0GB' },
-		{ name: '车联网月包20G', status: 'expired', statusText: '已失效', tagType: 'danger', startTime: '2025-02-01', totalFlow: '20GB', usedFlow: '20GB', leftFlow: '0GB' }
+		{ name: '车联网月包20G', status: 'pending', statusText: '待生效', tagType: 'primary', startTime: '2026-05-01', totalFlow: '20GB', usedFlow: '0GB', leftFlow: '20GB' },
+		{ name: '车联网月包20G', status: 'pending', statusText: '待生效', tagType: 'primary', startTime: '2026-06-01', totalFlow: '20GB', usedFlow: '0GB', leftFlow: '20GB' },
+		{ name: '车联网月包20G', status: 'expired', statusText: '已失效', tagType: 'error', startTime: '2025-03-01', totalFlow: '20GB', usedFlow: '20GB', leftFlow: '0GB' },
+		{ name: '车联网月包20G', status: 'expired', statusText: '已失效', tagType: 'error', startTime: '2025-02-01', totalFlow: '20GB', usedFlow: '20GB', leftFlow: '0GB' }
 	])
 
 	const current = ref(0)
@@ -158,16 +150,25 @@
 
 	// 点击卡片信息tab
 	const handleClick = (e: UTSJSONObject) => {
+		console.log(typeof e.index)
 		if (e.index != null) {
 			current.value = e.index as number
+			getPkgInfoList(e.index.toString())
 		}
 	}
 
 	// 切换tab 基本信息-卡片套餐-卡片订单
 	const changeTab = (e: CardDetailTabEvent) => {
-		console.log('e',e.index)
 		active.value = e.index
 		activeName.value = e.name
+
+		const tabActions: Record<number, () => void> = {
+			0: () => getCardDetail(),
+			1: () => getPkgInfoList('0'),
+			2: () => {} // getOrderList 
+		}
+		tabActions[e.index]?.()
+		current.value = 0
 	}
 
 	const goBack = () => {
@@ -208,8 +209,6 @@
 		console.log(res)
 		if(res.code == 200){
 			cardDetail.value = res.data
-		}else{
-			cardDetail.value = {}
 		}
 	}
 
@@ -217,7 +216,7 @@
 	const isBinded = ref(false)
 	const handleBindCard = async () => {
 		const res = await userBindCard({
-			rechargeNo: cardDetail.value?.rechargeNo ?? ''
+			rechargeNo: cardDetail.value?.rechargeNo
 		})
 		console.log(res)
 		if(res.code == 200){
@@ -235,14 +234,14 @@
 	}
 
 	/** 查询套餐信息列表 */
-	const getPkgInfoList = async () => {
+	const getPkgInfoList = async (state:string) => {
 		const res = await queryPkgInfoList({
-			rechargeNo: card_number.value
+			rechargeNo: card_number.value,
+			status:state
 		})
 		console.log(res)
 		// if(res.code == 200){
 		// 	packageList.value = res.data?.packageList ?? []
-		// 	refillList.value = res.data?.refillList ?? []
 		// }
 	}
 
@@ -254,7 +253,7 @@
 		const cardNumber = options.cardNumber ?? ''
 		card_number.value = cardNumber
 		getCardDetail()
-		getPkgInfoList()
+		
 	})
 </script>
 
@@ -467,11 +466,13 @@
 
 				.item-data-item {
 					flex: 1;
-					text-align: center;
 					background: #f8fbff;
 					border: 1rpx solid #e8eef7;
 					border-radius: 24rpx;
 					padding: 16rpx 10rpx;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
 
 					.item-data-label {
 						display: block;
@@ -485,6 +486,9 @@
 						font-weight: bold;
 						color: #0f172a;
 					}
+				}
+				.date-label{
+					font-size: 24rpx;
 				}
 			}
 		}

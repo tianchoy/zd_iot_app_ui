@@ -31,6 +31,7 @@ page .container.data-v-27a30816 {
   align-items: center;
   background-color: #f4f7fb;
   padding-bottom: 40rpx;
+  height: 100%;
 }
 page .container .logo.data-v-27a30816 {
   width: 200rpx;

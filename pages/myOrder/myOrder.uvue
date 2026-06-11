@@ -37,6 +37,7 @@
 						v-for="(order, index) in filteredOrders" 
 						:key="index"
 						class="order-card"
+						@click="handleOrderClick(order)"
 					>
 						<!-- 订单头部：套餐名称和状态 -->
 						<view class="order-header">
@@ -201,6 +202,13 @@
 			default:
 				return ''
 		}
+	}
+
+	// 处理订单点击
+	const handleOrderClick = (order: any) => {
+		uni.navigateTo({
+			url: '/pages/orderDetail/orderDetail?orderNo=' + getOrderText(order, 'orderNo')
+		})
 	}
 
 	// 处理返回

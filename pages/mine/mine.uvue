@@ -117,7 +117,7 @@
 			icon: 'none'
 		})
 		uni.reLaunch({
-			url: '/pages/index/index'
+			url: '/pages/card/card'
 		})
 	}
 

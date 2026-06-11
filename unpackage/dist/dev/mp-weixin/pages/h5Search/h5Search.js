@@ -42,7 +42,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const onCountryChange = (value = null, item = null) => {
       showCountryPopup.value = false;
       resCountry.value = value;
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:115", "选中国家/地区:", resCountry.value);
+      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:117", "选中国家/地区:", resCountry.value);
     };
     const onPopupClose = () => {
       showCountryPopup.value = false;
@@ -67,8 +67,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:146", "查询卡号:", cardNumber.value);
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:147", "国家/地区:", resCountry.value);
+      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:148", "查询卡号:", cardNumber.value);
+      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:149", "国家/地区:", resCountry.value);
       common_vendor.index.showToast({
         title: "查询中...",
         icon: "loading"
@@ -88,7 +88,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const initCountryList = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.getCountryList(false);
-        common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:173", "查询国家列表:", res);
+        common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:175", "查询国家列表:", res);
         if (res.code == 200) {
           countryOptions.value = res.data.map((item) => {
             return new common_vendor.UTSJSONObject({
@@ -136,12 +136,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         l: common_vendor.sr(searchSelectRef, "9fa4edd6-3,9fa4edd6-2", {
           "k": "searchSelectRef"
         }),
-        m: common_vendor.o(onCountryChange, "1b"),
+        m: common_vendor.o(onCountryChange, "b5"),
         n: common_vendor.o(($event) => {
           return selectedCountry.value = $event;
         }, "3d"),
         o: common_vendor.p({
           options: countryOptions.value,
+          maxHeight: "800rpx",
+          minHeight: "800rpx",
           ["search-placeholder"]: "搜索国家/地区名称",
           modelValue: selectedCountry.value,
           class: "r data-v-9fa4edd6"

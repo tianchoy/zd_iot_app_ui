@@ -25,7 +25,7 @@
 			scroll-y
 			:enhanced="true"
 			:show-scrollbar="false"
-			:style="{ maxHeight: maxHeight }"
+			:style="{ maxHeight: maxHeight,minHeight: minHeight}"
 		>
 			<view v-if="filteredOptions.length === 0" class="empty-state">
 				<text class="empty-text">{{ emptyText }}</text>
@@ -87,8 +87,13 @@
 		// 最大高度
 		maxHeight: {
 			type: String,
-			default: 'auto'
-		}
+			default: '50%'
+		},
+		// 最小高度
+		minHeight: {
+			type: String,
+			default: '50%'
+		},
 	})
 	
 	// Emits 定义

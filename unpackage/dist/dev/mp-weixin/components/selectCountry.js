@@ -38,7 +38,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     // 最大高度
     maxHeight: {
       type: String,
-      default: "auto"
+      default: "50%"
+    },
+    // 最小高度
+    minHeight: {
+      type: String,
+      default: "50%"
     }
   },
   emits: ["update:modelValue", "change"],
@@ -167,10 +172,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }),
         i: __props.maxHeight,
-        j: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        k: `${_ctx.u_s_b_h}px`,
-        l: `${_ctx.u_s_a_i_b}px`,
-        m: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        j: __props.minHeight,
+        k: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        l: `${_ctx.u_s_b_h}px`,
+        m: `${_ctx.u_s_a_i_b}px`,
+        n: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

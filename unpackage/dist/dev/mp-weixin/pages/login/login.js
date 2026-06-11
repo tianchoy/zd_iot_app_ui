@@ -29,7 +29,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           common_vendor.index.__f__("log", "at pages/login/login.uvue:34", "登录成功:", res.data.access_token);
           common_config.setToken(res.data.access_token, res.data.refreshToken);
           common_vendor.index.reLaunch({
-            url: "/pages/index/index"
+            url: "/pages/card/card"
           });
         }
       });

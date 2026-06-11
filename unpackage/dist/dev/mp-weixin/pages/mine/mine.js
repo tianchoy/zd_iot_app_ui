@@ -82,7 +82,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         icon: "none"
       });
       common_vendor.index.reLaunch({
-        url: "/pages/index/index"
+        url: "/pages/card/card"
       });
     };
     const cardListSum = common_vendor.ref(new api_types.CardListSumData({ all: 0, inUse: 0, inNotUse: 0 }));

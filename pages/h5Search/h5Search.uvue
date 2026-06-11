@@ -66,6 +66,8 @@
 			ref="searchSelectRef"
 			v-model="selectedCountry"
 			:options="countryOptions"
+			maxHeight="800rpx"
+			minHeight="800rpx"
 			search-placeholder="搜索国家/地区名称"
 			@change="onCountryChange"
 		/>

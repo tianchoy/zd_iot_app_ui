@@ -111,7 +111,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       current.value = index;
     };
     const handleSearch = () => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:187", "搜索关键词:", card_number.value);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:188", "搜索关键词:", card_number.value);
     };
     const getStatusClass = (status) => {
       switch (status) {
@@ -127,6 +127,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return "";
       }
     };
+    const handleOrderClick = (order = null) => {
+      common_vendor.index.navigateTo({
+        url: "/pages/orderDetail/orderDetail?orderNo=" + getOrderText(order, "orderNo")
+      });
+    };
     const handleBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
         delta: 1
@@ -134,7 +139,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handlePay = (order = null) => {
       const orderNo = getOrderText(order, "orderNo");
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:216", "去支付:", orderNo);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:224", "去支付:", orderNo);
       common_vendor.index.showToast({
         title: `支付订单 ${orderNo}`,
         icon: "none"
@@ -209,7 +214,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               return handlePay(order);
             }, index)
           } : {}, {
-            k: index
+            k: index,
+            l: common_vendor.o(($event) => {
+              return handleOrderClick(order);
+            }, index)
           });
         })
       }, {

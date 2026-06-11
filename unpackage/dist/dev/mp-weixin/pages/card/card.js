@@ -108,7 +108,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       ];
     });
     const handleDetail = (card) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:159", card);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:160", card);
       common_vendor.index.navigateTo({
         url: "/pages/cardDetail/cardDetail?cardNumber=" + card.cardNumber
       });
@@ -182,7 +182,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/card/card.uvue:243", result);
+        common_vendor.index.__f__("log", "at pages/card/card.uvue:244", result);
         if (result.length > 0) {
           card_number.value = result;
           common_vendor.index.showToast({
@@ -203,10 +203,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             status: "0"
           }));
           if (res.code === 200) {
-            common_vendor.index.__f__("log", "at pages/card/card.uvue:287", "查询卡列表成功:", res.data);
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:288", "查询卡列表成功:", res.data);
             allCardList.value = res.data.list;
           } else {
-            common_vendor.index.__f__("log", "at pages/card/card.uvue:290", "查询卡列表失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:291", "查询卡列表失败:", res.msg);
             allCardList.value = [];
             common_vendor.index.showToast({
               title: res.msg || "查询失败",
@@ -214,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/card/card.uvue:298", "查询卡列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/card/card.uvue:299", "查询卡列表异常:", error);
           allCardList.value = [];
           common_vendor.index.showToast({
             title: "网络异常，请稍后重试",
@@ -229,50 +229,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const token = common_config.getToken();
       return !!token;
     };
-    const userId = common_vendor.ref("");
-    const wxGetPhoneLogin = common_vendor.ref("");
-    const userLoginByOpenid = (codes) => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_http.login(new common_vendor.UTSJSONObject({
-          xcxCode: codes,
-          isLogin: "1"
-        }));
-        if (res.code == 200) {
-          userId.value = "" + res.data.id;
-          common_vendor.index.navigateTo({
-            url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value
-          });
-        }
-      });
-    };
-    const code = common_vendor.ref("");
-    const getCode = () => {
-      common_vendor.index.login(new common_vendor.UTSJSONObject({
-        success: (res) => {
-          code.value = res.code;
-          userLoginByOpenid(res.code);
-        }
-      }));
-    };
-    const getTenantInfos = () => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_http.getTenantInfo(common_config.getTenantId(), false);
-        if (res.code == 200) {
-          const tenantInfo = res.data;
-          wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
-        }
-      });
-    };
     const platform = () => {
-      if (common_config.isWechat()) {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (checkToken()) {
-          getCardList();
-        } else {
-          getTenantInfos().then(() => {
-            getCode();
-          });
+          yield getCardList();
         }
-      }
+      });
     };
     common_vendor.onLoad((options) => {
       platform();
@@ -321,7 +283,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "100%",
           class: "data-v-a89086b7"
         }),
-        j: common_vendor.o(handleClick, "29"),
+        j: common_vendor.o(handleClick, "ba"),
         k: common_vendor.o(($event) => {
           return current.value = $event;
         }, "9f"),
@@ -330,6 +292,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           list: tabs.value,
           ["line-width"]: 0,
           ["title-active-color"]: "#2563eb",
+          ["title-inactive-color"]: "#334155",
           customStyle: {
             height: "85rpx",
             padding: "10rpx",

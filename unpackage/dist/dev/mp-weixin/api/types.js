@@ -259,7 +259,8 @@ class PkgInfoListParams extends common_vendor.UTS.UTSType {
       kind: 2,
       get fields() {
         return {
-          rechargeNo: { type: String, optional: false }
+          rechargeNo: { type: String, optional: false },
+          status: { type: String, optional: false }
         };
       },
       name: "PkgInfoListParams"
@@ -269,6 +270,40 @@ class PkgInfoListParams extends common_vendor.UTS.UTSType {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.rechargeNo = this.__props__.rechargeNo;
+    this.status = this.__props__.status;
+    delete this.__props__;
+  }
+}
+class PackageItem extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: String, optional: false },
+          status: { type: "Unknown", optional: false },
+          statusText: { type: String, optional: false },
+          tagType: { type: String, optional: false },
+          startTime: { type: String, optional: false },
+          totalFlow: { type: String, optional: false },
+          usedFlow: { type: String, optional: false },
+          leftFlow: { type: String, optional: false }
+        };
+      },
+      name: "PackageItem"
+    };
+  }
+  constructor(options, metadata = PackageItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    this.status = this.__props__.status;
+    this.statusText = this.__props__.statusText;
+    this.tagType = this.__props__.tagType;
+    this.startTime = this.__props__.startTime;
+    this.totalFlow = this.__props__.totalFlow;
+    this.usedFlow = this.__props__.usedFlow;
+    this.leftFlow = this.__props__.leftFlow;
     delete this.__props__;
   }
 }
@@ -276,6 +311,7 @@ exports.BindCard = BindCard;
 exports.CardDetail = CardDetail;
 exports.CardItem = CardItem;
 exports.CardListSumData = CardListSumData;
+exports.PackageItem = PackageItem;
 exports.PkgInfoListParams = PkgInfoListParams;
 exports.QueryCardListParams = QueryCardListParams;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/types.js.map
