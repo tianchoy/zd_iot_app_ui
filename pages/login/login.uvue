@@ -13,7 +13,7 @@
 		</view>
 		<rice-divider backgroundColor="#f1f5f9"></rice-divider>
 		<view class="no-login">
-			<view class="no-login-text">暂不登录</view>
+			<view class="no-login-text" @click="noNowLogin">暂不登录</view>
 		</view>
 	</view>
 </template>
@@ -24,6 +24,7 @@
 	const wxGetPhoneLogin = ref<string>('')
 	const userId = ref<string>('')
 
+	//登录
 	const getLogin = async (code: string) => {
 		const res = await login({
 			xcxCode: code,
@@ -39,11 +40,18 @@
 		}
 	}
 
+	//获取手机号
 	const handleGetPhoneNumber =  (res: UTSJSONObject) => {
 		const detail = res['detail'] as UTSJSONObject
 		getLogin(detail['code'] as string)
 	}
 
+	//暂不登录
+	const noNowLogin = () => {
+		uni.reLaunch({
+			url: '/pages/card/card'
+		})
+	}
 
 	onLoad((options: OnLoadOptions) => {
 		console.log('登录参数:', options)

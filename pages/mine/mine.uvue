@@ -4,15 +4,15 @@
 		
 		<view class="card-info mb-24">
 			<view class="persion-card">
-				<view class="persion-card-item"  @click="cardType(0)">
+				<view class="persion-card-item">
 					<text class="persion-card-item-title">我的卡片</text>
 					<text class="persion-card-item-content"> {{ cardListSum.all != null ? cardListSum.all : 0 }}</text>
 				</view>
-				<view class="persion-card-item"  @click="cardType(1)">
+				<view class="persion-card-item">
 					<text class="persion-card-item-title">在用卡片</text>
 					<text class="persion-card-item-content"> {{ cardListSum.inUse != null ? cardListSum.inUse : 0 }}</text>
 				</view>
-				<view class="persion-card-item"  @click="cardType(2)">
+				<view class="persion-card-item">
 					<text class="persion-card-item-title">异常卡片</text>
 					<text class="persion-card-item-content"> {{ cardListSum.inNotUse != null ? cardListSum.inNotUse : 0 }}</text>
 				</view>
@@ -48,13 +48,6 @@
 	const title = ref('用户');
 	const wxGetPhoneLogin = ref<string>('')
 
-	// 卡片类型切换
-	const cardType = (type: number) => {
-		if (!isLogin()) return 
-		uni.reLaunch({
-			url: '/pages/card/card?type=' + type
-		})
-	}
 	// 跳转订单记录
 	const toOrder = () => {
 		if (!isLogin()) return 

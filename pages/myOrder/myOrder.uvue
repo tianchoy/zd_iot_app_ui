@@ -21,6 +21,7 @@
 				  :list="tabs" 
 				  :line-width="0" 
 				  :title-active-color="'#2563eb'" 
+				  :title-inactive-color="'#334155'"
 				  @click="handleTabClick" 
 				  :customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
 				  >
@@ -217,6 +218,46 @@
 			delta: 1
 		})
 	}
+
+	const scanCode = () => {
+		uni.navigateTo({
+			url: '/pages/scanCode/scanCode'
+		})
+	}
+
+	const queryKeyword = ref<string>('')
+	const handleInput = () => {
+		if (card_number.value.trim() === '') {
+			queryKeyword.value = ''
+		}
+	}
+
+	const handleQuery = () => {
+		const keyword = card_number.value.trim()
+		if (!keyword) {
+			uni.showToast({
+				title: '请输入卡号',
+				icon: 'none'
+			})
+			return
+		}
+		queryKeyword.value = keyword
+	}
+
+	// 接收扫码结果
+	const onScanResult = async (data: UTSJSONObject) => {
+		const result = data.getString('result') ?? ''
+		console.log(result)
+		if (result.length > 0) {
+			card_number.value = result
+			uni.showToast({
+				title: '扫码成功',
+				icon: 'success'
+			})
+			// 自动查询
+			await handleQuery()
+		}
+	}
 	
 	// 去支付
 	const handlePay = (order: any) => {
@@ -244,6 +285,15 @@
 		})
 		// #endif
 	}
+
+	onMounted(() => {
+		uni.$on('scanResult', onScanResult)
+	})
+
+	onUnload(() => {
+		// 移除事件监听
+		uni.$off('scanResult', onScanResult)
+	})
 </script>
 
 <style lang="scss" scoped>

@@ -26,7 +26,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isLogin: wxGetPhoneLogin.value
         }));
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:34", "登录成功:", res.data.access_token);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:35", "登录成功:", res.data.access_token);
           common_config.setToken(res.data.access_token, res.data.refreshToken);
           common_vendor.index.reLaunch({
             url: "/pages/card/card"
@@ -38,8 +38,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const detail = res["detail"];
       getLogin(detail["code"]);
     };
+    const noNowLogin = () => {
+      common_vendor.index.reLaunch({
+        url: "/pages/card/card"
+      });
+    };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:49", "登录参数:", options);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:57", "登录参数:", options);
       if (options["wxGetPhoneLogin"] != null) {
         wxGetPhoneLogin.value = options["wxGetPhoneLogin"];
         userId.value = options["userId"];
@@ -62,8 +67,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           backgroundColor: "#f1f5f9",
           class: "data-v-27a30816"
         }),
-        e: `${_ctx.u_s_b_h}px`,
-        f: `${_ctx.u_s_a_i_b}px`
+        e: common_vendor.o(noNowLogin, "82"),
+        f: `${_ctx.u_s_b_h}px`,
+        g: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

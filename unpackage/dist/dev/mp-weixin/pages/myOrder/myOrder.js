@@ -111,7 +111,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       current.value = index;
     };
     const handleSearch = () => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:188", "搜索关键词:", card_number.value);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:189", "搜索关键词:", card_number.value);
     };
     const getStatusClass = (status) => {
       switch (status) {
@@ -137,14 +137,52 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         delta: 1
       }));
     };
+    const scanCode = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/scanCode/scanCode"
+      });
+    };
+    const queryKeyword = common_vendor.ref("");
+    const handleQuery = () => {
+      const keyword = card_number.value.trim();
+      if (!keyword) {
+        common_vendor.index.showToast({
+          title: "请输入卡号",
+          icon: "none"
+        });
+        return null;
+      }
+      queryKeyword.value = keyword;
+    };
+    const onScanResult = (data) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a;
+        const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
+        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:250", result);
+        if (result.length > 0) {
+          card_number.value = result;
+          common_vendor.index.showToast({
+            title: "扫码成功",
+            icon: "success"
+          });
+          yield handleQuery();
+        }
+      });
+    };
     const handlePay = (order = null) => {
       const orderNo = getOrderText(order, "orderNo");
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:224", "去支付:", orderNo);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:265", "去支付:", orderNo);
       common_vendor.index.showToast({
         title: `支付订单 ${orderNo}`,
         icon: "none"
       });
     };
+    common_vendor.onMounted(() => {
+      common_vendor.index.$on("scanResult", onScanResult);
+    });
+    common_vendor.onUnload(() => {
+      common_vendor.index.$off("scanResult", onScanResult);
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
@@ -166,7 +204,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "40rpx",
           class: "data-v-87fe8731"
         }),
-        f: common_vendor.o(_ctx.scanCode, "ca"),
+        f: common_vendor.o(scanCode, "ba"),
         g: common_vendor.p({
           height: "100%",
           class: "scan-btn data-v-87fe8731"
@@ -179,7 +217,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "100%",
           class: "data-v-87fe8731"
         }),
-        j: common_vendor.o(handleTabClick, "29"),
+        j: common_vendor.o(handleTabClick, "cd"),
         k: common_vendor.o(($event) => {
           return current.value = $event;
         }, "41"),
@@ -188,6 +226,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           list: tabs.value,
           ["line-width"]: 0,
           ["title-active-color"]: "#2563eb",
+          ["title-inactive-color"]: "#334155",
           customStyle: {
             height: "85rpx",
             padding: "10rpx",

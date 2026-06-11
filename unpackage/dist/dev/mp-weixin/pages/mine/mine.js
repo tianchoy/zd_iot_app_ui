@@ -20,13 +20,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     common_vendor.ref("用户");
     const wxGetPhoneLogin = common_vendor.ref("");
-    const cardType = (type) => {
-      if (!isLogin())
-        return null;
-      common_vendor.index.reLaunch({
-        url: "/pages/card/card?type=" + type
-      });
-    };
     const toOrder = () => {
       if (!isLogin())
         return null;
@@ -92,12 +85,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_http.queryCardListSum();
           if (res.code === 200) {
             cardListSum.value = res.data;
-            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:131", "查询卡列表统计成功:", res.data);
+            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:124", "查询卡列表统计成功:", res.data);
           } else {
-            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:133", "查询卡列表统计失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:126", "查询卡列表统计失败:", res.msg);
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:136", "查询卡列表统计异常:", error);
+          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:129", "查询卡列表统计异常:", error);
         }
       });
     };
@@ -132,53 +125,44 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-284ae985"
         }),
         b: common_vendor.t(common_vendor.unref(cardListSum).all != null ? common_vendor.unref(cardListSum).all : 0),
-        c: common_vendor.o(($event) => {
-          return cardType(0);
-        }, "f3"),
-        d: common_vendor.t(common_vendor.unref(cardListSum).inUse != null ? common_vendor.unref(cardListSum).inUse : 0),
-        e: common_vendor.o(($event) => {
-          return cardType(1);
-        }, "dc"),
-        f: common_vendor.t(common_vendor.unref(cardListSum).inNotUse != null ? common_vendor.unref(cardListSum).inNotUse : 0),
-        g: common_vendor.o(($event) => {
-          return cardType(2);
-        }, "0b"),
+        c: common_vendor.t(common_vendor.unref(cardListSum).inUse != null ? common_vendor.unref(cardListSum).inUse : 0),
+        d: common_vendor.t(common_vendor.unref(cardListSum).inNotUse != null ? common_vendor.unref(cardListSum).inNotUse : 0),
+        e: common_vendor.p({
+          name: "arrow-right",
+          size: "20rpx",
+          class: "data-v-284ae985"
+        }),
+        f: common_vendor.o(toOrder, "3f"),
+        g: common_vendor.p({
+          name: "arrow-right",
+          size: "20rpx",
+          class: "data-v-284ae985"
+        }),
         h: common_vendor.p({
           name: "arrow-right",
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        i: common_vendor.o(toOrder, "d1"),
-        j: common_vendor.p({
-          name: "arrow-right",
-          size: "20rpx",
-          class: "data-v-284ae985"
-        }),
-        k: common_vendor.p({
-          name: "arrow-right",
-          size: "20rpx",
-          class: "data-v-284ae985"
-        }),
-        l: !isLogin()
+        i: !isLogin()
       }, !isLogin() ? {
-        m: common_vendor.o(handleLogin, "51"),
-        n: common_vendor.p({
+        j: common_vendor.o(handleLogin, "47"),
+        k: common_vendor.p({
           type: "primary",
           width: "100%",
           shape: "round",
           class: "data-v-284ae985"
         })
       } : {
-        o: common_vendor.o(handleLogout, "36"),
-        p: common_vendor.p({
+        l: common_vendor.o(handleLogout, "91"),
+        m: common_vendor.p({
           type: "error",
           width: "100%",
           shape: "round",
           class: "data-v-284ae985"
         })
       }, {
-        q: `${_ctx.u_s_b_h}px`,
-        r: `${_ctx.u_s_a_i_b}px`
+        n: `${_ctx.u_s_b_h}px`,
+        o: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };
