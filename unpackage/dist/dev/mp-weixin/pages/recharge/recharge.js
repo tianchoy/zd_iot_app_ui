@@ -179,7 +179,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleConfirmPayment = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:259", e);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:260", e);
       showPopup.value = false;
     };
     const goBack = () => {
@@ -197,6 +197,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/orderRecord/orderRecord"
       });
     };
+    common_vendor.onLoad(() => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+      });
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({

@@ -89,14 +89,6 @@ import { CardItem } from '@/api/types.uts'
 
 const card_number = ref('gn20260603164757')
 const queryKeyword = ref('')
-const tabs = computed(() => {
-	const numbers = tabNumbers.value
-	return [
-		{name: `全部 ${numbers[0]}`},
-		{name: `在用 ${numbers[1]}`},
-		{name: `异常 ${numbers[2]}`}
-	]
-})
 const tabStatuses = ['全部', '在用', '异常']
 const current = ref(0)
 const scrollViewHeight = ref(0)
@@ -139,32 +131,12 @@ const allCardList = ref<CardItem[]>([
 		usedTraffic: '1GB',
 		totalTraffic: '1GB',
 		currentCycle: '第1期 / 共1期'
-	},
-	{
-		id: 4,
-		cardNumber: '1064916585163',
-		iccid: '89860421123456789015',
-		tag: '备用卡',
-		status: '在用',
-		currentPackage: '工业设备月包5G',
-		expireDate: '2026-06-30',
-		usedTraffic: '2.15GB',
-		totalTraffic: '5GB',
-		currentCycle: '第1期 / 共3期'
-	},
-	{
-		id: 5,
-		cardNumber: '1064916585164',
-		iccid: '89860421123456789016',
-		tag: '体验卡',
-		status: '停机',
-		currentPackage: '体验套餐500M',
-		expireDate: '2026-02-28',
-		usedTraffic: '500MB',
-		totalTraffic: '500MB',
-		currentCycle: '第1期 / 共1期'
 	}
 ])
+
+type TabItem = {
+	name: string
+}
 
 // 计算每个 tab 对应的卡片数量
 const tabNumbers = computed<number[]>(() => {
@@ -172,6 +144,15 @@ const tabNumbers = computed<number[]>(() => {
 	const inUse = allCardList.value.filter((card: CardItem) => card.status === '在用').length
 	const abnormal = allCardList.value.filter((card: CardItem) => card.status !== '在用').length
 	return [total, inUse, abnormal]
+})
+
+const tabs = computed<TabItem[]>(() => {
+	const numbers = tabNumbers.value
+	return [
+		{name: `全部 ${numbers[0]}`},
+		{name: `在用 ${numbers[1]}`},
+		{name: `异常 ${numbers[2]}`}
+	]
 })
 
 const handleDetail = (card: CardItem) => {

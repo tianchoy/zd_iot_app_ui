@@ -1,7 +1,7 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
-import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue'
-import _easycom_m_button from '@/uni_modules/m-unix/components/m-button/m-button.uvue'
-import _easycom_m_segmented_control from '@/uni_modules/m-unix/components/m-segmented-control/m-segmented-control.uvue'
+import _easycom_rice_icon from '@/uni_modules/rice-ui/components/rice-icon/rice-icon.uvue'
+import _easycom_rice_button from '@/uni_modules/rice-ui/components/rice-button/rice-button.uvue'
+import _easycom_rice_tabs from '@/uni_modules/rice-ui/components/rice-tabs/rice-tabs.uvue'
 import { ref, computed } from 'vue'
 	
 	// 订单状态类型
@@ -20,7 +20,10 @@ import { ref, computed } from 'vue'
 	}
 	
 	// Tab 列表
-	
+	type OrderStatusTab = { __$originalPosition?: UTSSourceMapPosition<"OrderStatusTab", "pages/myOrder/myOrder.uvue", 96, 7>;
+			name: OrderStatus
+		}
+		
 const __sfc__ = defineComponent({
   __name: 'myOrder',
   setup(__props) {
@@ -28,7 +31,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const tabs = ref<OrderStatus[]>(['全部', '待支付', '已完成', '已退款', '已取消'])
+	const tabs = ref<OrderStatusTab[]>([{name:'全部'}, {name:'待支付'}, {name:'已完成'}, {name:'已退款'}, {name:'已取消'}])
 	const current = ref<number>(0)
 	const card_number = ref<string>('')
 	
@@ -91,7 +94,7 @@ const _cache = __ins.renderCache;
 		let result = orders.value
 
 		// 按Tab筛选
-		const currentStatus = tabs.value[current.value]
+		const currentStatus = tabs.value[current.value].name
 		if (currentStatus !== '全部') {
 			result = result.filter((order: any) : boolean => getOrderText(order, 'status') === currentStatus)
 		}
@@ -116,7 +119,7 @@ const _cache = __ins.renderCache;
 	// 处理搜索
 	const handleSearch = () => {
 		// 搜索逻辑已通过computed实现，此处可添加额外逻辑如埋点等
-		console.log('搜索关键词:', card_number.value, " at pages/myOrder/myOrder.uvue:183")
+		console.log('搜索关键词:', card_number.value, " at pages/myOrder/myOrder.uvue:187")
 	}
 	
 	// 获取状态样式类
@@ -145,7 +148,7 @@ const _cache = __ins.renderCache;
 	// 去支付
 	const handlePay = (order: any) => {
 		const orderNo = getOrderText(order, 'orderNo')
-		console.log('去支付:', orderNo, " at pages/myOrder/myOrder.uvue:212")
+		console.log('去支付:', orderNo, " at pages/myOrder/myOrder.uvue:216")
 
 
 
@@ -172,9 +175,9 @@ const _cache = __ins.renderCache;
 return (): any | null => {
 
 const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar)
-const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
-const _component_m_button = resolveEasyComponent("m-button",_easycom_m_button)
-const _component_m_segmented_control = resolveEasyComponent("m-segmented-control",_easycom_m_segmented_control)
+const _component_rice_icon = resolveEasyComponent("rice-icon",_easycom_rice_icon)
+const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_button)
+const _component_rice_tabs = resolveEasyComponent("rice-tabs",_easycom_rice_tabs)
 
   return _cE("view", null, [
     _cV(_component_topNavBar, _uM({
@@ -194,36 +197,40 @@ const _component_m_segmented_control = resolveEasyComponent("m-segmented-control
             placeholder: "请输入 ICCID / MSISDN",
             class: "search-input"
           }), null, 40 /* PROPS, NEED_HYDRATION */, ["modelValue", "onInput"]),
-          _cV(_component_m_button, _uM({
-            type: "white",
-            plain: true,
+          _cV(_component_rice_button, _uM({
             class: "scan-btn",
-            width: "90rpx"
+            height: "100%",
+            onClick: _ctx.scanCode
           }), _uM({
             default: withSlotCtx((): any[] => [
-              _cV(_component_m_icon, _uM({
-                name: "scanning",
+              _cV(_component_rice_icon, _uM({
+                name: "scan",
                 size: "40rpx"
               }))
             ]),
             _: 1 /* STABLE */
-          })),
-          _cV(_component_m_button, _uM({
+          }), 8 /* PROPS */, ["onClick"]),
+          _cV(_component_rice_button, _uM({
             type: "primary",
-            width: "120rpx",
+            color: "#1989fa",
+            textColor: "#ffffff",
+            height: "100%",
             onClick: handleSearch
           }), _uM({
             default: withSlotCtx((): any[] => ["查询"]),
             _: 1 /* STABLE */
           }))
         ]),
-        _cV(_component_m_segmented_control, _uM({
-          values: tabs.value,
-          current: current.value,
-          textActiveColor: '#2563eb',
+        _cV(_component_rice_tabs, _uM({
+          modelValue: current.value,
+          "onUpdate:modelValue": $event => {(current).value = $event},
+          "line-color": "#ffffff",
+          list: tabs.value,
+          "line-width": 0,
+          "title-active-color": '#2563eb',
           onClick: handleTabClick,
-          customStyle: {height:'unset',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}
-        }), null, 8 /* PROPS */, ["values", "current"])
+          customStyle: {height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}
+        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "list"])
       ]),
       _cE("scroll-view", _uM({
         class: "order-list",

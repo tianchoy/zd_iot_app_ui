@@ -44,7 +44,6 @@ function login(data, withToken = true) {
 }
 function getTenantInfo(tenantId, withToken = true) {
   const url = api_url.ApiUrl.getTenantPageConfigXcx + "/" + common_config.config.api.auth.tenantId;
-  const tk = true;
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,
@@ -60,10 +59,15 @@ function getTenantInfo(tenantId, withToken = true) {
     onErrorCode: null,
     url,
     method: "GET",
-    withToken: tk
+    withToken
   }));
 }
 function queryCardList(params, withToken = true) {
+  const data = new common_vendor.UTSJSONObject({
+    rechargeNo: params.rechargeNo,
+    status: params.status,
+    isSort: params.isSort
+  });
   return api_Request.request(new api_Request.RequestOptions({
     header: null,
     baseUrl: null,
@@ -78,7 +82,7 @@ function queryCardList(params, withToken = true) {
     onErrorCode: null,
     url: api_url.ApiUrl.queryCardList,
     method: "GET",
-    data: params,
+    data,
     withToken
   }));
 }
@@ -103,7 +107,6 @@ function queryCardListSum(withToken = true) {
 }
 function queryCardDetail(id, countryCode = null, withToken = true) {
   const url = api_url.ApiUrl.queryCardDetailXcx + id;
-  const tk = true;
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,
@@ -119,10 +122,13 @@ function queryCardDetail(id, countryCode = null, withToken = true) {
     onErrorCode: null,
     url,
     method: "GET",
-    withToken: tk
+    withToken
   }));
 }
 function userBindCard(data, withToken = true) {
+  const body = new common_vendor.UTSJSONObject({
+    rechargeNo: data.rechargeNo
+  });
   return api_Request.request(new api_Request.RequestOptions({
     header: null,
     baseUrl: null,
@@ -137,7 +143,30 @@ function userBindCard(data, withToken = true) {
     onErrorCode: null,
     url: api_url.ApiUrl.userBindCard,
     method: "POST",
-    data,
+    data: body,
+    withToken
+  }));
+}
+function queryPkgInfoList(data, withToken = true) {
+  const url = api_url.ApiUrl.queryXcxCardList;
+  const body = new common_vendor.UTSJSONObject({
+    rechargeNo: data.rechargeNo
+  });
+  return api_Request.request(new api_Request.RequestOptions({
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url,
+    method: "GET",
+    data: body,
     withToken
   }));
 }
@@ -147,5 +176,6 @@ exports.login = login;
 exports.queryCardDetail = queryCardDetail;
 exports.queryCardList = queryCardList;
 exports.queryCardListSum = queryCardListSum;
+exports.queryPkgInfoList = queryPkgInfoList;
 exports.userBindCard = userBindCard;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

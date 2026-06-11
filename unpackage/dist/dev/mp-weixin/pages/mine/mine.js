@@ -131,24 +131,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-284ae985"
         }),
-        b: common_vendor.t(common_vendor.unref(cardListSum).all || 0),
+        b: common_vendor.t(common_vendor.unref(cardListSum).all != null ? common_vendor.unref(cardListSum).all : 0),
         c: common_vendor.o(($event) => {
           return cardType(0);
         }, "f3"),
-        d: common_vendor.t(common_vendor.unref(cardListSum).inUse || 0),
+        d: common_vendor.t(common_vendor.unref(cardListSum).inUse != null ? common_vendor.unref(cardListSum).inUse : 0),
         e: common_vendor.o(($event) => {
           return cardType(1);
-        }, "2b"),
-        f: common_vendor.t(common_vendor.unref(cardListSum).inNotUse || 0),
+        }, "dc"),
+        f: common_vendor.t(common_vendor.unref(cardListSum).inNotUse != null ? common_vendor.unref(cardListSum).inNotUse : 0),
         g: common_vendor.o(($event) => {
           return cardType(2);
-        }, "1a"),
+        }, "0b"),
         h: common_vendor.p({
           name: "arrow-right",
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        i: common_vendor.o(toOrder, "4f"),
+        i: common_vendor.o(toOrder, "d1"),
         j: common_vendor.p({
           name: "arrow-right",
           size: "20rpx",
@@ -161,7 +161,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         l: !isLogin()
       }, !isLogin() ? {
-        m: common_vendor.o(handleLogin, "bc"),
+        m: common_vendor.o(handleLogin, "51"),
         n: common_vendor.p({
           type: "primary",
           width: "100%",
@@ -169,7 +169,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-284ae985"
         })
       } : {
-        o: common_vendor.o(handleLogout, "49"),
+        o: common_vendor.o(handleLogout, "36"),
         p: common_vendor.p({
           type: "error",
           width: "100%",

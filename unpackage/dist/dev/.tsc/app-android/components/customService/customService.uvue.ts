@@ -12,7 +12,11 @@ const _cache = __ins.renderCache;
 __ins.emit(event, ...do_not_transform_spread)
 }
 	const handleClick = (e: any) => {
-		emit('connect_service');
+		// emit('connect_service');
+		uni.showToast({
+			title: '连接客服',
+			icon: 'none'
+		})
 	}
 
 return (): any | null => {
@@ -22,6 +26,9 @@ const _component_rice_float_fab = resolveEasyComponent("rice-float-fab",_easycom
   return _cV(_component_rice_float_fab, _uM({
     "default-position": "bottom-right",
     icon: "chat-fill",
+    width: "80rpx",
+    height: "80rpx",
+    "icon-size": "50rpx",
     "gap-bottom": "200rpx",
     "gap-right": "50rpx",
     onClick: handleClick

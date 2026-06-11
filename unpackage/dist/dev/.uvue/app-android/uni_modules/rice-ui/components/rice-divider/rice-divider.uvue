@@ -1,0 +1,94 @@
+import { addUnit, hasStrValue } from '../../libs/utils';
+import { useNamespace } from '../../libs/use';
+import { DividerProps } from './type.uts';
+const __sfc__ = defineComponent({
+    __name: 'rice-divider',
+    name: 'rice-divider',
+    styleIsolation: 'app-and-page',
+    props: {
+        dashed: { type: Boolean, required: false, default: false },
+        hairline: { type: Boolean, required: false, default: true },
+        width: { type: [String, Number], required: false },
+        lineColor: { type: String, required: false },
+        text: { type: [String, Number], required: false },
+        textPosition: { type: String, required: false, default: 'center' },
+        textColor: { type: String, required: false },
+        textSize: { type: [String, Number], required: false },
+        customStyle: { type: UTSJSONObject, required: false, default: (): UTSJSONObject => ({}) }
+    },
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const ns = useNamespace('divider');
+        const slots = useSlots();
+        const props = __props;
+        const hasText = computed((): boolean => slots['default'] != null || hasStrValue(props.text));
+        const dividerStyle = computed((): Map<string, string> => {
+            const css = new Map<string, string>();
+            if (props.lineColor != null && !hasText.value)
+                css.set('border-color', props.lineColor!);
+            return css;
+        });
+        const dividerLineStyle = computed((): Map<string, string> => {
+            const css = new Map<string, string>();
+            if (props.lineColor != null)
+                css.set('border-color', props.lineColor!);
+            return css;
+        });
+        const dividerClass = computed((): string[] => {
+            return [
+                ns.b(""),
+                ns.theme(),
+                ns.is("single", !hasText.value),
+                ns.is('hairline', props.hairline && !hasText.value),
+                ns.is('dashed', props.dashed && !hasText.value),
+            ];
+        });
+        const getLineClass = (position: 'left' | 'right'): string[] => {
+            return [
+                ns.e(position),
+                ns.is('hairline', props.hairline),
+                ns.is('sides', props.textPosition == position),
+                ns.is('dashed', props.dashed),
+            ];
+        };
+        const textStyle = computed((): Map<string, string> => {
+            const css = new Map<string, string>();
+            if (props.textSize != null)
+                css.set('font-size', addUnit(props.textSize!));
+            if (props.textColor != null)
+                css.set('color', props.textColor!);
+            return css;
+        });
+        return (): any | null => {
+            return _cE("view", _uM({
+                class: _nC(unref(dividerClass)),
+                style: _nS([unref(dividerStyle), _ctx.customStyle])
+            }), [
+                isTrue(unref(hasText))
+                    ? _cE(Fragment, _uM({ key: 0 }), [
+                        _cE("view", _uM({
+                            class: _nC(getLineClass('left')),
+                            style: _nS(unref(dividerLineStyle))
+                        }), null, 6 /* CLASS, STYLE */),
+                        renderSlot(_ctx.$slots, "default", {}, (): any[] => [
+                            _cE("text", _uM({
+                                class: "rice-divider__text",
+                                style: _nS(unref(textStyle))
+                            }), _tD(_ctx.text), 5 /* TEXT, STYLE */)
+                        ]),
+                        _cE("view", _uM({
+                            class: _nC(getLineClass('right')),
+                            style: _nS(unref(dividerLineStyle))
+                        }), null, 6 /* CLASS, STYLE */)
+                    ], 64 /* STABLE_FRAGMENT */)
+                    : _cC("v-if", true)
+            ], 6 /* CLASS, STYLE */);
+        };
+    }
+});
+export default __sfc__;
+export type RiceDividerComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesRiceUiComponentsRiceDividerRiceDividerStyles = [_uM([["rice-divider", _pS(_uM([["flexDirection", "row"], ["alignItems", "center"], ["marginTop", 16], ["marginRight", "auto"], ["marginBottom", 16], ["marginLeft", "auto"], ["width", "100%"]]))], ["rice-divider--single", _pS(_uM([["borderTopWidth", 1], ["borderTopStyle", "solid"], ["borderTopColor", "var(--rice-divider-line-color)"], ["transform", "scale(1, 1)"]]))], ["rice-divider__text", _pS(_uM([["fontSize", 14], ["color", "var(--rice-text-color-2)"]]))], ["rice-divider__left", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["boxSizing", "border-box"], ["borderTopWidth", 1], ["borderTopStyle", "solid"], ["borderTopColor", "var(--rice-divider-line-color)"], ["marginRight", 12]]))], ["rice-divider__right", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["boxSizing", "border-box"], ["borderTopWidth", 1], ["borderTopStyle", "solid"], ["borderTopColor", "var(--rice-divider-line-color)"], ["marginLeft", 12]]))], ["rice-divider--sides", _pS(_uM([["width", 30], ["flexGrow", 0], ["flexShrink", 1], ["flexBasis", "auto"]]))], ["rice-divider--dashed", _pS(_uM([["borderTopStyle", "dashed"]]))], ["rice-divider--hairline", _pS(_uM([["transform", "scale(1, 0.5)"]]))]])];
+//# sourceMappingURL=rice-divider.uvue.map

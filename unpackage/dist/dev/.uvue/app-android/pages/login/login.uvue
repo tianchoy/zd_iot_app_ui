@@ -1,4 +1,5 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue';
+import _easycom_rice_divider from '@/uni_modules/rice-ui/components/rice-divider/rice-divider.uvue';
 import { login } from '@/api/http.uts';
 import { setToken } from '@/common/config.uts';
 const __sfc__ = defineComponent({
@@ -16,7 +17,7 @@ const __sfc__ = defineComponent({
                 isLogin: wxGetPhoneLogin.value,
             });
             if (res.code == 200) {
-                console.log('登录成功:', res.data.access_token, " at pages/login/login.uvue:33");
+                console.log('登录成功:', res.data.access_token, " at pages/login/login.uvue:34");
                 setToken(res.data.access_token, res.data.refreshToken);
                 uni.reLaunch({
                     url: '/pages/index/index'
@@ -28,7 +29,7 @@ const __sfc__ = defineComponent({
             getLogin(detail['code'] as string);
         };
         onLoad((options: OnLoadOptions) => {
-            console.log('登录参数:', options, " at pages/login/login.uvue:48");
+            console.log('登录参数:', options, " at pages/login/login.uvue:49");
             if (options['wxGetPhoneLogin'] != null) {
                 wxGetPhoneLogin.value = options['wxGetPhoneLogin'] as string;
                 userId.value = options['userId'] as string;
@@ -36,6 +37,7 @@ const __sfc__ = defineComponent({
         });
         return (): any | null => {
             const _component_topNavBar = resolveEasyComponent("topNavBar", _easycom_topNavBar);
+            const _component_rice_divider = resolveEasyComponent("rice-divider", _easycom_rice_divider);
             return _cE(Fragment, null, [
                 _cV(_component_topNavBar, _uM({
                     title: "中导云卡登录",
@@ -57,6 +59,7 @@ const __sfc__ = defineComponent({
                             onGetphonenumber: handleGetPhoneNumber
                         }), " 个人用户登录 ", 32 /* NEED_HYDRATION */)
                     ]),
+                    _cV(_component_rice_divider, _uM({ backgroundColor: "#f1f5f9" })),
                     _cE("view", _uM({ class: "no-login" }), [
                         _cE("view", _uM({ class: "no-login-text" }), "暂不登录")
                     ])

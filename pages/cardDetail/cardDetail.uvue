@@ -33,9 +33,9 @@
 							</view>
 							<view class="section-title">流量使用</view>
 							<view class="data-total">
-								<view class="total-item"><text class="total-label">已用流量:</text><text class="total-value">{{cardDetail.usedFlow || '0'}}</text></view>
-								<view class="total-item"><text class="total-label">剩余流量:</text><text class="total-value">{{cardDetail.unUsedFlow || '0'}}</text></view>
-								<view class="total-item"><text class="total-label">总流量:</text><text class="total-value">{{cardDetail.pkgFlow || '0'}}</text></view>
+								<view class="total-item"><text class="total-label">已用流量:</text><text class="total-value">{{cardDetail.usedFlow != null && cardDetail.usedFlow !== '' ? cardDetail.usedFlow : '0'}}</text></view>
+								<view class="total-item"><text class="total-label">剩余流量:</text><text class="total-value">{{cardDetail.unUsedFlow != null && cardDetail.unUsedFlow !== '' ? cardDetail.unUsedFlow : '0'}}</text></view>
+								<view class="total-item"><text class="total-label">总流量:</text><text class="total-value">{{cardDetail.pkgFlow != null && cardDetail.pkgFlow !== '' ? cardDetail.pkgFlow : '0'}}</text></view>
 							</view>
 						</view>
 
@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="uts">
-	import {queryCardDetail,userBindCard} from '@/api/http'
+	import {queryCardDetail,userBindCard,queryPkgInfoList} from '@/api/http'
 	import type {CardDetail,BindCard} from '@/api/types'
 
 
@@ -100,7 +100,9 @@
 	type CardDetailTabEvent = {
 		index: number
 		item: CardDetailTabItem
+		name: string
 	}
+
 
 	const card_number = ref('')
 	const active = ref(0)
@@ -108,7 +110,7 @@
 	const statusBarHeight = ref(20)
 	const navBarHeight = ref(44)
 	const fixedTabsHeight = 109
-	const cardDetail = ref<CardDetail>()
+		const cardDetail = ref<CardDetail>({} as CardDetail)
 
 	const fixedTabsStyle = computed(() => {
 		const css = new Map<string, string>()
@@ -154,13 +156,16 @@
 		return packageList.value
 	})
 
+	// 点击卡片信息tab
 	const handleClick = (e: UTSJSONObject) => {
 		if (e.index != null) {
 			current.value = e.index as number
 		}
 	}
 
+	// 切换tab 基本信息-卡片套餐-卡片订单
 	const changeTab = (e: CardDetailTabEvent) => {
+		console.log('e',e.index)
 		active.value = e.index
 		activeName.value = e.name
 	}
@@ -229,6 +234,18 @@
 		}
 	}
 
+	/** 查询套餐信息列表 */
+	const getPkgInfoList = async () => {
+		const res = await queryPkgInfoList({
+			rechargeNo: card_number.value
+		})
+		console.log(res)
+		// if(res.code == 200){
+		// 	packageList.value = res.data?.packageList ?? []
+		// 	refillList.value = res.data?.refillList ?? []
+		// }
+	}
+
 	onMounted(() => {
 		getNavBarInfo()
 	})
@@ -237,6 +254,7 @@
 		const cardNumber = options.cardNumber ?? ''
 		card_number.value = cardNumber
 		getCardDetail()
+		getPkgInfoList()
 	})
 </script>
 

@@ -1,0 +1,476 @@
+import _easycom_rice_overlay from '@/uni_modules/rice-ui/components/rice-overlay/rice-overlay.uvue'
+import _easycom_rice_icon from '@/uni_modules/rice-ui/components/rice-icon/rice-icon.uvue'
+import { addUnit } from "../../libs/utils"
+	import { BeforeChangeInterceptor } from "../../libs/types"
+	import { useNamespace, usePopup, UsePopupOptions, useSafeArea, safeAreaInsets } from "../../libs/use"
+	import { PopupProps } from "./type.uts"
+
+
+	
+const __sfc__ = defineComponent({
+  __name: 'rice-popup',
+
+		name: 'rice-popup',
+		styleIsolation: 'app-and-page',
+		externalClasses: ['popup-class', 'drag-bar-class', 'drag-wrap-class']
+	,
+  props: /*#__PURE__*/mergeModels({
+    duration: { type: Number, required: false, default: 300 },
+    position: { type: String, required: false, default: 'bottom' },
+    zIndex: { type: Number, required: false, default: 999 },
+    opacity: { type: Boolean, required: false, default: null },
+    zoom: { type: Boolean, required: false, default: true },
+    overlay: { type: Boolean, required: false, default: true },
+    overlayBgColor: { type: String, required: false },
+    closeable: { type: Boolean, required: false, default: true },
+    closeIcon: { type: String, required: false, default: 'cross' },
+    closeIconPosition: { type: String, required: false, default: 'top-right' },
+    closeOnClickOverlay: { type: Boolean, required: false, default: true },
+    radius: { type: [Number, String], required: false },
+    bgColor: { type: String, required: false },
+    safeAreaInsetTop: { type: Boolean, required: false, default: false },
+    safeAreaInsetBottom: { type: Boolean, required: false, default: true },
+    closeOnSlideDown: { type: Boolean, required: false, default: false },
+    slideDownThreshold: { type: Number, required: false, default: 40 },
+    showDragBar: { type: Boolean, required: false },
+    dragWrapClass: { type: String, required: false, default: '' },
+    dragBarClass: { type: String, required: false, default: '' },
+    lockScroll: { type: Boolean, required: false, default: true },
+    scrollId: { type: String, required: false },
+    beforeClose: { type: Object, required: false },
+    marginTop: { type: [String, Number], required: false },
+    popupClass: { type: String, required: false, default: '' },
+    customStyle: { type: UTSJSONObject, required: false, default: () : UTSJSONObject => ({}) }
+  }, {
+    "show": {
+		type: Boolean,
+		default: false,
+	},
+  }),
+  emits: /*#__PURE__*/mergeModels(["open", "close", "opened", "closed", "clickOverlay"], ["update:show"]),
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	
+
+	useSafeArea()
+	const ns = useNamespace('popup')
+
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+
+	const props = __props
+
+	const show = useModel<Boolean>(__ins.props, "show")
+
+	const popupRef = shallowRef<UniElement | null>(null)
+
+	//center默认为true，其他为false
+	const _opacity = computed<boolean>(() => {
+		if (props.opacity != null) return props.opacity!
+		return props.position == 'center'
+	})
+
+	const { realShow, doClose } = usePopup(popupRef, {
+		show,
+		position: toRef(() : string => props.position),
+		duration: toRef(() : number => props.duration),
+		opacity: toRef(() : boolean => _opacity.value),
+		zoom: toRef(() : boolean => props.zoom),
+		beforeClose: toRef(() => props.beforeClose as BeforeChangeInterceptor | null),
+	} as UsePopupOptions)
+
+	/**
+	 * 关闭按钮
+	 */
+	const handleClose = (e : UniPointerEvent) => {
+		e.stopPropagation()
+		doClose()
+	}
+
+	/**
+	 * 点击遮罩层
+	 */
+	const overlayClick = () => {
+		emit('clickOverlay')
+		if (!props.closeOnClickOverlay) {
+			return
+		}
+		doClose()
+	}
+
+	/**
+	 * 拖拽关闭
+	 */
+	let isAnimation = false
+	let halfScreenY = 0
+	let currentY = 0 //最新一次拖动的 Y 值
+	let previousY = 0 //上一次拖动的 Y 值
+	let lastDragDirection = 0 // 1: 下拉, -1: 上拉, 0: 未识别
+	let halfOffset = 0
+	let scrollEl : UniElement | null = null //popup内部有滚动容器时的id，
+	let contentTouchStartY = 0
+	let isContentDragging = false
+	const canDrag = computed(() => props.position == 'bottom')
+
+
+	const lockScrollAtTop = () => {
+		if (scrollEl == null) return
+		if (scrollEl!.scrollTop > 0) {
+			scrollEl!.scrollTop = 0
+		}
+	}
+
+	const resetDragState = (startY : number) => {
+		halfScreenY = startY
+		currentY = startY
+		previousY = startY
+		lastDragDirection = 0
+		halfOffset = 0
+		popupRef.value?.style.setProperty('transition-duration', '0ms')
+	}
+
+	const onDragstart = (e : UniTouchEvent) => {
+		const startY = e.touches[0].screenY
+		resetDragState(startY)
+		isContentDragging = false
+	}
+
+	const onDragmove = (e : UniTouchEvent) => {
+		if (isAnimation || !canDrag.value) return
+		let p = e.touches[0];
+		previousY = currentY
+		currentY = p.screenY
+		const moveDelta = currentY - previousY
+		if (Math.abs(moveDelta) >= 2) {
+			lastDragDirection = moveDelta > 0 ? 1 : -1
+		}
+
+		if (halfScreenY == 0) {
+			halfScreenY = p.screenY
+		}
+		let offset = p.screenY - halfScreenY
+		//向下拖动
+		if (offset > 0) {
+			lockScrollAtTop()
+			popupRef.value?.style.setProperty('transform', `translateY(${offset}px)`)
+			halfOffset = offset
+		}
+
+
+
+
+
+	}
+
+	const resumedPopup = () => {
+		popupRef.value?.style.setProperty('transform', 'translateY(0px)')
+		halfScreenY = 0
+		halfOffset = 0
+		lastDragDirection = 0
+		isContentDragging = false
+		isAnimation = false
+	}
+
+	const onDragend = () => {
+		popupRef.value?.style.setProperty('transition-duration', `${props.duration}ms`)
+		if (!canDrag.value) return
+		halfScreenY = 0
+		if (isAnimation) return
+		const threshold = Math.max(0, props.slideDownThreshold)
+		//最后一次的手势是否上拉，上拉的时候不要关闭popup
+		const isLastSwipeUp = lastDragDirection < 0
+		let shouldClose = halfOffset >= threshold && !isLastSwipeUp
+
+		if (shouldClose) {
+			isContentDragging = false
+			doClose()
+		} else {
+			resumedPopup()
+		}
+
+	}
+
+	const onContentstart = (e : UniTouchEvent) => {
+		if (!props.closeOnSlideDown) return
+		if (props.scrollId != null && props.scrollId != '') {
+			scrollEl = uni.getElementById(props.scrollId!)
+		} else {
+			scrollEl = null
+		}
+		contentTouchStartY = e.touches[0].screenY
+		isContentDragging = false
+		resetDragState(contentTouchStartY)
+	}
+
+	const onContentmove = (e : UniTouchEvent) => {
+		if (!props.closeOnSlideDown) return
+		if (!canDrag.value || isAnimation) return
+		const currentTouchY = e.touches[0].screenY
+		const gestureOffset = currentTouchY - contentTouchStartY
+		const isMovingDown = gestureOffset > 0
+
+		if (isContentDragging) {
+			lockScrollAtTop()
+			onDragmove(e)
+			return
+		}
+
+		if (!isMovingDown) {
+			return
+		}
+
+		const top = scrollEl?.scrollTop ?? 0
+
+		if (top >= 0.01) {
+			return
+		}
+
+		isContentDragging = true
+		resetDragState(contentTouchStartY)
+		lockScrollAtTop()
+		onDragmove(e)
+	}
+
+	const onContentend = () => {
+		popupRef.value?.style.setProperty('transition-duration', `${props.duration}ms`)
+		if (!props.closeOnSlideDown) return
+		if (!isContentDragging) {
+			resumedPopup()
+			return
+		}
+		onDragend()
+	}
+
+
+
+	/**
+	 * popup class
+	 */
+	const rootClass = computed(() => {
+		const isZoom = props.zoom && props.position == 'center'
+		const basic = [
+			ns.theme(),
+			ns.is('opacity', _opacity.value),
+			ns.m(props.position),
+			ns.is('zoom', isZoom)
+		] as string[]
+
+		//鸿蒙端在rice-popup--centen 里面设置 transform 会导致打开popup的时候动画异常
+
+
+
+
+
+
+		return basic
+	})
+
+	/**
+	 * popup style
+	 */
+
+	const popupStyle = computed(() => {
+		const css = new Map<string, string | number>()
+		const position = props.position
+		css.set('z-index', props.zIndex)
+		if (props.bgColor != null) {
+			css.set('background-color', props.bgColor!)
+		}
+		if (props.position == 'center' && props.marginTop != null) {
+			css.set('margin-top', addUnit(props.marginTop!))
+		}
+
+		//底部安全区域
+
+		if (props.position != 'center' && props.safeAreaInsetBottom) {
+			css.set('padding-bottom', safeAreaInsets.value.bottom + 'px')
+		}
+		if (props.position != 'center' && props.safeAreaInsetTop) {
+			css.set('padding-top', safeAreaInsets.value.top + 'px')
+		}
+
+
+		//圆角值
+
+		if (props.radius != null) {
+
+			const radius = addUnit(props.radius!)
+			if (position == 'top') {
+				css.set('border-bottom-left-radius', radius)
+				css.set('border-bottom-right-radius', radius)
+			} else if (position == 'bottom') {
+				css.set('border-top-left-radius', radius)
+				css.set('border-top-right-radius', radius)
+			} else if (position == 'left') {
+				css.set('border-top-right-radius', radius)
+				css.set('border-bottom-right-radius', radius)
+			} else if (position == 'right') {
+				css.set('border-top-left-radius', radius)
+				css.set('border-bottom-left-radius', radius)
+			} else {
+				css.set('border-radius', radius)
+			}
+		}
+
+		return css
+	})
+
+
+	const closeStyle = computed(() => {
+		const css = new Map<string, string>()
+		//底部安全区域
+
+		if (props.position != 'center' && props.safeAreaInsetBottom) {
+			css.set('bottom', safeAreaInsets.value.bottom + 'px')
+		}
+		if (props.position != 'center' && props.safeAreaInsetTop) {
+			css.set('top', safeAreaInsets.value.top + 'px')
+		}
+
+		return css
+	})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+return (): any | null => {
+
+const _component_rice_overlay = resolveEasyComponent("rice-overlay",_easycom_rice_overlay)
+const _component_rice_icon = resolveEasyComponent("rice-icon",_easycom_rice_icon)
+
+  return _cE(Fragment, null, [
+    isTrue(_ctx.overlay)
+      ? _cV(_component_rice_overlay, _uM({
+          key: 0,
+          show: show.value,
+          "z-index": _ctx.zIndex-1,
+          "close-on-click-overlay": false,
+          "bg-color": _ctx.overlayBgColor,
+          onClick: overlayClick
+        }), null, 8 /* PROPS */, ["show", "z-index", "bg-color"])
+      : _cC("v-if", true),
+    isTrue(unref(realShow))
+      ? _cE("view", _uM({
+          key: 1,
+          class: _nC(["rice-popup", [_ctx.popupClass,unref(rootClass)]]),
+          style: _nS([unref(popupStyle),_ctx.customStyle]),
+          ref_key: "popupRef",
+          ref: popupRef,
+          onTouchstart: onContentstart,
+          onTouchmove: withModifiers(onContentmove, ["stop"]),
+          onTouchend: onContentend,
+          onTouchcancel: onContentend
+        }), [
+          isTrue(_ctx.closeable)
+            ? _cE("view", _uM({
+                key: 0,
+                class: _nC(["rice-popup__close", `rice-popup__close--${_ctx.closeIconPosition}`]),
+                style: _nS(unref(closeStyle)),
+                onClick: withModifiers(handleClose, ["stop"])
+              }), [
+                _cV(_component_rice_icon, _uM({
+                  name: _ctx.closeIcon,
+                  size: "20px"
+                }), null, 8 /* PROPS */, ["name"])
+              ], 6 /* CLASS, STYLE */)
+            : _cC("v-if", true),
+          isTrue(_ctx.showDragBar==true&&_ctx.position=='bottom')
+            ? _cE("view", _uM({
+                key: 1,
+                class: _nC(["rice-popup__drag", _ctx.dragWrapClass]),
+                onTouchstart: onDragstart,
+                onTouchmove: withModifiers(onDragmove, ["stop"]),
+                onTouchend: withModifiers(onDragend, ["stop"]),
+                onTouchcancel: withModifiers(onDragend, ["stop"])
+              }), [
+                renderSlot(_ctx.$slots, "drag", {}, (): any[] => [
+                  _cE("view", _uM({
+                    class: _nC(["rice-popup__drag__bar", _ctx.dragBarClass])
+                  }), null, 2 /* CLASS */)
+                ])
+              ], 34 /* CLASS, NEED_HYDRATION */)
+            : _cC("v-if", true),
+          renderSlot(_ctx.$slots, "default")
+        ], 38 /* CLASS, STYLE, NEED_HYDRATION */)
+      : _cC("v-if", true)
+  ], 64 /* STABLE_FRAGMENT */)
+}
+}
+
+})
+export default __sfc__
+export type RicePopupComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesRiceUiComponentsRicePopupRicePopupStyles = [_uM([["rice-popup", _pS(_uM([["position", "fixed"], ["backgroundColor", "var(--rice-background-2)"], ["transform", "translate(0, 0) scale(1)"], ["transitionProperty", "transform,opacity"]]))], ["rice-popup__drag", _pS(_uM([["justifyContent", "center"], ["alignItems", "center"], ["minHeight", 32]]))], ["rice-popup__drag__bar", _pS(_uM([["height", 3], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["width", 20], ["backgroundColor", "#c8c9cc"]]))], ["rice-popup--opacity", _pS(_uM([["opacity", 0]]))], ["rice-popup--center", _pS(_uM([["top", "50%"], ["left", "50%"], ["transform", "translate(-50%, -50%)"]]))], ["rice-popup--zoom", _pS(_uM([["transform", "translate(-50%, -50%) scale(0.6)"]]))], ["rice-popup--top", _pS(_uM([["top", 0], ["left", 0], ["width", "100%"], ["transform", "translate(0, -100%)"]]))], ["rice-popup--bottom", _pS(_uM([["bottom", 0], ["left", 0], ["width", "100%"], ["transform", "translate(0px, 100%)"]]))], ["rice-popup--left", _pS(_uM([["top", 0], ["bottom", 0], ["left", 0], ["transform", "translate(-100%, 0)"]]))], ["rice-popup--right", _pS(_uM([["top", 0], ["bottom", 0], ["right", 0], ["transform", "translate(100%, 0)"]]))], ["rice-popup__close", _pS(_uM([["position", "absolute"], ["zIndex", 9], ["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 0], ["paddingLeft", 0]]))], ["rice-popup__close--top-left", _pS(_uM([["top", 0], ["left", 0]]))], ["rice-popup__close--top-right", _pS(_uM([["top", 0], ["right", 0]]))], ["rice-popup__close--bottom-left", _pS(_uM([["bottom", 0], ["left", 0]]))], ["rice-popup__close--bottom-right", _pS(_uM([["bottom", 0], ["right", 0]]))], ["@TRANSITION", _uM([["rice-popup", _uM([["property", "transform,opacity"]])]])]])]

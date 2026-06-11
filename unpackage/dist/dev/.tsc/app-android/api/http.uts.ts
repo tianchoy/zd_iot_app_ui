@@ -1,13 +1,18 @@
 // api/http.uts
 import { ApiUrl } from './url'
-import { request, type ApiResponse } from '@/uni_modules/m-unix/components/m-tools/Request.uts'
+import { request, type ApiResponse } from './Request.uts'
 import { config } from '@/common/config.uts'
 import type {
   LoginData,
   CountryData,
   TenantInfoData,
   QueryCardListParams,
-  CardListSumData
+  QueryCardListData,
+  CardListSumData,
+  CardItem,
+  BindCard,
+  PkgInfoListParams,
+  CardDetail
 } from './types'
 
 // 查询国家列表
@@ -54,29 +59,34 @@ export function getTenantInfo(tenantId: string, withToken: boolean = true): Prom
 
 
 
-  
 
 
 
-  
 
-  // 其他平台默认使用H5配置
-  const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
 
-  
-  return request<TenantInfoData>({
-    url: url,
-    method: 'GET',
-    withToken
-  })
+
+	// 其他平台默认使用H5配置
+	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
+
+
+	return request<TenantInfoData>({
+		url: url,
+		method: 'GET',
+		withToken: withToken
+	})
 }
 
 // 查询卡列表
-export function queryCardList(params: QueryCardListParams, withToken: boolean = true): Promise<ApiResponse<LoginData[]>> {
-  return request<LoginData[]>({
+export function queryCardList(params: QueryCardListParams, withToken: boolean = true): Promise<ApiResponse<QueryCardListData>> {
+  const data: UTSJSONObject = {
+    rechargeNo: params.rechargeNo,
+    status: params.status,
+    isSort: params.isSort
+  }
+  return request<QueryCardListData>({
     url: ApiUrl.queryCardList as string,
     method: 'GET',
-    data: params,
+    data: data,
     withToken: withToken
   })
 }
@@ -88,4 +98,67 @@ export function queryCardListSum(withToken: boolean = true): Promise<ApiResponse
     method: 'GET',
     withToken: withToken
   })
+}
+
+// 查询卡详情Xcx
+export function queryCardDetail(id: string, countryCode?: string, withToken: boolean = true): Promise<ApiResponse<CardDetail>> {
+
+
+
+
+
+
+
+
+
+	// 其他平台默认使用H5配置
+	const url = (ApiUrl.queryCardDetail as string) + id + '/' + countryCode
+
+
+	return request<CardDetail>({
+		url: url,
+		method: 'GET',
+		withToken: withToken
+	})
+}
+
+
+// 绑定卡
+export function userBindCard(data: BindCard, withToken: boolean = true): Promise<ApiResponse<any>> {
+  const body: UTSJSONObject = {
+    rechargeNo: data.rechargeNo
+  }
+  return request<any>({
+    url: ApiUrl.userBindCard as string,
+    method: 'POST',
+    data: body,
+    withToken: withToken
+  })
+}
+
+// 查询套餐信息列表 
+export function queryPkgInfoList(data: PkgInfoListParams, withToken: boolean = true): Promise<ApiResponse<any>> {
+
+
+
+
+
+
+
+
+
+	// 其他平台默认使用H5配置
+	const url = (ApiUrl.queryPkgInfoList as string)
+
+
+	const body: UTSJSONObject = {
+		rechargeNo: data.rechargeNo
+	}
+
+	return request<any>({
+		url: url,
+		method: 'GET',
+		data: body,
+		withToken: withToken
+	})
 }

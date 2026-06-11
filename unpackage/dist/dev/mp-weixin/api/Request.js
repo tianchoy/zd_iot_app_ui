@@ -114,11 +114,9 @@ function buildQueryString(data) {
   if (!data)
     return "";
   const parts = [];
-  const keys = Object.keys(data);
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
+  for (const key in data) {
     const value = data[key];
-    if (value != null && value !== void 0 && value !== "") {
+    if (value != null && value !== "") {
       let strValue = "";
       if (typeof value === "string") {
         strValue = value;

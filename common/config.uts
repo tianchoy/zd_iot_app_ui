@@ -130,6 +130,8 @@ export function isWechat(): boolean {
   // #ifdef MP-WEIXIN
   return true
   // #endif
+  
+  return false
 }
 
 //判断当前平台是否为H5
@@ -137,6 +139,7 @@ export function isH5(): boolean {
   // #ifdef H5
   return true
   // #endif
+  return false
 }
 
 //判断当前是国内版
@@ -144,6 +147,7 @@ export function isCN(): boolean {
   // #ifdef VERSION_CN
   return true
   // #endif
+  return false
 }
 
 //判断当前是否为国际版
@@ -151,4 +155,5 @@ export function isINT(): boolean {
   // #ifdef VERSION_INT
   return true
   // #endif
+  return false
 }

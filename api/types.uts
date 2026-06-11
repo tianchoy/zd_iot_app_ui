@@ -82,3 +82,8 @@ export type CardDetail = {
 export type BindCard = {
   rechargeNo: string
 }
+
+/** 查询套餐信息列表参数 */
+export type PkgInfoListParams = {
+  rechargeNo: string
+}

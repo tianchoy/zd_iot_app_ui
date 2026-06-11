@@ -253,8 +253,29 @@ class BindCard extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class PkgInfoListParams extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          rechargeNo: { type: String, optional: false }
+        };
+      },
+      name: "PkgInfoListParams"
+    };
+  }
+  constructor(options, metadata = PkgInfoListParams.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.rechargeNo = this.__props__.rechargeNo;
+    delete this.__props__;
+  }
+}
 exports.BindCard = BindCard;
+exports.CardDetail = CardDetail;
 exports.CardItem = CardItem;
 exports.CardListSumData = CardListSumData;
+exports.PkgInfoListParams = PkgInfoListParams;
 exports.QueryCardListParams = QueryCardListParams;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/types.js.map

@@ -1,4 +1,4 @@
-import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue'
+import _easycom_rice_icon from '@/uni_modules/rice-ui/components/rice-icon/rice-icon.uvue'
 import { onMounted, computed } from 'vue'
 
 
@@ -93,7 +93,7 @@ onMounted(() => {
 
 return (): any | null => {
 
-const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
+const _component_rice_icon = resolveEasyComponent("rice-icon",_easycom_rice_icon)
 
   return _cE(Fragment, null, [
     isTrue(_ctx.isShowStyle)
@@ -113,10 +113,11 @@ const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
             style: _nS(_uM({ visibility: _ctx.showBack ? 'visible' : 'hidden' }))
           }), [
             isTrue(_ctx.showBack)
-              ? _cV(_component_m_icon, _uM({
+              ? _cV(_component_rice_icon, _uM({
                   key: 0,
-                  name: "arrow-left-bold",
+                  name: "arrow-left",
                   size: "35rpx",
+                  color: "#333",
                   class: "icon",
                   onClick: handleBack
                 }))
@@ -136,7 +137,7 @@ const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
                     onClick: () => {emit('capsuleClick', 'menu')}
                   }), [
                     isTrue(_ctx.isIcon)
-                      ? _cV(_component_m_icon, _uM({
+                      ? _cV(_component_rice_icon, _uM({
                           key: 0,
                           name: _ctx.Icon,
                           size: "26",
@@ -161,9 +162,9 @@ const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
               style: _nS(_uM({ visibility: _ctx.showBack ? 'visible' : 'hidden' }))
             }), [
               isTrue(_ctx.showBack)
-                ? _cV(_component_m_icon, _uM({
+                ? _cV(_component_rice_icon, _uM({
                     key: 0,
-                    name: "arrow-left-bold",
+                    name: "arrow-left",
                     size: "40rpx",
                     class: "icon",
                     onClick: handleBack
@@ -184,7 +185,7 @@ const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
                       onClick: () => {emit('capsuleClick', 'menu')}
                     }), [
                       isTrue(_ctx.isIcon)
-                        ? _cV(_component_m_icon, _uM({
+                        ? _cV(_component_rice_icon, _uM({
                             key: 0,
                             name: _ctx.Icon,
                             size: "26",

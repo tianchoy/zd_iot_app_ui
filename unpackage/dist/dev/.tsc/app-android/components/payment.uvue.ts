@@ -1,3 +1,4 @@
+import _easycom_rice_button from '@/uni_modules/rice-ui/components/rice-button/rice-button.uvue'
 type PaymentMethod = { __$originalPosition?: UTSSourceMapPosition<"PaymentMethod", "components/payment.uvue", 114, 6>;
 	id: string
 	label: string
@@ -72,6 +73,8 @@ const handleConfirm = () => {
 
 return (): any | null => {
 
+const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_button)
+
   return _cE("view", _uM({ class: "payment-content" }), [
     _cE("view", _uM({ class: "payment-info" }), [
       _cE("text", _uM({ class: "info-title" }), "确认支付信息"),
@@ -127,14 +130,21 @@ return (): any | null => {
       _cE("text", _uM({ class: "tips-text" }), "续费后套餐将在30分钟内生效，如续费后设备始终无法上线，请您联系客服处理！")
     ]),
     _cE("view", _uM({ class: "action-buttons" }), [
-      _cE("button", _uM({
-        class: "btn cancel-btn",
+      _cV(_component_rice_button, _uM({
+        class: "btn cancel-btn mr-24",
         onClick: handleCancel
-      }), "取消"),
-      _cE("button", _uM({
-        class: "btn confirm-btn",
+      }), _uM({
+        default: withSlotCtx((): any[] => ["取消"]),
+        _: 1 /* STABLE */
+      })),
+      _cV(_component_rice_button, _uM({
+        class: "btn confirm-btn ml-24",
+        textColor: "#fff",
         onClick: handleConfirm
-      }), "确认支付")
+      }), _uM({
+        default: withSlotCtx((): any[] => ["确认支付"]),
+        _: 1 /* STABLE */
+      }))
     ])
   ])
 }

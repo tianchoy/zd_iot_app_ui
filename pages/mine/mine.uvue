@@ -6,15 +6,15 @@
 			<view class="persion-card">
 				<view class="persion-card-item"  @click="cardType(0)">
 					<text class="persion-card-item-title">我的卡片</text>
-					<text class="persion-card-item-content"> {{ cardListSum.all || 0 }}</text>
+					<text class="persion-card-item-content"> {{ cardListSum.all != null ? cardListSum.all : 0 }}</text>
 				</view>
 				<view class="persion-card-item"  @click="cardType(1)">
 					<text class="persion-card-item-title">在用卡片</text>
-					<text class="persion-card-item-content"> {{ cardListSum.inUse || 0 }}</text>
+					<text class="persion-card-item-content"> {{ cardListSum.inUse != null ? cardListSum.inUse : 0 }}</text>
 				</view>
 				<view class="persion-card-item"  @click="cardType(2)">
 					<text class="persion-card-item-title">异常卡片</text>
-					<text class="persion-card-item-content"> {{ cardListSum.inNotUse || 0 }}</text>
+					<text class="persion-card-item-content"> {{ cardListSum.inNotUse != null ? cardListSum.inNotUse : 0 }}</text>
 				</view>
 			</view>
 		</view>

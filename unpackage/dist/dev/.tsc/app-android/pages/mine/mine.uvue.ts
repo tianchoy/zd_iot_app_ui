@@ -1,6 +1,6 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
-import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue'
-import _easycom_m_button from '@/uni_modules/m-unix/components/m-button/m-button.uvue'
+import _easycom_rice_icon from '@/uni_modules/rice-ui/components/rice-icon/rice-icon.uvue'
+import _easycom_rice_button from '@/uni_modules/rice-ui/components/rice-button/rice-button.uvue'
 import { login,getTenantInfo,queryCardListSum} from '@/api/http.uts'
 	import type { CardListSumData } from '@/api/types.uts'
 	import { setStorageSync,getTenantId,getToken ,clearToken} from '@/common/config.uts'
@@ -91,7 +91,7 @@ const _cache = __ins.renderCache;
 	}
 
 	// 查询卡列表统计
-	const cardListSum = ref<CardListSumData>({})
+	const cardListSum = ref<CardListSumData>({ all: 0, inUse: 0, inNotUse: 0 })
 	const getCardListSum = async () => {
 		try {
 			const res = await queryCardListSum()
@@ -136,8 +136,8 @@ const _cache = __ins.renderCache;
 return (): any | null => {
 
 const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar)
-const _component_m_icon = resolveEasyComponent("m-icon",_easycom_m_icon)
-const _component_m_button = resolveEasyComponent("m-button",_easycom_m_button)
+const _component_rice_icon = resolveEasyComponent("rice-icon",_easycom_rice_icon)
+const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_button)
 
   return _cE(Fragment, null, [
     _cV(_component_topNavBar, _uM({
@@ -155,21 +155,21 @@ const _component_m_button = resolveEasyComponent("m-button",_easycom_m_button)
             onClick: () => {cardType(0)}
           }), [
             _cE("text", _uM({ class: "persion-card-item-title" }), "我的卡片"),
-            _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).all || 0), 1 /* TEXT */)
+            _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).all != null ? unref(cardListSum).all : 0), 1 /* TEXT */)
           ], 8 /* PROPS */, ["onClick"]),
           _cE("view", _uM({
             class: "persion-card-item",
             onClick: () => {cardType(1)}
           }), [
             _cE("text", _uM({ class: "persion-card-item-title" }), "在用卡片"),
-            _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).inUse || 0), 1 /* TEXT */)
+            _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).inUse != null ? unref(cardListSum).inUse : 0), 1 /* TEXT */)
           ], 8 /* PROPS */, ["onClick"]),
           _cE("view", _uM({
             class: "persion-card-item",
             onClick: () => {cardType(2)}
           }), [
             _cE("text", _uM({ class: "persion-card-item-title" }), "异常卡片"),
-            _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).inNotUse || 0), 1 /* TEXT */)
+            _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).inNotUse != null ? unref(cardListSum).inNotUse : 0), 1 /* TEXT */)
           ], 8 /* PROPS */, ["onClick"])
         ])
       ]),
@@ -179,41 +179,43 @@ const _component_m_button = resolveEasyComponent("m-button",_easycom_m_button)
           onClick: toOrder
         }), [
           _cE("text", _uM({ class: "order-label" }), "我的订单"),
-          _cV(_component_m_icon, _uM({
-            name: "arrow-right-bold",
+          _cV(_component_rice_icon, _uM({
+            name: "arrow-right",
             size: "20rpx"
           }))
         ]),
         _cE("view", _uM({ class: "item" }), [
           _cE("text", _uM({ class: "order-label" }), "绑定卡片"),
-          _cV(_component_m_icon, _uM({
-            name: "arrow-right-bold",
+          _cV(_component_rice_icon, _uM({
+            name: "arrow-right",
             size: "20rpx"
           }))
         ]),
         _cE("view", _uM({ class: "item" }), [
           _cE("text", _uM({ class: "order-label" }), "常见问题"),
-          _cV(_component_m_icon, _uM({
-            name: "arrow-right-bold",
+          _cV(_component_rice_icon, _uM({
+            name: "arrow-right",
             size: "20rpx"
           }))
         ])
       ]),
       _cE("view", _uM({ class: "btn-box" }), [
         isTrue(!isLogin())
-          ? _cV(_component_m_button, _uM({
+          ? _cV(_component_rice_button, _uM({
               key: 0,
               type: "primary",
-              shape: "circle",
+              width: "100%",
+              shape: "round",
               onClick: handleLogin
             }), _uM({
               default: withSlotCtx((): any[] => ["登录"]),
               _: 1 /* STABLE */
             }))
-          : _cV(_component_m_button, _uM({
+          : _cV(_component_rice_button, _uM({
               key: 1,
-              type: "warning",
-              shape: "circle",
+              type: "error",
+              width: "100%",
+              shape: "round",
               onClick: handleLogout
             }), _uM({
               default: withSlotCtx((): any[] => ["退出登录"]),

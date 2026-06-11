@@ -1,18 +1,29 @@
-export const ApiUrl = {
-    getTenantPageConfigXcx: '/system/tenantPageConfig/getTenantPageConfigXcx',
-    getTenantPageConfigH: '/system/tenantPageConfig/getTenantPageConfigH',
-    login: '/auth/login',
-    queryCardList: '/app/card/list',
-    queryCardListSum: '/app/card/listSum',
-    card_detail: '/app/card/info/',
-    countries: '/app/card/getH5CountryList',
-    addOrder: '/order/pkgOrder',
-    queryOrder: '/order/pkgOrder/',
-    goPay: '/pay/order/goPayment',
-    queryBySuccessId: '/order/pkgOrder/success/',
-    queryPkgInfoList: '/card/pkgInfo/list',
-    queryPkgInfoDetail: '/card/pkgInfo/info/',
-    queryOrderList: '/order/pkgOrder/list',
-    queryOrderPackInfo: '/order/pkgOrder/getOrderPackInfo/' // 查询订单套餐信息
-} as UTSJSONObject;
+function __uts_large_ApiUrl_fill_fill_1(__obj: UTSJSONObject): void {
+    __obj["getTenantPageConfigXcx"] = '/system/tenantPageConfig/getTenantPageConfigXcx';
+    __obj["getTenantPageConfigH"] = '/system/tenantPageConfig/getTenantPageConfigH';
+    __obj["login"] = '/auth/login';
+    __obj["queryXcxCardList"] = '/card/pkgInfo/xcxList';
+    __obj["queryCardListSum"] = '/app/card/listSum';
+    __obj["card_detail"] = '/app/card/info/';
+    __obj["countries"] = '/app/card/getH5CountryList';
+    __obj["addOrder"] = '/order/pkgOrder';
+    __obj["queryOrder"] = '/order/pkgOrder/';
+    __obj["goPay"] = '/pay/order/goPayment';
+    __obj["queryBySuccessId"] = '/order/pkgOrder/success/';
+    __obj["queryPkgInfoList"] = '/card/pkgInfo/list';
+    __obj["queryPkgInfoDetail"] = '/card/pkgInfo/info/';
+    __obj["queryOrderList"] = '/order/pkgOrder/list';
+    __obj["queryOrderPackInfo"] = '/order/pkgOrder/getOrderPackInfo/' // 查询订单套餐信息
+    ;
+    __obj["queryCardList"] = '/app/card/list';
+    __obj["queryCardDetailXcx"] = '/app/card/infoXcx/';
+    __obj["userBindCard"] = '/system/appUserCard/bind' // 绑定卡
+    ;
+}
+function __uts_large_ApiUrl_build_0(): UTSJSONObject {
+    const __obj = {} as UTSJSONObject;
+    __uts_large_ApiUrl_fill_fill_1(__obj);
+    return __obj;
+}
+export const ApiUrl = __uts_large_ApiUrl_build_0();
 //# sourceMappingURL=url.uts.map

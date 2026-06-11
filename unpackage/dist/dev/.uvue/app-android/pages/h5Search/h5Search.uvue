@@ -1,9 +1,10 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue';
-import _easycom_m_icon from '@/uni_modules/m-unix/components/m-icon/m-icon.uvue';
-import _easycom_m_bottom_popup from '@/uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup.uvue';
+import _easycom_rice_icon from '@/uni_modules/rice-ui/components/rice-icon/rice-icon.uvue';
+import _easycom_rice_popup from '@/uni_modules/rice-ui/components/rice-popup/rice-popup.uvue';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import SearchSelect from '@/components/selectCountry.uvue';
-import { getCountryList, type CountryData } from '@/api/http.uts';
+import { getCountryList } from '@/api/http.uts';
+import type { CountryData } from '@/api/types.uts';
 const __sfc__ = defineComponent({
     __name: 'h5Search',
     setup(__props) {
@@ -40,7 +41,7 @@ const __sfc__ = defineComponent({
             // console.log('选中国家/地区:', value, item)
             showCountryPopup.value = false;
             resCountry.value = value as string;
-            console.log('选中国家/地区:', resCountry.value, " at pages/h5Search/h5Search.uvue:123");
+            console.log('选中国家/地区:', resCountry.value, " at pages/h5Search/h5Search.uvue:115");
         };
         // 关闭弹窗时重置搜索
         const onPopupClose = () => {
@@ -68,8 +69,8 @@ const __sfc__ = defineComponent({
                 });
                 return;
             }
-            console.log('查询卡号:', cardNumber.value, " at pages/h5Search/h5Search.uvue:154");
-            console.log('国家/地区:', resCountry.value, " at pages/h5Search/h5Search.uvue:155");
+            console.log('查询卡号:', cardNumber.value, " at pages/h5Search/h5Search.uvue:146");
+            console.log('国家/地区:', resCountry.value, " at pages/h5Search/h5Search.uvue:147");
             uni.showToast({
                 title: '查询中...',
                 icon: 'loading'
@@ -93,7 +94,7 @@ const __sfc__ = defineComponent({
         // 初始化国家列表
         const initCountryList = async (): Promise<void> => {
             const res = await getCountryList(false);
-            console.log('查询国家列表:', res, " at pages/h5Search/h5Search.uvue:181");
+            console.log('查询国家列表:', res, " at pages/h5Search/h5Search.uvue:173");
             if (res.code == 200) {
                 countryOptions.value = res.data.map((item: CountryData): UTSJSONObject => {
                     return {
@@ -112,8 +113,8 @@ const __sfc__ = defineComponent({
         });
         return (): any | null => {
             const _component_topNavBar = resolveEasyComponent("topNavBar", _easycom_topNavBar);
-            const _component_m_icon = resolveEasyComponent("m-icon", _easycom_m_icon);
-            const _component_m_bottom_popup = resolveEasyComponent("m-bottom-popup", _easycom_m_bottom_popup);
+            const _component_rice_icon = resolveEasyComponent("rice-icon", _easycom_rice_icon);
+            const _component_rice_popup = resolveEasyComponent("rice-popup", _easycom_rice_popup);
             return _cE(Fragment, null, [
                 _cV(_component_topNavBar, _uM({
                     title: "查询卡号",
@@ -142,8 +143,8 @@ const __sfc__ = defineComponent({
                                     class: "scan-btn",
                                     onClick: handleScan
                                 }), [
-                                    _cV(_component_m_icon, _uM({
-                                        name: "scanning",
+                                    _cV(_component_rice_icon, _uM({
+                                        name: "scan",
                                         size: "40rpx",
                                         color: "#666"
                                     }))
@@ -178,24 +179,15 @@ const __sfc__ = defineComponent({
                         ])
                     ])
                 ]),
-                _cV(_component_m_bottom_popup, _uM({
+                _cV(_component_rice_popup, _uM({
                     show: showCountryPopup.value,
-                    height: '75%',
-                    radius: true,
+                    "onUpdate:show": ($event: boolean) => { (showCountryPopup).value = $event; },
+                    position: "bottom",
                     onClose: onPopupClose
                 }), _uM({
                     default: withSlotCtx((): any[] => [
                         _cE("view", _uM({ class: "popup-header" }), [
-                            _cE("text", _uM({ class: "popup-title" }), "选择国家/地区"),
-                            _cE("view", _uM({
-                                class: "popup-close",
-                                onClick: onPopupClose
-                            }), [
-                                _cV(_component_m_icon, _uM({
-                                    name: "close-bold",
-                                    size: "40rpx"
-                                }))
-                            ])
+                            _cE("text", _uM({ class: "popup-title" }), "选择国家/地区")
                         ]),
                         _cV(unref(SearchSelect), _uM({
                             ref_key: "searchSelectRef",
@@ -208,11 +200,11 @@ const __sfc__ = defineComponent({
                         }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "options"])
                     ]),
                     _: 1 /* STABLE */
-                }), 8 /* PROPS */, ["show"])
+                }), 8 /* PROPS */, ["show", "onUpdate:show"])
             ], 64 /* STABLE_FRAGMENT */);
         };
     }
 });
 export default __sfc__;
-const GenPagesH5SearchH5SearchStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["minHeight", "1000rpx"], ["backgroundColor", "#f5f7fa"]]))], ["main-content", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", 0], ["paddingRight", "24rpx"], ["paddingBottom", 0], ["paddingLeft", "24rpx"]]))], ["title-section", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["marginBottom", "48rpx"], ["backgroundImage", "linear-gradient(135deg, #2563eb 0%, #60a5fa 100%)"], ["backgroundColor", "rgba(0,0,0,0)"], ["borderTopLeftRadius", "22rpx"], ["borderTopRightRadius", "22rpx"], ["borderBottomRightRadius", "22rpx"], ["borderBottomLeftRadius", "22rpx"], ["paddingTop", 24], ["paddingRight", "20rpx"], ["paddingBottom", 24], ["paddingLeft", "20rpx"], ["color", "#ffffff"]]))], ["main-title", _uM([[".title-section ", _uM([["fontSize", "24rpx"], ["fontWeight", "bold"], ["marginBottom", "16rpx"]])]])], ["sub-title", _uM([[".title-section ", _uM([["fontSize", "50rpx"], ["fontWeight", "bold"], ["marginBottom", "24rpx"]])]])], ["desc-text", _uM([[".title-section ", _uM([["fontSize", "24rpx"]])]])], ["card-box", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["borderTopLeftRadius", "32rpx"], ["borderTopRightRadius", "32rpx"], ["borderBottomRightRadius", "32rpx"], ["borderBottomLeftRadius", "32rpx"], ["paddingTop", "32rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "32rpx"], ["paddingLeft", "32rpx"], ["marginBottom", "48rpx"], ["boxShadow", "0 4rpx 20rpx rgba(0, 0, 0, 0.04)"]]))], ["card-label", _uM([[".card-box ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#1f2937"], ["marginBottom", "24rpx"]])]])], ["search-value", _uM([[".card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e5e7eb"], ["borderRightColor", "#e5e7eb"], ["borderBottomColor", "#e5e7eb"], ["borderLeftColor", "#e5e7eb"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["backgroundColor", "#f9fafb"], ["marginBottom", "24rpx"]])]])], ["search-input", _uM([[".card-box .search-value ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", "24rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "28rpx"], ["height", "88rpx"], ["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["backgroundImage", "none"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#1f2937"], ["fontSize", "28rpx"]])]])], ["scan-btn", _uM([[".card-box .search-value ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["width", "88rpx"], ["height", "88rpx"], ["borderLeftWidth", "2rpx"], ["borderLeftStyle", "solid"], ["borderLeftColor", "#e5e7eb"]])]])], ["select-country-wrapper", _uM([[".card-box ", _uM([["marginBottom", "32rpx"]])]])], ["select-label", _uM([[".card-box .select-country-wrapper ", _uM([["fontSize", "28rpx"], ["color", "#666666"], ["marginBottom", "16rpx"]])]])], ["select-trigger", _uM([[".card-box .select-country-wrapper ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e5e7eb"], ["borderRightColor", "#e5e7eb"], ["borderBottomColor", "#e5e7eb"], ["borderLeftColor", "#e5e7eb"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["backgroundColor", "#f9fafb"], ["paddingTop", "24rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "28rpx"], ["minHeight", "88rpx"]])]])], ["select-value", _uM([[".card-box .select-country-wrapper .select-trigger ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "28rpx"], ["color", "#1f2937"]])], [".card-box .select-country-wrapper .select-trigger .placeholder", _uM([["color", "#999999"]])]])], ["select-arrow", _uM([[".card-box .select-country-wrapper .select-trigger ", _uM([["fontSize", "24rpx"], ["color", "#999999"], ["marginLeft", "16rpx"]])]])], ["query-btn", _uM([[".card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["backgroundImage", "linear-gradient(135deg, #2563eb, #1d4ed8)"], ["backgroundColor", "rgba(0,0,0,0)"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0]])]])], ["query-btn-text", _uM([[".card-box .query-btn ", _uM([["color", "#ffffff"], ["fontSize", "32rpx"], ["fontWeight", 600]])]])], ["instruction-box", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["boxShadow", "0 8rpx 20rpx rgba(15, 23, 42, 0.04)"]]))], ["instruction-title", _uM([[".instruction-box ", _uM([["fontSize", "30rpx"], ["fontWeight", 600], ["color", "#1f2937"], ["marginBottom", "24rpx"]])]])], ["instruction-list", _uM([[".instruction-box ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["instruction-item", _uM([[".instruction-box .instruction-list ", _uM([["fontSize", "26rpx"], ["color", "#6b7280"], ["lineHeight", 1.6]])]])], ["popup-header", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "32rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "32rpx"], ["borderBottomWidth", "2rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"]]))], ["popup-title", _uM([[".popup-header ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#1f2937"]])]])], ["popup-close", _uM([[".popup-header ", _uM([["width", "56rpx"], ["height", "56rpx"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["fontSize", "44rpx"], ["color", "#999999"]])]])]])];
+const GenPagesH5SearchH5SearchStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["minHeight", "1000rpx"], ["backgroundColor", "#f5f7fa"]]))], ["main-content", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", 0], ["paddingRight", "24rpx"], ["paddingBottom", 0], ["paddingLeft", "24rpx"]]))], ["title-section", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["marginBottom", "48rpx"], ["backgroundImage", "linear-gradient(135deg, #2563eb 0%, #60a5fa 100%)"], ["backgroundColor", "rgba(0,0,0,0)"], ["borderTopLeftRadius", "22rpx"], ["borderTopRightRadius", "22rpx"], ["borderBottomRightRadius", "22rpx"], ["borderBottomLeftRadius", "22rpx"], ["paddingTop", 24], ["paddingRight", "20rpx"], ["paddingBottom", 24], ["paddingLeft", "20rpx"], ["color", "#ffffff"]]))], ["main-title", _uM([[".title-section ", _uM([["fontSize", "24rpx"], ["fontWeight", "bold"], ["marginBottom", "16rpx"]])]])], ["sub-title", _uM([[".title-section ", _uM([["fontSize", "50rpx"], ["fontWeight", "bold"], ["marginBottom", "24rpx"]])]])], ["desc-text", _uM([[".title-section ", _uM([["fontSize", "24rpx"]])]])], ["card-box", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["borderTopLeftRadius", "32rpx"], ["borderTopRightRadius", "32rpx"], ["borderBottomRightRadius", "32rpx"], ["borderBottomLeftRadius", "32rpx"], ["paddingTop", "32rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "32rpx"], ["paddingLeft", "32rpx"], ["marginBottom", "48rpx"], ["boxShadow", "0 4rpx 20rpx rgba(0, 0, 0, 0.04)"]]))], ["card-label", _uM([[".card-box ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#1f2937"], ["marginBottom", "24rpx"]])]])], ["search-value", _uM([[".card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e5e7eb"], ["borderRightColor", "#e5e7eb"], ["borderBottomColor", "#e5e7eb"], ["borderLeftColor", "#e5e7eb"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["backgroundColor", "#f9fafb"], ["marginBottom", "24rpx"]])]])], ["search-input", _uM([[".card-box .search-value ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", "24rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "28rpx"], ["height", "88rpx"], ["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["backgroundImage", "none"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#1f2937"], ["fontSize", "28rpx"]])]])], ["scan-btn", _uM([[".card-box .search-value ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["width", "88rpx"], ["height", "88rpx"], ["borderLeftWidth", "2rpx"], ["borderLeftStyle", "solid"], ["borderLeftColor", "#e5e7eb"]])]])], ["select-country-wrapper", _uM([[".card-box ", _uM([["marginBottom", "32rpx"]])]])], ["select-label", _uM([[".card-box .select-country-wrapper ", _uM([["fontSize", "28rpx"], ["color", "#666666"], ["marginBottom", "16rpx"]])]])], ["select-trigger", _uM([[".card-box .select-country-wrapper ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e5e7eb"], ["borderRightColor", "#e5e7eb"], ["borderBottomColor", "#e5e7eb"], ["borderLeftColor", "#e5e7eb"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["backgroundColor", "#f9fafb"], ["paddingTop", "24rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "28rpx"], ["minHeight", "88rpx"]])]])], ["select-value", _uM([[".card-box .select-country-wrapper .select-trigger ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "28rpx"], ["color", "#1f2937"]])], [".card-box .select-country-wrapper .select-trigger .placeholder", _uM([["color", "#999999"]])]])], ["select-arrow", _uM([[".card-box .select-country-wrapper .select-trigger ", _uM([["fontSize", "24rpx"], ["color", "#999999"], ["marginLeft", "16rpx"]])]])], ["query-btn", _uM([[".card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["backgroundImage", "linear-gradient(135deg, #2563eb, #1d4ed8)"], ["backgroundColor", "rgba(0,0,0,0)"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0]])]])], ["query-btn-text", _uM([[".card-box .query-btn ", _uM([["color", "#ffffff"], ["fontSize", "32rpx"], ["fontWeight", 600]])]])], ["instruction-box", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["boxShadow", "0 8rpx 20rpx rgba(15, 23, 42, 0.04)"]]))], ["instruction-title", _uM([[".instruction-box ", _uM([["fontSize", "30rpx"], ["fontWeight", 600], ["color", "#1f2937"], ["marginBottom", "24rpx"]])]])], ["instruction-list", _uM([[".instruction-box ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["instruction-item", _uM([[".instruction-box .instruction-list ", _uM([["fontSize", "26rpx"], ["color", "#6b7280"], ["lineHeight", 1.6]])]])], ["popup-header", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "32rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "32rpx"], ["borderBottomWidth", "2rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f0f0"], ["backgroundColor", "#ffffff"]]))], ["popup-title", _uM([[".popup-header ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#1f2937"]])]])], ["popup-close", _uM([[".popup-header ", _uM([["width", "56rpx"], ["height", "56rpx"], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["fontSize", "44rpx"], ["color", "#999999"]])]])]])];
 //# sourceMappingURL=h5Search.uvue.map

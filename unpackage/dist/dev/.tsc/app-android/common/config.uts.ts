@@ -41,7 +41,7 @@ const ENV = 'dev' //  dev | prod
 
 const API_CONFIG: UTSJSONObject = {
   dev: {
-    baseUrl: 'http://192.168.3.7:8081',
+    baseUrl: 'http://192.168.0.4:8081',
     timeout: 30000
   },
   prod: {
@@ -123,4 +123,37 @@ export function getStorageSync(key: string): string {
 // 从存储中移除值
 export function removeStorageSync(key: string) {
   uni.removeStorageSync(key)
+}
+
+//判断当前平台是否为微信小程序
+export function isWechat(): boolean {
+
+
+
+  
+  return false
+}
+
+//判断当前平台是否为H5
+export function isH5(): boolean {
+
+
+
+  return false
+}
+
+//判断当前是国内版
+export function isCN(): boolean {
+
+
+
+  return false
+}
+
+//判断当前是否为国际版
+export function isINT(): boolean {
+
+
+
+  return false
 }

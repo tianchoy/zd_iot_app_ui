@@ -11,6 +11,8 @@ import type {
   CardListSumData,
   CardItem,
   BindCard,
+  PkgInfoListParams,
+  CardDetail
 } from './types'
 
 // 查询国家列表
@@ -54,34 +56,37 @@ export function login(data: UTSJSONObject, withToken: boolean = true): Promise<A
 
 // 获取租户页面配置（自动适配平台）
 export function getTenantInfo(tenantId: string, withToken: boolean = true): Promise<ApiResponse<TenantInfoData>> {
-  // #ifdef MP-WEIXIN
-  const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + config.api.auth.tenantId
-  const tk = true
-  // #endif
-  
-  // #ifdef H5
-  const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
-  const tk = false
-  // #endif
-  
-  // #ifndef MP-WEIXIN || H5
-  // 其他平台默认使用H5配置
-  const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
-  // #endif
-  
-  return request<TenantInfoData>({
-    url: url,
-    method: 'GET',
-    withToken: tk
-  })
+	// #ifdef MP-WEIXIN
+	const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + config.api.auth.tenantId
+	// #endif
+
+	// #ifdef H5
+	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
+	// #endif
+
+	// #ifndef MP-WEIXIN || H5
+	// 其他平台默认使用H5配置
+	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
+	// #endif
+
+	return request<TenantInfoData>({
+		url: url,
+		method: 'GET',
+		withToken: withToken
+	})
 }
 
 // 查询卡列表
 export function queryCardList(params: QueryCardListParams, withToken: boolean = true): Promise<ApiResponse<QueryCardListData>> {
+  const data: UTSJSONObject = {
+    rechargeNo: params.rechargeNo,
+    status: params.status,
+    isSort: params.isSort
+  }
   return request<QueryCardListData>({
     url: ApiUrl.queryCardList as string,
     method: 'GET',
-    data: params as unknown as UTSJSONObject,
+    data: data,
     withToken: withToken
   })
 }
@@ -97,35 +102,72 @@ export function queryCardListSum(withToken: boolean = true): Promise<ApiResponse
 
 // 查询卡详情Xcx
 export function queryCardDetail(id: string, countryCode?: string, withToken: boolean = true): Promise<ApiResponse<CardDetail>> {
-  // #ifdef MP-WEIXIN
-  const url = (ApiUrl.queryCardDetailXcx as string) + id
-  const tk = true
-  // #endif
-  
-  // #ifdef H5
-  const url = (ApiUrl.queryCardDetail as string) + id + '/' + countryCode
-  const tk = false
-  // #endif
-  
-  // #ifndef MP-WEIXIN || H5
-  // 其他平台默认使用H5配置
-  const url = (ApiUrl.queryCardDetail as string) +  id + '/' + countryCode
-  // #endif
-  
-  return request<CardDetail>({
-    url: url,
-    method: 'GET',
-    withToken: tk
-  })
+	// #ifdef MP-WEIXIN
+	const url = (ApiUrl.queryCardDetailXcx as string) + id
+	// #endif
+
+	// #ifdef H5
+	const url = (ApiUrl.queryCardDetail as string) + id + '/' + countryCode
+	// #endif
+
+	// #ifndef MP-WEIXIN || H5
+	// 其他平台默认使用H5配置
+	const url = (ApiUrl.queryCardDetail as string) + id + '/' + countryCode
+	// #endif
+
+	return request<CardDetail>({
+		url: url,
+		method: 'GET',
+		withToken: withToken
+	})
 }
 
 
 // 绑定卡
 export function userBindCard(data: BindCard, withToken: boolean = true): Promise<ApiResponse<any>> {
+  const body: UTSJSONObject = {
+    rechargeNo: data.rechargeNo
+  }
   return request<any>({
     url: ApiUrl.userBindCard as string,
     method: 'POST',
-    data: data,
+    data: body,
+    withToken: withToken
+  })
+}
+
+// 查询套餐信息列表 
+export function queryPkgInfoList(data: PkgInfoListParams, withToken: boolean = true): Promise<ApiResponse<any>> {
+	// #ifdef MP-WEIXIN
+	const url = (ApiUrl.queryXcxCardList as string)
+	// #endif
+
+	// #ifdef H5
+	const url = (ApiUrl.queryPkgInfoList as string)
+	// #endif
+
+	// #ifndef MP-WEIXIN || H5
+	// 其他平台默认使用H5配置
+	const url = (ApiUrl.queryPkgInfoList as string)
+	// #endif
+
+	const body: UTSJSONObject = {
+		rechargeNo: data.rechargeNo
+	}
+
+	return request<any>({
+		url: url,
+		method: 'GET',
+		data: body,
+		withToken: withToken
+	})
+}
+
+// 查询套餐信息详情
+export function queryPkgInfoDetail(id: string, withToken: boolean = true): Promise<ApiResponse<CardDetail>> {
+  return request<CardDetail>({
+    url: (ApiUrl.queryPkgInfoDetail as string) + id,
+    method: 'GET',
     withToken: withToken
   })
 }

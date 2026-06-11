@@ -23,19 +23,30 @@ const _easycom_customService = () => "../../components/customService/customServi
 if (!Math) {
   (_easycom_topNavBar + _easycom_rice_input + _easycom_rice_icon + _easycom_rice_button + _easycom_rice_tabs + _easycom_rice_divider + _easycom_customService)();
 }
+class TabItem extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: String, optional: false }
+        };
+      },
+      name: "TabItem"
+    };
+  }
+  constructor(options, metadata = TabItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "card",
   setup(__props) {
     const card_number = common_vendor.ref("gn20260603164757");
     const queryKeyword = common_vendor.ref("");
-    const tabs = common_vendor.computed(() => {
-      const numbers = tabNumbers.value;
-      return [
-        new common_vendor.UTSJSONObject({ name: `全部 ${numbers[0]}` }),
-        new common_vendor.UTSJSONObject({ name: `在用 ${numbers[1]}` }),
-        new common_vendor.UTSJSONObject({ name: `异常 ${numbers[2]}` })
-      ];
-    });
     const tabStatuses = ["全部", "在用", "异常"];
     const current = common_vendor.ref(0);
     const scrollViewHeight = common_vendor.ref(0);
@@ -76,30 +87,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         usedTraffic: "1GB",
         totalTraffic: "1GB",
         currentCycle: "第1期 / 共1期"
-      }),
-      new api_types.CardItem({
-        id: 4,
-        cardNumber: "1064916585163",
-        iccid: "89860421123456789015",
-        tag: "备用卡",
-        status: "在用",
-        currentPackage: "工业设备月包5G",
-        expireDate: "2026-06-30",
-        usedTraffic: "2.15GB",
-        totalTraffic: "5GB",
-        currentCycle: "第1期 / 共3期"
-      }),
-      new api_types.CardItem({
-        id: 5,
-        cardNumber: "1064916585164",
-        iccid: "89860421123456789016",
-        tag: "体验卡",
-        status: "停机",
-        currentPackage: "体验套餐500M",
-        expireDate: "2026-02-28",
-        usedTraffic: "500MB",
-        totalTraffic: "500MB",
-        currentCycle: "第1期 / 共1期"
       })
     ]);
     const tabNumbers = common_vendor.computed(() => {
@@ -112,8 +99,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }).length;
       return [total, inUse, abnormal];
     });
+    const tabs = common_vendor.computed(() => {
+      const numbers = tabNumbers.value;
+      return [
+        new TabItem({ name: `全部 ${numbers[0]}` }),
+        new TabItem({ name: `在用 ${numbers[1]}` }),
+        new TabItem({ name: `异常 ${numbers[2]}` })
+      ];
+    });
     const handleDetail = (card) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:178", card);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:159", card);
       common_vendor.index.navigateTo({
         url: "/pages/cardDetail/cardDetail?cardNumber=" + card.cardNumber
       });
@@ -187,7 +182,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/card/card.uvue:262", result);
+        common_vendor.index.__f__("log", "at pages/card/card.uvue:243", result);
         if (result.length > 0) {
           card_number.value = result;
           common_vendor.index.showToast({
@@ -208,10 +203,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             status: "0"
           }));
           if (res.code === 200) {
-            common_vendor.index.__f__("log", "at pages/card/card.uvue:306", "查询卡列表成功:", res.data);
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:287", "查询卡列表成功:", res.data);
             allCardList.value = res.data.list;
           } else {
-            common_vendor.index.__f__("log", "at pages/card/card.uvue:309", "查询卡列表失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:290", "查询卡列表失败:", res.msg);
             allCardList.value = [];
             common_vendor.index.showToast({
               title: res.msg || "查询失败",
@@ -219,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/card/card.uvue:317", "查询卡列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/card/card.uvue:298", "查询卡列表异常:", error);
           allCardList.value = [];
           common_vendor.index.showToast({
             title: "网络异常，请稍后重试",
@@ -269,7 +264,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const platform = () => {
-      {
+      if (common_config.isWechat()) {
         if (checkToken()) {
           getCardList();
         } else {

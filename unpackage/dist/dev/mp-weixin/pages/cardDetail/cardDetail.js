@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const api_http = require("../../api/http.js");
 const api_types = require("../../api/types.js");
+const api_http = require("../../api/http.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
@@ -42,7 +42,8 @@ class CardDetailTabEvent extends common_vendor.UTS.UTSType {
       get fields() {
         return {
           index: { type: Number, optional: false },
-          item: { type: CardDetailTabItem, optional: false }
+          item: { type: CardDetailTabItem, optional: false },
+          name: { type: String, optional: false }
         };
       },
       name: "CardDetailTabEvent"
@@ -53,6 +54,7 @@ class CardDetailTabEvent extends common_vendor.UTS.UTSType {
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.index = this.__props__.index;
     this.item = this.__props__.item;
+    this.name = this.__props__.name;
     delete this.__props__;
   }
 }
@@ -97,7 +99,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const activeName = common_vendor.ref("基本信息");
     const statusBarHeight = common_vendor.ref(20);
     const navBarHeight = common_vendor.ref(44);
-    const cardDetail = common_vendor.ref();
+    const cardDetail = common_vendor.ref(new api_types.CardDetail({
+      currentPeriodEndTime: null,
+      currentPeriodStartTime: null,
+      effectiveTime: null,
+      expirationTime: null,
+      pkgFlow: null,
+      pkgName: null,
+      rechargeNo: null,
+      status: null,
+      totalPeriod: null,
+      unUsedFlow: null,
+      usedFlow: null,
+      usedPeriod: null,
+      isBind: null
+    }));
     const fixedTabsStyle = common_vendor.computed(() => {
       const css = /* @__PURE__ */ new Map();
       css.set("top", statusBarHeight.value + navBarHeight.value + "px");
@@ -139,6 +155,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const changeTab = (e) => {
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:168", "e", e.index);
       active.value = e.index;
       activeName.value = e.name;
     };
@@ -157,7 +174,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = navHeight > 0 ? navHeight : 44;
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:185", "获取导航栏信息失败", e);
+        common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:190", "获取导航栏信息失败", e);
       }
     };
     const handleRecharge = () => {
@@ -168,7 +185,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getCardDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.queryCardDetail(card_number.value);
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:203", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:208", res);
         if (res.code == 200) {
           cardDetail.value = res.data;
         } else {
@@ -183,7 +200,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_http.userBindCard(new api_types.BindCard({
           rechargeNo: (_b = (_a = cardDetail.value) === null || _a === void 0 ? null : _a.rechargeNo) !== null && _b !== void 0 ? _b : ""
         }));
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:217", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:222", res);
         if (res.code == 200) {
           common_vendor.index.showToast({
             title: "绑定成功",
@@ -198,6 +215,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
+    const getPkgInfoList = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_http.queryPkgInfoList(new api_types.PkgInfoListParams({
+          rechargeNo: card_number.value
+        }));
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:242", res);
+      });
+    };
     common_vendor.onMounted(() => {
       getNavBarInfo();
     });
@@ -206,6 +231,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const cardNumber = (_a = options.cardNumber) !== null && _a !== void 0 ? _a : "";
       card_number.value = cardNumber;
       getCardDetail();
+      getPkgInfoList();
     });
     return (_ctx, _cache) => {
       "raw js";
@@ -267,16 +293,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(cardDetail).expirationTime ? {
         w: common_vendor.t(common_vendor.unref(cardDetail).expirationTime)
       } : {}, {
-        x: common_vendor.t(common_vendor.unref(cardDetail).usedFlow || "0"),
-        y: common_vendor.t(common_vendor.unref(cardDetail).unUsedFlow || "0"),
-        z: common_vendor.t(common_vendor.unref(cardDetail).pkgFlow || "0")
+        x: common_vendor.t(common_vendor.unref(cardDetail).usedFlow != null && common_vendor.unref(cardDetail).usedFlow !== "" ? common_vendor.unref(cardDetail).usedFlow : "0"),
+        y: common_vendor.t(common_vendor.unref(cardDetail).unUsedFlow != null && common_vendor.unref(cardDetail).unUsedFlow !== "" ? common_vendor.unref(cardDetail).unUsedFlow : "0"),
+        z: common_vendor.t(common_vendor.unref(cardDetail).pkgFlow != null && common_vendor.unref(cardDetail).pkgFlow !== "" ? common_vendor.unref(cardDetail).pkgFlow : "0")
       }) : {}, {
         A: common_vendor.unref(activeName) == "卡片套餐"
       }, common_vendor.unref(activeName) == "卡片套餐" ? {
-        B: common_vendor.o(handleClick, "da"),
+        B: common_vendor.o(handleClick, "ed"),
         C: common_vendor.o(($event) => {
           return common_vendor.isRef(current) ? current.value = $event : null;
-        }, "15"),
+        }, "8e"),
         D: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: common_vendor.unref(pkgTabs),
@@ -329,7 +355,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         I: common_vendor.t(common_vendor.unref(card_number))
       } : {}, {
-        J: common_vendor.o(_ctx.handleUnbind, "a4"),
+        J: common_vendor.o(_ctx.handleUnbind, "85"),
         K: common_vendor.p({
           type: "error",
           plain: true,
@@ -350,7 +376,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        N: common_vendor.o(handleBindCard, "fd"),
+        N: common_vendor.o(handleBindCard, "90"),
         O: common_vendor.p({
           bold: true,
           customStyle: {
@@ -359,7 +385,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        P: common_vendor.o(handleRecharge, "73"),
+        P: common_vendor.o(handleRecharge, "04"),
         Q: common_vendor.p({
           type: "primary",
           color: "#1989fa",

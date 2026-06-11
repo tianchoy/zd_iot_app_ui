@@ -125,6 +125,7 @@
 
 <script setup lang="uts">
 	import { ref, computed } from 'vue';
+
 	import LinearProgress from '@/components/progress.uvue';
 	import Payment from '@/components/payment.uvue';
 	
@@ -280,6 +281,9 @@
 			url: '/pages/orderRecord/orderRecord'
 		})
 	}
+
+	onLoad(async () => {
+	})
 	
 </script>
 

@@ -1,20 +1,21 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
-import _easycom_m_tag from '@/uni_modules/m-unix/components/m-tag/m-tag.uvue'
-import _easycom_m_button from '@/uni_modules/m-unix/components/m-button/m-button.uvue'
-import _easycom_m_tabs from '@/uni_modules/m-unix/components/m-tabs/m-tabs.uvue'
-import _easycom_m_bottom_popup from '@/uni_modules/m-unix/components/m-bottom-popup/m-bottom-popup.uvue'
-import _easycom_m_sticky_bottom from '@/uni_modules/m-unix/components/m-sticky-bottom/m-sticky-bottom.uvue'
+import _easycom_rice_tag from '@/uni_modules/rice-ui/components/rice-tag/rice-tag.uvue'
+import _easycom_rice_progress from '@/uni_modules/rice-ui/components/rice-progress/rice-progress.uvue'
+import _easycom_rice_button from '@/uni_modules/rice-ui/components/rice-button/rice-button.uvue'
+import _easycom_rice_tabs from '@/uni_modules/rice-ui/components/rice-tabs/rice-tabs.uvue'
+import _easycom_rice_popup from '@/uni_modules/rice-ui/components/rice-popup/rice-popup.uvue'
 import { ref, computed } from 'vue';
+
 	import LinearProgress from '@/components/progress.uvue';
 	import Payment from '@/components/payment.uvue';
 	
 	// Tab 项类型
-	type TabItem = { __$originalPosition?: UTSSourceMapPosition<"TabItem", "pages/recharge/recharge.uvue", 140, 7>;
+	type TabItem = { __$originalPosition?: UTSSourceMapPosition<"TabItem", "pages/recharge/recharge.uvue", 133, 7>;
 		name: string;
 	};
 	
 	// 套餐包/加油包项类型
-	type PackageItem = { __$originalPosition?: UTSSourceMapPosition<"PackageItem", "pages/recharge/recharge.uvue", 145, 7>;
+	type PackageItem = { __$originalPosition?: UTSSourceMapPosition<"PackageItem", "pages/recharge/recharge.uvue", 138, 7>;
 		name: string;
 		tag: string;
 		data: string;
@@ -24,7 +25,7 @@ import { ref, computed } from 'vue';
 	};
 	
 	// changeTab 函数的参数类型
-	type ChangeTabEvent = { __$originalPosition?: UTSSourceMapPosition<"ChangeTabEvent", "pages/recharge/recharge.uvue", 155, 7>;
+	type ChangeTabEvent = { __$originalPosition?: UTSSourceMapPosition<"ChangeTabEvent", "pages/recharge/recharge.uvue", 148, 7>;
 		index: number;
 	};
 	
@@ -37,7 +38,7 @@ const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
 	const showPopup = ref<boolean>(false);
-	const progress1 = ref<number>(80);
+	const percentage = ref<number>(60);
 	
 	const active = ref<number>(0);
 	const tabs = ref<Array<TabItem>>([
@@ -144,7 +145,7 @@ const _cache = __ins.renderCache;
 	
 	// 确认支付
 	const handleConfirmPayment = (e: any) => {
-		console.log(e, " at pages/recharge/recharge.uvue:267");
+		console.log(e, " at pages/recharge/recharge.uvue:260");
 		// 处理确认逻辑
 		showPopup.value = false;
 	}
@@ -168,17 +169,20 @@ const _cache = __ins.renderCache;
 			url: '/pages/orderRecord/orderRecord'
 		})
 	}
+
+	onLoad(async () => {
+	})
 	
 
 return (): any | null => {
 
 const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar)
-const _component_m_tag = resolveEasyComponent("m-tag",_easycom_m_tag)
-const _component_m_button = resolveEasyComponent("m-button",_easycom_m_button)
-const _component_m_tabs = resolveEasyComponent("m-tabs",_easycom_m_tabs)
+const _component_rice_tag = resolveEasyComponent("rice-tag",_easycom_rice_tag)
+const _component_rice_progress = resolveEasyComponent("rice-progress",_easycom_rice_progress)
+const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_button)
+const _component_rice_tabs = resolveEasyComponent("rice-tabs",_easycom_rice_tabs)
 const _component_block = resolveComponent("block")
-const _component_m_bottom_popup = resolveEasyComponent("m-bottom-popup",_easycom_m_bottom_popup)
-const _component_m_sticky_bottom = resolveEasyComponent("m-sticky-bottom",_easycom_m_sticky_bottom)
+const _component_rice_popup = resolveEasyComponent("rice-popup",_easycom_rice_popup)
 
   return _cE(Fragment, null, [
     _cV(_component_topNavBar, _uM({
@@ -193,12 +197,12 @@ const _component_m_sticky_bottom = resolveEasyComponent("m-sticky-bottom",_easyc
       _cE("view", _uM({ class: "card-info" }), [
         _cE("view", _uM({ class: "card-title" }), [
           _cE("text", _uM({ class: "title" }), "卡片信息"),
-          _cV(_component_m_tag, _uM({
+          _cV(_component_rice_tag, _uM({
             text: "标签",
             round: true,
-            plain: true,
+            "plain-fill": "",
             size: "small",
-            type: "primary"
+            type: "success"
           }))
         ]),
         _cE("view", _uM({ class: "card-number" }), [
@@ -207,7 +211,7 @@ const _component_m_sticky_bottom = resolveEasyComponent("m-sticky-bottom",_easyc
         _cE("view", _uM({ class: "info-list" }), [
           _cE("view", _uM({ class: "info-item" }), [
             _cE("text", _uM({ class: "label" }), "当前套餐"),
-            _cE("text", _uM({ class: "value" }), "车联网月包20G（名称较长时自动换行展示）")
+            _cE("text", _uM({ class: "value" }), "车联网月包20G(名称较长时自动换行展示)")
           ]),
           _cE("view", _uM({ class: "info-item" }), [
             _cE("text", _uM({ class: "label" }), "卡片余额"),
@@ -215,29 +219,22 @@ const _component_m_sticky_bottom = resolveEasyComponent("m-sticky-bottom",_easyc
           ])
         ]),
         _cE("view", _uM({ class: "flow-box" }), [
-          _cE("view", _uM({ class: "flow-label" }), "充值成功"),
-          _cV(unref(LinearProgress), _uM({ value: progress1.value }), null, 8 /* PROPS */, ["value"])
+          _cE("view", _uM({ class: "flow-label" }), "流量信息"),
+          _cV(_component_rice_progress, _uM({
+            percentage: percentage.value,
+            "show-text": ""
+          }), null, 8 /* PROPS */, ["percentage"])
         ]),
         _cE("view", _uM({ class: "card-bottom" }), [
-          _cV(_component_m_button, _uM({
-            type: "white",
-            plain: true,
-            margin: '0 20rpx',
-            height: "70rpx",
-            shape: "circle",
-            bold: true,
+          _cV(_component_rice_button, _uM({
+            class: "btn mr-24",
             onClick: toMyPackage
           }), _uM({
             default: withSlotCtx((): any[] => ["卡片套餐"]),
             _: 1 /* STABLE */
           })),
-          _cV(_component_m_button, _uM({
-            type: "white",
-            plain: true,
-            margin: '0 20rpx',
-            height: "70rpx",
-            shape: "circle",
-            bold: true,
+          _cV(_component_rice_button, _uM({
+            class: "btn",
             onClick: toOrderRecord
           }), _uM({
             default: withSlotCtx((): any[] => ["订单记录"]),
@@ -246,16 +243,16 @@ const _component_m_sticky_bottom = resolveEasyComponent("m-sticky-bottom",_easyc
         ])
       ]),
       _cE("view", _uM({ class: "pkg-box" }), [
-        _cV(_component_m_tabs, _uM({
-          tabs: tabs.value,
-          width: "100rpx",
-          padding: 0,
-          isSlider: true,
-          currentTab: active.value,
+        _cV(_component_rice_tabs, _uM({
+          modelValue: active.value,
+          "onUpdate:modelValue": $event => {(active).value = $event},
+          "line-color": "#ffffff",
+          list: tabs.value,
+          "line-width": 0,
+          "title-active-color": '#2563eb',
           onChange: changeTab,
-          unlined: false,
-          bold: true
-        }), null, 8 /* PROPS */, ["tabs", "currentTab"]),
+          customStyle: {height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}
+        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "list"]),
         _cE("view", _uM({ class: "pkg-content" }), [
           active.value === 0
             ? _cV(_component_block, _uM({ key: 0 }), _uM({
@@ -345,11 +342,11 @@ const _component_m_sticky_bottom = resolveEasyComponent("m-sticky-bottom",_easyc
         ])
       ])
     ]),
-    _cV(_component_m_bottom_popup, _uM({
+    _cV(_component_rice_popup, _uM({
       show: showPopup.value,
-      height: '75%',
-      radius: true,
-      onClose: () => {showPopup.value = false}
+      "onUpdate:show": $event => {(showPopup).value = $event},
+      position: "bottom",
+      onClose: _ctx.onPopupClose
     }), _uM({
       default: withSlotCtx((): any[] => [
         _cV(unref(Payment), _uM({
@@ -359,36 +356,25 @@ const _component_m_sticky_bottom = resolveEasyComponent("m-sticky-bottom",_easyc
         }), null, 8 /* PROPS */, ["amount"])
       ]),
       _: 1 /* STABLE */
-    }), 8 /* PROPS */, ["show", "onClose"]),
-    _cV(_component_m_sticky_bottom, null, _uM({
-      default: withSlotCtx((): any[] => [
-        _cE("view", _uM({ class: "bottom-box" }), [
-          _cE("view", _uM({ class: "price-box" }), [
-            _cE("text", _uM({ class: "price-label" }), "当前套餐金额"),
-            _cE("text", _uM({ class: "price-value" }), "¥" + _tD(currentPrice.value), 1 /* TEXT */)
-          ]),
-          _cV(_component_m_button, _uM({
-            type: "primary",
-            onClick: choosePayment,
-            plain: false,
-            margin: '0 20rpx',
-            width: "200rpx",
-            height: "70rpx",
-            shape: "circle",
-            bold: true,
-            shadow: false
-          }), _uM({
-            default: withSlotCtx((): any[] => ["去支付"]),
-            _: 1 /* STABLE */
-          }))
-        ])
+    }), 8 /* PROPS */, ["show", "onUpdate:show", "onClose"]),
+    _cE("view", _uM({ class: "bottom-box" }), [
+      _cE("view", _uM({ class: "price-box" }), [
+        _cE("text", _uM({ class: "price-label" }), "当前套餐金额"),
+        _cE("text", _uM({ class: "price-value" }), "¥" + _tD(currentPrice.value), 1 /* TEXT */)
       ]),
-      _: 1 /* STABLE */
-    }))
+      _cV(_component_rice_button, _uM({
+        type: "primary",
+        onClick: choosePayment,
+        class: "btn"
+      }), _uM({
+        default: withSlotCtx((): any[] => ["去支付"]),
+        _: 1 /* STABLE */
+      }))
+    ])
   ], 64 /* STABLE_FRAGMENT */)
 }
 }
 
 })
 export default __sfc__
-const GenPagesRechargeRechargeStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"]]))], ["card-info", _uM([[".container ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"]])]])], ["card-title", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["title", _uM([[".container .card-info .card-title ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["card-number", _uM([[".container .card-info ", _uM([["color", "#475569"], ["marginTop", "24rpx"]])]])], ["info-list", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["info-item", _uM([[".container .card-info .info-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0]])]])], ["label", _uM([[".container .card-info .info-list .info-item ", _uM([["color", "#64748b"], ["marginRight", "20rpx"]])]])], ["value", _uM([[".container .card-info .info-list .info-item ", _uM([["fontWeight", "bold"], ["whiteSpace", "pre-wrap"], ["lineHeight", 1.5]])]])], ["flow-box", _uM([[".container .card-info ", _uM([["marginTop", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["flow-label", _uM([[".container .card-info .flow-box ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginBottom", "12rpx"]])]])], ["card-bottom", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["marginTop", "24rpx"]])]])], ["pkg-box", _uM([[".container ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginTop", "24rpx"], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"]])]])], ["pkg-content", _uM([[".container ", _uM([["marginTop", "20rpx"]])]])], ["pkg-card", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "28rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "20rpx"], ["transitionProperty", "all"], ["transitionDuration", "0.2s"], ["transitionTimingFunction", "ease"]])]])], ["pkg-info", _uM([[".container .pkg-card ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["pkg-name", _uM([[".container .pkg-card .pkg-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginBottom", "12rpx"], ["flexWrap", "wrap"]])]])], ["pkg-title", _uM([[".container .pkg-card .pkg-info .pkg-name ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#1e293b"]])]])], ["pkg-tag", _uM([[".container .pkg-card .pkg-info .pkg-name ", _uM([["backgroundImage", "linear-gradient(135deg, #ff9a3c, #ff6b3c)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#ffffff"], ["fontSize", "20rpx"], ["paddingTop", "4rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["marginLeft", "12rpx"]])]])], ["pkg-desc", _uM([[".container .pkg-card .pkg-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["pkg-icon", _uM([[".container .pkg-card .pkg-info .pkg-desc ", _uM([["display", "flex"], ["alignItems", "center"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8fafc"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["color", "#475569"], ["fontSize", "20rpx"], ["fontWeight", 700], ["marginRight", "20rpx"]])]])], ["pkg-price", _uM([[".container .pkg-card ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-end"]])]])], ["price-wrapper", _uM([[".container .pkg-card .pkg-price ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["price-symbol", _uM([[".container .pkg-card .pkg-price .price-wrapper ", _uM([["fontSize", "24rpx"], ["color", "#ef4444"], ["fontWeight", "bold"]])]])], ["price-number", _uM([[".container .pkg-card .pkg-price .price-wrapper ", _uM([["fontSize", "40rpx"], ["color", "#ef4444"], ["fontWeight", "bold"]])]])], ["price-original", _uM([[".container .pkg-card .pkg-price ", _uM([["fontSize", "22rpx"], ["color", "#94a3b8"], ["marginTop", "4rpx"]])]])], ["pkg-card-selected", _uM([[".container ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#3b82f6"], ["borderRightColor", "#3b82f6"], ["borderBottomColor", "#3b82f6"], ["borderLeftColor", "#3b82f6"], ["backgroundImage", "none"], ["backgroundColor", "#f8fafc"], ["boxShadow", "0 4rpx 12rpx rgba(59, 130, 246, 0.08)"]])]])], ["bottom-box", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0]]))], ["price-box", _uM([[".bottom-box ", _uM([["display", "flex"], ["flexDirection", "column"], ["marginLeft", "24rpx"]])]])], ["price-label", _uM([[".bottom-box .price-box ", _uM([["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["price-value", _uM([[".bottom-box .price-box ", _uM([["fontWeight", "bold"], ["color", "#ef4444"], ["fontSize", "40rpx"]])]])], ["@TRANSITION", _uM([["pkg-card", _uM([["property", "all"], ["duration", "0.2s"], ["timingFunction", "ease"]])]])]])]
+const GenPagesRechargeRechargeStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"], ["height", "100%"]]))], ["card-info", _uM([[".container ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"]])]])], ["card-title", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["title", _uM([[".container .card-info .card-title ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#333333"]])]])], ["card-number", _uM([[".container .card-info ", _uM([["color", "#475569"], ["marginTop", "24rpx"]])]])], ["info-list", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["info-item", _uM([[".container .card-info .info-list ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0]])]])], ["label", _uM([[".container .card-info .info-list .info-item ", _uM([["color", "#64748b"], ["marginRight", "20rpx"], ["fontSize", "24rpx"]])]])], ["value", _uM([[".container .card-info .info-list .info-item ", _uM([["fontWeight", "bold"], ["whiteSpace", "pre-wrap"], ["lineHeight", 1.5], ["fontSize", "24rpx"]])]])], ["flow-box", _uM([[".container .card-info ", _uM([["marginTop", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"]])]])], ["flow-label", _uM([[".container .card-info .flow-box ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginBottom", "12rpx"]])]])], ["card-bottom", _uM([[".container .card-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginTop", "24rpx"]])]])], ["btn", _uM([[".container .card-info .card-bottom ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["pkg-box", _uM([[".container ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginTop", "24rpx"], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"]])]])], ["pkg-content", _uM([[".container ", _uM([["marginTop", "20rpx"]])]])], ["pkg-card", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["paddingTop", "28rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "20rpx"], ["transitionProperty", "all"], ["transitionDuration", "0.2s"], ["transitionTimingFunction", "ease"]])]])], ["pkg-info", _uM([[".container .pkg-card ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["pkg-name", _uM([[".container .pkg-card .pkg-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginBottom", "12rpx"], ["flexWrap", "wrap"]])]])], ["pkg-title", _uM([[".container .pkg-card .pkg-info .pkg-name ", _uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#1e293b"]])]])], ["pkg-tag", _uM([[".container .pkg-card .pkg-info .pkg-name ", _uM([["backgroundImage", "linear-gradient(135deg, #ff9a3c, #ff6b3c)"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#ffffff"], ["fontSize", "20rpx"], ["paddingTop", "4rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "4rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["marginLeft", "12rpx"]])]])], ["pkg-desc", _uM([[".container .pkg-card .pkg-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["pkg-icon", _uM([[".container .pkg-card .pkg-info .pkg-desc ", _uM([["display", "flex"], ["alignItems", "center"], ["paddingTop", "10rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["backgroundImage", "none"], ["backgroundColor", "#f8fafc"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["color", "#475569"], ["fontSize", "20rpx"], ["fontWeight", 700], ["marginRight", "20rpx"]])]])], ["pkg-price", _uM([[".container .pkg-card ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-end"]])]])], ["price-wrapper", _uM([[".container .pkg-card .pkg-price ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["price-symbol", _uM([[".container .pkg-card .pkg-price .price-wrapper ", _uM([["fontSize", "24rpx"], ["color", "#ef4444"], ["fontWeight", "bold"]])]])], ["price-number", _uM([[".container .pkg-card .pkg-price .price-wrapper ", _uM([["fontSize", "40rpx"], ["color", "#ef4444"], ["fontWeight", "bold"]])]])], ["price-original", _uM([[".container .pkg-card .pkg-price ", _uM([["fontSize", "22rpx"], ["color", "#94a3b8"], ["marginTop", "4rpx"]])]])], ["pkg-card-selected", _uM([[".container ", _uM([["borderTopWidth", "2rpx"], ["borderRightWidth", "2rpx"], ["borderBottomWidth", "2rpx"], ["borderLeftWidth", "2rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#3b82f6"], ["borderRightColor", "#3b82f6"], ["borderBottomColor", "#3b82f6"], ["borderLeftColor", "#3b82f6"], ["backgroundImage", "none"], ["backgroundColor", "#f8fafc"], ["boxShadow", "0 4rpx 12rpx rgba(59, 130, 246, 0.08)"]])]])], ["bottom-box", _pS(_uM([["position", "fixed"], ["bottom", 0], ["left", 0], ["right", 0], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]]))], ["price-box", _uM([[".bottom-box ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["price-label", _uM([[".bottom-box .price-box ", _uM([["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["price-value", _uM([[".bottom-box .price-box ", _uM([["fontWeight", "bold"], ["color", "#ef4444"], ["fontSize", "40rpx"]])]])], ["@TRANSITION", _uM([["pkg-card", _uM([["property", "all"], ["duration", "0.2s"], ["timingFunction", "ease"]])]])]])]

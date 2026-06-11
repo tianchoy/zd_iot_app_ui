@@ -1,0 +1,30 @@
+// utils/inject-config.uts
+import { config } from '@/common/config.uts'
+import { injectMUnixHostProjectConfig, getHostProjectConfig } from '@/api/ProjectConfig.uts'
+
+const mUnixConfig = {
+	env: config.env,
+	baseUrl: config.baseUrl,
+	storage: {
+		token: config.storage.token,
+		userInfo: 'userInfo',
+	},
+	loginRequiredPaths: config.loginRequiredPaths,
+	loginPagePath: config.loginPagePath,
+	api: {},
+	configInfo: {
+		name: config.configInfo.name,
+		logo: config.configInfo.logo,
+		desc: config.configInfo.desc,
+		versionCode: config.configInfo.versionCode,
+		versionName: config.configInfo.versionName,
+	},
+	mUi: null,
+} as UTSJSONObject
+
+// 注入配置到 m-unix
+injectMUnixHostProjectConfig(mUnixConfig)
+
+// 验证配置是否注入成功
+const injectedConfig = getHostProjectConfig()
+__f__('log','at utils/inject-m-unix.uts:30','配置注入成功:', injectedConfig.baseUrl)
