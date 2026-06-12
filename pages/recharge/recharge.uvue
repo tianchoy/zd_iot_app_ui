@@ -56,8 +56,8 @@
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon">流量 {{ formatFlow(item.pkgFlow) }}</text>
-								<text class="pkg-icon">有效期 {{ item.validityPeriod || '无固定期限' }}天</text>
+								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ formatFlow(item.pkgFlow) }}</text>
+								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod || '无固定期限' }}天</text>
 							</view>
 						</view>
 						<view class="pkg-price">
@@ -89,8 +89,8 @@
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon">流量 {{ formatFlow(item.pkgFlow) }}</text>
-								<text class="pkg-icon">有效期 {{ item.validityPeriod || '无固定期限' }}天</text>
+								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ formatFlow(item.pkgFlow) }}</text>
+								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod || '无固定期限' }}天</text>
 							</view>
 						</view>
 						<view class="pkg-price">
@@ -133,7 +133,7 @@
 <script setup lang="uts">
 	import { ref, computed, onMounted } from 'vue';
 	import { queryCardDetail } from '@/api/http.uts';
-	import type {CardDetail} from '@/api/types'
+	import type {CardDetail,PkgXcxVo} from '@/api/types'
 
 	import LinearProgress from '@/components/progress.uvue';
 	import Payment from '@/components/payment.uvue';
@@ -142,18 +142,7 @@
 	type TabItem = {
 		name: string;
 	};
-	
-	// 套餐包/加油包项类型（基于接口返回的数据结构）
-	type PkgItem = {
-		pkgId: string;
-		pkgName: string;
-		pkgCategory: string; // 3:套餐 4:加油包
-		pkgType: string;
-		validityPeriod: string | null;
-		pkgFlow: string | null;
-		crossedOutPrice: string;
-		sellingPrice: string;
-	};
+
 	
 	// changeTab 函数的参数类型
 	type ChangeTabEvent = {
@@ -205,9 +194,9 @@
 	]);
 	
 	// 套餐包列表（基于接口数据）
-	const packageList = ref<Array<PkgItem>>([]);
+	const packageList = ref<Array<PkgXcxVo>>([]);
 	// 加油包列表（基于接口数据）
-	const refillList = ref<Array<PkgItem>>([]);
+	const refillList = ref<Array<PkgXcxVo>>([]);
 	
 	// 选中的套餐包索引
 	const selectedPackageIndex = ref<number>(0);
@@ -248,9 +237,9 @@
 	};
 	
 	// 根据 pkgCategory 分类套餐和加油包
-	const classifyPackages = (packages: Array<PkgItem>) => {
-		const packagesList: Array<PkgItem> = [];
-		const refillsList: Array<PkgItem> = [];
+	const classifyPackages = (packages: Array<PkgXcxVo>) => {
+		const packagesList: Array<PkgXcxVo> = [];
+		const refillsList: Array<PkgXcxVo> = [];
 		
 		packages.forEach((item, index) => {
 			// pkgCategory: 3为套餐，4为加油包
@@ -360,7 +349,7 @@
 				cardDetail.value = res.data
 				// 处理套餐和加油包分类
 				if (res.data?.pkgXcxVos && res.data.pkgXcxVos.length > 0) {
-					classifyPackages(res.data.pkgXcxVos as Array<PkgItem>)
+					classifyPackages(res.data.pkgXcxVos as Array<PkgXcxVo>)
 				}
 			}
 		} catch (error) {

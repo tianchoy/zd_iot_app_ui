@@ -40,39 +40,6 @@ class TabItem extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-class PkgItem extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          pkgId: { type: String, optional: false },
-          pkgName: { type: String, optional: false },
-          pkgCategory: { type: String, optional: false },
-          pkgType: { type: String, optional: false },
-          validityPeriod: { type: String, optional: true },
-          pkgFlow: { type: String, optional: true },
-          crossedOutPrice: { type: String, optional: false },
-          sellingPrice: { type: String, optional: false }
-        };
-      },
-      name: "PkgItem"
-    };
-  }
-  constructor(options, metadata = PkgItem.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.pkgId = this.__props__.pkgId;
-    this.pkgName = this.__props__.pkgName;
-    this.pkgCategory = this.__props__.pkgCategory;
-    this.pkgType = this.__props__.pkgType;
-    this.validityPeriod = this.__props__.validityPeriod;
-    this.pkgFlow = this.__props__.pkgFlow;
-    this.crossedOutPrice = this.__props__.crossedOutPrice;
-    this.sellingPrice = this.__props__.sellingPrice;
-    delete this.__props__;
-  }
-}
 class ChangeTabEvent extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -220,13 +187,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleConfirmPayment = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:317", e);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:306", e);
       const currentItem = active.value === 0 ? packageList.value[selectedPackageIndex.value] : refillList.value[selectedRefillIndex.value];
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:323", "支付套餐信息:", currentItem);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:312", "支付套餐信息:", currentItem);
       showPopup.value = false;
     };
     const onPopupClose = () => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:329", "弹窗关闭");
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:318", "弹窗关闭");
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -249,7 +216,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         var _a;
         try {
           const res = yield api_http.queryCardDetail(cardNumber2, "0");
-          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:358", "卡片详情返回:", res);
+          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:347", "卡片详情返回:", res);
           if (res.code == 200) {
             cardDetail.value = res.data;
             if (((_a = res.data) === null || _a === void 0 ? null : _a.pkgXcxVos) && res.data.pkgXcxVos.length > 0) {
@@ -257,7 +224,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:367", "获取卡片详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:356", "获取卡片详情失败:", error);
           common_vendor.index.showToast({
             title: "获取卡片信息失败",
             icon: "none"
@@ -271,7 +238,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         cardNumber.value = options.cardNumber;
         getCardDetail(cardNumber.value);
       } else {
-        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:383", "未获取到卡片号码");
+        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:372", "未获取到卡片号码");
         common_vendor.index.showToast({
           title: "卡片号码不存在",
           icon: "none"
@@ -279,7 +246,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     });
     common_vendor.onMounted(() => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:394", "页面加载完成");
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:383", "页面加载完成");
     });
     return (_ctx, _cache) => {
       "raw js";
@@ -345,16 +312,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, item.tag ? {
             c: common_vendor.t(item.tag)
           } : {}, {
-            d: common_vendor.t(formatFlow(item.pkgFlow)),
-            e: common_vendor.t(item.validityPeriod || "无固定期限"),
-            f: common_vendor.t(item.sellingPrice),
-            g: item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice
-          }, item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice ? {
-            h: common_vendor.t(item.crossedOutPrice)
+            d: item.pkgFlow
+          }, item.pkgFlow ? {
+            e: common_vendor.t(formatFlow(item.pkgFlow))
           } : {}, {
-            i: item.pkgId || index,
-            j: selectedPackageIndex.value === index ? 1 : "",
-            k: common_vendor.o(($event) => {
+            f: item.validityPeriod
+          }, item.validityPeriod ? {
+            g: common_vendor.t(item.validityPeriod || "无固定期限")
+          } : {}, {
+            h: common_vendor.t(item.sellingPrice),
+            i: item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice
+          }, item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice ? {
+            j: common_vendor.t(item.crossedOutPrice)
+          } : {}, {
+            k: item.pkgId || index,
+            l: selectedPackageIndex.value === index ? 1 : "",
+            m: common_vendor.o(($event) => {
               return selectPackage(index);
             }, item.pkgId || index)
           });
@@ -368,16 +341,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, item.tag ? {
             c: common_vendor.t(item.tag)
           } : {}, {
-            d: common_vendor.t(formatFlow(item.pkgFlow)),
-            e: common_vendor.t(item.validityPeriod || "无固定期限"),
-            f: common_vendor.t(item.sellingPrice),
-            g: item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice
-          }, item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice ? {
-            h: common_vendor.t(item.crossedOutPrice)
+            d: item.pkgFlow
+          }, item.pkgFlow ? {
+            e: common_vendor.t(formatFlow(item.pkgFlow))
           } : {}, {
-            i: item.pkgId || index,
-            j: selectedRefillIndex.value === index ? 1 : "",
-            k: common_vendor.o(($event) => {
+            f: item.validityPeriod
+          }, item.validityPeriod ? {
+            g: common_vendor.t(item.validityPeriod || "无固定期限")
+          } : {}, {
+            h: common_vendor.t(item.sellingPrice),
+            i: item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice
+          }, item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice ? {
+            j: common_vendor.t(item.crossedOutPrice)
+          } : {}, {
+            k: item.pkgId || index,
+            l: selectedRefillIndex.value === index ? 1 : "",
+            m: common_vendor.o(($event) => {
               return selectRefill(index);
             }, item.pkgId || index)
           });
@@ -386,23 +365,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, refillList.value.length === 0 ? {} : {}), {
         t: `${_ctx.u_s_b_h}px`,
         v: `${_ctx.u_s_a_i_b}px`,
-        w: common_vendor.o(handleCancelPayment, "98"),
-        x: common_vendor.o(handleConfirmPayment, "fe"),
+        w: common_vendor.o(handleCancelPayment, "ad"),
+        x: common_vendor.o(handleConfirmPayment, "53"),
         y: common_vendor.p({
           amount: currentPrice.value,
           class: "data-v-722cdacb"
         }),
-        z: common_vendor.o(onPopupClose, "a0"),
+        z: common_vendor.o(onPopupClose, "7b"),
         A: common_vendor.o(($event) => {
           return showPopup.value = $event;
-        }, "d6"),
+        }, "1b"),
         B: common_vendor.p({
           position: "bottom",
           show: showPopup.value,
           class: "data-v-722cdacb"
         }),
         C: common_vendor.t(currentPrice.value),
-        D: common_vendor.o(choosePayment, "6e"),
+        D: common_vendor.o(choosePayment, "5c"),
         E: common_vendor.p({
           type: "primary",
           class: "btn data-v-722cdacb"

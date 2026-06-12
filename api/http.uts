@@ -12,7 +12,9 @@ import type {
   CardItem,
   BindCard,
   PkgInfoListParams,
-  CardDetail
+  CardDetail,
+  QueryOrderListXcxParams,
+  QueryOrderListXcxData,
 } from './types'
 
 // 查询国家列表
@@ -169,6 +171,16 @@ export function queryPkgInfoDetail(id: string, withToken: boolean = true): Promi
   return request<CardDetail>({
     url: (ApiUrl.queryPkgInfoDetail as string) + id,
     method: 'GET',
+    withToken: withToken
+  })
+}
+
+// 查询订单列表Xcx
+export function queryOrderListXcx(data: UTSJSONObject, withToken: boolean = true): Promise<ApiResponse<QueryOrderListXcxData>> {
+  return request<QueryOrderListXcxData>({
+    url: ApiUrl.queryOrderListXcx as string,
+    method: 'GET',
+    data: data,
     withToken: withToken
   })
 }

@@ -171,12 +171,32 @@ function queryPkgInfoList(data, withToken = true) {
     withToken
   }));
 }
+function queryOrderListXcx(data, withToken = true) {
+  return api_Request.request(new api_Request.RequestOptions({
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.queryOrderListXcx,
+    method: "GET",
+    data,
+    withToken
+  }));
+}
 exports.getCountryList = getCountryList;
 exports.getTenantInfo = getTenantInfo;
 exports.login = login;
 exports.queryCardDetail = queryCardDetail;
 exports.queryCardList = queryCardList;
 exports.queryCardListSum = queryCardListSum;
+exports.queryOrderListXcx = queryOrderListXcx;
 exports.queryPkgInfoList = queryPkgInfoList;
 exports.userBindCard = userBindCard;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

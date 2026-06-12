@@ -12,9 +12,7 @@
 					@input="handleInput"
 				>
 				</rice-input>
-				<rice-button class="scan-btn" height="100%" @click="scanCode">
-					<rice-icon name="scan" size="40rpx"></rice-icon>
-				</rice-button>
+				<rice-button class="scan-btn" height="100%" icon="scan" @click="scanCode"></rice-button>
 				<rice-button type="primary" color="#1989fa" textColor="#ffffff" height="100%" @click="handleQuery">查询</rice-button>
 			</view>
 			
@@ -96,44 +94,7 @@ const scrollViewHeight = ref(0)
 const loading = ref<boolean>(false)
 
 // 完整的卡片列表数据
-const allCardList = ref<CardItem[]>([
-	{
-		id: 1,
-		cardNumber: '1064916585160',
-		iccid: '89860421123456789012',
-		tag: '主卡',
-		status: '在用',
-		currentPackage: '车联网月包20G',
-		expireDate: '2026-04-30',
-		usedTraffic: '11.34GB',
-		totalTraffic: '20GB',
-		currentCycle: '第1期 / 共12期'
-	},
-	{
-		id: 2,
-		cardNumber: '1064916585161',
-		iccid: '89860421123456789013',
-		tag: '副卡',
-		status: '在用',
-		currentPackage: '车联网月包10G',
-		expireDate: '2026-05-15',
-		usedTraffic: '5.21GB',
-		totalTraffic: '10GB',
-		currentCycle: '第2期 / 共6期'
-	},
-	{
-		id: 3,
-		cardNumber: '1064916585162',
-		iccid: '89860421123456789014',
-		tag: '测试卡',
-		status: '异常',
-		currentPackage: '测试套餐1G',
-		expireDate: '2026-03-31',
-		usedTraffic: '1GB',
-		totalTraffic: '1GB',
-		currentCycle: '第1期 / 共1期'
-	}
-])
+const allCardList = ref<CardItem[]>([])
 
 type TabItem = {
 	name: string
@@ -141,9 +102,11 @@ type TabItem = {
 
 // 计算每个 tab 对应的卡片数量
 const tabNumbers = computed<number[]>(() => {
-	const total = allCardList.value.length
-	const inUse = allCardList.value.filter((card: CardItem) => card.status === '在用').length
-	const abnormal = allCardList.value.filter((card: CardItem) => card.status !== '在用').length
+	// 确保 allCardList.value 是数组，如果不是则返回空数组
+	const list = Array.isArray(allCardList.value) ? allCardList.value : []
+	const total = list.length
+	const inUse = list.filter((card: CardItem) => card.status === '在用').length
+	const abnormal = list.filter((card: CardItem) => card.status !== '在用').length
 	return [total, inUse, abnormal]
 })
 
@@ -165,10 +128,13 @@ const handleDetail = (card: CardItem) => {
 
 // 根据选中的 tab 和查询卡号过滤卡片列表
 const filteredCardList = computed<CardItem[]>(() : CardItem[] => {
+	// 确保 allCardList.value 是数组
+	const list = Array.isArray(allCardList.value) ? allCardList.value : []
 	const currentStatus = tabStatuses[current.value]
-	let list = allCardList.value
+	let filteredList = [...list]
+	
 	if (currentStatus !== '全部') {
-		list = list.filter((card: CardItem) : boolean => {
+		filteredList = filteredList.filter((card: CardItem) : boolean => {
 			const status = '' + card.status
 			if (currentStatus === '异常') {
 				return status !== '在用'
@@ -177,12 +143,12 @@ const filteredCardList = computed<CardItem[]>(() : CardItem[] => {
 		})
 	}
 	if (queryKeyword.value !== '') {
-		list = list.filter((card: CardItem) : boolean => {
+		filteredList = filteredList.filter((card: CardItem) : boolean => {
 			const cardNumber = '' + card.cardNumber
 			return cardNumber.indexOf(queryKeyword.value) !== -1
 		})
 	}
-	return list
+	return filteredList
 })
 
 const getCardText = (card: CardItem, key: string): string => {
@@ -262,12 +228,9 @@ const calculateScrollHeight = () => {
 		const statusBarHeight = systemInfo.statusBarHeight || 0
 		uni.createSelectorQuery().select('.container').boundingClientRect((rect) => {
 			if (rect) {
-				// 获取顶部搜索框区域高度
 				uni.createSelectorQuery().select('.card-box').boundingClientRect((searchRect) => {
 					if (searchRect) {
-						// container 的 padding-bottom 40rpx 转换为 px
 						const paddingBottom = 40 / 750 * systemInfo.windowWidth
-						// 减去顶部搜索区域和容器内边距，剩余高度给 scroll-view
 						scrollViewHeight.value = windowHeight - searchRect.top - paddingBottom - 20
 					}
 				}).exec()
@@ -278,17 +241,22 @@ const calculateScrollHeight = () => {
 }
 
 // 查询卡列表
-const getCardList = async () => {
-	loading.value = true
+const getCardList = async (state: string) => {
 	try {
 		const res = await queryCardList({
-			status: '0'
+			status: state,
+			isSort: '1'
 		})
-		if (res.code === 200) {
-			console.log('查询卡列表成功:', res.data)
-			allCardList.value = res.data.list as CardItem[]
+		console.log('查询卡列表返回:', res)
+		if (res.code == 200) {
+			if (res.data && Array.isArray(res.data)) {
+				allCardList.value = res.data
+			} else if (res.data === null || res.data === undefined) {
+				allCardList.value = []
+			} else {
+				allCardList.value = []
+			}
 		} else {
-			console.log('查询卡列表失败:', res.msg)
 			allCardList.value = []
 			uni.showToast({
 				title: res.msg || '查询失败',
@@ -299,11 +267,9 @@ const getCardList = async () => {
 		console.error('查询卡列表异常:', error)
 		allCardList.value = []
 		uni.showToast({
-			title: '网络异常，请稍后重试',
+			title: '查询失败，请稍后重试',
 			icon: 'none'
 		})
-	} finally {
-		loading.value = false
 	}
 }
 
@@ -329,7 +295,7 @@ const isLogin = (): boolean => {
 const platform = async () => {
 	if (checkToken()) {
 		//加载列表数据
-		await getCardList()
+		await getCardList('0')
 	}
 }
 

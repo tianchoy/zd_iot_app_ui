@@ -334,7 +334,7 @@ class PkgInfoListParams extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-class PackageItem extends common_vendor.UTS.UTSType {
+class PkgInfoItem extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -350,10 +350,10 @@ class PackageItem extends common_vendor.UTS.UTSType {
           leftFlow: { type: String, optional: false }
         };
       },
-      name: "PackageItem"
+      name: "PkgInfoItem"
     };
   }
-  constructor(options, metadata = PackageItem.get$UTSMetadata$(), isJSONParse = false) {
+  constructor(options, metadata = PkgInfoItem.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.name = this.__props__.name;
@@ -367,11 +367,82 @@ class PackageItem extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class QueryOrderListXcxParams extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          rechargeNo: { type: String, optional: false }
+        };
+      },
+      name: "QueryOrderListXcxParams"
+    };
+  }
+  constructor(options, metadata = QueryOrderListXcxParams.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.rechargeNo = this.__props__.rechargeNo;
+    delete this.__props__;
+  }
+}
+class QueryOrderListXcxData extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          rows: { type: common_vendor.UTS.UTSType.withGenerics(Array, [OrderListXcxItem]), optional: false },
+          total: { type: Number, optional: false }
+        };
+      },
+      name: "QueryOrderListXcxData"
+    };
+  }
+  constructor(options, metadata = QueryOrderListXcxData.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.rows = this.__props__.rows;
+    this.total = this.__props__.total;
+    delete this.__props__;
+  }
+}
+class OrderListXcxItem extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          id: { type: Number, optional: false },
+          orderNo: { type: String, optional: false },
+          pkgName: { type: String, optional: false },
+          createTime: { type: String, optional: false },
+          status: { type: String, optional: false },
+          payCurrencyAmount: { type: String, optional: false }
+        };
+      },
+      name: "OrderListXcxItem"
+    };
+  }
+  constructor(options, metadata = OrderListXcxItem.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.id = this.__props__.id;
+    this.orderNo = this.__props__.orderNo;
+    this.pkgName = this.__props__.pkgName;
+    this.createTime = this.__props__.createTime;
+    this.status = this.__props__.status;
+    this.payCurrencyAmount = this.__props__.payCurrencyAmount;
+    delete this.__props__;
+  }
+}
 exports.BindCard = BindCard;
 exports.CardDetail = CardDetail;
-exports.CardItem = CardItem;
 exports.CardListSumData = CardListSumData;
-exports.PackageItem = PackageItem;
 exports.PkgInfoListParams = PkgInfoListParams;
 exports.QueryCardListParams = QueryCardListParams;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/types.js.map

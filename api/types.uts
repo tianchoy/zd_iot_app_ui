@@ -109,7 +109,7 @@ export type PkgInfoListParams = {
   status: string
 }
 
-export type PackageItem = {
+export type PkgInfoItem = {
 		name: string
 		status: 'active' | 'pending' | 'expired'
 		statusText: string
@@ -118,4 +118,25 @@ export type PackageItem = {
 		totalFlow: string
 		usedFlow: string
 		leftFlow: string
+}
+
+// 查询订单列表Xcx参数
+export type QueryOrderListXcxParams = {
+	rechargeNo: string,
+}
+// 查询订单列表Xcx返回数据
+export type QueryOrderListXcxData = {
+	code: number;
+	msg: string;
+	rows: OrderListXcxItem[];
+  total: number;
+}
+
+export type OrderListXcxItem = {
+  id: number;
+  orderNo: string;
+  pkgName: string;
+  createTime: string;
+  status: string;
+  payCurrencyAmount: string;
 }

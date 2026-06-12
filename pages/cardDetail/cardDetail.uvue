@@ -27,13 +27,14 @@
 									<view class="info-item" v-if="cardDetail.pkgName"><text class="info-label">套餐名称</text><text class="info-value">{{cardDetail.pkgName}}</text></view>
 									<view class="info-item" v-if="cardDetail.effectiveTime"><text class="info-label">生效时间</text><text class="info-value">{{cardDetail.effectiveTime}}</text></view>
 									<view class="info-item" v-if="cardDetail.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail.expirationTime}}</text></view>
-
+									<view class="info-item" v-if="cardDetail.statusStr"><text class="info-label">状态</text><rice-tag type="success" :text="cardDetail.statusStr" /></view>
 									<view class="info-item" v-if="cardDetail.usedPeriod && cardDetail.totalPeriod"><text class="info-label">周期</text><text class="info-value">{{cardDetail.usedPeriod}} / {{cardDetail.totalPeriod}}</text></view>
 									<view class="info-item" v-if="cardDetail.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail.expirationTime}}</text></view>
 								</view>
+								<rice-divider v-if="cardDetail.pkgFlow" dashed />
 							</view>
-							<view class="section-title">流量使用</view>
-							<view class="data-total">
+							<view class="section-title" v-if="cardDetail.pkgFlow">流量使用</view>
+							<view class="data-total" v-if="cardDetail.pkgFlow">
 								<view class="total-item"><text class="total-label">已用流量:</text><text class="total-value">{{cardDetail.usedFlow != null && cardDetail.usedFlow !== '' ? cardDetail.usedFlow : '0'}}</text></view>
 								<view class="total-item"><text class="total-label">剩余流量:</text><text class="total-value">{{cardDetail.unUsedFlow != null && cardDetail.unUsedFlow !== '' ? cardDetail.unUsedFlow : '0'}}</text></view>
 								<view class="total-item"><text class="total-label">总流量:</text><text class="total-value">{{cardDetail.pkgFlow != null && cardDetail.pkgFlow !== '' ? cardDetail.pkgFlow : '0'}}</text></view>
@@ -53,28 +54,59 @@
 								>
 							</rice-tabs>
 							<view class="card-pkg-box">
+								<view v-if="filteredPackageList.length === 0" class="empty-order">
+									<view class="empty-text">暂无套餐记录</view>
+								</view>
 								<view class="item" v-for="(item, index) in filteredPackageList" :key="index">
-									<view class="item-head"><text class="item-label">{{ item.name }}</text><rice-tag :text="item.statusText" :round="true" plain-fill size="small" :type="item.tagType"></rice-tag></view>
-									<view class="item-sub-title">生效时间：{{ item.startTime }}</view>
+									<view class="item-head">
+										<text class="item-label">{{ item.pkgName }}</text>
+										<rice-tag :text="getPackageStatusText(item.status)" :round="true" plain-fill size="small" :type="getPackageStatusType(item.status)"></rice-tag>
+									</view>
+									<view class="item-sub-title">生效时间：{{ item.effectiveTime}}</view>
+									<view class="item-sub-title" v-if="item.expirationTime">到期时间：{{ item.expirationTime}}</view>
 									<view class="item-data">
-										<view class="item-data-item"><text class="item-data-label">套餐流量</text><text class="item-data-value">{{ item.totalFlow }}</text></view>
-										<view class="item-data-item"><text class="item-data-label">已用流量</text><text class="item-data-value">{{ item.usedFlow }}</text></view>
-										<view class="item-data-item"><text class="item-data-label">剩余流量</text><text class="item-data-value">{{ item.leftFlow }}</text></view>
+										<view class="item-data-item">
+											<text class="item-data-label">套餐流量</text>
+											<text class="item-data-value">{{ item.pkgFlow }}</text>
+										</view>
+										<view class="item-data-item">
+											<text class="item-data-label">已用流量</text>
+											<text class="item-data-value">{{ item.usedFlow }}</text>
+										</view>
+										<view class="item-data-item">
+											<text class="item-data-label">剩余流量</text>
+											<text class="item-data-value">{{ item.unUsedFlow }}</text>
+										</view>
 									</view>
 								</view>
 							</view>
 						</view>
 
 						<view class="section-content card-order" v-if="activeName == '卡片订单'">
-							<view class="item" v-for="date in orderDates" :key="date">
-								<view class="item-head"><text class="item-label">车联网月包20G</text><rice-tag text="已完成" :round="true" plain-fill size="small" type="success"></rice-tag></view>
-								<view class="item-sub-title">订单号: {{card_number}}</view>
-								<view class="item-data"><text class="date-label">{{ date }}</text><text class="total-value">¥200</text></view>
+							<view v-if="orderList.length === 0" class="empty-order">
+								<view class="empty-text">暂无订单记录</view>
+							</view>
+							<view class="item" v-for="(order, index) in orderList" :key="order.id || index">
+								<view class="item-head">
+									<text class="item-label">{{ order.pkgName || '未知套餐' }}</text>
+									<rice-tag 
+										:type="getOrderStatusType(order.status)" 
+										:text="getOrderStatusText(order.status)" 
+										:round="true" 
+										plain-fill 
+										size="small"
+									></rice-tag>
+								</view>
+								<view class="item-sub-title">订单号: {{ order.orderNo || '未知' }}</view>
+								<view class="item-data">
+									<text class="date-label">{{ order.createTime}}</text>
+									<text class="total-value">¥{{ order.payCurrencyAmount }}</text>
+								</view>
 							</view>
 						</view>
 					</view>
 				</view>
-				<rice-button v-if="cardDetail.isBind || isBinded" class="ml-24 mr-24 mt-24 mb-24" type="error" plain text="解绑卡片" :customStyle="{backgroundColor:'#ffffff'}" @click="handleUnbind"></rice-button>
+				<rice-button v-if="cardDetail.isBind || isBinded" class="ml-24 mr-24 mt-24 mb-24" type="error" plain-fill text="解绑卡片" :customStyle="{backgroundColor:'#ffffff'}" @click="handleUnbind"></rice-button>
 			</view>
 
 			<view class="fixed-bottom-buttons">
@@ -85,15 +117,14 @@
 			</view>
 		</view>
 		<view class="empty-state" v-else>
-			<text class="empty-text">暂无卡片详情</text>
+			<view class="empty-text">暂无卡片详情</view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import {queryCardDetail,userBindCard,queryPkgInfoList} from '@/api/http'
-	import type {CardDetail,BindCard,PackageItem} from '@/api/types'
-
+	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderListXcx} from '@/api/http'
+	import type {CardDetail,BindCard,OrderListXcxItem,PkgInfoItem} from '@/api/types'
 
 	type CardDetailTabItem = {
 		name: string
@@ -105,7 +136,6 @@
 		name: string
 	}
 
-
 	const card_number = ref('')
 	const active = ref(0)
 	const activeName = ref('基本信息')
@@ -113,6 +143,8 @@
 	const navBarHeight = ref(44)
 	const fixedTabsHeight = 109
 	const cardDetail = ref<CardDetail>({} as CardDetail)
+	const orderList = ref<OrderListXcxItem[]>([])
+	const pkgInfoList = ref<PkgInfoItem[]>([])
 
 	const fixedTabsStyle = computed(() => {
 		const css = new Map<string, string>()
@@ -127,30 +159,72 @@
 	])
 
 	const pkgTabs = ref([{ name: '全部' }, { name: '在用套餐' }, { name: '待生效' }, { name: '已失效' }])
-	const orderDates = ref(['2026-03-25', '2026-02-25', '2026-01-25'])
-
-	
-
-	const packageList = ref<PackageItem[]>([
-		{ name: '车联网月包20G', status: 'active', statusText: '在用', tagType: 'success', startTime: '2026-04-01', totalFlow: '20GB', usedFlow: '11.34GB', leftFlow: '8.66GB' },
-		{ name: '车联网月包20G', status: 'pending', statusText: '待生效', tagType: 'primary', startTime: '2026-05-01', totalFlow: '20GB', usedFlow: '0GB', leftFlow: '20GB' },
-		{ name: '车联网月包20G', status: 'pending', statusText: '待生效', tagType: 'primary', startTime: '2026-06-01', totalFlow: '20GB', usedFlow: '0GB', leftFlow: '20GB' },
-		{ name: '车联网月包20G', status: 'expired', statusText: '已失效', tagType: 'error', startTime: '2025-03-01', totalFlow: '20GB', usedFlow: '20GB', leftFlow: '0GB' },
-		{ name: '车联网月包20G', status: 'expired', statusText: '已失效', tagType: 'error', startTime: '2025-02-01', totalFlow: '20GB', usedFlow: '20GB', leftFlow: '0GB' }
-	])
 
 	const current = ref(0)
 
-	const filteredPackageList = computed<PackageItem[]>(() => {
-		if (current.value == 1) return packageList.value.filter((item) => item.status == 'active')
-		if (current.value == 2) return packageList.value.filter((item) => item.status == 'pending')
-		if (current.value == 3) return packageList.value.filter((item) => item.status == 'expired')
-		return packageList.value
+	// 过滤套餐列表
+	const filteredPackageList = computed<PkgInfoItem[]>(() => {
+		if (current.value == 0) return pkgInfoList.value
+		if (current.value == 1) return pkgInfoList.value.filter((item) => item.status === 'active')
+		if (current.value == 2) return pkgInfoList.value.filter((item) => item.status === 'pending')
+		if (current.value == 3) return pkgInfoList.value.filter((item) => item.status === 'expired')
+		return pkgInfoList.value
 	})
+
+	// 获取套餐状态对应的文本
+	const getPackageStatusText = (status: string): string => {
+		const statusMap: Record<string, string> = {
+			'active': '在用',
+			'pending': '待生效',
+			'expired': '已失效',
+			'using': '在用',
+			'waiting': '待生效',
+			'invalid': '已失效'
+		}
+		return statusMap[status] || status || '未知'
+	}
+
+	// 获取套餐状态对应的标签类型
+	const getPackageStatusType = (status: string): string => {
+		const typeMap: Record<string, string> = {
+			'active': 'success',
+			'using': 'success',
+			'pending': 'primary',
+			'waiting': 'primary',
+			'expired': 'error',
+			'invalid': 'error'
+		}
+		return typeMap[status] || 'primary'
+	}
+
+	// 获取订单状态对应的文本
+	const getOrderStatusText = (status: string): string => {
+		const statusMap: Record<string, string> = {
+			'success': '已完成',
+			'pending': '处理中',
+			'failed': '失败',
+			'cancelled': '已取消',
+			'processing': '处理中',
+			'completed': '已完成'
+		}
+		return statusMap[status] || status || '未知'
+	}
+
+	// 获取订单状态对应的标签类型
+	const getOrderStatusType = (status: string): string => {
+		const typeMap: Record<string, string> = {
+			'success': 'success',
+			'completed': 'success',
+			'pending': 'warning',
+			'processing': 'warning',
+			'failed': 'error',
+			'cancelled': 'error'
+		}
+		return typeMap[status] || 'primary'
+	}
 
 	// 点击卡片信息tab
 	const handleClick = (e: UTSJSONObject) => {
-		console.log(typeof e.index)
 		if (e.index != null) {
 			current.value = e.index as number
 			getPkgInfoList(e.index.toString())
@@ -165,7 +239,7 @@
 		const tabActions: Record<number, () => void> = {
 			0: () => getCardDetail(),
 			1: () => getPkgInfoList('0'),
-			2: () => {} // getOrderList 
+			2: () => getOrderList()
 		}
 		tabActions[e.index]?.()
 		current.value = 0
@@ -212,6 +286,59 @@
 		}
 	}
 
+	// 查询订单列表Xcx
+	const getOrderList = async () => {
+		try {
+			const res = await queryOrderListXcx({
+				rechargeNo: card_number.value,
+			})
+			console.log('订单列表返回:', res)
+			if (res.code == 200) {
+				if (res.rows && Array.isArray(res.rows)) {
+					orderList.value = res.rows
+					console.log('订单列表数量:', orderList.value.length)
+				} else if (res.data && Array.isArray(res.data)) {
+					orderList.value = res.data
+				} else {
+					orderList.value = []
+				}
+			} else {
+				console.log('查询订单列表失败:', res.msg)
+				orderList.value = []
+			}
+		} catch (error) {
+			console.error('查询订单列表异常:', error)
+			orderList.value = []
+		}
+	}
+
+	/** 查询套餐信息列表 */
+	const getPkgInfoList = async (state: string) => {
+		try {
+			const res = await queryPkgInfoList({
+				rechargeNo: card_number.value,
+				status: state,
+			})
+			console.log('套餐列表返回:', res)
+			if (res.code == 200) {
+				if (res.rows && Array.isArray(res.rows)) {
+					pkgInfoList.value = res.rows
+					console.log('套餐列表数量:', pkgInfoList.value.length)
+				} else if (res.data && Array.isArray(res.data)) {
+					pkgInfoList.value = res.data
+				} else {
+					pkgInfoList.value = []
+				}
+			} else {
+				console.log('查询套餐列表失败:', res.msg)
+				pkgInfoList.value = []
+			}
+		} catch (error) {
+			console.error('查询套餐列表异常:', error)
+			pkgInfoList.value = []
+		}
+	}
+
 	/** 绑定卡 */
 	const isBinded = ref(false)
 	const handleBindCard = async () => {
@@ -242,18 +369,6 @@
 		})
 	}
 
-	/** 查询套餐信息列表 */
-	const getPkgInfoList = async (state:string) => {
-		const res = await queryPkgInfoList({
-			rechargeNo: card_number.value,
-			status:state
-		})
-		console.log(res)
-		// if(res.code == 200){
-		// 	packageList.value = res.data?.packageList ?? []
-		// }
-	}
-
 	onMounted(() => {
 		getNavBarInfo()
 	})
@@ -262,7 +377,6 @@
 		const cardNumber = options.cardNumber ?? ''
 		card_number.value = cardNumber
 		getCardDetail()
-		
 	})
 </script>
 
@@ -321,9 +435,6 @@
 		.base-info {
 			display: flex;
 			flex-direction: column;
-			padding-bottom: 24rpx;
-			border-bottom: 1rpx solid #eef2f7;
-			margin-bottom: 24rpx;
 
 			.info-item {
 				display: flex;
@@ -465,6 +576,7 @@
 				font-size: 22rpx;
 				color: #64748b;
 				line-height: 1.55;
+				margin-bottom: 8rpx;
 			}
 
 			.item-data {
@@ -517,6 +629,32 @@
 			}
 		}
 	}
+
+
+	.empty-order {
+		text-align: center;
+		padding: 60rpx 20rpx;
+		color: #94a3b8;
+		font-size: 28rpx;
+
+		.empty-state {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 120rpx 32rpx;
+			background-color: #ffffff;
+			margin: 0 24rpx;
+			border-radius: 24rpx;
+			
+			.empty-text {
+				text-align: center;
+				font-size: 28rpx;
+				color: #9ca3af;
+			}
+		}
+	}
+	
 }
 
 .fixed-bottom-buttons {
@@ -540,19 +678,4 @@
 	}
 }
 
-.empty-state {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 120rpx 32rpx;
-	background-color: #ffffff;
-	margin: 0 24rpx;
-	border-radius: 24rpx;
-	
-	.empty-text {
-		font-size: 28rpx;
-		color: #9ca3af;
-	}
-}
 </style>

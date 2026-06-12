@@ -73,9 +73,6 @@ page .card-content .base-info-box.data-v-2bc48812 {
 page .card-content .base-info-box .base-info.data-v-2bc48812 {
   display: flex;
   flex-direction: column;
-  padding-bottom: 24rpx;
-  border-bottom: 1rpx solid #eef2f7;
-  margin-bottom: 24rpx;
 }
 page .card-content .base-info-box .base-info .info-item.data-v-2bc48812 {
   display: flex;
@@ -197,6 +194,7 @@ page .card-content .card-pkg-box .item .item-sub-title.data-v-2bc48812,page  .ca
   font-size: 22rpx;
   color: #64748b;
   line-height: 1.55;
+  margin-bottom: 8rpx;
 }
 page .card-content .card-pkg-box .item .item-data.data-v-2bc48812,page  .card-content .card-order .item .item-data.data-v-2bc48812 {
   display: flex;
@@ -239,6 +237,27 @@ page .card-content .card-order .item-data .total-value.data-v-2bc48812 {
   font-weight: 900;
   color: #ef4444;
 }
+page .card-content .empty-order.data-v-2bc48812 {
+  text-align: center;
+  padding: 60rpx 20rpx;
+  color: #94a3b8;
+  font-size: 28rpx;
+}
+page .card-content .empty-order .empty-state.data-v-2bc48812 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 32rpx;
+  background-color: #ffffff;
+  margin: 0 24rpx;
+  border-radius: 24rpx;
+}
+page .card-content .empty-order .empty-state .empty-text.data-v-2bc48812 {
+  text-align: center;
+  font-size: 28rpx;
+  color: #9ca3af;
+}
 page .fixed-bottom-buttons.data-v-2bc48812 {
   position: fixed;
   bottom: 0;
@@ -257,18 +276,4 @@ page .fixed-bottom-buttons.data-v-2bc48812 {
 }
 page .fixed-bottom-buttons .btn.data-v-2bc48812 {
   flex: 1;
-}
-page .empty-state.data-v-2bc48812 {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 120rpx 32rpx;
-  background-color: #ffffff;
-  margin: 0 24rpx;
-  border-radius: 24rpx;
-}
-page .empty-state .empty-text.data-v-2bc48812 {
-  font-size: 28rpx;
-  color: #9ca3af;
 }

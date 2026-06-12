@@ -4,6 +4,7 @@
     "top-nav-bar": "../../components/topNavBar/topNavBar",
     "rice-tabs": "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs",
     "rice-tag": "../../uni_modules/rice-ui/components/rice-tag/rice-tag",
+    "rice-divider": "../../uni_modules/rice-ui/components/rice-divider/rice-divider",
     "rice-button": "../../uni_modules/rice-ui/components/rice-button/rice-button"
   }
 }
