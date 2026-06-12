@@ -101,9 +101,9 @@ export function queryCardListSum(withToken: boolean = true): Promise<ApiResponse
 }
 
 // 查询卡详情Xcx
-export function queryCardDetail(id: string, countryCode?: string, withToken: boolean = true): Promise<ApiResponse<CardDetail>> {
+export function queryCardDetail(id: string, isFind:string,countryCode?: string, withToken: boolean = true): Promise<ApiResponse<CardDetail>> {
 	// #ifdef MP-WEIXIN
-	const url = (ApiUrl.queryCardDetailXcx as string) + id
+	const url = (ApiUrl.queryCardDetailXcx as string) + id + '/' + isFind
 	// #endif
 
 	// #ifdef H5

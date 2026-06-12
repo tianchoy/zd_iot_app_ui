@@ -105,8 +105,8 @@ function queryCardListSum(withToken = true) {
     withToken
   }));
 }
-function queryCardDetail(id, countryCode = null, withToken = true) {
-  const url = api_url.ApiUrl.queryCardDetailXcx + id;
+function queryCardDetail(id, isFind, countryCode = null, withToken = true) {
+  const url = api_url.ApiUrl.queryCardDetailXcx + id + "/" + isFind;
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,

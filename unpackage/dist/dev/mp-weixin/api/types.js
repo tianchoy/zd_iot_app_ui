@@ -191,25 +191,95 @@ class QueryCardListData extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class PkgXcxVo extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          pkgId: { type: String, optional: false },
+          pkgName: { type: String, optional: false },
+          pkgCategory: { type: String, optional: false },
+          pkgType: { type: String, optional: false },
+          validityPeriod: { type: String, optional: true },
+          pkgFlow: { type: String, optional: true },
+          crossedOutPrice: { type: String, optional: false },
+          sellingPrice: { type: String, optional: false }
+        };
+      },
+      name: "PkgXcxVo"
+    };
+  }
+  constructor(options, metadata = PkgXcxVo.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.pkgId = this.__props__.pkgId;
+    this.pkgName = this.__props__.pkgName;
+    this.pkgCategory = this.__props__.pkgCategory;
+    this.pkgType = this.__props__.pkgType;
+    this.validityPeriod = this.__props__.validityPeriod;
+    this.pkgFlow = this.__props__.pkgFlow;
+    this.crossedOutPrice = this.__props__.crossedOutPrice;
+    this.sellingPrice = this.__props__.sellingPrice;
+    delete this.__props__;
+  }
+}
+class RechargeData extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          rechargeNo: { type: String, optional: false },
+          pkgName: { type: String, optional: false },
+          status: { type: String, optional: false },
+          statusStr: { type: String, optional: false },
+          effectiveTime: { type: String, optional: false },
+          expirationTime: { type: String, optional: true },
+          pkgFlow: { type: String, optional: true },
+          usedFlow: { type: String, optional: true },
+          unUsedFlow: { type: String, optional: true },
+          usedPeriod: { type: String, optional: true },
+          totalPeriod: { type: String, optional: true },
+          currentPeriodStartTime: { type: String, optional: true },
+          currentPeriodEndTime: { type: String, optional: true },
+          isBind: { type: Boolean, optional: false },
+          pkgXcxVos: { type: common_vendor.UTS.UTSType.withGenerics(Array, [PkgXcxVo]), optional: false }
+        };
+      },
+      name: "RechargeData"
+    };
+  }
+  constructor(options, metadata = RechargeData.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.rechargeNo = this.__props__.rechargeNo;
+    this.pkgName = this.__props__.pkgName;
+    this.status = this.__props__.status;
+    this.statusStr = this.__props__.statusStr;
+    this.effectiveTime = this.__props__.effectiveTime;
+    this.expirationTime = this.__props__.expirationTime;
+    this.pkgFlow = this.__props__.pkgFlow;
+    this.usedFlow = this.__props__.usedFlow;
+    this.unUsedFlow = this.__props__.unUsedFlow;
+    this.usedPeriod = this.__props__.usedPeriod;
+    this.totalPeriod = this.__props__.totalPeriod;
+    this.currentPeriodStartTime = this.__props__.currentPeriodStartTime;
+    this.currentPeriodEndTime = this.__props__.currentPeriodEndTime;
+    this.isBind = this.__props__.isBind;
+    this.pkgXcxVos = this.__props__.pkgXcxVos;
+    delete this.__props__;
+  }
+}
 class CardDetail extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
       get fields() {
         return {
-          currentPeriodEndTime: { type: String, optional: false },
-          currentPeriodStartTime: { type: String, optional: false },
-          effectiveTime: { type: String, optional: false },
-          expirationTime: { type: String, optional: false },
-          pkgFlow: { type: String, optional: false },
-          pkgName: { type: String, optional: false },
-          rechargeNo: { type: String, optional: false },
-          status: { type: String, optional: false },
-          totalPeriod: { type: String, optional: false },
-          unUsedFlow: { type: String, optional: false },
-          usedFlow: { type: String, optional: false },
-          usedPeriod: { type: String, optional: false },
-          isBind: { type: Boolean, optional: false }
+          code: { type: Number, optional: false },
+          msg: { type: String, optional: false },
+          data: { type: RechargeData, optional: false }
         };
       },
       name: "CardDetail"
@@ -218,19 +288,9 @@ class CardDetail extends common_vendor.UTS.UTSType {
   constructor(options, metadata = CardDetail.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.currentPeriodEndTime = this.__props__.currentPeriodEndTime;
-    this.currentPeriodStartTime = this.__props__.currentPeriodStartTime;
-    this.effectiveTime = this.__props__.effectiveTime;
-    this.expirationTime = this.__props__.expirationTime;
-    this.pkgFlow = this.__props__.pkgFlow;
-    this.pkgName = this.__props__.pkgName;
-    this.rechargeNo = this.__props__.rechargeNo;
-    this.status = this.__props__.status;
-    this.totalPeriod = this.__props__.totalPeriod;
-    this.unUsedFlow = this.__props__.unUsedFlow;
-    this.usedFlow = this.__props__.usedFlow;
-    this.usedPeriod = this.__props__.usedPeriod;
-    this.isBind = this.__props__.isBind;
+    this.code = this.__props__.code;
+    this.msg = this.__props__.msg;
+    this.data = this.__props__.data;
     delete this.__props__;
   }
 }

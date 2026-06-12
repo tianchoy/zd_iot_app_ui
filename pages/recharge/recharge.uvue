@@ -4,19 +4,19 @@
 		<view class="card-info">
 			<view class="card-title">
 				<text class="title">卡片信息</text>
-				<rice-tag text="标签" :round="true" plain-fill size="small" type="success"></rice-tag>
+				<rice-tag :text="cardDetail?.statusStr || '未知'" :round="true" plain-fill size="small" type="success"></rice-tag>
 			</view>
 			<view class="card-number">
-				<text>1234567890123456</text>
+				<text>{{ cardDetail?.rechargeNo || '未知' }}</text>
 			</view>
 			<view class="info-list">
 				<view class="info-item">
 					<text class="label">当前套餐</text>
-					<text class="value">车联网月包20G(名称较长时自动换行展示)</text>
+					<text class="value">{{ cardDetail?.pkgName || '未知' }}</text>
 				</view>
 				<view class="info-item">
 					<text class="label">卡片余额</text>
-					<text class="value">¥1000.00</text>
+					<text class="value">¥{{ cardSellingPrice || '未知' }}</text>
 				</view>
 			</view>
 			<view class="flow-box">
@@ -30,74 +30,81 @@
 		</view>
 		<view class="pkg-box">
 			<rice-tabs
-				  v-model="active"
-				  line-color="#ffffff" 
-				  :list="tabs" 
-				  :line-width="0" 
-				  :title-active-color="'#2563eb'" 
-				  @change="changeTab" 
-				  :customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
-				  >
+				v-model="active"
+				line-color="#ffffff" 
+				:list="tabs" 
+				:line-width="0" 
+				:title-active-color="'#2563eb'" 
+				:title-inactive-color="'#334155'"
+				@change="changeTab" 
+				:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
+			>
 			</rice-tabs>
 			<view class="pkg-content">
 				<!-- 套餐包列表 -->
 				<block v-if="active === 0">
 					<view 
 						v-for="(item, index) in packageList" 
-						:key="index" 
+						:key="item.pkgId || index" 
 						class="pkg-card"
 						:class="{ 'pkg-card-selected': selectedPackageIndex === index }"
 						@click="selectPackage(index)"
 					>
 						<view class="pkg-info">
 							<view class="pkg-name">
-								<text class="pkg-title">{{ item.name }}</text>
+								<text class="pkg-title">{{ item.pkgName }}</text>
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon">流量 {{ item.data }}</text>
-								<text class="pkg-icon">有效期 {{ item.validity }}</text>
+								<text class="pkg-icon">流量 {{ formatFlow(item.pkgFlow) }}</text>
+								<text class="pkg-icon">有效期 {{ item.validityPeriod || '无固定期限' }}天</text>
 							</view>
 						</view>
 						<view class="pkg-price">
 							<view class="price-wrapper">
 								<text class="price-symbol">¥</text>
-								<text class="price-number">{{ item.price }}</text>
+								<text class="price-number">{{ item.sellingPrice }}</text>
 							</view>
-							<view class="price-original" v-if="item.originalPrice">
-								<text>¥{{ item.originalPrice }}</text>
+							<view class="price-original" v-if="item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice">
+								<text>¥{{ item.crossedOutPrice }}</text>
 							</view>
 						</view>
+					</view>
+					<view v-if="packageList.length === 0" class="empty-state">
+						<text>暂无套餐包</text>
 					</view>
 				</block>
 				<!-- 加油包列表 -->
 				<block v-else>
 					<view 
 						v-for="(item, index) in refillList" 
-						:key="index" 
+						:key="item.pkgId || index" 
 						class="pkg-card"
 						:class="{ 'pkg-card-selected': selectedRefillIndex === index }"
 						@click="selectRefill(index)"
 					>
 						<view class="pkg-info">
 							<view class="pkg-name">
-								<text class="pkg-title">{{ item.name }}</text>
+								<text class="pkg-title">{{ item.pkgName }}</text>
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon">流量 {{ item.data }}</text>
-								<text class="pkg-icon">有效期 {{ item.validity }}</text>
+								<text class="pkg-icon">流量 {{ formatFlow(item.pkgFlow) }}</text>
+								<text class="pkg-icon">有效期 {{ item.validityPeriod || '无固定期限' }}天</text>
 							</view>
 						</view>
 						<view class="pkg-price">
 							<view class="price-wrapper">
 								<text class="price-symbol">¥</text>
-								<text class="price-number">{{ item.price }}</text>
+								<text class="price-number">{{ item.sellingPrice }}</text>
 							</view>
-							<view class="price-original" v-if="item.originalPrice">
-								<text>¥{{ item.originalPrice }}</text>
+							<view class="price-original" v-if="item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice">
+								<text>¥{{ item.crossedOutPrice }}</text>
 							</view>
 						</view>
+					</view>
+					<view v-if="refillList.length === 0" class="empty-state">
+						<text>暂无加油包</text>
 					</view>
 				</block>
 			</view>
@@ -124,7 +131,9 @@
 </template>
 
 <script setup lang="uts">
-	import { ref, computed } from 'vue';
+	import { ref, computed, onMounted } from 'vue';
+	import { queryCardDetail } from '@/api/http.uts';
+	import type {CardDetail} from '@/api/types'
 
 	import LinearProgress from '@/components/progress.uvue';
 	import Payment from '@/components/payment.uvue';
@@ -134,14 +143,16 @@
 		name: string;
 	};
 	
-	// 套餐包/加油包项类型
-	type PackageItem = {
-		name: string;
-		tag: string;
-		data: string;
-		validity: string;
-		price: number;
-		originalPrice: number;
+	// 套餐包/加油包项类型（基于接口返回的数据结构）
+	type PkgItem = {
+		pkgId: string;
+		pkgName: string;
+		pkgCategory: string; // 3:套餐 4:加油包
+		pkgType: string;
+		validityPeriod: string | null;
+		pkgFlow: string | null;
+		crossedOutPrice: string;
+		sellingPrice: string;
 	};
 	
 	// changeTab 函数的参数类型
@@ -149,8 +160,39 @@
 		index: number;
 	};
 	
+	// onLoad 参数类型
+	type OnLoadOptions = {
+		cardNumber?: string;
+	};
+	
 	const showPopup = ref<boolean>(false);
-	const percentage = ref<number>(60);
+	
+	// 计算流量使用百分比（基于 usedPeriod 和 pkgFlow）
+	const percentage = computed<number>((): number => {
+		const usedFlow = cardDetail.value?.usedPeriod;
+		const totalFlow = cardDetail.value?.pkgFlow;
+		
+		// 如果没有数据，返回0
+		if (!usedFlow || !totalFlow) {
+			return 0;
+		}
+		
+		const used = parseFloat(usedFlow);
+		const total = parseFloat(totalFlow);
+		
+		// 避免除以0
+		if (total === 0) {
+			return 0;
+		}
+		
+		// 计算百分比，保留整数
+		let percent = (used / total) * 100;
+		
+		// 限制百分比在0-100之间
+		percent = Math.min(100, Math.max(0, percent));
+		
+		return Math.round(percent);
+	});
 	
 	const active = ref<number>(0);
 	const tabs = ref<Array<TabItem>>([
@@ -162,76 +204,77 @@
 		}
 	]);
 	
-	// 套餐包列表数据
-	const packageList = ref<Array<PackageItem>>([
-		{
-			name: '车联网月包20G',
-			tag: '推荐',
-			data: '20GB',
-			validity: '30天',
-			price: 90,
-			originalPrice: 100
-		},
-		{
-			name: '车联网月包10G',
-			tag: '',
-			data: '10GB',
-			validity: '30天',
-			price: 50,
-			originalPrice: 0
-		},
-		{
-			name: '工业设备月包5G',
-			tag: '',
-			data: '5GB',
-			validity: '30天',
-			price: 30,
-			originalPrice: 0
-		}
-	]);
-	
-	// 加油包列表数据
-	const refillList = ref<Array<PackageItem>>([
-		{
-			name: '加油包5G',
-			tag: '推荐',
-			data: '5GB',
-			validity: '7天',
-			price: 20,
-			originalPrice: 30
-		},
-		{
-			name: '加油包10G',
-			tag: '',
-			data: '10GB',
-			validity: '15天',
-			price: 35,
-			originalPrice: 45
-		},
-		{
-			name: '加油包20G',
-			tag: '',
-			data: '20GB',
-			validity: '30天',
-			price: 60,
-			originalPrice: 80
-		}
-	]);
+	// 套餐包列表（基于接口数据）
+	const packageList = ref<Array<PkgItem>>([]);
+	// 加油包列表（基于接口数据）
+	const refillList = ref<Array<PkgItem>>([]);
 	
 	// 选中的套餐包索引
 	const selectedPackageIndex = ref<number>(0);
 	// 选中的加油包索引
 	const selectedRefillIndex = ref<number>(0);
 	
-	const currentPrice = computed<number>((): number => {
+	// 当前价格（根据选中的套餐/加油包计算）
+	const currentPrice = computed<string>((): string => {
 		if (active.value === 0) {
 			const item = packageList.value[selectedPackageIndex.value];
-			return item ? item.price : 0;
+			return item ? item.sellingPrice : '0.00';
 		} else {
 			const item = refillList.value[selectedRefillIndex.value];
-			return item ? item.price : 0;
+			return item ? item.sellingPrice : '0.00';
 		}
 	});
+	
+	// 卡片售价（从卡片详情中获取，这里先使用第一个套餐的价格，实际可能需要根据接口调整）
+	const cardSellingPrice = ref<string>('0.00');
+	
+	// 格式化流量显示（将字节转换为GB）
+	const formatFlow = (flow: string | null): string => {
+		if (!flow) return '未知';
+		const flowBytes = parseFloat(flow);
+		if (isNaN(flowBytes)) return '未知';
+		
+		// 转换为GB（假设流量以字节为单位）
+		const flowGB = flowBytes / (1024 * 1024);
+		
+		if (flowGB >= 1024) {
+			return `${(flowGB / 1024).toFixed(2)}TB`;
+		} else if (flowGB >= 1) {
+			return `${flowGB.toFixed(2)}GB`;
+		} else {
+			const flowMB = flowBytes / (1024);
+			return `${flowMB.toFixed(2)}MB`;
+		}
+	};
+	
+	// 根据 pkgCategory 分类套餐和加油包
+	const classifyPackages = (packages: Array<PkgItem>) => {
+		const packagesList: Array<PkgItem> = [];
+		const refillsList: Array<PkgItem> = [];
+		
+		packages.forEach((item, index) => {
+			// pkgCategory: 3为套餐，4为加油包
+			if (item.pkgCategory === '3') {
+				packagesList.push(item);
+			} else if (item.pkgCategory === '4') {
+				refillsList.push(item);
+			}
+		});
+		
+		packageList.value = packagesList;
+		refillList.value = refillsList;
+		
+		// 重置选中索引
+		selectedPackageIndex.value = 0;
+		selectedRefillIndex.value = 0;
+		
+		// 设置卡片售价（使用套餐的第一个价格，或加油包的第一个价格）
+		if (packagesList.length > 0) {
+			cardSellingPrice.value = packagesList[0].sellingPrice;
+		} else if (refillsList.length > 0) {
+			cardSellingPrice.value = refillsList[0].sellingPrice;
+		}
+	};
 	
 	const changeTab = (e: ChangeTabEvent) => {
 		active.value = e.index;
@@ -247,6 +290,20 @@
 	
 	// 选择支付方式
 	const choosePayment = () => {
+		if (active.value === 0 && packageList.value.length === 0) {
+			uni.showToast({
+				title: '暂无套餐包可选',
+				icon: 'none'
+			});
+			return;
+		}
+		if (active.value === 1 && refillList.value.length === 0) {
+			uni.showToast({
+				title: '暂无加油包可选',
+				icon: 'none'
+			});
+			return;
+		}
 		showPopup.value = true;
 	}
 	
@@ -258,8 +315,18 @@
 	// 确认支付
 	const handleConfirmPayment = (e: any) => {
 		console.log(e);
+		// 获取当前选中的套餐信息
+		const currentItem = active.value === 0 
+			? packageList.value[selectedPackageIndex.value]
+			: refillList.value[selectedRefillIndex.value];
+		
+		console.log('支付套餐信息:', currentItem);
 		// 处理确认逻辑
 		showPopup.value = false;
+	}
+	
+	const onPopupClose = () => {
+		console.log('弹窗关闭');
 	}
 	
 	const goBack = () => {
@@ -281,10 +348,51 @@
 			url: '/pages/orderRecord/orderRecord'
 		})
 	}
-
-	onLoad(async () => {
+	
+	/** 卡详情 */
+	const cardDetail = ref<CardDetail | null>(null)
+	
+	const getCardDetail = async (cardNumber: string) => {
+		try {
+			const res = await queryCardDetail(cardNumber, '0')
+			console.log('卡片详情返回:', res)
+			if(res.code == 200){
+				cardDetail.value = res.data
+				// 处理套餐和加油包分类
+				if (res.data?.pkgXcxVos && res.data.pkgXcxVos.length > 0) {
+					classifyPackages(res.data.pkgXcxVos as Array<PkgItem>)
+				}
+			}
+		} catch (error) {
+			console.error('获取卡片详情失败:', error)
+			uni.showToast({
+				title: '获取卡片信息失败',
+				icon: 'none'
+			})
+		}
+	}
+	
+	const cardNumber = ref<string>('')
+	
+	// 使用 onLoad 生命周期
+	onLoad((options: OnLoadOptions) => {
+		if (options && options.cardNumber) {
+			cardNumber.value = options.cardNumber
+			getCardDetail(cardNumber.value)
+		} else {
+			console.error('未获取到卡片号码')
+			uni.showToast({
+				title: '卡片号码不存在',
+				icon: 'none'
+			})
+		}
 	})
 	
+	// 初始化数据（备用）
+	onMounted(() => {
+		// 如果需要在页面加载时做额外操作，可以在这里添加
+		console.log('页面加载完成')
+	})
 </script>
 
 <style lang="scss" scoped>
@@ -368,9 +476,11 @@
 			border-radius: 20rpx;
 			padding: 24rpx;
 			margin: 24rpx;
+			flex: 1;
 		}
 		.pkg-content {
 			margin-top: 20rpx;
+			padding-bottom: 120rpx;
 		}
 		.pkg-card {
 			display: flex;
@@ -456,6 +566,12 @@
 			background: #f8fafc;
 			box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.08);
 		}
+		.empty-state {
+			text-align: center;
+			padding: 60rpx;
+			color: #94a3b8;
+			font-size: 28rpx;
+		}
 	}
 	.bottom-box{
 		position: fixed;
@@ -468,6 +584,7 @@
 		justify-content: space-between;
 		background: #ffffff;
 		padding: 24rpx;
+		box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
 		.price-box{
 			display: flex;
 			flex-direction: column;

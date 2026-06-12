@@ -166,7 +166,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const getCardDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_http.queryCardDetail(card_number.value);
+        const res = yield api_http.queryCardDetail(card_number.value, "1");
         common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:209", res);
         if (res.code == 200) {
           cardDetail.value = res.data;
@@ -176,9 +176,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const isBinded = common_vendor.ref(false);
     const handleBindCard = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        var _a, _b;
+        var _a;
         const res = yield api_http.userBindCard(new api_types.BindCard({
-          rechargeNo: (_a = cardDetail.value) === null || _a === void 0 ? null : _a.rechargeNo
+          rechargeNo: card_number.value
         }));
         common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:221", res);
         if (res.code == 200) {
@@ -189,10 +189,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isBinded.value = true;
         } else {
           common_vendor.index.showToast({
-            title: (_b = res.msg) !== null && _b !== void 0 ? _b : "绑定失败",
+            title: (_a = res.msg) !== null && _a !== void 0 ? _a : "绑定失败",
             icon: "none"
           });
         }
+      });
+    };
+    const handleUnbind = () => {
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:238", "解绑卡片");
+      common_vendor.index.showToast({
+        title: "解绑成功",
+        icon: "success"
       });
     };
     const getPkgInfoList = (state) => {
@@ -201,7 +208,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           rechargeNo: card_number.value,
           status: state
         }));
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:242", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:251", res);
       });
     };
     common_vendor.onMounted(() => {
@@ -337,8 +344,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         I: common_vendor.t(common_vendor.unref(card_number))
       } : {}, {
-        J: common_vendor.o(_ctx.handleUnbind, "1a"),
-        K: common_vendor.p({
+        J: common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded)
+      }, common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded) ? {
+        K: common_vendor.o(handleUnbind, "d7"),
+        L: common_vendor.p({
           type: "error",
           plain: true,
           text: "解绑卡片",
@@ -346,10 +355,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             backgroundColor: "#ffffff"
           },
           class: "ml-24 mr-24 mt-24 mb-24 data-v-2bc48812"
-        }),
-        L: common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded)
+        })
+      } : {}, {
+        M: common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded)
       }, common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded) ? {
-        M: common_vendor.p({
+        N: common_vendor.p({
           bold: true,
           disabled: true,
           customStyle: {
@@ -358,8 +368,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        N: common_vendor.o(handleBindCard, "ff"),
-        O: common_vendor.p({
+        O: common_vendor.o(handleBindCard, "5d"),
+        P: common_vendor.p({
           bold: true,
           customStyle: {
             border: "none"
@@ -367,8 +377,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        P: common_vendor.o(handleRecharge, "dc"),
-        Q: common_vendor.p({
+        Q: common_vendor.o(handleRecharge, "eb"),
+        R: common_vendor.p({
           type: "primary",
           color: "#1989fa",
           textColor: "#ffffff",
@@ -380,10 +390,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }) : {}, {
-        R: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        S: `${_ctx.u_s_b_h}px`,
-        T: `${_ctx.u_s_a_i_b}px`,
-        U: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        S: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        T: `${_ctx.u_s_b_h}px`,
+        U: `${_ctx.u_s_a_i_b}px`,
+        V: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

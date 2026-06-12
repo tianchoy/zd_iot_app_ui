@@ -74,7 +74,7 @@
 						</view>
 					</view>
 				</view>
-				<rice-button class="ml-24 mr-24 mt-24 mb-24" type="error" plain text="解绑卡片" :customStyle="{backgroundColor:'#ffffff'}" @click="handleUnbind"></rice-button>
+				<rice-button v-if="cardDetail.isBind || isBinded" class="ml-24 mr-24 mt-24 mb-24" type="error" plain text="解绑卡片" :customStyle="{backgroundColor:'#ffffff'}" @click="handleUnbind"></rice-button>
 			</view>
 
 			<view class="fixed-bottom-buttons">
@@ -205,7 +205,7 @@
 	}
 
 	const getCardDetail = async () => {
-		const res = await queryCardDetail(card_number.value)
+		const res = await queryCardDetail(card_number.value,'1')
 		console.log(res)
 		if(res.code == 200){
 			cardDetail.value = res.data
@@ -216,7 +216,7 @@
 	const isBinded = ref(false)
 	const handleBindCard = async () => {
 		const res = await userBindCard({
-			rechargeNo: cardDetail.value?.rechargeNo
+			rechargeNo: card_number.value
 		})
 		console.log(res)
 		if(res.code == 200){
@@ -231,6 +231,15 @@
 				icon: 'none'
 			})
 		}
+	}
+
+	// 解绑卡片
+	const handleUnbind = () => {
+		console.log('解绑卡片')
+			uni.showToast({
+			title: '解绑成功',
+			icon: 'success'
+		})
 	}
 
 	/** 查询套餐信息列表 */

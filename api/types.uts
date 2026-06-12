@@ -62,21 +62,41 @@ export type QueryCardListData = {
 	list: CardItem[]
 }
 
+// 卡片详情数据类型
+export type PkgXcxVo = {
+  pkgId: string;
+  pkgName: string;
+  pkgCategory: string;
+  pkgType: string;
+  validityPeriod: string | null;
+  pkgFlow: string | null;
+  crossedOutPrice: string;
+  sellingPrice: string;
+};
+
+export type RechargeData = {
+  rechargeNo: string;
+  pkgName: string;
+  status: string;
+  statusStr: string;
+  effectiveTime: string;
+  expirationTime: string | null;
+  pkgFlow: string | null;
+  usedFlow: string | null;
+  unUsedFlow: string | null;
+  usedPeriod: string | null;
+  totalPeriod: string | null;
+  currentPeriodStartTime: string | null;
+  currentPeriodEndTime: string | null;
+  isBind: boolean;
+  pkgXcxVos: PkgXcxVo[];
+};
+
 export type CardDetail = {
-	currentPeriodEndTime: string
-  currentPeriodStartTime: string
-  effectiveTime: string
-  expirationTime: string
-  pkgFlow: string
-  pkgName: string
-  rechargeNo: string
-  status: string
-  totalPeriod: string
-  unUsedFlow: string
-  usedFlow: string
-  usedPeriod: string
-  isBind: boolean
-}
+  code: number;
+  msg: string;
+  data: RechargeData;
+};
 
 /** 绑定卡参数 */
 export type BindCard = {
