@@ -10030,6 +10030,27 @@ function __awaiter(thisArg, _arguments, P, generator) {
     step((generator = generator.apply(thisArg, _arguments || [])).next());
   });
 }
+function __read(o2, n2) {
+  var m = typeof Symbol === "function" && o2[Symbol.iterator];
+  if (!m)
+    return o2;
+  var i = m.call(o2), r, ar = [], e2;
+  try {
+    while ((n2 === void 0 || n2-- > 0) && !(r = i.next()).done)
+      ar.push(r.value);
+  } catch (error) {
+    e2 = { error };
+  } finally {
+    try {
+      if (r && !r.done && (m = i["return"]))
+        m.call(i);
+    } finally {
+      if (e2)
+        throw e2.error;
+    }
+  }
+  return ar;
+}
 typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
   var e2 = new Error(message);
   return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
@@ -10077,6 +10098,7 @@ const onAppShow = onShow;
 exports.UTS = UTS;
 exports.UTSJSONObject = UTSJSONObject;
 exports.__awaiter = __awaiter;
+exports.__read = __read;
 exports._export_sfc = _export_sfc;
 exports.computed = computed;
 exports.createSSRApp = createSSRApp;

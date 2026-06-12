@@ -45,60 +45,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const card_number = common_vendor.ref("gn20260603164757");
     const queryKeyword = common_vendor.ref("");
-    const tabStatuses = ["全部", "在用", "异常"];
     const current = common_vendor.ref(0);
     const scrollViewHeight = common_vendor.ref(0);
     common_vendor.ref(false);
-    const allCardList = common_vendor.ref([]);
-    const tabNumbers = common_vendor.computed(() => {
-      const list = Array.isArray(allCardList.value) ? allCardList.value : [];
-      const total = list.length;
-      const inUse = list.filter((card) => {
-        return card.status === "在用";
-      }).length;
-      const abnormal = list.filter((card) => {
-        return card.status !== "在用";
-      }).length;
-      return [total, inUse, abnormal];
-    });
+    const cardList = common_vendor.ref([]);
+    const cardCounts = common_vendor.ref([0, 0, 0]);
     const tabs = common_vendor.computed(() => {
-      const numbers = tabNumbers.value;
       return [
-        new TabItem({ name: `全部 ${numbers[0]}` }),
-        new TabItem({ name: `在用 ${numbers[1]}` }),
-        new TabItem({ name: `异常 ${numbers[2]}` })
+        new TabItem({ name: `全部 ${cardCounts.value[0]}` }),
+        new TabItem({ name: `在用 ${cardCounts.value[1]}` }),
+        new TabItem({ name: `异常 ${cardCounts.value[2]}` })
       ];
     });
     const handleDetail = (card) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:123", card);
       common_vendor.index.navigateTo({
-        url: "/pages/cardDetail/cardDetail?cardNumber=" + card.cardNumber
+        url: "/pages/cardDetail/cardDetail?cardNumber=" + card.rechargeNo
       });
-    };
-    const filteredCardList = common_vendor.computed(() => {
-      const list = Array.isArray(allCardList.value) ? allCardList.value : [];
-      const currentStatus = tabStatuses[current.value];
-      let filteredList = [...list];
-      if (currentStatus !== "全部") {
-        filteredList = filteredList.filter((card) => {
-          const status = "" + card.status;
-          if (currentStatus === "异常") {
-            return status !== "在用";
-          }
-          return status === currentStatus;
-        });
-      }
-      if (queryKeyword.value !== "") {
-        filteredList = filteredList.filter((card) => {
-          const cardNumber = "" + card.cardNumber;
-          return cardNumber.indexOf(queryKeyword.value) !== -1;
-        });
-      }
-      return filteredList;
-    });
-    const getCardText = (card, key) => {
-      const value = card[key];
-      return value == null ? "" : "" + value;
     };
     const getStatusClass = (status) => {
       switch (status) {
@@ -106,15 +68,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return "status-completed";
         case "异常":
           return "status-pending";
-        case "停机":
-          return "status-refunded";
         default:
           return "";
       }
     };
+    const getFlowText = (card) => {
+      var _a, _b;
+      const used = (_a = card.usedFlow) !== null && _a !== void 0 ? _a : 0;
+      const total = (_b = card.pkgFlow) !== null && _b !== void 0 ? _b : 0;
+      return `${used} / ${total}`;
+    };
+    const getCycleText = (card) => {
+      var _a, _b;
+      const used = (_a = card.usedPeriod) !== null && _a !== void 0 ? _a : 0;
+      const total = (_b = card.totalPeriod) !== null && _b !== void 0 ? _b : 0;
+      return `${used} / ${total}`;
+    };
     const handleClick = (e) => {
       if (e.index != null) {
         current.value = e.index;
+        getCardList(current.value.toString()).then((list) => {
+          cardList.value = list;
+        });
       }
     };
     const scanCode = () => {
@@ -145,7 +120,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/card/card.uvue:210", result);
         if (result.length > 0) {
           card_number.value = result;
           common_vendor.index.showToast({
@@ -162,31 +136,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_http.queryCardList(new api_types.QueryCardListParams({
             rechargeNo: null,
             status: state,
-            isSort: "1"
+            isSort: "0"
           }));
-          common_vendor.index.__f__("log", "at pages/card/card.uvue:250", "查询卡列表返回:", res);
-          if (res.code == 200) {
-            if (res.data && Array.isArray(res.data)) {
-              allCardList.value = res.data;
-            } else if (res.data === null || res.data === void 0) {
-              allCardList.value = [];
-            } else {
-              allCardList.value = [];
-            }
-          } else {
-            allCardList.value = [];
-            common_vendor.index.showToast({
-              title: res.msg || "查询失败",
-              icon: "none"
-            });
+          if (res.code == 0) {
+            return Array.isArray(res.data) ? res.data : [];
           }
+          common_vendor.index.showToast({
+            title: res.msg || "查询失败",
+            icon: "none"
+          });
+          return [];
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/card/card.uvue:267", "查询卡列表异常:", error);
-          allCardList.value = [];
           common_vendor.index.showToast({
             title: "查询失败，请稍后重试",
             icon: "none"
           });
+          return [];
         }
       });
     };
@@ -197,11 +162,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const platform = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (checkToken()) {
-          yield getCardList("0");
+          const _a = common_vendor.__read(yield Promise.all([
+            getCardList("0"),
+            getCardList("1"),
+            getCardList("2")
+          ]), 3), allList = _a[0], inUseList = _a[1], abnormalList = _a[2];
+          cardCounts.value = [allList.length, inUseList.length, abnormalList.length];
+          cardList.value = allList;
         }
       });
     };
-    common_vendor.onLoad((options) => {
+    common_vendor.onLoad(() => {
       platform();
       common_vendor.index.$on("scanResult", onScanResult);
     });
@@ -221,22 +192,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-a89086b7"
         }),
-        b: common_vendor.o(handleInput, "f9"),
+        b: common_vendor.o(handleInput, "34"),
         c: common_vendor.o(($event) => {
           return card_number.value = $event;
-        }, "2c"),
+        }, "07"),
         d: common_vendor.p({
           placeholder: "请输入 ICCID / MSISDN",
           modelValue: card_number.value,
           class: "search-input data-v-a89086b7"
         }),
-        e: common_vendor.o(scanCode, "ea"),
+        e: common_vendor.o(scanCode, "c1"),
         f: common_vendor.p({
           height: "100%",
           icon: "scan",
           class: "scan-btn data-v-a89086b7"
         }),
-        g: common_vendor.o(handleQuery, "f9"),
+        g: common_vendor.o(handleQuery, "97"),
         h: common_vendor.p({
           type: "primary",
           color: "#1989fa",
@@ -244,10 +215,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "100%",
           class: "data-v-a89086b7"
         }),
-        i: common_vendor.o(handleClick, "ec"),
+        i: common_vendor.o(handleClick, "43"),
         j: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "c3"),
+        }, "39"),
         k: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
@@ -262,21 +233,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: current.value,
           class: "data-v-a89086b7"
         }),
-        l: common_vendor.f(filteredCardList.value, (card, index, i0) => {
+        l: common_vendor.f(cardList.value, (card, index, i0) => {
           return {
-            a: common_vendor.t(getCardText(card, "cardNumber")),
-            b: common_vendor.t(getCardText(card, "iccid")),
-            c: common_vendor.t(getCardText(card, "status")),
-            d: common_vendor.n(getStatusClass(getCardText(card, "status"))),
-            e: common_vendor.t(getCardText(card, "currentPackage")),
+            a: common_vendor.t(card.rechargeNo || "-"),
+            b: common_vendor.t(card.pkgName || "-"),
+            c: common_vendor.t(card.statusStr || "未知"),
+            d: common_vendor.n(getStatusClass(card.statusStr)),
+            e: common_vendor.t(getFlowText(card)),
             f: "a89086b7-5-" + i0,
-            g: common_vendor.t(getCardText(card, "expireDate")),
-            h: common_vendor.t(getCardText(card, "usedTraffic")),
-            i: common_vendor.t(getCardText(card, "totalTraffic")),
-            j: common_vendor.t(getCardText(card, "currentCycle")),
-            k: "a89086b7-6-" + i0,
-            l: index,
-            m: common_vendor.o(($event) => {
+            g: common_vendor.t(card.effectiveTime || "-"),
+            h: common_vendor.t(card.expirationTime || "-"),
+            i: common_vendor.t(getCycleText(card)),
+            j: "a89086b7-6-" + i0,
+            k: index,
+            l: common_vendor.o(($event) => {
               return handleDetail(card);
             }, index)
           };
@@ -294,8 +264,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-a89086b7"
         }),
         o: scrollViewHeight.value + "px",
-        p: filteredCardList.value.length === 0
-      }, filteredCardList.value.length === 0 ? {} : {}, {
+        p: cardList.value.length === 0
+      }, cardList.value.length === 0 ? {} : {}, {
         q: common_vendor.p({
           class: "data-v-a89086b7"
         }),

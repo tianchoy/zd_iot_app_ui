@@ -1,7 +1,7 @@
 <template>
 	<topNavBar title="卡片" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
-		
+
 		<view class="card-box mb-24">
 			<view class="card-label">卡号查询</view>
 			<view class="search-value mt-24">
@@ -15,55 +15,55 @@
 				<rice-button class="scan-btn" height="100%" icon="scan" @click="scanCode"></rice-button>
 				<rice-button type="primary" color="#1989fa" textColor="#ffffff" height="100%" @click="handleQuery">查询</rice-button>
 			</view>
-			
+
 		</view>
-		
+
 		<view class="card-box">
 			<view class="card-tabs">
 				<rice-tabs
 				  v-model="current"
-				  line-color="#ffffff" 
-				  :list="tabs" 
-				  :line-width="0" 
-				  :title-active-color="'#2563eb'" 
+				  line-color="#ffffff"
+				  :list="tabs"
+				  :line-width="0"
+				  :title-active-color="'#2563eb'"
 				  :title-inactive-color="'#334155'"
-				  @click="handleClick" 
+				  @change="handleClick"
 				  :customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
 				>
 				</rice-tabs>
 			</view>
-			<scroll-view 
-				class="card-list" 
+			<scroll-view
+				class="card-list"
 				scroll-y="true"
 				:style="{ height: scrollViewHeight + 'px' }"
 			>
-				<view class="card-item" v-for="(card, index) in filteredCardList" :key="index" @click="handleDetail(card)">
+				<view class="card-item" v-for="(card, index) in cardList" :key="index" @click="handleDetail(card)">
 					<view class="item-head">
 						<view class="item-head-label">
-							<text class="card-item-title">{{ getCardText(card, 'cardNumber') }}</text>
-							<text class="card-item-content">ICCID: {{ getCardText(card, 'iccid') }}</text>
+							<text class="card-item-title">{{ card.rechargeNo || '-' }}</text>
+							<text class="card-item-content">套餐：{{ card.pkgName || '-' }}</text>
 						</view>
-						<text class="status-tag" :class="getStatusClass(getCardText(card, 'status'))">{{ getCardText(card, 'status') }}</text>
+						<text class="status-tag" :class="getStatusClass(card.statusStr)">{{ card.statusStr || '未知' }}</text>
 					</view>
 					<view class="item-package">
-						<text class="package-label">当前套餐:</text>
-						<text class="package-value">{{ getCardText(card, 'currentPackage') }}</text>
+						<text class="package-label">流量：</text>
+						<text class="package-value">{{ getFlowText(card) }}</text>
 					</view>
 					<rice-divider dashed :customStyle="{margin:'0'}"></rice-divider>
 					<view class="card-metrics">
 						<view class="metric-box mr-24">
-							<view class="metric-label">到期时间</view>
-							<view class="metric-value">{{ getCardText(card, 'expireDate') }}</view>
+							<view class="metric-label">生效时间</view>
+							<view class="metric-value">{{ card.effectiveTime || '-' }}</view>
 						</view>
 						<view class="metric-box">
-							<view class="metric-label">本月流量</view>
-							<view class="metric-value">{{ getCardText(card, 'usedTraffic') }} / {{ getCardText(card, 'totalTraffic') }}</view>
+							<view class="metric-label">到期时间</view>
+							<view class="metric-value">{{ card.expirationTime || '-' }}</view>
 						</view>
 					</view>
 					<view class="card-bottom">
 						<view class="card-cycle-text">
 							<text class="cycle-label">当前周期：</text>
-							<text class="cycle-value">{{ getCardText(card, 'currentCycle') }}</text>
+							<text class="cycle-value">{{ getCycleText(card) }}</text>
 						</view>
 						<rice-button type="primary" size="small" >去充值</rice-button>
 					</view>
@@ -72,7 +72,7 @@
 		</view>
 
 		<!-- 空状态 -->
-		<view v-if="filteredCardList.length === 0" class="empty-state">
+		<view v-if="cardList.length === 0" class="empty-state">
 			<text class="empty-text">暂无卡片数据</text>
 		</view>
 		<customService></customService>
@@ -81,98 +81,64 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { queryCardList,login,getTenantInfo } from '@/api/http.uts'
-import { getPageParams } from '@/utils/routerParams'
-import { getToken,getTenantId,isWechat,isH5 } from '@/common/config.uts'
-import { CardItem } from '@/api/types.uts'
+import { queryCardList } from '@/api/http.uts'
+import { getToken } from '@/common/config.uts'
+import type { RechargeData } from '@/api/types.uts'
 
 const card_number = ref('gn20260603164757')
 const queryKeyword = ref('')
-const tabStatuses = ['全部', '在用', '异常']
 const current = ref(0)
 const scrollViewHeight = ref(0)
 const loading = ref<boolean>(false)
 
-// 完整的卡片列表数据
-const allCardList = ref<CardItem[]>([])
+const cardList = ref<RechargeData[]>([])
+const cardCounts = ref<[number, number, number]>([0, 0, 0])
 
 type TabItem = {
 	name: string
 }
 
-// 计算每个 tab 对应的卡片数量
-const tabNumbers = computed<number[]>(() => {
-	// 确保 allCardList.value 是数组，如果不是则返回空数组
-	const list = Array.isArray(allCardList.value) ? allCardList.value : []
-	const total = list.length
-	const inUse = list.filter((card: CardItem) => card.status === '在用').length
-	const abnormal = list.filter((card: CardItem) => card.status !== '在用').length
-	return [total, inUse, abnormal]
-})
+const tabs = computed<TabItem[]>(() => ([
+	{name: `全部 ${cardCounts.value[0]}`},
+	{name: `在用 ${cardCounts.value[1]}`},
+	{name: `异常 ${cardCounts.value[2]}`}
+]))
 
-const tabs = computed<TabItem[]>(() => {
-	const numbers = tabNumbers.value
-	return [
-		{name: `全部 ${numbers[0]}`},
-		{name: `在用 ${numbers[1]}`},
-		{name: `异常 ${numbers[2]}`}
-	]
-})
-
-const handleDetail = (card: CardItem) => {
-	console.log(card)
+const handleDetail = (card: RechargeData) => {
 	uni.navigateTo({
-		url: '/pages/cardDetail/cardDetail?cardNumber=' + card.cardNumber
+		url: '/pages/cardDetail/cardDetail?cardNumber=' + card.rechargeNo
 	})
 }
 
-// 根据选中的 tab 和查询卡号过滤卡片列表
-const filteredCardList = computed<CardItem[]>(() : CardItem[] => {
-	// 确保 allCardList.value 是数组
-	const list = Array.isArray(allCardList.value) ? allCardList.value : []
-	const currentStatus = tabStatuses[current.value]
-	let filteredList = [...list]
-	
-	if (currentStatus !== '全部') {
-		filteredList = filteredList.filter((card: CardItem) : boolean => {
-			const status = '' + card.status
-			if (currentStatus === '异常') {
-				return status !== '在用'
-			}
-			return status === currentStatus
-		})
-	}
-	if (queryKeyword.value !== '') {
-		filteredList = filteredList.filter((card: CardItem) : boolean => {
-			const cardNumber = '' + card.cardNumber
-			return cardNumber.indexOf(queryKeyword.value) !== -1
-		})
-	}
-	return filteredList
-})
-
-const getCardText = (card: CardItem, key: string): string => {
-	const value = card[key]
-	return value == null ? '' : '' + value
-}
-
-// 获取状态样式类
 const getStatusClass = (status: string): string => {
 	switch (status) {
 		case '在用':
 			return 'status-completed'
 		case '异常':
 			return 'status-pending'
-		case '停机':
-			return 'status-refunded'
 		default:
 			return ''
 	}
 }
 
+const getFlowText = (card: RechargeData): string => {
+	const used = card.usedFlow ?? 0
+	const total = card.pkgFlow ?? 0
+	return `${used} / ${total}`
+}
+
+const getCycleText = (card: RechargeData): string => {
+	const used = card.usedPeriod ?? 0
+	const total = card.totalPeriod ?? 0
+	return `${used} / ${total}`
+}
+
 const handleClick = (e: UTSJSONObject) => {
-	if(e.index != null){
+	if (e.index != null) {
 		current.value = e.index as number
+		getCardList(current.value.toString()).then((list) => {
+			cardList.value = list
+		})
 	}
 }
 
@@ -181,7 +147,6 @@ const scanCode = () => {
 		url: '/pages/scanCode/scanCode'
 	})
 }
-
 
 const handleInput = () => {
 	if (card_number.value.trim() === '') {
@@ -204,28 +169,23 @@ const handleQuery = () => {
 	})
 }
 
-// 接收扫码结果
 const onScanResult = async (data: UTSJSONObject) => {
 	const result = data.getString('result') ?? ''
-	console.log(result)
 	if (result.length > 0) {
 		card_number.value = result
 		uni.showToast({
 			title: '扫码成功',
 			icon: 'success'
 		})
-		// 自动查询
 		await handleQuery()
 	}
 }
 
-// 计算 scroll-view 的高度
 const calculateScrollHeight = () => {
 	// #ifdef APP-ANDROID
 	nextTick(() => {
 		const systemInfo = uni.getSystemInfoSync()
 		const windowHeight = systemInfo.windowHeight
-		const statusBarHeight = systemInfo.statusBarHeight || 0
 		uni.createSelectorQuery().select('.container').boundingClientRect((rect) => {
 			if (rect) {
 				uni.createSelectorQuery().select('.card-box').boundingClientRect((searchRect) => {
@@ -240,66 +200,47 @@ const calculateScrollHeight = () => {
 	// #endif
 }
 
-// 查询卡列表
 const getCardList = async (state: string) => {
 	try {
 		const res = await queryCardList({
 			status: state,
-			isSort: '1'
+			isSort: '0'
 		})
-		console.log('查询卡列表返回:', res)
-		if (res.code == 200) {
-			if (res.data && Array.isArray(res.data)) {
-				allCardList.value = res.data
-			} else if (res.data === null || res.data === undefined) {
-				allCardList.value = []
-			} else {
-				allCardList.value = []
-			}
-		} else {
-			allCardList.value = []
-			uni.showToast({
-				title: res.msg || '查询失败',
-				icon: 'none'
-			})
+		if (res.code == 0) {
+			return Array.isArray(res.data) ? res.data : []
 		}
+		uni.showToast({
+			title: res.msg || '查询失败',
+			icon: 'none'
+		})
+		return []
 	} catch (error) {
-		console.error('查询卡列表异常:', error)
-		allCardList.value = []
 		uni.showToast({
 			title: '查询失败，请稍后重试',
 			icon: 'none'
 		})
+		return []
 	}
 }
 
-// 检查token状态
 const checkToken = (): boolean => {
 	const token = getToken()
 	return !!token
 }
 
-// 检查是否登录
-const isLogin = (): boolean => {
-	if (!checkToken()) {
-		uni.showToast({
-			title: '请先登录',
-			icon: 'none'
-		})
-		return false
-	}
-	return true
-}
-
-//根据平台不一致，请求的方式不一致
 const platform = async () => {
 	if (checkToken()) {
-		//加载列表数据
-		await getCardList('0')
+		const [allList, inUseList, abnormalList] = await Promise.all([
+			getCardList('0'),
+			getCardList('1'),
+			getCardList('2')
+		])
+		cardCounts.value = [allList.length, inUseList.length, abnormalList.length]
+		cardList.value = allList
 	}
 }
 
-onLoad((options) => {
+onLoad(() => {
 	platform()
 	uni.$on('scanResult', onScanResult)
 })
@@ -309,9 +250,8 @@ onMounted(() => {
 })
 
 onUnload(() => {
-		// 移除事件监听
-		uni.$off('scanResult', onScanResult)
-	})
+	uni.$off('scanResult', onScanResult)
+})
 </script>
 
 <style lang="scss" scoped>
