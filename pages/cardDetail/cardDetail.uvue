@@ -54,9 +54,7 @@
 								>
 							</rice-tabs>
 							<view class="card-pkg-box">
-								<view v-if="filteredPackageList.length === 0" class="empty-order">
-									<view class="empty-text">暂无套餐记录</view>
-								</view>
+								<view v-if="filteredPackageList.length === 0" class="empty-order">暂无套餐记录</view>
 								<view class="item" v-for="(item, index) in filteredPackageList" :key="index">
 									<view class="item-head">
 										<text class="item-label">{{ item.pkgName }}</text>
@@ -279,7 +277,7 @@
 	}
 
 	const getCardDetail = async () => {
-		const res = await queryCardDetail(card_number.value,'1')
+		const res = await queryCardDetail(card_number.value,'','1')
 		console.log(res)
 		if(res.code == 200){
 			cardDetail.value = res.data

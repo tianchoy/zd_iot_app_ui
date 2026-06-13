@@ -18,7 +18,7 @@ const SearchSelect = () => "../../components/selectCountry.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "h5Search",
   setup(__props) {
-    const cardNumber = common_vendor.ref("1064916585160");
+    const cardNumber = common_vendor.ref("gn20260603164757");
     const showCountryPopup = common_vendor.ref(false);
     const selectedCountry = common_vendor.ref("");
     const searchSelectRef = common_vendor.ref(null);
@@ -67,11 +67,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:148", "查询卡号:", cardNumber.value);
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:149", "国家/地区:", resCountry.value);
       common_vendor.index.showToast({
         title: "查询中...",
         icon: "loading"
+      });
+      common_vendor.index.navigateTo({
+        url: `/pages/recharge/recharge?cardNumber=${cardNumber.value}&country=${selectedCountry.value}`
       });
     };
     const onScanResult = (data) => {
@@ -88,7 +89,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const initCountryList = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.getCountryList(false);
-        common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:175", "查询国家列表:", res);
+        common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:173", "查询国家列表:", res);
         if (res.code == 200) {
           countryOptions.value = res.data.map((item) => {
             return new common_vendor.UTSJSONObject({

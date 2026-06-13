@@ -6,21 +6,18 @@
 				<text class="title">卡片信息</text>
 				<rice-tag :text="cardDetail?.statusStr || '未知'" :round="true" plain-fill size="small" type="success"></rice-tag>
 			</view>
-			<view class="card-number">
-				<text>{{ cardDetail?.rechargeNo || '未知' }}</text>
-			</view>
+			<view class="card-number">{{ cardDetail?.rechargeNo || '未知' }}</view>
 			<view class="info-list">
-				<view class="info-item">
+				<view class="info-item" v-if="cardDetail?.pkgName">
 					<text class="label">当前套餐</text>
 					<text class="value">{{ cardDetail?.pkgName || '未知' }}</text>
 				</view>
-				<view class="info-item">
-					<text class="label">卡片余额</text>
-					<text class="value">¥{{ cardSellingPrice || '未知' }}</text>
-				</view>
 			</view>
 			<view class="flow-box">
-				<view class="flow-label">流量信息</view>
+				<view class="flow-label">
+					<text class="label">流量信息</text>
+					<text class="value">已用 {{ cardDetail?.usedFlow || 0 }}GB / 剩余 {{ cardDetail?.unUsedFlow || 0 }}GB / 总流量 {{ cardDetail?.pkgFlow || 0 }}GB</text>
+				</view>
 				<rice-progress :percentage="percentage" show-text />
 			</view>
 			<view class="card-bottom">
@@ -66,13 +63,11 @@
 								<text class="price-number">{{ item.sellingPrice }}</text>
 							</view>
 							<view class="price-original" v-if="item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice">
-								<text>¥{{ item.crossedOutPrice }}</text>
+								¥{{ item.crossedOutPrice }}
 							</view>
 						</view>
 					</view>
-					<view v-if="packageList.length === 0" class="empty-state">
-						<text>暂无套餐包</text>
-					</view>
+					<view v-if="packageList.length == 0" class="empty-state">暂无套餐包</view>
 				</block>
 				<!-- 加油包列表 -->
 				<block v-else>
@@ -80,7 +75,7 @@
 						v-for="(item, index) in refillList" 
 						:key="item.pkgId || index" 
 						class="pkg-card"
-						:class="{ 'pkg-card-selected': selectedRefillIndex === index }"
+						:class="{ 'pkg-card-selected': selectedRefillIndex == index }"
 						@click="selectRefill(index)"
 					>
 						<view class="pkg-info">
@@ -99,13 +94,11 @@
 								<text class="price-number">{{ item.sellingPrice }}</text>
 							</view>
 							<view class="price-original" v-if="item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice">
-								<text>¥{{ item.crossedOutPrice }}</text>
+								¥{{ item.crossedOutPrice }}
 							</view>
 						</view>
 					</view>
-					<view v-if="refillList.length === 0" class="empty-state">
-						<text>暂无加油包</text>
-					</view>
+					<view v-if="refillList.length == 0" class="empty-state">暂无加油包</view>
 				</block>
 			</view>
 		</view>
@@ -131,32 +124,16 @@
 </template>
 
 <script setup lang="uts">
-	import { ref, computed, onMounted } from 'vue';
+	import { ref, computed } from 'vue';
 	import { queryCardDetail } from '@/api/http.uts';
-	import type {CardDetail,PkgXcxVo} from '@/api/types'
+	import type {RechargeData,PkgXcxVo} from '@/api/types'
 
 	import LinearProgress from '@/components/progress.uvue';
 	import Payment from '@/components/payment.uvue';
 	
-	// Tab 项类型
-	type TabItem = {
-		name: string;
-	};
-
-	
-	// changeTab 函数的参数类型
-	type ChangeTabEvent = {
-		index: number;
-	};
-	
-	// onLoad 参数类型
-	type OnLoadOptions = {
-		cardNumber?: string;
-	};
-	
 	const showPopup = ref<boolean>(false);
 	
-	// 计算流量使用百分比（基于 usedPeriod 和 pkgFlow）
+	// 计算流量使用百分比
 	const percentage = computed<number>((): number => {
 		const usedFlow = cardDetail.value?.usedPeriod;
 		const totalFlow = cardDetail.value?.pkgFlow;
@@ -184,7 +161,7 @@
 	});
 	
 	const active = ref<number>(0);
-	const tabs = ref<Array<TabItem>>([
+	const tabs = ref<Array<{name: string}>>([
 		{
 			name: '套餐包'
 		},
@@ -193,9 +170,9 @@
 		}
 	]);
 	
-	// 套餐包列表（基于接口数据）
+	// 套餐包列表
 	const packageList = ref<Array<PkgXcxVo>>([]);
-	// 加油包列表（基于接口数据）
+	// 加油包列表
 	const refillList = ref<Array<PkgXcxVo>>([]);
 	
 	// 选中的套餐包索引
@@ -213,9 +190,6 @@
 			return item ? item.sellingPrice : '0.00';
 		}
 	});
-	
-	// 卡片售价（从卡片详情中获取，这里先使用第一个套餐的价格，实际可能需要根据接口调整）
-	const cardSellingPrice = ref<string>('0.00');
 	
 	// 格式化流量显示（将字节转换为GB）
 	const formatFlow = (flow: string | null): string => {
@@ -257,15 +231,9 @@
 		selectedPackageIndex.value = 0;
 		selectedRefillIndex.value = 0;
 		
-		// 设置卡片售价（使用套餐的第一个价格，或加油包的第一个价格）
-		if (packagesList.length > 0) {
-			cardSellingPrice.value = packagesList[0].sellingPrice;
-		} else if (refillsList.length > 0) {
-			cardSellingPrice.value = refillsList[0].sellingPrice;
-		}
 	};
 	
-	const changeTab = (e: ChangeTabEvent) => {
+	const changeTab = (e: {index: number}) => {
 		active.value = e.index;
 	}
 	
@@ -339,15 +307,13 @@
 	}
 	
 	/** 卡详情 */
-	const cardDetail = ref<CardDetail | null>(null)
+	const cardDetail = ref<RechargeData | null>(null)
 	
-	const getCardDetail = async (cardNumber: string) => {
+	const getCardDetail = async (cardNumber: string,country: string) => {
 		try {
-			const res = await queryCardDetail(cardNumber, '0')
-			console.log('卡片详情返回:', res)
+			const res = await queryCardDetail(cardNumber, country,'0')
 			if(res.code == 200){
-				cardDetail.value = res.data
-				// 处理套餐和加油包分类
+				cardDetail.value = res.data as any
 				if (res.data?.pkgXcxVos && res.data.pkgXcxVos.length > 0) {
 					classifyPackages(res.data.pkgXcxVos as Array<PkgXcxVo>)
 				}
@@ -362,12 +328,17 @@
 	}
 	
 	const cardNumber = ref<string>('')
-	
-	// 使用 onLoad 生命周期
-	onLoad((options: OnLoadOptions) => {
-		if (options && options.cardNumber) {
-			cardNumber.value = options.cardNumber
-			getCardDetail(cardNumber.value)
+	const country = ref<string>('')
+	onLoad((options: UTSJSONObject) => {
+		console.log('options:', options)
+		const opt = options as any
+		const cardNumberValue = opt.cardNumber
+		const countryValue = opt.country
+		
+		if (cardNumberValue) {
+			cardNumber.value = cardNumberValue
+			country.value = countryValue ?? ''
+			getCardDetail(cardNumber.value, country.value)
 		} else {
 			console.error('未获取到卡片号码')
 			uni.showToast({
@@ -375,12 +346,6 @@
 				icon: 'none'
 			})
 		}
-	})
-	
-	// 初始化数据（备用）
-	onMounted(() => {
-		// 如果需要在页面加载时做额外操作，可以在这里添加
-		console.log('页面加载完成')
 	})
 </script>
 
@@ -411,7 +376,8 @@
 				}
 			}
 			.card-number{
-				color: #475569;
+				color: #47556A;
+				font-size: 32rpx;
 				margin-top: 24rpx;
 			}
 			.info-list{
@@ -443,6 +409,10 @@
 				border-radius: 16rpx;
 				padding: 20rpx;
 				.flow-label{
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: space-between;
 					font-size: 24rpx;
 					color: #64748b;
 					margin-bottom: 12rpx;
@@ -547,6 +517,7 @@
 					font-size: 22rpx;
 					color: #94a3b8;
 					margin-top: 4rpx;
+					text-decoration: line-through;
 				}
 			}
 		}

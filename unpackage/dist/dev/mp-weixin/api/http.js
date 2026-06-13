@@ -105,8 +105,10 @@ function queryCardListSum(withToken = true) {
     withToken
   }));
 }
-function queryCardDetail(id, isFind, countryCode = null, withToken = true) {
+function queryCardDetail(id, countryCode = null, isFind = null, withToken = true) {
   const url = api_url.ApiUrl.queryCardDetailXcx + id + "/" + isFind;
+  const token = true;
+  common_vendor.index.__f__("log", "at api/http.uts:123", "查询卡详情Xcx", "id:", id, "countryCode:", countryCode, "isFind:", isFind);
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,
@@ -122,7 +124,7 @@ function queryCardDetail(id, isFind, countryCode = null, withToken = true) {
     onErrorCode: null,
     url,
     method: "GET",
-    withToken
+    withToken: token
   }));
 }
 function userBindCard(data, withToken = true) {
@@ -149,6 +151,7 @@ function userBindCard(data, withToken = true) {
 }
 function queryPkgInfoList(data, withToken = true) {
   const url = api_url.ApiUrl.queryXcxCardList;
+  const token = true;
   const body = new common_vendor.UTSJSONObject({
     rechargeNo: data.rechargeNo,
     status: data.status
@@ -168,7 +171,7 @@ function queryPkgInfoList(data, withToken = true) {
     url,
     method: "GET",
     data: body,
-    withToken
+    withToken: token
   }));
 }
 function queryOrderListXcx(data, withToken = true) {

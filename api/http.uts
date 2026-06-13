@@ -103,24 +103,29 @@ export function queryCardListSum(withToken: boolean = true): Promise<ApiResponse
 }
 
 // 查询卡详情Xcx
-export function queryCardDetail(id: string, isFind:string,countryCode?: string, withToken: boolean = true): Promise<ApiResponse<CardDetail>> {
+export function queryCardDetail(id: string,countryCode?: string, isFind?:string, withToken: boolean = true): Promise<ApiResponse<CardDetail>> {
 	// #ifdef MP-WEIXIN
 	const url = (ApiUrl.queryCardDetailXcx as string) + id + '/' + isFind
+  const token = true
 	// #endif
 
 	// #ifdef H5
 	const url = (ApiUrl.card_detail as string) + id + '/' + countryCode
+  const token = false
 	// #endif
 
 	// #ifndef MP-WEIXIN || H5
 	// 其他平台默认使用H5配置
 	const url = (ApiUrl.card_detail as string) + id + '/' + countryCode
+  const token = false
 	// #endif
+
+  console.log('查询卡详情Xcx','id:',id,'countryCode:',countryCode,'isFind:',isFind)
 
 	return request<CardDetail>({
 		url: url,
 		method: 'GET',
-		withToken: withToken
+		withToken: token
 	})
 }
 
@@ -142,15 +147,18 @@ export function userBindCard(data: BindCard, withToken: boolean = true): Promise
 export function queryPkgInfoList(data: PkgInfoListParams, withToken: boolean = true): Promise<ApiResponse<any>> {
 	// #ifdef MP-WEIXIN
 	const url = (ApiUrl.queryXcxCardList as string)
+  const token = true
 	// #endif
 
 	// #ifdef H5
 	const url = (ApiUrl.queryPkgInfoList as string)
+  const token = false
 	// #endif
 
 	// #ifndef MP-WEIXIN || H5
 	// 其他平台默认使用H5配置
 	const url = (ApiUrl.queryPkgInfoList as string)
+  const token = false
 	// #endif
 
 	const body: UTSJSONObject = {
@@ -162,7 +170,7 @@ export function queryPkgInfoList(data: PkgInfoListParams, withToken: boolean = t
 		url: url,
 		method: 'GET',
 		data: body,
-		withToken: withToken
+		withToken: token
 	})
 }
 

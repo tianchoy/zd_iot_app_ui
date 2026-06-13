@@ -6253,6 +6253,10 @@ class UniElement {
     this.dataset = {};
     this.offsetTop = NaN;
     this.offsetLeft = NaN;
+    this.scrollTop = NaN;
+    this.scrollLeft = NaN;
+    this.scrollHeight = NaN;
+    this.scrollWidth = NaN;
     this.id = id;
     this.tagName = name.toUpperCase();
     this.nodeName = this.tagName;
@@ -6497,7 +6501,7 @@ function initMiniProgramNode(uniElement, ins) {
   if (uniElement.tagName === "SCROLL-VIEW") {
     uniElement.$node = new Promise((resolve2) => {
       setTimeout(() => {
-        index.createSelectorQuery().in(ins.proxy).select("#" + uniElement.id).fields({ node: true }, (res) => {
+        index.createSelectorQuery().in(ins.proxy).select("#" + uniElement.id).fields({ node: true, scrollOffset: true }, (res) => {
           const node = res.node;
           resolve2(node);
           uniElement.$node = {
@@ -6505,10 +6509,24 @@ function initMiniProgramNode(uniElement, ins) {
               fn(node);
             }
           };
+          setUniElementScrollOffset(uniElement, res);
         }).exec();
       }, 2);
     });
   }
+}
+function setUniElementScrollOffset(uniElement, res) {
+  const properties = [
+    "scrollTop",
+    "scrollLeft",
+    "scrollHeight",
+    "scrollWidth"
+  ];
+  properties.forEach((prop) => {
+    if (res[prop] !== void 0) {
+      uniElement[prop] = res[prop];
+    }
+  });
 }
 function vOn(value, key) {
   const instance = getCurrentInstance();
@@ -7904,9 +7922,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "5.12",
-    uniCompilerVersion: "5.12",
-    uniRuntimeVersion: "5.12",
+    uniCompileVersion: "5.13",
+    uniCompilerVersion: "5.13",
+    uniRuntimeVersion: "5.13",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -7936,8 +7954,8 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("5.12");
-      parameters.uniRuntimeVersionCode = parseFloat("5.12");
+      parameters.uniCompilerVersionCode = parseFloat("5.13");
+      parameters.uniRuntimeVersionCode = parseFloat("5.13");
     } catch (error) {
     }
   }
@@ -8073,14 +8091,20 @@ const getAppBaseInfo = {
       hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "5.12",
-      uniCompilerVersion: "5.12",
-      uniRuntimeVersion: "5.12"
+      uniCompileVersion: "5.13",
+      uniCompilerVersion: "5.13",
+      uniRuntimeVersion: "5.13"
     };
+    try {
+      if (typeof wx.getAccountInfoSync === "function") {
+        parameters.packagename = wx.getAccountInfoSync().miniProgram.appId;
+      }
+    } catch (error) {
+    }
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("5.12");
-        parameters.uniRuntimeVersionCode = parseFloat("5.12");
+        parameters.uniCompilerVersionCode = parseFloat("5.13");
+        parameters.uniRuntimeVersionCode = parseFloat("5.13");
       } catch (error) {
       }
     }
@@ -8915,7 +8939,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "127.0.0.1,192.168.1.95";
   const port = "8090";
-  const id = "mp-weixin_GSTmPg";
+  const id = "mp-weixin_WaZEO2";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();

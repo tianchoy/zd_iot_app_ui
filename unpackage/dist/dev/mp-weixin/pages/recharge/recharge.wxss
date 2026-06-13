@@ -53,7 +53,8 @@ page .container .card-info .card-title .title.data-v-722cdacb {
   color: #333;
 }
 page .container .card-info .card-number.data-v-722cdacb {
-  color: #475569;
+  color: #47556A;
+  font-size: 32rpx;
   margin-top: 24rpx;
 }
 page .container .card-info .info-list.data-v-722cdacb {
@@ -86,6 +87,10 @@ page .container .card-info .flow-box.data-v-722cdacb {
   padding: 20rpx;
 }
 page .container .card-info .flow-box .flow-label.data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   font-size: 24rpx;
   color: #64748b;
   margin-bottom: 12rpx;
@@ -189,6 +194,7 @@ page .container .pkg-card .pkg-price .price-original.data-v-722cdacb {
   font-size: 22rpx;
   color: #94a3b8;
   margin-top: 4rpx;
+  text-decoration: line-through;
 }
 page .container .pkg-card-selected.data-v-722cdacb {
   border: 2rpx solid #3b82f6;

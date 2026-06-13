@@ -136,7 +136,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_http.queryCardList(new api_types.QueryCardListParams({
             rechargeNo: null,
             status: state,
-            isSort: "0"
+            isSort: true
           }));
           if (res.code == 0) {
             return Array.isArray(res.data) ? res.data : [];

@@ -80,7 +80,7 @@
 	import { getCountryList } from '@/api/http.uts'
 	import type { CountryData } from '@/api/types.uts'
 	
-	const cardNumber = ref<string>('1064916585160')
+	const cardNumber = ref<string>('gn20260603164757')
 	
 	// 国家/地区相关
 	const showCountryPopup = ref<boolean>(false)
@@ -145,16 +145,14 @@
 			})
 			return
 		}
-		console.log('查询卡号:', cardNumber.value)
-		console.log('国家/地区:', resCountry.value)
 		uni.showToast({
 			title: '查询中...',
 			icon: 'loading'
 		})
 		// 跳转到充值页面
-		// uni.navigateTo({
-		// 	url: `/pages/recharge/recharge?cardNo=${cardNumber.value}&country=${selectedCountry.value}`
-		// })
+		uni.navigateTo({
+			url: `/pages/recharge/recharge?cardNumber=${cardNumber.value}&country=${selectedCountry.value}`
+		})
 	}
 	
 	// 监听扫码结果
