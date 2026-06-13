@@ -85,12 +85,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_http.queryCardListSum();
           if (res.code === 200) {
             cardListSum.value = res.data;
-            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:124", "查询卡列表统计成功:", res.data);
+            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:126", "查询卡列表统计成功:", res.data);
           } else {
-            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:126", "查询卡列表统计失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:128", "查询卡列表统计失败:", res.msg);
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:129", "查询卡列表统计异常:", error);
+          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:131", "查询卡列表统计异常:", error);
         }
       });
     };
@@ -145,7 +145,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         i: !isLogin()
       }, !isLogin() ? {
-        j: common_vendor.o(handleLogin, "47"),
+        j: common_vendor.o(handleLogin, "32"),
         k: common_vendor.p({
           type: "primary",
           width: "100%",
@@ -153,7 +153,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-284ae985"
         })
       } : {
-        l: common_vendor.o(handleLogout, "91"),
+        l: common_vendor.o(handleLogout, "26"),
         m: common_vendor.p({
           type: "error",
           width: "100%",

@@ -1,0 +1,1 @@
+{"version":3,"file":"en_US.js","sources":["locales/en_US.uts"],"sourcesContent":["export const enUS = {\n  'recharge': 'Recharge',\n}\n\n// 添加默认导出\nexport default enUS"],"names":["UTSJSONObject"],"mappings":";;AAAa,MAAA,OAAO,IAAAA,cAAAA;AAAAA,EAAA;AAAA,IAClB,YAAY;AAAA,EACb;AAAA;;;"}

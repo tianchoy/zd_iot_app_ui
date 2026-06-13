@@ -5,7 +5,7 @@
 import { getHostProjectConfig } from './ProjectConfig.uts'
 import { storage } from './Storage.uts'
 import { uploadFileRequest, type UploadApiResponse, type UploadFileOptions } from './Upload.uts'
-import { config, getToken,setToken, clearToken } from '@/common/config'
+import { config, getToken,setToken, clearToken,setStorageSync } from '@/common/config'
 
 // ========== 类型定义 ==========
 
@@ -21,6 +21,8 @@ export type ApiResponse<T = any> = {
 
 const systemInfo = uni.getSystemInfoSync()
 const DEFAULT_LANGUAGE = (systemInfo.language ?? 'zh_CN').replace('-', '_') as string
+setStorageSync('uVueI18nLocale', systemInfo.language.replace('_', '-'))
+
 
 /** 请求配置选项 */
 export type RequestOptions = {
@@ -308,9 +310,9 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 
 				// 未授权处理
 				if (isUnauthorizedCode) {
-					if (redirectOnUnauthorized) {
-						navigateToLogin(finalLoginPage)
-					}
+					// if (redirectOnUnauthorized) {
+					// 	navigateToLogin(finalLoginPage)
+					// }
 					reject(result)
 					return
 				}

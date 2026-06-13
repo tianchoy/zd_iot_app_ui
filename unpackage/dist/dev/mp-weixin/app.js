@@ -2,6 +2,8 @@
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
 require("./utils/inject-m-unix.js");
+const i18n_index = require("./i18n/index.js");
+const common_config = require("./common/config.js");
 if (!Math) {
   "./pages/card/card.js";
   "./pages/recharge/recharge.js";
@@ -23,13 +25,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App",
   setup(__props) {
     common_vendor.onLaunch(() => {
-      common_vendor.index.__f__("log", "at App.uvue:19", "App Launch");
+      i18n_index.i18n.global.locale.value = common_config.getStorageSync("uVueI18nLocale");
+      common_vendor.index.__f__("log", "at App.uvue:22", "App Launch");
     });
     common_vendor.onAppShow(() => {
-      common_vendor.index.__f__("log", "at App.uvue:23", "App Show");
+      common_vendor.index.__f__("log", "at App.uvue:26", "App Show");
     });
     common_vendor.onAppHide(() => {
-      common_vendor.index.__f__("log", "at App.uvue:27", "App Hide");
+      common_vendor.index.__f__("log", "at App.uvue:30", "App Hide");
     });
     return () => {
     };
@@ -37,6 +40,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 function createApp() {
   const app = common_vendor.createSSRApp(_sfc_main);
+  app.use(i18n_index.i18n);
   return {
     app
   };

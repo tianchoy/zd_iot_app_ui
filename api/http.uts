@@ -26,15 +26,6 @@ export function getCountryList(withToken: boolean = false): Promise<ApiResponse<
   })
 }
 
-// 查询卡详情
-export function card_detail(id: string, countryCode: string, withToken: boolean = true): Promise<ApiResponse<LoginData>> {
-  return request<LoginData>({
-    url: (ApiUrl.card_detail as string) + id + '/' + countryCode,
-    method: 'GET',
-    withToken
-  })
-}
-
 // 登录
 /*
 * 登录需要这三个固定的参数

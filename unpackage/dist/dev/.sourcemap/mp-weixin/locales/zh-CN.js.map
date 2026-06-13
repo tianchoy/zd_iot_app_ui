@@ -1,0 +1,1 @@
+{"version":3,"file":"zh-CN.js","sources":["locales/zh-CN.uts"],"sourcesContent":["export const zhCN = {\n  'recharge': '充值',\n}\n\n// 添加默认导出\nexport default zhCN"],"names":["UTSJSONObject"],"mappings":";;AAAa,MAAA,OAAO,IAAAA,cAAAA;AAAAA,EAAA;AAAA,IAClB,YAAY;AAAA,EACb;AAAA;;;"}

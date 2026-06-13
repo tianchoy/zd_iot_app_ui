@@ -1221,6 +1221,9 @@ class EffectScope {
     }
   }
 }
+function effectScope(detached) {
+  return new EffectScope(detached);
+}
 function recordEffectScope(effect2, scope = activeEffectScope) {
   if (scope && scope.active) {
     scope.effects.push(effect2);
@@ -10128,6 +10131,7 @@ exports.computed = computed;
 exports.createSSRApp = createSSRApp;
 exports.defineComponent = defineComponent;
 exports.e = e;
+exports.effectScope = effectScope;
 exports.f = f;
 exports.gei = gei;
 exports.getCurrentInstance = getCurrentInstance;

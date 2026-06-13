@@ -186,9 +186,17 @@ function clearToken() {
   common_vendor.index.removeStorageSync(config.storage.token);
   common_vendor.index.removeStorageSync(config.storage.refreshToken);
 }
+function setStorageSync(key, value = null) {
+  common_vendor.index.setStorageSync(key, value);
+}
+function getStorageSync(key) {
+  return common_vendor.index.getStorageSync(key);
+}
 exports.clearToken = clearToken;
 exports.config = config;
+exports.getStorageSync = getStorageSync;
 exports.getTenantId = getTenantId;
 exports.getToken = getToken;
+exports.setStorageSync = setStorageSync;
 exports.setToken = setToken;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/config.js.map
