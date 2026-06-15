@@ -3,7 +3,7 @@ Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
 require("./utils/inject-m-unix.js");
 const i18n_index = require("./i18n/index.js");
-const common_config = require("./common/config.js");
+require("./common/config.js");
 if (!Math) {
   "./pages/card/card.js";
   "./pages/recharge/recharge.js";
@@ -25,7 +25,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App",
   setup(__props) {
     common_vendor.onLaunch(() => {
-      i18n_index.i18n.global.locale.value = common_config.getStorageSync("uVueI18nLocale");
       common_vendor.index.__f__("log", "at App.uvue:22", "App Launch");
     });
     common_vendor.onAppShow(() => {

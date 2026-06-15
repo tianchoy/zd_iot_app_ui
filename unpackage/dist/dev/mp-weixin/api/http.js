@@ -108,7 +108,7 @@ function queryCardListSum(withToken = true) {
 function queryCardDetail(id, countryCode = null, isFind = null, withToken = true) {
   const url = api_url.ApiUrl.queryCardDetailXcx + id + "/" + isFind;
   const token = true;
-  common_vendor.index.__f__("log", "at api/http.uts:114", "查询卡详情Xcx", "id:", id, "countryCode:", countryCode, "isFind:", isFind);
+  common_vendor.index.__f__("log", "at api/http.uts:115", "查询卡详情Xcx", "id:", id, "countryCode:", countryCode, "isFind:", isFind);
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,
@@ -193,12 +193,52 @@ function queryOrderListXcx(data, withToken = true) {
     withToken
   }));
 }
+function addOrderXcx(data, withToken = true) {
+  return api_Request.request(new api_Request.RequestOptions({
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.addOrderXcx,
+    method: "POST",
+    data,
+    withToken
+  }));
+}
+function queryOrderDetailXcx(id, withToken = true) {
+  return api_Request.request(new api_Request.RequestOptions({
+    data: null,
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.queryOrderDetailXcx + id,
+    method: "GET",
+    withToken
+  }));
+}
+exports.addOrderXcx = addOrderXcx;
 exports.getCountryList = getCountryList;
 exports.getTenantInfo = getTenantInfo;
 exports.login = login;
 exports.queryCardDetail = queryCardDetail;
 exports.queryCardList = queryCardList;
 exports.queryCardListSum = queryCardListSum;
+exports.queryOrderDetailXcx = queryOrderDetailXcx;
 exports.queryOrderListXcx = queryOrderListXcx;
 exports.queryPkgInfoList = queryPkgInfoList;
 exports.userBindCard = userBindCard;

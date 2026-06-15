@@ -207,21 +207,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getOrderList = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
-          const res = yield api_http.queryOrderListXcx(new common_vendor.UTSJSONObject({
+          const resp = yield api_http.queryOrderListXcx(new common_vendor.UTSJSONObject({
             rechargeNo: card_number.value
           }));
-          common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:293", "订单列表返回:", res);
-          if (res.code == 200) {
-            if (res.rows && Array.isArray(res.rows)) {
-              orderList.value = res.rows;
+          common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:293", "订单列表返回resp:", resp);
+          if (resp.code == 200) {
+            if (resp.rows && Array.isArray(resp.rows)) {
+              orderList.value = resp.rows;
               common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:297", "订单列表数量:", orderList.value.length);
-            } else if (res.data && Array.isArray(res.data)) {
-              orderList.value = res.data;
+            } else if (resp.data && Array.isArray(resp.data)) {
+              orderList.value = resp.data;
             } else {
               orderList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:304", "查询订单列表失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:304", "查询订单列表失败:", resp.msg);
             orderList.value = [];
           }
         } catch (error) {

@@ -124,13 +124,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleConfirmPayment = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:274", e);
-      const currentItem = active.value === 0 ? packageList.value[selectedPackageIndex.value] : refillList.value[selectedRefillIndex.value];
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:280", "支付套餐信息:", currentItem);
-      showPopup.value = false;
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:274", e);
+        const currentItem = active.value === 0 ? packageList.value[selectedPackageIndex.value] : refillList.value[selectedRefillIndex.value];
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:280", "支付套餐信息,pkgId:", currentItem.pkgId);
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:281", "支付套餐信息,cardNumberValue:", cardNumber.value);
+        try {
+          const res = yield api_http.addOrderXcx(new common_vendor.UTSJSONObject({
+            pkgId: currentItem.pkgId,
+            rechargeNo: cardNumber.value
+          }));
+          if (res.code == 200) {
+            common_vendor.index.showToast({
+              title: "支付成功",
+              icon: "success"
+            });
+          } else {
+            common_vendor.index.showToast({
+              title: res.msg || "支付失败",
+              icon: "none"
+            });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:300", "添加订单失败:", error);
+          common_vendor.index.showToast({
+            title: "添加订单失败",
+            icon: "none"
+          });
+        }
+        showPopup.value = false;
+      });
     };
     const onPopupClose = () => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:286", "弹窗关闭");
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:310", "弹窗关闭");
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -160,7 +186,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:322", "获取卡片详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:346", "获取卡片详情失败:", error);
           common_vendor.index.showToast({
             title: "获取卡片信息失败",
             icon: "none"
@@ -171,7 +197,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const cardNumber = common_vendor.ref("");
     const country = common_vendor.ref("");
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:333", "options:", options);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:357", "options:", options);
       const opt = options;
       const cardNumberValue = opt.cardNumber;
       const countryValue = opt.country;
@@ -180,7 +206,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         country.value = countryValue !== null && countryValue !== void 0 ? countryValue : "";
         getCardDetail(cardNumber.value, country.value);
       } else {
-        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:343", "未获取到卡片号码");
+        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:367", "未获取到卡片号码");
         common_vendor.index.showToast({
           title: "卡片号码不存在",
           icon: "none"

@@ -24,4 +24,7 @@ export const ApiUrl = {
     queryCardDetailXcx: '/app/card/infoXcx/',//小程序首页 查询卡详情Xcx
     userBindCard:'/system/appUserCard/bind', // 绑定卡
     queryOrderListXcx:'/order/pkgOrder/xcxList', // 查询订单列表Xcx
+
+    addOrderXcx:'/order/pkgOrder/xcx/add', // 添加订单Xcx
+    queryOrderDetailXcx:'/order/pkgOrder/getOrderPackInfo/xcx/', // 查询订单详情Xcx
 } 

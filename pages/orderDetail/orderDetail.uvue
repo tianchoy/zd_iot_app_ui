@@ -102,9 +102,11 @@
 </template>
 
 <script setup lang="uts">
+	import { queryOrderDetailXcx } from '@/api/http.uts';
 	import Payment from '@/components/payment.uvue';
 	const showPopup = ref(false);
 	const currentPrice = ref(50);
+	const orderId = ref('');
 	
 	const getStatusClass = (status: string): string => {
 		switch (status) {
@@ -144,6 +146,25 @@
 			delta: 1
 		})
 	}
+
+	// 查询订单详情
+	const getOrderDetail = async () => {
+		try {
+			const res = await queryOrderDetailXcx(orderId.value);
+			if (res.code == 200) {
+				// 处理订单详情数据
+				console.log(res.data);
+			}
+		} catch (error) {
+			console.error('查询订单详情失败:', error);
+		}
+	}
+	
+	onLoad((options)=>{
+		console.log(options);
+		orderId.value = options.orderNo;
+		getOrderDetail()
+	})
 </script>
 
 <style lang="scss" scoped>

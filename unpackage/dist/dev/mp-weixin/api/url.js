@@ -21,8 +21,10 @@ const ApiUrl = new common_vendor.UTSJSONObject({
   queryCardList: "/app/card/list",
   queryCardDetailXcx: "/app/card/infoXcx/",
   userBindCard: "/system/appUserCard/bind",
-  queryOrderListXcx: "/order/pkgOrder/xcxList"
-  // 查询订单列表Xcx
+  queryOrderListXcx: "/order/pkgOrder/xcxList",
+  addOrderXcx: "/order/pkgOrder/xcx/add",
+  queryOrderDetailXcx: "/order/pkgOrder/getOrderPackInfo/xcx/"
+  // 查询订单详情Xcx
 });
 exports.ApiUrl = ApiUrl;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/url.js.map

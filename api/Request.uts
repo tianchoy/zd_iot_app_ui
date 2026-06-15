@@ -17,6 +17,8 @@ export type ApiResponse<T = any> = {
 	code: number
 	msg: string
 	data: T
+	rows?: any[]
+	total?: number
 }
 
 const systemInfo = uni.getSystemInfoSync()
@@ -283,7 +285,9 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 				const result = {
 					code,
 					msg: rawMsg == null ? '' : '' + rawMsg,
-					data: raw['data'] as T
+					data: raw['data'] as T,
+						rows: raw['rows'] as any[] | null,
+						total: raw['total'] as number | null
 				} as ApiResponse<T>
 				const msg = result.msg
 

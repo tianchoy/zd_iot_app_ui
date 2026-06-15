@@ -125,7 +125,7 @@
 
 <script setup lang="uts">
 	import { ref, computed } from 'vue';
-	import { queryCardDetail } from '@/api/http.uts';
+	import { queryCardDetail, addOrderXcx } from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
 
 	import LinearProgress from '@/components/progress.uvue';
@@ -270,15 +270,39 @@
 	}
 	
 	// 确认支付
-	const handleConfirmPayment = (e: any) => {
+	const handleConfirmPayment =  async (e: any) => {
 		console.log(e);
 		// 获取当前选中的套餐信息
 		const currentItem = active.value === 0 
 			? packageList.value[selectedPackageIndex.value]
 			: refillList.value[selectedRefillIndex.value];
 		
-		console.log('支付套餐信息:', currentItem);
+		console.log('支付套餐信息,pkgId:', currentItem.pkgId);
+		console.log('支付套餐信息,cardNumberValue:', cardNumber.value);
 		// 处理确认逻辑
+		try {
+			const res = await addOrderXcx({
+				pkgId: currentItem.pkgId,
+				rechargeNo: cardNumber.value,
+			})
+			if(res.code == 200){
+				uni.showToast({
+					title: '支付成功',
+					icon: 'success'
+				})
+			} else {
+				uni.showToast({
+					title: res.msg || '支付失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('添加订单失败:', error)
+			uni.showToast({
+				title: '添加订单失败',
+				icon: 'none'
+			})
+		}
 		showPopup.value = false;
 	}
 	

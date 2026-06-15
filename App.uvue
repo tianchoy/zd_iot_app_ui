@@ -6,7 +6,7 @@
 	// #endif
 
 	onLaunch(() => {
-		i18n.global.locale.value = getStorageSync('uVueI18nLocale')
+		// i18n.global.locale.value = getStorageSync('uVueI18nLocale')
 		// #ifndef MP
 		  uni.loadFontFace({
 		    family: 'iconfont',

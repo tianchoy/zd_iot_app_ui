@@ -73,11 +73,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(common_vendor.unref(traffic)),
         d: common_vendor.t(common_vendor.unref(validityPeriod)),
         e: common_vendor.t(common_vendor.unref(formattedAmount)),
-        f: common_vendor.o(handleCancel, "bd"),
+        f: common_vendor.o(handleCancel, "2c"),
         g: common_vendor.p({
           class: "btn cancel-btn mr-24 data-v-0c94e3a5"
         }),
-        h: common_vendor.o(handleConfirm, "61"),
+        h: common_vendor.o(handleConfirm, "62"),
         i: common_vendor.p({
           textColor: "#fff",
           class: "btn confirm-btn ml-24 data-v-0c94e3a5"

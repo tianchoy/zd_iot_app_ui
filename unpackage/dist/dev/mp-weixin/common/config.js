@@ -189,12 +189,8 @@ function clearToken() {
 function setStorageSync(key, value = null) {
   common_vendor.index.setStorageSync(key, value);
 }
-function getStorageSync(key) {
-  return common_vendor.index.getStorageSync(key);
-}
 exports.clearToken = clearToken;
 exports.config = config;
-exports.getStorageSync = getStorageSync;
 exports.getTenantId = getTenantId;
 exports.getToken = getToken;
 exports.setStorageSync = setStorageSync;

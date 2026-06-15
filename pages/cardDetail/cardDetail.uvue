@@ -287,21 +287,21 @@
 	// 查询订单列表Xcx
 	const getOrderList = async () => {
 		try {
-			const res = await queryOrderListXcx({
+			const resp = await queryOrderListXcx({
 				rechargeNo: card_number.value,
 			})
-			console.log('订单列表返回:', res)
-			if (res.code == 200) {
-				if (res.rows && Array.isArray(res.rows)) {
-					orderList.value = res.rows
+			console.log('订单列表返回resp:', resp)
+			if (resp.code == 200) {
+				if (resp.rows && Array.isArray(resp.rows)) {
+					orderList.value = resp.rows
 					console.log('订单列表数量:', orderList.value.length)
-				} else if (res.data && Array.isArray(res.data)) {
-					orderList.value = res.data
+				} else if (resp.data && Array.isArray(resp.data)) {
+					orderList.value = resp.data
 				} else {
 					orderList.value = []
 				}
 			} else {
-				console.log('查询订单列表失败:', res.msg)
+				console.log('查询订单列表失败:', resp.msg)
 				orderList.value = []
 			}
 		} catch (error) {

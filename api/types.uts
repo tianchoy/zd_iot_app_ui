@@ -140,3 +140,33 @@ export type OrderListXcxItem = {
   status: string;
   payCurrencyAmount: string;
 }
+
+
+export type Refund = {
+    property1: string;
+    property2: string;
+}
+
+export type QueryOrderDetailXcxData = {
+  orderNo: string;
+  rechargeNo: string;
+  pkgName: string;
+  pkgCategory: string;
+  pkgType: string;
+  pkgFlow: number;
+  validityPeriod: string;
+  startDate: string;
+  endDate: string;  
+  status: string;
+  pkgRefundStatus: string;
+  orderAmount: number;
+  payAmount: number;
+  orderCreateTime: string;
+  payTime: string;        
+  refunds: Refund[];
+  cancelTime: string;     
+  payFailTime: string;    
+  payFailReason: string;
+  usageInstructions: string;
+  currentSeconds: number;
+}

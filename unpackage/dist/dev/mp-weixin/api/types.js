@@ -440,6 +440,86 @@ class OrderListXcxItem extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class Refund extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          property1: { type: String, optional: false },
+          property2: { type: String, optional: false }
+        };
+      },
+      name: "Refund"
+    };
+  }
+  constructor(options, metadata = Refund.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.property1 = this.__props__.property1;
+    this.property2 = this.__props__.property2;
+    delete this.__props__;
+  }
+}
+class QueryOrderDetailXcxData extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          orderNo: { type: String, optional: false },
+          rechargeNo: { type: String, optional: false },
+          pkgName: { type: String, optional: false },
+          pkgCategory: { type: String, optional: false },
+          pkgType: { type: String, optional: false },
+          pkgFlow: { type: Number, optional: false },
+          validityPeriod: { type: String, optional: false },
+          startDate: { type: String, optional: false },
+          endDate: { type: String, optional: false },
+          status: { type: String, optional: false },
+          pkgRefundStatus: { type: String, optional: false },
+          orderAmount: { type: Number, optional: false },
+          payAmount: { type: Number, optional: false },
+          orderCreateTime: { type: String, optional: false },
+          payTime: { type: String, optional: false },
+          refunds: { type: common_vendor.UTS.UTSType.withGenerics(Array, [Refund]), optional: false },
+          cancelTime: { type: String, optional: false },
+          payFailTime: { type: String, optional: false },
+          payFailReason: { type: String, optional: false },
+          usageInstructions: { type: String, optional: false },
+          currentSeconds: { type: Number, optional: false }
+        };
+      },
+      name: "QueryOrderDetailXcxData"
+    };
+  }
+  constructor(options, metadata = QueryOrderDetailXcxData.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.orderNo = this.__props__.orderNo;
+    this.rechargeNo = this.__props__.rechargeNo;
+    this.pkgName = this.__props__.pkgName;
+    this.pkgCategory = this.__props__.pkgCategory;
+    this.pkgType = this.__props__.pkgType;
+    this.pkgFlow = this.__props__.pkgFlow;
+    this.validityPeriod = this.__props__.validityPeriod;
+    this.startDate = this.__props__.startDate;
+    this.endDate = this.__props__.endDate;
+    this.status = this.__props__.status;
+    this.pkgRefundStatus = this.__props__.pkgRefundStatus;
+    this.orderAmount = this.__props__.orderAmount;
+    this.payAmount = this.__props__.payAmount;
+    this.orderCreateTime = this.__props__.orderCreateTime;
+    this.payTime = this.__props__.payTime;
+    this.refunds = this.__props__.refunds;
+    this.cancelTime = this.__props__.cancelTime;
+    this.payFailTime = this.__props__.payFailTime;
+    this.payFailReason = this.__props__.payFailReason;
+    this.usageInstructions = this.__props__.usageInstructions;
+    this.currentSeconds = this.__props__.currentSeconds;
+    delete this.__props__;
+  }
+}
 exports.BindCard = BindCard;
 exports.CardDetail = CardDetail;
 exports.CardListSumData = CardListSumData;

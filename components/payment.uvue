@@ -31,15 +31,6 @@
 
 			<!-- 支付方式区域：根据平台条件渲染 -->
 			<view class="payment-methods">
-				<!-- 微信小程序平台 -->
-				<!-- #ifdef MP-WEIXIN -->
-				<view class="method-item fixed-method">
-					<text class="method-label">支付方式</text>
-					<text class="method-name">微信小程序支付</text>
-				</view>
-				<!-- #endif -->
-
-				<!-- 非微信小程序平台 (H5) -->
 				<!-- #ifndef MP-WEIXIN -->
 				<view class="method-section">
 					<text class="section-title">选择支付方式</text>

@@ -13,7 +13,9 @@ class ApiResponse extends common_vendor.UTS.UTSType {
         return {
           code: { type: Number, optional: false },
           msg: { type: String, optional: false },
-          data: { type: "Unknown", optional: false }
+          data: { type: "Unknown", optional: false },
+          rows: { type: common_vendor.UTS.UTSType.withGenerics(Array, ["Any"]), optional: true },
+          total: { type: Number, optional: true }
         };
       },
       name: "ApiResponse"
@@ -25,6 +27,8 @@ class ApiResponse extends common_vendor.UTS.UTSType {
     this.code = this.__props__.code;
     this.msg = this.__props__.msg;
     this.data = this.__props__.data;
+    this.rows = this.__props__.rows;
+    this.total = this.__props__.total;
     delete this.__props__;
   }
 }
@@ -265,7 +269,9 @@ function request(options) {
         const result = new ApiResponse({
           code,
           msg: rawMsg == null ? "" : "" + rawMsg,
-          data: raw["data"]
+          data: raw["data"],
+          rows: raw["rows"],
+          total: raw["total"]
         });
         const msg = result.msg;
         let isSuccessCode = false;
@@ -306,6 +312,8 @@ function request(options) {
           showErrorToast("网络异常，请检查网络连接");
         }
         reject(new ApiResponse({
+          rows: null,
+          total: null,
           code: -1,
           msg: "网络异常",
           data: null

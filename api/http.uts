@@ -15,6 +15,7 @@ import type {
   CardDetail,
   QueryOrderListXcxParams,
   QueryOrderListXcxData,
+  QueryOrderDetailXcxData,
 } from './types'
 
 // 查询国家列表
@@ -180,6 +181,25 @@ export function queryOrderListXcx(data: UTSJSONObject, withToken: boolean = true
     url: ApiUrl.queryOrderListXcx as string,
     method: 'GET',
     data: data,
+    withToken: withToken
+  })
+}
+
+// 添加订单Xcx
+export function addOrderXcx(data: UTSJSONObject, withToken: boolean = true): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: ApiUrl.addOrderXcx as string,
+    method: 'POST',
+    data: data,
+    withToken: withToken
+  })
+}
+
+// 查询订单详情Xcx
+export function queryOrderDetailXcx(id: string, withToken: boolean = true): Promise<ApiResponse<QueryOrderDetailXcxData>> {
+  return request<QueryOrderDetailXcxData>({
+    url: (ApiUrl.queryOrderDetailXcx as string) + id,
+    method: 'GET',
     withToken: withToken
   })
 }

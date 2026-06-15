@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_http = require("../../api/http.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_popup_1 = common_vendor.resolveComponent("rice-popup");
@@ -16,6 +17,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const showPopup = common_vendor.ref(false);
     const currentPrice = common_vendor.ref(50);
+    const orderId = common_vendor.ref("");
     const getStatusClass = (status) => {
       switch (status) {
         case "已完成":
@@ -37,7 +39,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleConfirmPayment = (e = null) => {
-      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:136", e);
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:138", e);
       showPopup.value = false;
     };
     const handleBack = () => {
@@ -45,6 +47,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         delta: 1
       }));
     };
+    const getOrderDetail = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const res = yield api_http.queryOrderDetailXcx(orderId.value);
+          if (res.code == 200) {
+            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:156", res.data);
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:159", "查询订单详情失败:", error);
+        }
+      });
+    };
+    common_vendor.onLoad((options) => {
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:164", options);
+      orderId.value = options.orderNo;
+      getOrderDetail();
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
