@@ -27,7 +27,7 @@
 /* 文章场景相关 */
 page .container.data-v-87fe8731 {
   background-color: #f4f7fb;
-  min-height: 1000rpx;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -100,19 +100,19 @@ page .container .order-list .orders-container .order-card .order-header .status-
   background-color: #f3f4f6;
   color: #6b7280;
 }
-page .container .order-list .orders-container .order-card .order-header .status-tag .status-completed.data-v-87fe8731 {
+page .container .order-list .orders-container .order-card .order-header .status-completed.data-v-87fe8731 {
   background-color: #e8f5e9;
   color: #2e7d32;
 }
-page .container .order-list .orders-container .order-card .order-header .status-tag .status-pending.data-v-87fe8731 {
+page .container .order-list .orders-container .order-card .order-header .status-pending.data-v-87fe8731 {
   background-color: #fff3e0;
   color: #ed6c02;
 }
-page .container .order-list .orders-container .order-card .order-header .status-tag .status-refunded.data-v-87fe8731 {
+page .container .order-list .orders-container .order-card .order-header .status-refunded.data-v-87fe8731 {
   background-color: #fce4ec;
   color: #c62828;
 }
-page .container .order-list .orders-container .order-card .order-header .status-tag .status-cancelled.data-v-87fe8731 {
+page .container .order-list .orders-container .order-card .order-header .status-cancelled.data-v-87fe8731 {
   background-color: #eeeeee;
   color: #757575;
 }

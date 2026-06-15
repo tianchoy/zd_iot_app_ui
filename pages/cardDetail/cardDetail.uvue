@@ -27,7 +27,7 @@
 									<view class="info-item" v-if="cardDetail.pkgName"><text class="info-label">套餐名称</text><text class="info-value">{{cardDetail.pkgName}}</text></view>
 									<view class="info-item" v-if="cardDetail.effectiveTime"><text class="info-label">生效时间</text><text class="info-value">{{cardDetail.effectiveTime}}</text></view>
 									<view class="info-item" v-if="cardDetail.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail.expirationTime}}</text></view>
-									<view class="info-item" v-if="cardDetail.statusStr"><text class="info-label">状态</text><rice-tag type="success" :text="cardDetail.statusStr" /></view>
+									<view class="info-item" v-if="cardDetail.statusStr"><text class="info-label">状态</text><rice-tag type="success" plain-fill :text="cardDetail.statusStr" /></view>
 									<view class="info-item" v-if="cardDetail.usedPeriod && cardDetail.totalPeriod"><text class="info-label">周期</text><text class="info-value">{{cardDetail.usedPeriod}} / {{cardDetail.totalPeriod}}</text></view>
 									<view class="info-item" v-if="cardDetail.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail.expirationTime}}</text></view>
 								</view>
@@ -198,12 +198,10 @@
 	// 获取订单状态对应的文本
 	const getOrderStatusText = (status: string): string => {
 		const statusMap: Record<string, string> = {
-			'success': '已完成',
-			'pending': '处理中',
-			'failed': '失败',
-			'cancelled': '已取消',
-			'processing': '处理中',
-			'completed': '已完成'
+			'0': '已支付',
+			'1': '待支付',
+			'2': '已退款',
+			'3': '已取消',
 		}
 		return statusMap[status] || status || '未知'
 	}
@@ -211,12 +209,10 @@
 	// 获取订单状态对应的标签类型
 	const getOrderStatusType = (status: string): string => {
 		const typeMap: Record<string, string> = {
-			'success': 'success',
-			'completed': 'success',
-			'pending': 'warning',
-			'processing': 'warning',
-			'failed': 'error',
-			'cancelled': 'error'
+			'0': 'success',
+			'1': 'warning',
+			'2': 'error',
+			'3': 'error',
 		}
 		return typeMap[status] || 'primary'
 	}
@@ -290,11 +286,9 @@
 			const resp = await queryOrderListXcx({
 				rechargeNo: card_number.value,
 			})
-			console.log('订单列表返回resp:', resp)
 			if (resp.code == 200) {
 				if (resp.rows && Array.isArray(resp.rows)) {
 					orderList.value = resp.rows
-					console.log('订单列表数量:', orderList.value.length)
 				} else if (resp.data && Array.isArray(resp.data)) {
 					orderList.value = resp.data
 				} else {

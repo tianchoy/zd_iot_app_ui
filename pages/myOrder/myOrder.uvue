@@ -1,179 +1,137 @@
 <template>
-	<view>
-		<topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
-		<view class="container">
-			<view class="card-box">
-				<!-- 搜索框区域 -->
-				<view class="search-value">
-					<input
-						v-model="card_number"
-						placeholder="请输入 ICCID / MSISDN"
-						class="search-input"
-					/>
-					<rice-button class="scan-btn" height="100%" @click="scanCode">
-						<rice-icon name="scan" size="40rpx"></rice-icon>
-					</rice-button>
-					<rice-button type="primary" color="#1989fa" textColor="#ffffff" height="100%" @click="handleSearch">查询</rice-button>
-				</view>
-				<rice-tabs
-				  v-model="current"
-				  line-color="#ffffff" 
-				  :list="tabs" 
-				  :line-width="0" 
-				  :title-active-color="'#2563eb'" 
-				  :title-inactive-color="'#334155'"
-				  @click="handleTabClick" 
-				  :customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
-				  >
-				</rice-tabs>
+	<topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<view class="container">
+		<view class="card-box">
+			<!-- 搜索框区域 -->
+			<view class="search-value">
+				<input
+					v-model="card_number"
+					placeholder="请输入 ICCID / MSISDN"
+					class="search-input"
+				/>
+				<rice-button class="scan-btn" height="100%" @click="scanCode" icon="scan"></rice-button>
+				<rice-button type="primary" color="#1989fa" textColor="#ffffff" height="100%" @click="handleSearch">查询</rice-button>
 			</view>
-			
-			<!-- 订单列表 -->
-			<scroll-view class="order-list" scroll-y :enhanced="true" :show-scrollbar="false">
-				<view v-if="filteredOrders.length === 0" class="empty-state">
-					<text class="empty-text">暂无订单</text>
-				</view>
-				<view v-else class="orders-container">
-					<view 
-						v-for="(order, index) in filteredOrders" 
-						:key="index"
-						class="order-card"
-						@click="handleOrderClick(order)"
-					>
-						<!-- 订单头部：套餐名称和状态 -->
-						<view class="order-header">
-							<text class="package-name">{{ getOrderText(order, 'packageName') }}</text>
-							<text class="status-tag" :class="getStatusClass(getOrderText(order, 'status'))">{{ getOrderText(order, 'status') }}</text>
-						</view>
-						
-						<!-- 订单详情 -->
-						<view class="order-details">
-							<view class="detail-row">
-								<text class="detail-label">订单号</text>
-								<text class="detail-value">{{ getOrderText(order, 'orderNo') }}</text>
-							</view>
-							<view class="detail-row">
-								<text class="detail-label">卡号</text>
-								<text class="detail-value">{{ getOrderText(order, 'cardNo') }}</text>
-							</view>
-							<view class="detail-row">
-								<text class="detail-label">ICCID</text>
-								<text class="detail-value">{{ getOrderText(order, 'iccid') }}</text>
-							</view>
-							<view class="detail-row">
-								<text class="detail-value">{{ getOrderText(order, 'time') }}</text>
-								<view class="order-footer">
-									<text class="price">¥{{ getOrderText(order, 'amount') }}</text>
-									<text v-if="getOrderText(order, 'status') === '待支付'" class="pay-btn" @click="handlePay(order)">去支付</text>
-								</view>
-							</view>
-						</view>
-						
-					</view>
-				</view>
-			</scroll-view>
+			<rice-tabs
+				v-model="current"
+				line-color="#ffffff" 
+				:list="tabs" 
+				:line-width="0" 
+				:title-active-color="'#2563eb'" 
+				:title-inactive-color="'#334155'"
+				@change="handleTabClick" 
+				:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
+				>
+			</rice-tabs>
 		</view>
+		
+		<!-- 订单列表 -->
+		<scroll-view class="order-list" scroll-y :enhanced="true" :show-scrollbar="false">
+			<view v-if="filteredOrders.length === 0" class="empty-state">
+				<text class="empty-text">暂无订单</text>
+			</view>
+			<view v-else class="orders-container">
+				<view 
+					v-for="(order, index) in filteredOrders" 
+					:key="index"
+					class="order-card"
+					@click="handleOrderClick(order)"
+				>
+					<!-- 订单头部：套餐名称和状态 -->
+					<view class="order-header">
+						<text class="package-name">{{ order.pkgName || '套餐名称' }}</text>
+						<text class="status-tag" :class="getStatusClass(getStatusText(order.status))">{{ getStatusText(order.status) }}</text>
+					</view>
+					
+					<!-- 订单详情 -->
+					<view class="order-details">
+						<view class="detail-row">
+							<text class="detail-label">订单号</text>
+							<text class="detail-value">{{ order.orderNo || '-' }}</text>
+						</view>
+						<view class="detail-row">
+							<text class="detail-label">卡号</text>
+							<text class="detail-value">{{ order.cardNo || '-' }}</text>
+						</view>
+						<view class="detail-row">
+							<text class="detail-label">ICCID</text>
+							<text class="detail-value">{{ order.iccid || '-' }}</text>
+						</view>
+						<view class="detail-row">
+							<text class="detail-value">{{ order.createTime || '-' }}</text>
+							<view class="order-footer">
+								<text class="price">¥{{ order.payCurrencyAmount || '0.00' }}</text>
+								<text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
+							</view>
+						</view>
+					</view>
+					
+				</view>
+			</view>
+		</scroll-view>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref, computed } from 'vue'
+	import {queryOrderListXcx} from '@/api/http'
+	import type {OrderListXcxItem} from '@/api/types'
+	import { ref, computed, onMounted } from 'vue'
 	
-	// 订单状态类型
+	// 订单状态映射
 	type OrderStatus = '全部' | '待支付' | '已完成' | '已退款' | '已取消'
-	type OrderItemStatus = '待支付' | '已完成' | '已退款' | '已取消'
-
-	// 订单数据结构
-	interface Order {
-		packageName: string
-		status: OrderItemStatus
-		orderNo: string
-		cardNo: string
-		iccid: string
-		time: string
-		amount: number
-	}
 	
 	// Tab 列表
 	type OrderStatusTab = {
-			name: OrderStatus
-		}
-		const tabs = ref<OrderStatusTab[]>([{name:'全部'}, {name:'待支付'}, {name:'已完成'}, {name:'已退款'}, {name:'已取消'}])
+		name: OrderStatus
+	}
+	const tabs = ref<OrderStatusTab[]>([
+		{name: '全部'}, 
+		{name: '待支付'}, 
+		{name: '已完成'}, 
+		{name: '已退款'}, 
+		{name: '已取消'}
+	])
 	const current = ref<number>(0)
 	const card_number = ref<string>('')
 	
-	// 订单数据（根据图片内容）
-	const orders = ref<any[]>([
-		{
-			packageName: '车联网月包20G',
-			status: '已完成',
-			orderNo: 'O202604280001',
-			cardNo: '1064916585160',
-			iccid: '89860421123456789012',
-			time: '2026-04-28 10:12:30',
-			amount: 90
-		},
-		{
-			packageName: '车联网月包10G',
-			status: '待支付',
-			orderNo: 'O202604280002',
-			cardNo: '1064916585160',
-			iccid: '89860421123456789012',
-			time: '2026-04-28 11:20:12',
-			amount: 50
-		},
-		{
-			packageName: '测试套餐1G',
-			status: '已退款',
-			orderNo: 'O202603010001',
-			cardNo: '1064916585160',
-			iccid: '89860421123456789012',
-			time: '2026-03-01 08:10:00',
-			amount: 10
-		},
-		{
-			packageName: '500MB加油包',
-			status: '已完成',
-			orderNo: 'PO202605120001',
-			cardNo: '14700002233',
-			iccid: '8986032044208356010',
-			time: '2026-05-12 11:02:00',
-			amount: 19
-		},
-		{
-			packageName: '1GB加油包',
-			status: '已取消',
-			orderNo: 'PO202605120002',
-			cardNo: '14700002233',
-			iccid: '8986032044208356010',
-			time: '2026-05-12 12:18:00',
-			amount: 29
-		}
-	])
+	// 订单数据
+	const orderList = ref<OrderListXcxItem[]>([])
 	
-	const getOrderText = (order: any, key: string): string => {
-		const value = (order as UTSJSONObject)[key]
-		return value == null ? '' : '' + value
+	// 状态码映射
+	const getStatusText = (status: string): string => {
+		switch (status) {
+			case '0':
+				return '待支付'
+			case '1':
+				return '已完成'
+			case '2':
+				return '已退款'
+			case '3':
+				return '已取消'
+			default:
+				return '未知状态'
+		}
 	}
-
+	
 	// 根据搜索词和Tab状态过滤订单
-	const filteredOrders = computed<any[]>(() : any[] => {
-		let result = orders.value
-
+	const filteredOrders = computed(() => {
+		let result = orderList.value
+		
 		// 按Tab筛选
 		const currentStatus = tabs.value[current.value].name
 		if (currentStatus !== '全部') {
-			result = result.filter((order: any) : boolean => getOrderText(order, 'status') === currentStatus)
+			result = result.filter(order => getStatusText(order.status) === currentStatus)
 		}
-
+		
 		// 按搜索词筛选（ICCID或卡号）
 		if (card_number.value.trim().length > 0) {
 			const keyword = card_number.value.trim()
-			result = result.filter((order: any) : boolean =>
-				getOrderText(order, 'iccid').includes(keyword) || getOrderText(order, 'cardNo').includes(keyword)
+			result = result.filter(order =>
+				(order.iccid && order.iccid.includes(keyword)) || 
+				(order.cardNo && order.cardNo.includes(keyword))
 			)
 		}
-
+		
 		return result
 	})
 	
@@ -181,11 +139,31 @@
 	const handleTabClick = (e: UTSJSONObject) => {
 		const index = e.index as number
 		current.value = index
+		const statusCode = getStatusCodeByTabIndex(index)
+		getOrderList(statusCode)
+	}
+	
+	// 根据Tab索引获取状态码
+	const getStatusCodeByTabIndex = (index: number): string => {
+		switch (index) {
+			case 0: // 全部
+				return ''
+			case 1: // 待支付
+				return '0'
+			case 2: // 已完成
+				return '1'
+			case 3: // 已退款
+				return '2'
+			case 4: // 已取消
+				return '3'
+			default:
+				return ''
+		}
 	}
 	
 	// 处理搜索
 	const handleSearch = () => {
-		// 搜索逻辑已通过computed实现，此处可添加额外逻辑如埋点等
+		// 搜索逻辑已通过computed实现，此处重新触发筛选
 		console.log('搜索关键词:', card_number.value)
 	}
 	
@@ -204,34 +182,27 @@
 				return ''
 		}
 	}
-
+	
 	// 处理订单点击
-	const handleOrderClick = (order: any) => {
+	const handleOrderClick = (order: OrderListXcxItem) => {
 		uni.navigateTo({
-			url: '/pages/orderDetail/orderDetail?orderNo=' + getOrderText(order, 'orderNo')
+			url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
 		})
 	}
-
+	
 	// 处理返回
 	const handleBack = () => {
 		uni.navigateBack({
 			delta: 1
 		})
 	}
-
+	
 	const scanCode = () => {
 		uni.navigateTo({
 			url: '/pages/scanCode/scanCode'
 		})
 	}
-
-	const queryKeyword = ref<string>('')
-	const handleInput = () => {
-		if (card_number.value.trim() === '') {
-			queryKeyword.value = ''
-		}
-	}
-
+	
 	const handleQuery = () => {
 		const keyword = card_number.value.trim()
 		if (!keyword) {
@@ -241,9 +212,8 @@
 			})
 			return
 		}
-		queryKeyword.value = keyword
 	}
-
+	
 	// 接收扫码结果
 	const onScanResult = async (data: UTSJSONObject) => {
 		const result = data.getString('result') ?? ''
@@ -260,36 +230,72 @@
 	}
 	
 	// 去支付
-	const handlePay = (order: any) => {
-		const orderNo = getOrderText(order, 'orderNo')
-		console.log('去支付:', orderNo)
+	const handlePay = (order: OrderListXcxItem) => {
+		console.log('去支付:', order.orderNo)
 		// #ifdef MP-WEIXIN
 		// 微信小程序支付逻辑
 		uni.showToast({
-			title: `支付订单 ${orderNo}`,
+			title: `支付订单 ${order.orderNo}`,
 			icon: 'none'
 		})
 		// #endif
 		// #ifdef APP
 		// App支付逻辑
 		uni.showToast({
-			title: `支付订单 ${orderNo}`,
+			title: `支付订单 ${order.orderNo}`,
 			icon: 'none'
 		})
 		// #endif
 		// #ifdef H5
 		// H5支付逻辑
 		uni.showToast({
-			title: `支付订单 ${orderNo}`,
+			title: `支付订单 ${order.orderNo}`,
 			icon: 'none'
 		})
 		// #endif
 	}
-
+	
+	// 获取订单列表
+	const getOrderList = async (status: string) => {
+		try {
+			const params: any = {}
+			if (status !== '') {
+				params.status = status
+			}
+			const resp = await queryOrderListXcx(params)
+			if (resp.code == 200) {
+				if (resp.rows && Array.isArray(resp.rows)) {
+					orderList.value = resp.rows
+				} else if (resp.data && Array.isArray(resp.data)) {
+					orderList.value = resp.data
+				} else {
+					orderList.value = []
+				}
+			} else {
+				orderList.value = []
+				uni.showToast({
+					title: resp.msg || '获取订单列表失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('获取订单列表失败:', error)
+			orderList.value = []
+			uni.showToast({
+				title: '网络错误，请稍后重试',
+				icon: 'none'
+			})
+		}
+	}
+	
+	onLoad(() => {
+		getOrderList('')
+	})
+	
 	onMounted(() => {
 		uni.$on('scanResult', onScanResult)
 	})
-
+	
 	onUnload(() => {
 		// 移除事件监听
 		uni.$off('scanResult', onScanResult)
@@ -299,7 +305,7 @@
 <style lang="scss" scoped>
 	.container {
 		background-color: #f4f7fb;
-		min-height: 1000rpx;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
 		
@@ -379,26 +385,26 @@
 							border-radius: 20rpx;
 							background-color: #f3f4f6;
 							color: #6b7280;
-							
-							.status-completed {
-								background-color: #e8f5e9;
-								color: #2e7d32;
-							}
-							
-							.status-pending {
-								background-color: #fff3e0;
-								color: #ed6c02;
-							}
-							
-							.status-refunded {
-								background-color: #fce4ec;
-								color: #c62828;
-							}
-							
-							.status-cancelled {
-								background-color: #eeeeee;
-								color: #757575;
-							}
+						}
+						
+						.status-completed {
+							background-color: #e8f5e9;
+							color: #2e7d32;
+						}
+						
+						.status-pending {
+							background-color: #fff3e0;
+							color: #ed6c02;
+						}
+						
+						.status-refunded {
+							background-color: #fce4ec;
+							color: #c62828;
+						}
+						
+						.status-cancelled {
+							background-color: #eeeeee;
+							color: #757575;
 						}
 					}
 					
@@ -410,7 +416,6 @@
 							flex-direction: row;
 							align-items: center;
 							margin-bottom: 16rpx;
-
 							
 							.detail-label {
 								width: 100rpx;

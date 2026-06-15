@@ -1,18 +1,18 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_http = require("../../api/http.js");
+require("../../api/types.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
-  const _easycom_rice_icon_1 = common_vendor.resolveComponent("rice-icon");
   const _easycom_rice_button_1 = common_vendor.resolveComponent("rice-button");
   const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
-  (_easycom_topNavBar_1 + _easycom_rice_icon_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1)();
+  (_easycom_topNavBar_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
-const _easycom_rice_icon = () => "../../uni_modules/rice-ui/components/rice-icon/rice-icon.js";
 const _easycom_rice_button = () => "../../uni_modules/rice-ui/components/rice-button/rice-button.js";
 const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_rice_icon + _easycom_rice_button + _easycom_rice_tabs)();
+  (_easycom_topNavBar + _easycom_rice_button + _easycom_rice_tabs)();
 }
 class OrderStatusTab extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -36,72 +36,42 @@ class OrderStatusTab extends common_vendor.UTS.UTSType {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "myOrder",
   setup(__props) {
-    const tabs = common_vendor.ref([new OrderStatusTab({ name: "全部" }), new OrderStatusTab({ name: "待支付" }), new OrderStatusTab({ name: "已完成" }), new OrderStatusTab({ name: "已退款" }), new OrderStatusTab({ name: "已取消" })]);
+    const tabs = common_vendor.ref([
+      new OrderStatusTab({ name: "全部" }),
+      new OrderStatusTab({ name: "待支付" }),
+      new OrderStatusTab({ name: "已完成" }),
+      new OrderStatusTab({ name: "已退款" }),
+      new OrderStatusTab({ name: "已取消" })
+    ]);
     const current = common_vendor.ref(0);
     const card_number = common_vendor.ref("");
-    const orders = common_vendor.ref([
-      new common_vendor.UTSJSONObject({
-        packageName: "车联网月包20G",
-        status: "已完成",
-        orderNo: "O202604280001",
-        cardNo: "1064916585160",
-        iccid: "89860421123456789012",
-        time: "2026-04-28 10:12:30",
-        amount: 90
-      }),
-      new common_vendor.UTSJSONObject({
-        packageName: "车联网月包10G",
-        status: "待支付",
-        orderNo: "O202604280002",
-        cardNo: "1064916585160",
-        iccid: "89860421123456789012",
-        time: "2026-04-28 11:20:12",
-        amount: 50
-      }),
-      new common_vendor.UTSJSONObject({
-        packageName: "测试套餐1G",
-        status: "已退款",
-        orderNo: "O202603010001",
-        cardNo: "1064916585160",
-        iccid: "89860421123456789012",
-        time: "2026-03-01 08:10:00",
-        amount: 10
-      }),
-      new common_vendor.UTSJSONObject({
-        packageName: "500MB加油包",
-        status: "已完成",
-        orderNo: "PO202605120001",
-        cardNo: "14700002233",
-        iccid: "8986032044208356010",
-        time: "2026-05-12 11:02:00",
-        amount: 19
-      }),
-      new common_vendor.UTSJSONObject({
-        packageName: "1GB加油包",
-        status: "已取消",
-        orderNo: "PO202605120002",
-        cardNo: "14700002233",
-        iccid: "8986032044208356010",
-        time: "2026-05-12 12:18:00",
-        amount: 29
-      })
-    ]);
-    const getOrderText = (order = null, key) => {
-      const value = order[key];
-      return value == null ? "" : "" + value;
+    const orderList = common_vendor.ref([]);
+    const getStatusText = (status) => {
+      switch (status) {
+        case "0":
+          return "待支付";
+        case "1":
+          return "已完成";
+        case "2":
+          return "已退款";
+        case "3":
+          return "已取消";
+        default:
+          return "未知状态";
+      }
     };
     const filteredOrders = common_vendor.computed(() => {
-      let result = orders.value;
+      let result = orderList.value;
       const currentStatus = tabs.value[current.value].name;
       if (currentStatus !== "全部") {
-        result = result.filter((order = null) => {
-          return getOrderText(order, "status") === currentStatus;
+        result = result.filter((order) => {
+          return getStatusText(order.status) === currentStatus;
         });
       }
       if (card_number.value.trim().length > 0) {
         const keyword = card_number.value.trim();
-        result = result.filter((order = null) => {
-          return getOrderText(order, "iccid").includes(keyword) || getOrderText(order, "cardNo").includes(keyword);
+        result = result.filter((order) => {
+          return order.iccid && order.iccid.includes(keyword) || order.cardNo && order.cardNo.includes(keyword);
         });
       }
       return result;
@@ -109,9 +79,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handleTabClick = (e) => {
       const index = e.index;
       current.value = index;
+      const statusCode = getStatusCodeByTabIndex(index);
+      getOrderList(statusCode);
+    };
+    const getStatusCodeByTabIndex = (index) => {
+      switch (index) {
+        case 0:
+          return "";
+        case 1:
+          return "0";
+        case 2:
+          return "1";
+        case 3:
+          return "2";
+        case 4:
+          return "3";
+        default:
+          return "";
+      }
     };
     const handleSearch = () => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:189", "搜索关键词:", card_number.value);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:167", "搜索关键词:", card_number.value);
     };
     const getStatusClass = (status) => {
       switch (status) {
@@ -127,9 +115,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return "";
       }
     };
-    const handleOrderClick = (order = null) => {
+    const handleOrderClick = (order) => {
       common_vendor.index.navigateTo({
-        url: "/pages/orderDetail/orderDetail?orderNo=" + getOrderText(order, "orderNo")
+        url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
       });
     };
     const handleBack = () => {
@@ -142,7 +130,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/scanCode/scanCode"
       });
     };
-    const queryKeyword = common_vendor.ref("");
     const handleQuery = () => {
       const keyword = card_number.value.trim();
       if (!keyword) {
@@ -152,13 +139,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      queryKeyword.value = keyword;
     };
     const onScanResult = (data) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:250", result);
+        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:220", result);
         if (result.length > 0) {
           card_number.value = result;
           common_vendor.index.showToast({
@@ -169,14 +155,49 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    const handlePay = (order = null) => {
-      const orderNo = getOrderText(order, "orderNo");
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:265", "去支付:", orderNo);
+    const handlePay = (order) => {
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:234", "去支付:", order.orderNo);
       common_vendor.index.showToast({
-        title: `支付订单 ${orderNo}`,
+        title: `支付订单 ${order.orderNo}`,
         icon: "none"
       });
     };
+    const getOrderList = (status) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const params = new common_vendor.UTSJSONObject({});
+          if (status !== "") {
+            params.status = status;
+          }
+          const resp = yield api_http.queryOrderListXcx(params);
+          if (resp.code == 200) {
+            if (resp.rows && Array.isArray(resp.rows)) {
+              orderList.value = resp.rows;
+            } else if (resp.data && Array.isArray(resp.data)) {
+              orderList.value = resp.data;
+            } else {
+              orderList.value = [];
+            }
+          } else {
+            orderList.value = [];
+            common_vendor.index.showToast({
+              title: resp.msg || "获取订单列表失败",
+              icon: "none"
+            });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:282", "获取订单列表失败:", error);
+          orderList.value = [];
+          common_vendor.index.showToast({
+            title: "网络错误，请稍后重试",
+            icon: "none"
+          });
+        }
+      });
+    };
+    common_vendor.onLoad(() => {
+      getOrderList("");
+    });
     common_vendor.onMounted(() => {
       common_vendor.index.$on("scanResult", onScanResult);
     });
@@ -186,7 +207,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(handleBack, "6a"),
+        a: common_vendor.o(handleBack, "56"),
         b: common_vendor.p({
           title: "我的订单",
           ["show-back"]: true,
@@ -198,30 +219,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: card_number.value,
         d: common_vendor.o(($event) => {
           return card_number.value = $event.detail.value;
-        }, "4d"),
-        e: common_vendor.p({
-          name: "scan",
-          size: "40rpx",
-          class: "data-v-87fe8731"
-        }),
-        f: common_vendor.o(scanCode, "ba"),
-        g: common_vendor.p({
+        }, "fc"),
+        e: common_vendor.o(scanCode, "f4"),
+        f: common_vendor.p({
           height: "100%",
+          icon: "scan",
           class: "scan-btn data-v-87fe8731"
         }),
-        h: common_vendor.o(handleSearch, "e8"),
-        i: common_vendor.p({
+        g: common_vendor.o(handleSearch, "bc"),
+        h: common_vendor.p({
           type: "primary",
           color: "#1989fa",
           textColor: "#ffffff",
           height: "100%",
           class: "data-v-87fe8731"
         }),
-        j: common_vendor.o(handleTabClick, "cd"),
-        k: common_vendor.o(($event) => {
+        i: common_vendor.o(handleTabClick, "ac"),
+        j: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "41"),
-        l: common_vendor.p({
+        }, "d3"),
+        k: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
           ["line-width"]: 0,
@@ -235,20 +252,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: current.value,
           class: "data-v-87fe8731"
         }),
-        m: filteredOrders.value.length === 0
+        l: filteredOrders.value.length === 0
       }, filteredOrders.value.length === 0 ? {} : {
-        n: common_vendor.f(filteredOrders.value, (order, index, i0) => {
+        m: common_vendor.f(filteredOrders.value, (order, index, i0) => {
           return common_vendor.e({
-            a: common_vendor.t(getOrderText(order, "packageName")),
-            b: common_vendor.t(getOrderText(order, "status")),
-            c: common_vendor.n(getStatusClass(getOrderText(order, "status"))),
-            d: common_vendor.t(getOrderText(order, "orderNo")),
-            e: common_vendor.t(getOrderText(order, "cardNo")),
-            f: common_vendor.t(getOrderText(order, "iccid")),
-            g: common_vendor.t(getOrderText(order, "time")),
-            h: common_vendor.t(getOrderText(order, "amount")),
-            i: getOrderText(order, "status") === "待支付"
-          }, getOrderText(order, "status") === "待支付" ? {
+            a: common_vendor.t(order.pkgName || "套餐名称"),
+            b: common_vendor.t(getStatusText(order.status)),
+            c: common_vendor.n(getStatusClass(getStatusText(order.status))),
+            d: common_vendor.t(order.orderNo || "-"),
+            e: common_vendor.t(order.cardNo || "-"),
+            f: common_vendor.t(order.iccid || "-"),
+            g: common_vendor.t(order.createTime || "-"),
+            h: common_vendor.t(order.payCurrencyAmount || "0.00"),
+            i: order.status === "0"
+          }, order.status === "0" ? {
             j: common_vendor.o(($event) => {
               return handlePay(order);
             }, index)
@@ -260,10 +277,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }, {
-        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        p: `${_ctx.u_s_b_h}px`,
-        q: `${_ctx.u_s_a_i_b}px`,
-        r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        n: `${_ctx.u_s_b_h}px`,
+        o: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };
