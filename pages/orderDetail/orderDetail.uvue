@@ -5,12 +5,12 @@
 			<!-- 套餐名称卡片 -->
 			<view class="package-card">
 				<view class="package-header">
-					<text class="package-name">车联网月包10G</text>
-					<text class="status-tag status-pending" :class="getStatusClass('待支付')" >待支付</text>
+					<text class="package-name">{{ orderDetail.pkgName || '-' }}</text>
+					<text class="status-tag" :class="getStatusClass(getOrderStatusText())">{{ getOrderStatusText() }}</text>
 				</view>
 				<view class="card-number-row">
 					<text class="card-number-label">当前卡号：</text>
-					<text class="card-number">1064916585160</text>
+					<text class="card-number">{{ orderDetail.rechargeNo || '-' }}</text>
 				</view>
 			</view>
 			
@@ -18,31 +18,39 @@
 			<view class="info-card">
 				<view class="info-row">
 					<text class="info-label">订单编号</text>
-					<text class="info-value">0202604280002</text>
+					<text class="info-value">{{ orderDetail.orderNo || '-' }}</text>
 				</view>
 				<view class="info-row">
 					<text class="info-label">ICCID</text>
-					<text class="info-value">89860421123456789012</text>
+					<text class="info-value">{{ orderDetail.iccid || '-' }}</text>
 				</view>
 				<view class="info-row">
 					<text class="info-label">支付金额</text>
-					<text class="info-value price">¥50</text>
+					<text class="info-value price">¥{{ orderDetail.payAmount || orderDetail.orderAmount || 0 }}</text>
 				</view>
 				<view class="info-row">
 					<text class="info-label">订单状态</text>
-					<text class="info-value status">待支付</text>
+					<text class="info-value status">{{ getOrderStatusText() }}</text>
 				</view>
 				<view class="info-row">
 					<text class="info-label">支付方式</text>
-					<text class="info-value">微信小程序支付</text>
+					<text class="info-value">{{ getPaymentMethod() }}</text>
 				</view>
 				<view class="info-row">
 					<text class="info-label">下单时间</text>
-					<text class="info-value">2026-04-28 11:20:12</text>
+					<text class="info-value">{{ formatDateTime(orderDetail.orderCreateTime) }}</text>
 				</view>
 				<view class="info-row">
 					<text class="info-label">支付时间</text>
-					<text class="info-value">--</text>
+					<text class="info-value">{{ formatDateTime(orderDetail.payTime) || '--' }}</text>
+				</view>
+				<view v-if="orderDetail.payFailReason" class="info-row">
+					<text class="info-label">支付失败原因</text>
+					<text class="info-value status-fail">{{ orderDetail.payFailReason }}</text>
+				</view>
+				<view v-if="orderDetail.cancelTime" class="info-row">
+					<text class="info-label">取消时间</text>
+					<text class="info-value">{{ formatDateTime(orderDetail.cancelTime) }}</text>
 				</view>
 			</view>
 			
@@ -53,35 +61,43 @@
 				</view>
 				<view class="info-row">
 					<text class="info-label">套餐类型</text>
-					<text class="info-value">套餐包</text>
+					<text class="info-value">{{ getPkgCategoryText() }}</text>
 				</view>
 				<view class="info-row">
 					<text class="info-label">套餐流量</text>
-					<text class="info-value">10GB</text>
+					<text class="info-value">{{ getPkgFlowText() }}</text>
 				</view>
 				<view class="info-row">
 					<text class="info-label">有效期</text>
-					<text class="info-value">30天</text>
+					<text class="info-value">{{ orderDetail.validityPeriod || '-' }}</text>
+				</view>
+				<view class="info-row">
+					<text class="info-label">生效时间</text>
+					<text class="info-value">{{ formatDateTime(orderDetail.startDate) || '--' }}</text>
+				</view>
+				<view class="info-row">
+					<text class="info-label">失效时间</text>
+					<text class="info-value">{{ formatDateTime(orderDetail.endDate) || '--' }}</text>
 				</view>
 			</view>
 			
 			<!-- 说明卡片 -->
-			<view class="notice-card">
+			<view v-if="orderDetail.usageInstructions || getNoticeText()" class="notice-card">
 				<view class="section-header">
 					<text class="section-title">说明</text>
 				</view>
-				<text class="notice-text">订单尚未支付，支付完成后套餐才会生效。</text>
+				<text class="notice-text">{{ orderDetail.usageInstructions || getNoticeText() }}</text>
 			</view>
 			
 			<!-- 底部占位 -->
 			<view class="bottom-placeholder"></view>
 		</scroll-view>
 		
-		<!-- 底部支付栏 -->
-		<view class="bottom-bar">
+		<!-- 底部支付栏（仅待支付状态显示） -->
+		<view v-if="orderDetail.status === '0'" class="bottom-bar">
 			<view class="amount-section">
 				<text class="amount-label">待支付金额</text>
-				<text class="amount-value">¥50</text>
+				<text class="amount-value">¥{{ orderDetail.payAmount || orderDetail.orderAmount || 0 }}</text>
 			</view>
 			<view class="pay-button" @click="choosePayment">
 				<text class="pay-button-text">去支付</text>
@@ -103,11 +119,54 @@
 
 <script setup lang="uts">
 	import { queryOrderDetailXcx } from '@/api/http.uts';
+	import { addOrderXcx } from '@/api/http.uts';
 	import Payment from '@/components/payment.uvue';
-	const showPopup = ref(false);
-	const currentPrice = ref(50);
-	const orderId = ref('');
 	
+	const showPopup = ref(false);
+	const currentPrice = ref(0);
+	const orderId = ref('');
+	const orderDetail = ref<any>({
+		orderNo: '',
+		rechargeNo: '',
+		pkgName: '',
+		pkgCategory: '',
+		pkgType: '',
+		pkgFlow: 0,
+		validityPeriod: '',
+		startDate: '',
+		endDate: '',
+		status: '',
+		pkgRefundStatus: '',
+		orderAmount: 0,
+		payAmount: 0,
+		orderCreateTime: '',
+		payTime: '',
+		refunds: [],
+		cancelTime: '',
+		payFailTime: '',
+		payFailReason: '',
+		usageInstructions: '',
+		currentSeconds: 0
+	});
+	
+	// 获取订单状态文本
+	const getOrderStatusText = (): string => {
+		const status = orderDetail.value.status;
+		switch (status) {
+			case '0':
+				return '待支付'
+			case '1':
+				return '已完成'
+			case '2':
+				return '已退款'
+			case '3':
+				return '已取消'
+			default:
+				return '未知状态'
+		}
+	}
+	
+	// 获取状态样式类
 	const getStatusClass = (status: string): string => {
 		switch (status) {
 			case '已完成':
@@ -123,46 +182,153 @@
 		}
 	}
 	
+	// 获取套餐类型文本
+	const getPkgCategoryText = (): string => {
+		const category = orderDetail.value.pkgCategory;
+		switch (category) {
+			case '1':
+				return '套餐包'
+			case '2':
+				return '加油包'
+			default:
+				return orderDetail.value.pkgCategory || '-'
+		}
+	}
+	
+	// 获取套餐流量文本
+	const getPkgFlowText = (): string => {
+		const flow = orderDetail.value.pkgFlow;
+		if (!flow && flow !== 0) return '-';
+		
+		// 根据套餐类型判断单位
+		const pkgType = orderDetail.value.pkgType;
+		if (flow >= 1024) {
+			return `${(flow / 1024).toFixed(2)}GB`;
+		}
+		return `${flow}MB`;
+	}
+	
+	// 获取支付方式
+	const getPaymentMethod = (): string => {
+		// #ifdef MP-WEIXIN
+		return '微信小程序支付'
+		// #endif
+		// #ifdef APP
+		return 'App支付'
+		// #endif
+		// #ifdef H5
+		return 'H5支付'
+		// #endif
+		return '微信支付'
+	}
+	
+	// 获取说明文本
+	const getNoticeText = (): string => {
+		const status = orderDetail.value.status;
+		switch (status) {
+			case '0':
+				return '订单尚未支付，支付完成后套餐才会生效。'
+			case '1':
+				return '套餐已生效，可在有效期内使用。'
+			case '2':
+				return '订单已退款，金额将原路返回。'
+			case '3':
+				return '订单已取消。'
+			default:
+				return ''
+		}
+	}
+	
+	// 格式化日期时间（不转换时区，直接显示原值）
+	const formatDateTime = (dateTime: string): string => {
+		if (!dateTime) return ''
+		// 如果是 ISO 格式，提取前面部分
+		if (dateTime.includes('T')) {
+			return dateTime.replace('T', ' ').substring(0, 19)
+		}
+		return dateTime
+	}
+	
 	// 选择支付方式
 	const choosePayment = () => {
-		showPopup.value = true;
+		currentPrice.value = orderDetail.value.payAmount || orderDetail.value.orderAmount || 0
+		showPopup.value = true
 	}
-
+	
 	// 取消支付
 	const handleCancelPayment = () => {
-		showPopup.value = false;
+		showPopup.value = false
 	}
-
+	
 	// 确认支付
-	const handleConfirmPayment = (e: any) => {
-		console.log(e);
-		// 处理确认逻辑
-		showPopup.value = false;
+	const handleConfirmPayment = async (e: any) => {
+		console.log(e)
+		try {
+			const res = await addOrderXcx({
+				pkgId: orderDetail.value.pkgId,
+				rechargeNo: orderDetail.value.rechargeNo,
+			})
+			if (res.code == 200) {
+				uni.showToast({
+					title: '支付成功',
+					icon: 'success'
+				})
+				// 刷新订单详情
+				await getOrderDetail()
+			} else {
+				uni.showToast({
+					title: res.msg || '支付失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('支付失败:', error)
+			uni.showToast({
+				title: '支付失败，请稍后重试',
+				icon: 'none'
+			})
+		}
+		showPopup.value = false
 	}
-
+	
+	// 支付弹窗关闭
+	const onPopupClose = () => {
+		showPopup.value = false
+	}
+	
 	// 返回上一页
 	const handleBack = () => {
 		uni.navigateBack({
 			delta: 1
 		})
 	}
-
+	
 	// 查询订单详情
 	const getOrderDetail = async () => {
+		if (!orderId.value) return
 		try {
-			const res = await queryOrderDetailXcx(orderId.value);
+			const res = await queryOrderDetailXcx(Number(orderId.value))
 			if (res.code == 200) {
-				// 处理订单详情数据
-				console.log(res.data);
+				orderDetail.value = res.data
+				console.log('订单详情:', orderDetail.value)
+			} else {
+				uni.showToast({
+					title: res.msg || '查询订单详情失败',
+					icon: 'none'
+				})
 			}
 		} catch (error) {
-			console.error('查询订单详情失败:', error);
+			console.error('查询订单详情失败:', error)
+			uni.showToast({
+				title: '网络错误，请稍后重试',
+				icon: 'none'
+			})
 		}
 	}
 	
-	onLoad((options)=>{
-		console.log(options);
-		orderId.value = options.orderNo;
+	onLoad((options) => {
+		console.log(options.orderNo)
+		orderId.value = options.orderNo
 		getOrderDetail()
 	})
 </script>
@@ -199,13 +365,26 @@
 				font-size: 24rpx;
 				padding: 6rpx 16rpx;
 				border-radius: 20rpx;
-				background-color: #fff3e0;
-				color: #ed6c02;
 				font-weight: 500;
 				
 				&.status-pending {
 					background-color: #fff3e0;
 					color: #ed6c02;
+				}
+				
+				&.status-completed {
+					background-color: #e8f5e9;
+					color: #2e7d32;
+				}
+				
+				&.status-refunded {
+					background-color: #fce4ec;
+					color: #c62828;
+				}
+				
+				&.status-cancelled {
+					background-color: #eeeeee;
+					color: #757575;
 				}
 			}
 		}
@@ -255,7 +434,7 @@
 			padding: 20rpx 0;
 			
 			.info-label {
-				font-size: 24rpx;
+				font-size: 28rpx;
 				color: #64748b;
 			}
 			
@@ -263,16 +442,18 @@
 				font-size: 28rpx;
 				color: #374151;
 				text-align: right;
-				font-weight: bold;
-			}
-			.price {
-				font-size: 36rpx;
-				font-weight: bold;
-				color: #ef4444;
+				
+				&.price {
+					font-size: 36rpx;
+					font-weight: bold;
+					color: #ef4444;
+				}
+				
+				&.status-fail {
+					color: #ef4444;
+				}
 			}
 		}
-
-
 	}
 	
 	// 说明卡片
@@ -316,8 +497,8 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 24rpx 32rpx;
-		// padding-bottom: calc(24rpx + constant(safe-area-inset-bottom));
-		// padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+		padding-bottom: calc(24rpx + constant(safe-area-inset-bottom));
+		padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
 		box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
 		
 		.amount-section {

@@ -185,8 +185,9 @@
 	
 	// 处理订单点击
 	const handleOrderClick = (order: OrderListXcxItem) => {
+		console.log(order)
 		uni.navigateTo({
-			url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
+			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
 		})
 	}
 	

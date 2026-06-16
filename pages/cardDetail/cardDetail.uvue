@@ -121,7 +121,7 @@
 </template>
 
 <script setup lang="uts">
-	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderListXcx} from '@/api/http'
+	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderListXcx,userUnBindCard} from '@/api/http'
 	import type {CardDetail,BindCard,OrderListXcxItem,PkgInfoItem} from '@/api/types'
 
 	type CardDetailTabItem = {
@@ -353,12 +353,25 @@
 	}
 
 	// 解绑卡片
-	const handleUnbind = () => {
+	const handleUnbind = async () => {
 		console.log('解绑卡片')
+		const res = await userUnBindCard(card_number.value)
+		console.log(res)
+		if(res.code == 200){
 			uni.showToast({
 			title: '解绑成功',
 			icon: 'success'
 		})
+		isBinded.value = false
+		uni.navigateBack({
+			delta: 1
+		})
+		}else{
+			uni.showToast({
+				title: res.msg ?? '解绑失败',
+				icon: 'none'
+			})
+		}
 	}
 
 	onMounted(() => {

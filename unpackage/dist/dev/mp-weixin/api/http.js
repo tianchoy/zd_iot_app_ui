@@ -149,6 +149,25 @@ function userBindCard(data, withToken = true) {
     withToken
   }));
 }
+function userUnBindCard(id, withToken = true) {
+  return api_Request.request(new api_Request.RequestOptions({
+    data: null,
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.userUnBindCard + id,
+    method: "DELETE",
+    withToken
+  }));
+}
 function queryPkgInfoList(data, withToken = true) {
   const url = api_url.ApiUrl.queryXcxCardList;
   const token = true;
@@ -242,4 +261,5 @@ exports.queryOrderDetailXcx = queryOrderDetailXcx;
 exports.queryOrderListXcx = queryOrderListXcx;
 exports.queryPkgInfoList = queryPkgInfoList;
 exports.userBindCard = userBindCard;
+exports.userUnBindCard = userUnBindCard;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

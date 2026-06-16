@@ -274,10 +274,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleUnbind = () => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:357", "解绑卡片");
-      common_vendor.index.showToast({
-        title: "解绑成功",
-        icon: "success"
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        var _a;
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:357", "解绑卡片");
+        const res = yield api_http.userUnBindCard(card_number.value);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:359", res);
+        if (res.code == 200) {
+          common_vendor.index.showToast({
+            title: "解绑成功",
+            icon: "success"
+          });
+          isBinded.value = false;
+          common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
+            delta: 1
+          }));
+        } else {
+          common_vendor.index.showToast({
+            title: (_a = res.msg) !== null && _a !== void 0 ? _a : "解绑失败",
+            icon: "none"
+          });
+        }
       });
     };
     common_vendor.onMounted(() => {

@@ -135,6 +135,17 @@ export function userBindCard(data: BindCard, withToken: boolean = true): Promise
   })
 }
 
+// 解绑卡
+export function userUnBindCard(id: string, withToken: boolean = true): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: (ApiUrl.userUnBindCard as string) + id,
+    method: 'DELETE',
+    withToken: withToken
+  })
+}
+
+
+
 // 查询套餐信息列表 
 export function queryPkgInfoList(data: PkgInfoListParams, withToken: boolean = true): Promise<ApiResponse<any>> {
 	// #ifdef MP-WEIXIN

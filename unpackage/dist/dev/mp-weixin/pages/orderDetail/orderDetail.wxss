@@ -53,13 +53,23 @@ page .package-card .package-header .status-tag.data-v-6ec85291 {
   font-size: 24rpx;
   padding: 6rpx 16rpx;
   border-radius: 20rpx;
-  background-color: #fff3e0;
-  color: #ed6c02;
   font-weight: 500;
 }
 page .package-card .package-header .status-tag.status-pending.data-v-6ec85291 {
   background-color: #fff3e0;
   color: #ed6c02;
+}
+page .package-card .package-header .status-tag.status-completed.data-v-6ec85291 {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+page .package-card .package-header .status-tag.status-refunded.data-v-6ec85291 {
+  background-color: #fce4ec;
+  color: #c62828;
+}
+page .package-card .package-header .status-tag.status-cancelled.data-v-6ec85291 {
+  background-color: #eeeeee;
+  color: #757575;
 }
 page .package-card .card-number-row.data-v-6ec85291 {
   display: flex;
@@ -99,18 +109,20 @@ page .info-card .info-row.data-v-6ec85291 {
   padding: 20rpx 0;
 }
 page .info-card .info-row .info-label.data-v-6ec85291 {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #64748b;
 }
 page .info-card .info-row .info-value.data-v-6ec85291 {
   font-size: 28rpx;
   color: #374151;
   text-align: right;
-  font-weight: bold;
 }
-page .info-card .info-row .price.data-v-6ec85291 {
+page .info-card .info-row .info-value.price.data-v-6ec85291 {
   font-size: 36rpx;
   font-weight: bold;
+  color: #ef4444;
+}
+page .info-card .info-row .info-value.status-fail.data-v-6ec85291 {
   color: #ef4444;
 }
 page .notice-card.data-v-6ec85291 {
@@ -146,6 +158,8 @@ page .bottom-bar.data-v-6ec85291 {
   justify-content: space-between;
   align-items: center;
   padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
 }
 page .bottom-bar .amount-section.data-v-6ec85291 {
