@@ -126,7 +126,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleConfirmPayment = (e = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:265", e);
+        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:264", e);
         try {
           const res = yield api_http.addOrderXcx(new common_vendor.UTSJSONObject({
             pkgId: orderDetail.value.pkgId,
@@ -145,7 +145,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:285", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:284", "支付失败:", error);
           common_vendor.index.showToast({
             title: "支付失败，请稍后重试",
             icon: "none"
@@ -167,10 +167,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (!orderId.value)
           return Promise.resolve(null);
         try {
-          const res = yield api_http.queryOrderDetailXcx(Number(orderId.value));
+          const res = yield api_http.queryOrderDetailXcx(orderId.value);
           if (res.code == 200) {
             orderDetail.value = res.data;
-            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:313", "订单详情:", orderDetail.value);
+            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:312", "订单详情:", orderDetail.value);
           } else {
             common_vendor.index.showToast({
               title: res.msg || "查询订单详情失败",
@@ -178,7 +178,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:321", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:320", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"
@@ -187,9 +187,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:330", options.orderNo);
-      orderId.value = options.orderNo;
-      getOrderDetail();
+      const orderNo = options === null || options === void 0 ? null : options.orderNo;
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:330", orderNo);
+      if (orderNo != null) {
+        orderId.value = orderNo;
+        getOrderDetail();
+      }
     });
     return (_ctx, _cache) => {
       "raw js";

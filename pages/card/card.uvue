@@ -89,7 +89,6 @@ const card_number = ref('gn20260603164757')
 const queryKeyword = ref('')
 const current = ref(0)
 const scrollViewHeight = ref(0)
-const loading = ref<boolean>(false)
 
 const cardList = ref<RechargeData[]>([])
 const cardCounts = ref<[number, number, number]>([0, 0, 0])

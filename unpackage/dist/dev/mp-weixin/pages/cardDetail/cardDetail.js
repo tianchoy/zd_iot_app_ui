@@ -475,6 +475,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         S: common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded)
       }, common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded) ? {
         T: common_vendor.p({
+          height: "100rpx",
           bold: true,
           disabled: true,
           customStyle: {
@@ -483,8 +484,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        U: common_vendor.o(handleBindCard, "f8"),
+        U: common_vendor.o(handleBindCard, "f2"),
         V: common_vendor.p({
+          height: "100rpx",
           bold: true,
           customStyle: {
             border: "none"
@@ -492,8 +494,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        W: common_vendor.o(handleRecharge, "b8"),
+        W: common_vendor.o(handleRecharge, "63"),
         X: common_vendor.p({
+          height: "100rpx",
           type: "primary",
           color: "#1989fa",
           textColor: "#ffffff",

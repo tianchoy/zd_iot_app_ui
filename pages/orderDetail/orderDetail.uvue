@@ -118,8 +118,7 @@
 </template>
 
 <script setup lang="uts">
-	import { queryOrderDetailXcx } from '@/api/http.uts';
-	import { addOrderXcx } from '@/api/http.uts';
+	import { addOrderXcx , queryOrderDetailXcx } from '@/api/http.uts';
 	import Payment from '@/components/payment.uvue';
 	
 	const showPopup = ref(false);
@@ -307,7 +306,7 @@
 	const getOrderDetail = async () => {
 		if (!orderId.value) return
 		try {
-			const res = await queryOrderDetailXcx(Number(orderId.value))
+			const res = await queryOrderDetailXcx(orderId.value)
 			if (res.code == 200) {
 				orderDetail.value = res.data
 				console.log('订单详情:', orderDetail.value)
@@ -327,9 +326,12 @@
 	}
 	
 	onLoad((options) => {
-		console.log(options.orderNo)
-		orderId.value = options.orderNo
-		getOrderDetail()
+		const orderNo = options?.orderNo as string | null
+		console.log(orderNo)
+		if (orderNo != null) {
+			orderId.value = orderNo
+			getOrderDetail()
+		}
 	})
 </script>
 

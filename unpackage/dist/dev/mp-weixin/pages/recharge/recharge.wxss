@@ -217,12 +217,12 @@ page .bottom-box.data-v-722cdacb {
   align-items: center;
   justify-content: space-between;
   background: #ffffff;
-  padding: 24rpx;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
 }
 page .bottom-box .price-box.data-v-722cdacb {
   display: flex;
   flex-direction: column;
+  margin-left: 50rpx;
 }
 page .bottom-box .price-box .price-label.data-v-722cdacb {
   font-size: 24rpx;

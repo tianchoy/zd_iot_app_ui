@@ -47,7 +47,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const queryKeyword = common_vendor.ref("");
     const current = common_vendor.ref(0);
     const scrollViewHeight = common_vendor.ref(0);
-    common_vendor.ref(false);
     const cardList = common_vendor.ref([]);
     const cardCounts = common_vendor.ref([0, 0, 0]);
     const tabs = common_vendor.computed(() => {

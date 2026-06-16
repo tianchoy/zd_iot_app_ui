@@ -109,9 +109,9 @@
 
 			<view class="fixed-bottom-buttons">
 				<!-- <rice-button class="btn" :bold="true" :customStyle="{border:'none'}">诊断</rice-button> -->
-				<rice-button v-if="cardDetail.isBind || isBinded" class="btn" :bold="true" :disabled="true" :customStyle="{border:'none'}">已绑定</rice-button>
-				<rice-button v-else class="btn" :bold="true" :customStyle="{border:'none'}" @click="handleBindCard">去绑定</rice-button>
-				<rice-button class="btn" type="primary" color="#1989fa" textColor="#ffffff" :bold="true" :shadow="true" :customStyle="{border:'none'}" @click="handleRecharge">去充值</rice-button>
+				<rice-button v-if="cardDetail.isBind || isBinded" height="100rpx" class="btn" :bold="true" :disabled="true" :customStyle="{border:'none'}">已绑定</rice-button>
+				<rice-button v-else height="100rpx" class="btn" :bold="true" :customStyle="{border:'none'}" @click="handleBindCard">去绑定</rice-button>
+				<rice-button height="100rpx" class="btn" type="primary" color="#1989fa" textColor="#ffffff" :bold="true" :shadow="true" :customStyle="{border:'none'}" @click="handleRecharge">去充值</rice-button>
 			</view>
 		</view>
 		<view class="empty-state" v-else>
@@ -671,8 +671,6 @@
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
-	padding: 20rpx 24rpx;
-	padding-bottom: 20rpx;
 	background-color: #ffffff;
 	border-top: 1rpx solid #e7edf5;
 	box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.04);

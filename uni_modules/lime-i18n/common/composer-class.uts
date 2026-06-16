@@ -239,7 +239,7 @@ export class ComposerClass {
 	// 当前语言
 	locale : Ref<string>;
 	// 回退语言
-	fallbackLocale : ComputedRefImpl<any>;
+	fallbackLocale : Ref<any>;
 	// 语言消息映射
 	messages : Ref<Map<string, UTSJSONObject>>;
 	// 可用语言列表

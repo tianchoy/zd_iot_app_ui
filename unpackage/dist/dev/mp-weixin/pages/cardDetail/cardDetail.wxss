@@ -267,8 +267,6 @@ page .fixed-bottom-buttons.data-v-2bc48812 {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 24rpx;
-  padding-bottom: 20rpx;
   background-color: #ffffff;
   border-top: 1rpx solid #e7edf5;
   box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.04);

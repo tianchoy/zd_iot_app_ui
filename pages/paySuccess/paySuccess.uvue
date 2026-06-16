@@ -63,6 +63,7 @@
 </template>
 
 <script setup lang="uts">
+	const orderId = ref<string>('')
 	// 查看订单点击处理
 	const handleViewOrder = () => {
 		// 平台兼容处理
@@ -90,6 +91,11 @@
 		console.log('返回卡片详情');
 		// #endif
 	}
+
+	onLoad((options)=>{
+		console.log('orderId:',options.orderId)	
+		orderId.value = options.orderId ?? ''
+	})
 </script>
 
 <style lang="scss" scoped>

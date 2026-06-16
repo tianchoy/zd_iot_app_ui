@@ -119,7 +119,7 @@
 			<text class="price-label">当前套餐金额</text>
 			<text class="price-value">¥{{ currentPrice }}</text>
 		</view>
-		<rice-button type="primary" @click="choosePayment" class="btn">去支付</rice-button>
+		<rice-button type="primary" width="300rpx" height="110rpx" @click="choosePayment" class="btn">去支付</rice-button>
 	</view>
 </template>
 
@@ -268,17 +268,125 @@
 	const handleCancelPayment = () => {
 		showPopup.value = false;
 	}
+
+	const orderId = ref<string>('')
+	const toPay = (data:any) => {
+		if(!data) return
+		orderId.value = res.id
+		const res = data as any
+		if(res.payWxType == 'wechat_pay'){
+			uni.requestPayment({
+				provider: 'wxpay',
+				timeStamp: res.timeStamp,
+				nonceStr: res.nonceStr,
+				package: res.package,
+				paySign: res.paySign,
+				signType: res.signType,
+
+				success: (res) => {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付成功",
+						icon: 'success',
+						duration: 3000,
+					})
+					uni.navigateTo({
+						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value
+					})
+				},
+				fail: (res) => {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付失败，请您重新支付",
+						icon: 'none',
+						duration: 3000
+					});
+					return
+				},
+			})
+		}
+		else if(res.payWxType == 'allin_pay'){
+			if(res.payWxClass == '0'){
+				wx.requestPayment({
+					timeStamp: res.timeStamp,
+					nonceStr: res.nonceStr,
+					package: res.package,
+					paySign: res.paySign,
+					signType: res.signType,
+					success: function (res) {
+						uni.hideLoading()
+						uni.showToast({
+							title: "支付成功",
+							icon: 'success',
+							duration: 3000,
+							success() {
+								uni.navigateTo({
+									url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value
+								})
+							}
+						});
+					},
+					fail: function (err) {
+						uni.hideLoading()
+						uni.showToast({
+							title: "支付失败，请您重新支付",
+							icon: 'none',
+							duration: 3000
+						});
+						return
+					},
+				});
+			}else{
+				let param = {
+					cusid: res.cusid,
+					appid: res.appid,
+					orgid: res.orgid,
+					version: res.version,
+					trxamt: res.trxamt,
+					reqsn: res.reqsn,
+					notify_url: res.notify_url,
+					body: res.body,
+					remark: res.remark,
+					randomstr: res.randomstr,
+					paytype: res.paytype,
+					signtype: res.signtype,
+					sign: res.sign,
+				}
+
+				wx.navigateToMiniProgram({
+					appId: 'wxef277996acc166c3',
+					extraData: param,
+					success(res) { 
+						console.log('支付成功:', res);
+						uni.navigateTo({
+							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value
+						})
+					},
+					fail(res) {
+						uni.hideLoading()
+						uni.showToast({
+							title: "支付取消，请您重新支付",
+							icon: 'none',
+							duration: 3000
+						});
+					}
+				})
+			}
+		}
+	}
 	
 	// 确认支付
 	const handleConfirmPayment =  async (e: any) => {
-		console.log(e);
+		uni.showLoading({
+			title: '支付中...'
+		})
+
+		showPopup.value = false;
 		// 获取当前选中的套餐信息
 		const currentItem = active.value === 0 
 			? packageList.value[selectedPackageIndex.value]
 			: refillList.value[selectedRefillIndex.value];
-		
-		console.log('支付套餐信息,pkgId:', currentItem.pkgId);
-		console.log('支付套餐信息,cardNumberValue:', cardNumber.value);
+
 		// 处理确认逻辑
 		try {
 			const res = await addOrderXcx({
@@ -286,11 +394,9 @@
 				rechargeNo: cardNumber.value,
 			})
 			if(res.code == 200){
-				uni.showToast({
-					title: '支付成功',
-					icon: 'success'
-				})
+				toPay(res.data)
 			} else {
+				uni.hideLoading()
 				uni.showToast({
 					title: res.msg || '支付失败',
 					icon: 'none'
@@ -298,12 +404,12 @@
 			}
 		} catch (error) {
 			console.error('添加订单失败:', error)
+			uni.hideLoading()
 			uni.showToast({
 				title: '添加订单失败',
 				icon: 'none'
 			})
 		}
-		showPopup.value = false;
 	}
 	
 	const onPopupClose = () => {
@@ -369,6 +475,57 @@
 				title: '卡片号码不存在',
 				icon: 'none'
 			})
+		}
+	})
+
+	onShow(() => {
+		console.log('onShow')
+		let options = wx.getEnterOptionsSync();
+		if (options.scene == '1038' &&
+			options.referrerInfo.appId == 'wxef277996acc166c3') {
+			// 代表从收银台小程序返回
+			let extraData = options.referrerInfo.extraData;
+			if (!extraData) {
+				// "当前通过物理按键返回，未接收到返参，建议自行查询交易结果";
+				uni.hideLoading()
+				uni.showToast({
+					title: "支付取消，请您重新支付",
+					icon: 'none',
+					duration: 3000
+				});
+				return
+			} else {
+				if (extraData.code == 'success') {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付成功",
+						icon: 'success',
+						duration: 3000,
+						success() {
+							uni.navigateBack({
+								delta: 1
+							})
+						}
+					});
+					// "支付成功";
+				} else if (extraData.code == 'cancel') {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付取消，请您重新支付",
+						icon: 'none',
+						duration: 3000
+					});
+					return
+				} else {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付失败，请您重新支付",
+						icon: 'none',
+						duration: 3000
+					});
+					return
+				}
+			}
 		}
 	})
 </script>
@@ -567,11 +724,11 @@
 		align-items: center;
 		justify-content: space-between;
 		background: #ffffff;
-		padding: 24rpx;
 		box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
 		.price-box{
 			display: flex;
 			flex-direction: column;
+			margin-left: 50rpx;
 			.price-label{
 				font-size: 24rpx;
 				color: #64748b;

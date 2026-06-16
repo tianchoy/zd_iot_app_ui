@@ -11,12 +11,18 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "paySuccess",
   setup(__props) {
+    const orderId = common_vendor.ref("");
     const handleViewOrder = () => {
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:73", "查看订单");
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:74", "查看订单");
     };
     const handleBackCard = () => {
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:87", "返回卡片详情");
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:88", "返回卡片详情");
     };
+    common_vendor.onLoad((options) => {
+      var _a;
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:96", "orderId:", options.orderId);
+      orderId.value = (_a = options.orderId) !== null && _a !== void 0 ? _a : "";
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
