@@ -13,10 +13,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const orderId = common_vendor.ref("");
     const handleViewOrder = () => {
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:74", "查看订单");
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:74", "查看订单MP-WEIXIN");
     };
     const handleBackCard = () => {
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:88", "返回卡片详情");
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:88", "返回卡片详情MP-WEIXIN");
     };
     common_vendor.onLoad((options) => {
       var _a;

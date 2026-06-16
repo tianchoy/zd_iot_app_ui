@@ -486,7 +486,6 @@
 			// 代表从收银台小程序返回
 			let extraData = options.referrerInfo.extraData;
 			if (!extraData) {
-				// "当前通过物理按键返回，未接收到返参，建议自行查询交易结果";
 				uni.hideLoading()
 				uni.showToast({
 					title: "支付取消，请您重新支付",

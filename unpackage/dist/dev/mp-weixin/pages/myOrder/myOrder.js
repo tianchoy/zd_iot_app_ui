@@ -162,6 +162,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         title: `支付订单 ${order.orderNo}`,
         icon: "none"
       });
+      common_vendor.index.navigateTo({
+        url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
+      });
     };
     const getOrderList = (status) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -187,7 +190,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:283", "获取订单列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:286", "获取订单列表失败:", error);
           orderList.value = [];
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",

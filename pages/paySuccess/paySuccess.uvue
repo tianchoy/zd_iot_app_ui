@@ -68,13 +68,13 @@
 	const handleViewOrder = () => {
 		// 平台兼容处理
 		// #ifdef APP
-		console.log('查看订单');
+		console.log('查看订单APP');
 		// #endif
 		// #ifdef MP-WEIXIN
-		console.log('查看订单');
+		console.log('查看订单MP-WEIXIN');
 		// #endif
 		// #ifdef H5
-		console.log('查看订单');
+		console.log('查看订单H5');
 		// #endif
 	}
 	
@@ -82,13 +82,13 @@
 	const handleBackCard = () => {
 		// 平台兼容处理
 		// #ifdef APP
-		console.log('返回卡片详情');
+		console.log('返回卡片详情APP');
 		// #endif
 		// #ifdef MP-WEIXIN
-		console.log('返回卡片详情');
+		console.log('返回卡片详情MP-WEIXIN');
 		// #endif
 		// #ifdef H5
-		console.log('返回卡片详情');
+		console.log('返回卡片详情H5');
 		// #endif
 	}
 

@@ -258,6 +258,112 @@
 	const handleCancelPayment = () => {
 		showPopup.value = false
 	}
+
+	const orderId = ref<string>('')
+	const toPay = (data:any) => {
+		if(!data) return
+		orderId.value = res.id
+		const res = data as any
+		if(res.payWxType == 'wechat_pay'){
+			uni.requestPayment({
+				provider: 'wxpay',
+				timeStamp: res.timeStamp,
+				nonceStr: res.nonceStr,
+				package: res.package,
+				paySign: res.paySign,
+				signType: res.signType,
+
+				success: (res) => {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付成功",
+						icon: 'success',
+						duration: 3000,
+					})
+					uni.navigateTo({
+						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value
+					})
+				},
+				fail: (res) => {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付失败，请您重新支付",
+						icon: 'none',
+						duration: 3000
+					});
+					return
+				},
+			})
+		}
+		else if(res.payWxType == 'allin_pay'){
+			if(res.payWxClass == '0'){
+				wx.requestPayment({
+					timeStamp: res.timeStamp,
+					nonceStr: res.nonceStr,
+					package: res.package,
+					paySign: res.paySign,
+					signType: res.signType,
+					success: function (res) {
+						uni.hideLoading()
+						uni.showToast({
+							title: "支付成功",
+							icon: 'success',
+							duration: 3000,
+							success() {
+								uni.navigateTo({
+									url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value
+								})
+							}
+						});
+					},
+					fail: function (err) {
+						uni.hideLoading()
+						uni.showToast({
+							title: "支付失败，请您重新支付",
+							icon: 'none',
+							duration: 3000
+						});
+						return
+					},
+				});
+			}else{
+				let param = {
+					cusid: res.cusid,
+					appid: res.appid,
+					orgid: res.orgid,
+					version: res.version,
+					trxamt: res.trxamt,
+					reqsn: res.reqsn,
+					notify_url: res.notify_url,
+					body: res.body,
+					remark: res.remark,
+					randomstr: res.randomstr,
+					paytype: res.paytype,
+					signtype: res.signtype,
+					sign: res.sign,
+				}
+
+				wx.navigateToMiniProgram({
+					appId: 'wxef277996acc166c3',
+					extraData: param,
+					success(res) { 
+						console.log('支付成功:', res);
+						uni.navigateTo({
+							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value
+						})
+					},
+					fail(res) {
+						uni.hideLoading()
+						uni.showToast({
+							title: "支付取消，请您重新支付",
+							icon: 'none',
+							duration: 3000
+						});
+					}
+				})
+			}
+		}
+	}
 	
 	// 确认支付
 	const handleConfirmPayment = async (e: any) => {
@@ -268,12 +374,7 @@
 				rechargeNo: orderDetail.value.rechargeNo,
 			})
 			if (res.code == 200) {
-				uni.showToast({
-					title: '支付成功',
-					icon: 'success'
-				})
-				// 刷新订单详情
-				await getOrderDetail()
+				toPay(res.data)
 			} else {
 				uni.showToast({
 					title: res.msg || '支付失败',
@@ -331,6 +432,57 @@
 		if (orderNo != null) {
 			orderId.value = orderNo
 			getOrderDetail()
+		}
+	})
+
+	onShow(() => {
+		console.log('onShow')
+		let options = wx.getEnterOptionsSync();
+		if (options.scene == '1038' &&
+			options.referrerInfo.appId == 'wxef277996acc166c3') {
+			// 代表从收银台小程序返回
+			let extraData = options.referrerInfo.extraData;
+			if (!extraData) {
+				// "当前通过物理按键返回，未接收到返参，建议自行查询交易结果";
+				uni.hideLoading()
+				uni.showToast({
+					title: "支付取消，请您重新支付",
+					icon: 'none',
+					duration: 3000
+				});
+				return
+			} else {
+				if (extraData.code == 'success') {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付成功",
+						icon: 'success',
+						duration: 3000,
+						success() {
+							uni.navigateBack({
+								delta: 1
+							})
+						}
+					});
+					// "支付成功";
+				} else if (extraData.code == 'cancel') {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付取消，请您重新支付",
+						icon: 'none',
+						duration: 3000
+					});
+					return
+				} else {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付失败，请您重新支付",
+						icon: 'none',
+						duration: 3000
+					});
+					return
+				}
+			}
 		}
 	})
 </script>

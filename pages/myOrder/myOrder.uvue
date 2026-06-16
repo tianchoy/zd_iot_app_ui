@@ -239,6 +239,9 @@
 			title: `支付订单 ${order.orderNo}`,
 			icon: 'none'
 		})
+		uni.navigateTo({
+			url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
+		})
 		// #endif
 		// #ifdef APP
 		// App支付逻辑
