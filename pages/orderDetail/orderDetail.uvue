@@ -113,7 +113,11 @@
 			:amount="currentPrice" 
 			@cancel="handleCancelPayment"
 			@confirm="handleConfirmPayment"
-		/>
+			:cardNumber="orderDetail.rechargeNo",
+			:productName="orderDetail.pkgName"
+			:traffic="orderDetail.pkgFlow"
+			:validityPeriod="orderDetail.validityPeriod"
+			/>
 	</rice-popup>
 </template>
 
@@ -262,8 +266,8 @@
 
 	const toPay = (data:any) => {
 		if(!data) return
-		orderId.value = res.id
 		const res = data as any
+		orderId.value = res.id
 		if(res.payWxType == 'wechat_pay'){
 			uni.requestPayment({
 				provider: 'wxpay',
@@ -297,7 +301,7 @@
 		}
 		else if(res.payWxType == 'allin_pay'){
 			if(res.payWxClass == '0'){
-				wx.requestPayment({
+				uni.requestPayment({
 					timeStamp: res.timeStamp,
 					nonceStr: res.nonceStr,
 					package: res.package,
@@ -436,9 +440,7 @@
 	})
 
 	onShow(() => {
-		console.log('onShow')
-		console.log('config.api.auth.appID:', config.api.auth.appID)
-		let options = wx.getEnterOptionsSync();
+		let options = uni.getEnterOptionsSync();
 		if (options.scene == '1038' &&
 			options.referrerInfo.appId == config.api.auth.appID) {
 			// 代表从收银台小程序返回

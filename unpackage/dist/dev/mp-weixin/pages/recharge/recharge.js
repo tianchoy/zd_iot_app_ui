@@ -128,8 +128,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const toPay = (data = null) => {
       if (!data)
         return null;
-      orderId.value = res.id;
       const res = data;
+      orderId.value = res.id;
       if (res.payWxType == "wechat_pay") {
         common_vendor.index.requestPayment({
           provider: "wxpay",
@@ -161,13 +161,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       } else if (res.payWxType == "allin_pay") {
         if (res.payWxClass == "0") {
-          common_vendor.wx$1.requestPayment(new common_vendor.UTSJSONObject({
+          common_vendor.index.requestPayment({
             timeStamp: res.timeStamp,
             nonceStr: res.nonceStr,
             package: res.package,
             paySign: res.paySign,
             signType: res.signType,
-            success: function(res2 = null) {
+            success: function(res2) {
               common_vendor.index.hideLoading();
               common_vendor.index.showToast({
                 title: "支付成功",
@@ -180,7 +180,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 }
               });
             },
-            fail: function(err = null) {
+            fail: function(err) {
               common_vendor.index.hideLoading();
               common_vendor.index.showToast({
                 title: "支付失败，请您重新支付",
@@ -189,7 +189,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
               return null;
             }
-          }));
+          });
         } else {
           let param = new common_vendor.UTSJSONObject({
             cusid: res.cusid,
@@ -210,7 +210,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:361", "支付成功:", res2);
+              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:365", "支付成功:", res2);
               common_vendor.index.navigateTo({
                 url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value
               });
@@ -249,7 +249,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:407", "添加订单失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:411", "添加订单失败:", error);
           common_vendor.index.hideLoading();
           common_vendor.index.showToast({
             title: "添加订单失败",
@@ -259,7 +259,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const onPopupClose = () => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:417", "弹窗关闭");
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:421", "弹窗关闭");
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -289,7 +289,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:453", "获取卡片详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:457", "获取卡片详情失败:", error);
           common_vendor.index.showToast({
             title: "获取卡片信息失败",
             icon: "none"
@@ -300,7 +300,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const cardNumber = common_vendor.ref("");
     const country = common_vendor.ref("");
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:464", "options:", options);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:468", "options:", options);
       const opt = options;
       const cardNumberValue = opt.cardNumber;
       const countryValue = opt.country;
@@ -309,7 +309,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         country.value = countryValue !== null && countryValue !== void 0 ? countryValue : "";
         getCardDetail(cardNumber.value, country.value);
       } else {
-        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:474", "未获取到卡片号码");
+        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:478", "未获取到卡片号码");
         common_vendor.index.showToast({
           title: "卡片号码不存在",
           icon: "none"
@@ -317,9 +317,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     });
     common_vendor.onShow(() => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:483", "onShow");
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:484", "config.api.auth.appID:", common_config.config.api.auth.appID);
-      let options = common_vendor.wx$1.getEnterOptionsSync();
+      let options = common_vendor.index.getEnterOptionsSync();
       if (options.scene == "1038" && options.referrerInfo.appId == common_config.config.api.auth.appID) {
         let extraData = options.referrerInfo.extraData;
         if (!extraData) {
@@ -489,6 +487,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         A: common_vendor.o(handleConfirmPayment, "b7"),
         B: common_vendor.p({
           amount: currentPrice.value,
+          cardNumber: cardDetail.value.rechargeNo,
+          [","]: true,
+          productName: cardDetail.value.pkgName,
+          traffic: cardDetail.value.pkgFlow,
+          validityPeriod: cardDetail.value.validityPeriod,
           class: "data-v-722cdacb"
         }),
         C: common_vendor.o(onPopupClose, "1a"),
@@ -501,7 +504,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-722cdacb"
         }),
         F: common_vendor.t(currentPrice.value),
-        G: common_vendor.o(choosePayment, "17"),
+        G: common_vendor.o(choosePayment, "48"),
         H: common_vendor.p({
           type: "primary",
           width: "300rpx",
