@@ -3,6 +3,7 @@ export type AuthApiPaths = {
   tenantId: string
   clientId: string
   grantType: string
+  appID: string
 }
 
 // ApiPaths 只引用已定义的 interface
@@ -64,6 +65,7 @@ export const config: ProjectConfig = {
       tenantId: '000000', // 租户ID
       clientId: '12353d4772a25656d6d2a67d53353cc3',
       grantType: 'xcx',
+      appID: 'wxef277996acc166c3'
     },
   },
   

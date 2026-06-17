@@ -119,6 +119,7 @@
 
 <script setup lang="uts">
 	import { addOrderXcx , queryOrderDetailXcx } from '@/api/http.uts';
+	import { config } from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	
 	const showPopup = ref(false);
@@ -259,7 +260,6 @@
 		showPopup.value = false
 	}
 
-	const orderId = ref<string>('')
 	const toPay = (data:any) => {
 		if(!data) return
 		orderId.value = res.id
@@ -344,7 +344,7 @@
 				}
 
 				wx.navigateToMiniProgram({
-					appId: 'wxef277996acc166c3',
+					appId: config.api.auth.appID,
 					extraData: param,
 					success(res) { 
 						console.log('支付成功:', res);
@@ -368,6 +368,7 @@
 	// 确认支付
 	const handleConfirmPayment = async (e: any) => {
 		console.log(e)
+		showPopup.value = false
 		try {
 			const res = await addOrderXcx({
 				pkgId: orderDetail.value.pkgId,
@@ -388,7 +389,6 @@
 				icon: 'none'
 			})
 		}
-		showPopup.value = false
 	}
 	
 	// 支付弹窗关闭
@@ -437,9 +437,10 @@
 
 	onShow(() => {
 		console.log('onShow')
+		console.log('config.api.auth.appID:', config.api.auth.appID)
 		let options = wx.getEnterOptionsSync();
 		if (options.scene == '1038' &&
-			options.referrerInfo.appId == 'wxef277996acc166c3') {
+			options.referrerInfo.appId == config.api.auth.appID) {
 			// 代表从收银台小程序返回
 			let extraData = options.referrerInfo.extraData;
 			if (!extraData) {

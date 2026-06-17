@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_http = require("../../api/http.js");
+const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_popup_1 = common_vendor.resolveComponent("rice-popup");
@@ -124,20 +125,119 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handleCancelPayment = () => {
       showPopup.value = false;
     };
+    const toPay = (data = null) => {
+      if (!data)
+        return null;
+      orderId.value = res.id;
+      const res = data;
+      if (res.payWxType == "wechat_pay") {
+        common_vendor.index.requestPayment({
+          provider: "wxpay",
+          timeStamp: res.timeStamp,
+          nonceStr: res.nonceStr,
+          package: res.package,
+          paySign: res.paySign,
+          signType: res.signType,
+          success: (res2) => {
+            common_vendor.index.hideLoading();
+            common_vendor.index.showToast({
+              title: "支付成功",
+              icon: "success",
+              duration: 3e3
+            });
+            common_vendor.index.navigateTo({
+              url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value
+            });
+          },
+          fail: (res2) => {
+            common_vendor.index.hideLoading();
+            common_vendor.index.showToast({
+              title: "支付失败，请您重新支付",
+              icon: "none",
+              duration: 3e3
+            });
+            return null;
+          }
+        });
+      } else if (res.payWxType == "allin_pay") {
+        if (res.payWxClass == "0") {
+          common_vendor.wx$1.requestPayment(new common_vendor.UTSJSONObject({
+            timeStamp: res.timeStamp,
+            nonceStr: res.nonceStr,
+            package: res.package,
+            paySign: res.paySign,
+            signType: res.signType,
+            success: function(res2 = null) {
+              common_vendor.index.hideLoading();
+              common_vendor.index.showToast({
+                title: "支付成功",
+                icon: "success",
+                duration: 3e3,
+                success() {
+                  common_vendor.index.navigateTo({
+                    url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value
+                  });
+                }
+              });
+            },
+            fail: function(err = null) {
+              common_vendor.index.hideLoading();
+              common_vendor.index.showToast({
+                title: "支付失败，请您重新支付",
+                icon: "none",
+                duration: 3e3
+              });
+              return null;
+            }
+          }));
+        } else {
+          let param = new common_vendor.UTSJSONObject({
+            cusid: res.cusid,
+            appid: res.appid,
+            orgid: res.orgid,
+            version: res.version,
+            trxamt: res.trxamt,
+            reqsn: res.reqsn,
+            notify_url: res.notify_url,
+            body: res.body,
+            remark: res.remark,
+            randomstr: res.randomstr,
+            paytype: res.paytype,
+            signtype: res.signtype,
+            sign: res.sign
+          });
+          common_vendor.wx$1.navigateToMiniProgram(new common_vendor.UTSJSONObject({
+            appId: common_config.config.api.auth.appID,
+            extraData: param,
+            success(res2 = null) {
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:350", "支付成功:", res2);
+              common_vendor.index.navigateTo({
+                url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value
+              });
+            },
+            fail(res2 = null) {
+              common_vendor.index.hideLoading();
+              common_vendor.index.showToast({
+                title: "支付取消，请您重新支付",
+                icon: "none",
+                duration: 3e3
+              });
+            }
+          }));
+        }
+      }
+    };
     const handleConfirmPayment = (e = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:264", e);
+        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:370", e);
+        showPopup.value = false;
         try {
           const res = yield api_http.addOrderXcx(new common_vendor.UTSJSONObject({
             pkgId: orderDetail.value.pkgId,
             rechargeNo: orderDetail.value.rechargeNo
           }));
           if (res.code == 200) {
-            common_vendor.index.showToast({
-              title: "支付成功",
-              icon: "success"
-            });
-            yield getOrderDetail();
+            toPay(res.data);
           } else {
             common_vendor.index.showToast({
               title: res.msg || "支付失败",
@@ -145,13 +245,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:284", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:386", "支付失败:", error);
           common_vendor.index.showToast({
             title: "支付失败，请稍后重试",
             icon: "none"
           });
         }
-        showPopup.value = false;
       });
     };
     const onPopupClose = () => {
@@ -170,7 +269,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_http.queryOrderDetailXcx(orderId.value);
           if (res.code == 200) {
             orderDetail.value = res.data;
-            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:312", "订单详情:", orderDetail.value);
+            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:413", "订单详情:", orderDetail.value);
           } else {
             common_vendor.index.showToast({
               title: res.msg || "查询订单详情失败",
@@ -178,7 +277,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:320", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:421", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"
@@ -188,10 +287,57 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onLoad((options) => {
       const orderNo = options === null || options === void 0 ? null : options.orderNo;
-      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:330", orderNo);
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:431", orderNo);
       if (orderNo != null) {
         orderId.value = orderNo;
         getOrderDetail();
+      }
+    });
+    common_vendor.onShow(() => {
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:439", "onShow");
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:440", "config.api.auth.appID:", common_config.config.api.auth.appID);
+      let options = common_vendor.wx$1.getEnterOptionsSync();
+      if (options.scene == "1038" && options.referrerInfo.appId == common_config.config.api.auth.appID) {
+        let extraData = options.referrerInfo.extraData;
+        if (!extraData) {
+          common_vendor.index.hideLoading();
+          common_vendor.index.showToast({
+            title: "支付取消，请您重新支付",
+            icon: "none",
+            duration: 3e3
+          });
+          return null;
+        } else {
+          if (extraData.code == "success") {
+            common_vendor.index.hideLoading();
+            common_vendor.index.showToast({
+              title: "支付成功",
+              icon: "success",
+              duration: 3e3,
+              success() {
+                common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
+                  delta: 1
+                }));
+              }
+            });
+          } else if (extraData.code == "cancel") {
+            common_vendor.index.hideLoading();
+            common_vendor.index.showToast({
+              title: "支付取消，请您重新支付",
+              icon: "none",
+              duration: 3e3
+            });
+            return null;
+          } else {
+            common_vendor.index.hideLoading();
+            common_vendor.index.showToast({
+              title: "支付失败，请您重新支付",
+              icon: "none",
+              duration: 3e3
+            });
+            return null;
+          }
+        }
       }
     });
     return (_ctx, _cache) => {

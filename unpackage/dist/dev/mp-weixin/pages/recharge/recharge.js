@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_http = require("../../api/http.js");
 require("../../api/types.js");
+const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_tag_1 = common_vendor.resolveComponent("rice-tag");
@@ -206,10 +207,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             sign: res.sign
           });
           common_vendor.wx$1.navigateToMiniProgram(new common_vendor.UTSJSONObject({
-            appId: "wxef277996acc166c3",
+            appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:360", "支付成功:", res2);
+              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:361", "支付成功:", res2);
               common_vendor.index.navigateTo({
                 url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value
               });
@@ -248,7 +249,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:406", "添加订单失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:407", "添加订单失败:", error);
           common_vendor.index.hideLoading();
           common_vendor.index.showToast({
             title: "添加订单失败",
@@ -258,7 +259,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const onPopupClose = () => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:416", "弹窗关闭");
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:417", "弹窗关闭");
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -288,7 +289,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:452", "获取卡片详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:453", "获取卡片详情失败:", error);
           common_vendor.index.showToast({
             title: "获取卡片信息失败",
             icon: "none"
@@ -299,7 +300,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const cardNumber = common_vendor.ref("");
     const country = common_vendor.ref("");
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:463", "options:", options);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:464", "options:", options);
       const opt = options;
       const cardNumberValue = opt.cardNumber;
       const countryValue = opt.country;
@@ -308,7 +309,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         country.value = countryValue !== null && countryValue !== void 0 ? countryValue : "";
         getCardDetail(cardNumber.value, country.value);
       } else {
-        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:473", "未获取到卡片号码");
+        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:474", "未获取到卡片号码");
         common_vendor.index.showToast({
           title: "卡片号码不存在",
           icon: "none"
@@ -316,9 +317,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     });
     common_vendor.onShow(() => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:482", "onShow");
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:483", "onShow");
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:484", "config.api.auth.appID:", common_config.config.api.auth.appID);
       let options = common_vendor.wx$1.getEnterOptionsSync();
-      if (options.scene == "1038" && options.referrerInfo.appId == "wxef277996acc166c3") {
+      if (options.scene == "1038" && options.referrerInfo.appId == common_config.config.api.auth.appID) {
         let extraData = options.referrerInfo.extraData;
         if (!extraData) {
           common_vendor.index.hideLoading();

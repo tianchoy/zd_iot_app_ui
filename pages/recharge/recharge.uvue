@@ -127,6 +127,7 @@
 	import { ref, computed } from 'vue';
 	import { queryCardDetail, addOrderXcx } from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
+	import { config } from '@/common/config.uts';
 
 	import LinearProgress from '@/components/progress.uvue';
 	import Payment from '@/components/payment.uvue';
@@ -354,7 +355,7 @@
 				}
 
 				wx.navigateToMiniProgram({
-					appId: 'wxef277996acc166c3',
+					appId: config.api.auth.appID,
 					extraData: param,
 					success(res) { 
 						console.log('支付成功:', res);
@@ -480,9 +481,10 @@
 
 	onShow(() => {
 		console.log('onShow')
+		console.log('config.api.auth.appID:', config.api.auth.appID)
 		let options = wx.getEnterOptionsSync();
 		if (options.scene == '1038' &&
-			options.referrerInfo.appId == 'wxef277996acc166c3') {
+			options.referrerInfo.appId == config.api.auth.appID) {
 			// 代表从收银台小程序返回
 			let extraData = options.referrerInfo.extraData;
 			if (!extraData) {

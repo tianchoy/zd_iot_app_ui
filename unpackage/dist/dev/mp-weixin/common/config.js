@@ -8,7 +8,8 @@ class AuthApiPaths extends common_vendor.UTS.UTSType {
         return {
           tenantId: { type: String, optional: false },
           clientId: { type: String, optional: false },
-          grantType: { type: String, optional: false }
+          grantType: { type: String, optional: false },
+          appID: { type: String, optional: false }
         };
       },
       name: "AuthApiPaths"
@@ -20,6 +21,7 @@ class AuthApiPaths extends common_vendor.UTS.UTSType {
     this.tenantId = this.__props__.tenantId;
     this.clientId = this.__props__.clientId;
     this.grantType = this.__props__.grantType;
+    this.appID = this.__props__.appID;
     delete this.__props__;
   }
 }
@@ -146,7 +148,8 @@ const config = new ProjectConfig(
       auth: new AuthApiPaths({
         tenantId: "000000",
         clientId: "12353d4772a25656d6d2a67d53353cc3",
-        grantType: "xcx"
+        grantType: "xcx",
+        appID: "wxef277996acc166c3"
       })
     }),
     storage: new StorageKeys({
