@@ -208,10 +208,6 @@ const getCardList = async (state: string) => {
 		if (res.code == 0) {
 			return Array.isArray(res.data) ? res.data : []
 		}
-		uni.showToast({
-			title: res.msg || '查询失败',
-			icon: 'none'
-		})
 		return []
 	} catch (error) {
 		uni.showToast({

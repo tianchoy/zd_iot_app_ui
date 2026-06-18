@@ -140,10 +140,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (res.code == 0) {
             return Array.isArray(res.data) ? res.data : [];
           }
-          common_vendor.index.showToast({
-            title: res.msg || "查询失败",
-            icon: "none"
-          });
           return [];
         } catch (error) {
           common_vendor.index.showToast({

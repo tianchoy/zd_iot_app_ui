@@ -4,45 +4,45 @@
 		<scroll-view class="container" scroll-y :enhanced="true">
 			<!-- 套餐名称卡片 -->
 			<view class="package-card">
-				<view class="package-header">
-					<text class="package-name">{{ orderDetail.pkgName || '-' }}</text>
+				<view class="package-header" v-if="orderDetail.pkgName">
+					<text class="package-name">{{ orderDetail.pkgName }}</text>
 					<text class="status-tag" :class="getStatusClass(getOrderStatusText())">{{ getOrderStatusText() }}</text>
 				</view>
-				<view class="card-number-row">
+				<view class="card-number-row" v-if="orderDetail.rechargeNo">
 					<text class="card-number-label">当前卡号：</text>
-					<text class="card-number">{{ orderDetail.rechargeNo || '-' }}</text>
+					<text class="card-number">{{ orderDetail.rechargeNo }}</text>
 				</view>
 			</view>
 			
 			<!-- 订单信息卡片 -->
 			<view class="info-card">
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.orderNo">
 					<text class="info-label">订单编号</text>
-					<text class="info-value">{{ orderDetail.orderNo || '-' }}</text>
+					<text class="info-value">{{ orderDetail.orderNo }}</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.iccid">
 					<text class="info-label">ICCID</text>
-					<text class="info-value">{{ orderDetail.iccid || '-' }}</text>
+					<text class="info-value">{{ orderDetail.iccid }}</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.orderAmount">
 					<text class="info-label">支付金额</text>
 					<text class="info-value price">¥{{ orderDetail.payAmount || orderDetail.orderAmount || 0 }}</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.orderStatus">
 					<text class="info-label">订单状态</text>
 					<text class="info-value status">{{ getOrderStatusText() }}</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.payMethod">
 					<text class="info-label">支付方式</text>
 					<text class="info-value">{{ getPaymentMethod() }}</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.orderCreateTime">
 					<text class="info-label">下单时间</text>
 					<text class="info-value">{{ formatDateTime(orderDetail.orderCreateTime) }}</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.payTime">
 					<text class="info-label">支付时间</text>
-					<text class="info-value">{{ formatDateTime(orderDetail.payTime) || '--' }}</text>
+					<text class="info-value">{{ formatDateTime(orderDetail.payTime)}}</text>
 				</view>
 				<view v-if="orderDetail.payFailReason" class="info-row">
 					<text class="info-label">支付失败原因</text>
@@ -59,25 +59,25 @@
 				<view class="section-header">
 					<text class="section-title">套餐信息</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.pkgCategory">
 					<text class="info-label">套餐类型</text>
 					<text class="info-value">{{ getPkgCategoryText() }}</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.pkgFlow">
 					<text class="info-label">套餐流量</text>
 					<text class="info-value">{{ getPkgFlowText() }}</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.validityPeriod">
 					<text class="info-label">有效期</text>
-					<text class="info-value">{{ orderDetail.validityPeriod || '-' }}</text>
+					<text class="info-value">{{ orderDetail.validityPeriod }}</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.startDate">
 					<text class="info-label">生效时间</text>
-					<text class="info-value">{{ formatDateTime(orderDetail.startDate) || '--' }}</text>
+					<text class="info-value">{{ formatDateTime(orderDetail.startDate) }}</text>
 				</view>
-				<view class="info-row">
+				<view class="info-row" v-if="orderDetail.endDate">
 					<text class="info-label">失效时间</text>
-					<text class="info-value">{{ formatDateTime(orderDetail.endDate) || '--' }}</text>
+					<text class="info-value">{{ formatDateTime(orderDetail.endDate)}}</text>
 				</view>
 			</view>
 			

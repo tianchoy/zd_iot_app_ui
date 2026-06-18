@@ -86,6 +86,9 @@
 		// #endif
 		// #ifdef MP-WEIXIN
 		console.log('返回卡片详情MP-WEIXIN');
+		uni.navigateTo({
+			url: `/pages/cardDetail/cardDetail?cardNumber=${orderId.value}`
+		})
 		// #endif
 		// #ifdef H5
 		console.log('返回卡片详情H5');
@@ -93,14 +96,14 @@
 	}
 
 	onLoad((options)=>{
-		console.log('orderId:',options.orderId)	
+		console.log('orderId:',options)	
 		orderId.value = options.orderId ?? ''
 	})
 </script>
 
 <style lang="scss" scoped>
 	.container {
-		background-color: #f5f5f5;
+		background-color: #f4f7fb;
 		padding: 40rpx 32rpx;
 		display: flex;
 		flex-direction: column;

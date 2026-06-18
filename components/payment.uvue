@@ -1,8 +1,3 @@
-<!--
-纯支付内容组件，不含弹窗外层，配合 m-bottom-popup 使用
-根据平台类型（微信小程序 vs H5）动态显示支付方式选项
--->
-
 <template>
 	<view class="payment-content">
 		<!-- 支付信息区域 -->

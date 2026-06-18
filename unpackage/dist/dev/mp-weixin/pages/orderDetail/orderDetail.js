@@ -350,44 +350,86 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-6ec85291"
         }),
-        c: common_vendor.t(common_vendor.unref(orderDetail).pkgName || "-"),
-        d: common_vendor.t(getOrderStatusText()),
-        e: common_vendor.n(getStatusClass(getOrderStatusText())),
-        f: common_vendor.t(common_vendor.unref(orderDetail).rechargeNo || "-"),
-        g: common_vendor.t(common_vendor.unref(orderDetail).orderNo || "-"),
-        h: common_vendor.t(common_vendor.unref(orderDetail).iccid || "-"),
-        i: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0),
-        j: common_vendor.t(getOrderStatusText()),
-        k: common_vendor.t(getPaymentMethod()),
-        l: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).orderCreateTime)),
-        m: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).payTime) || "--"),
-        n: common_vendor.unref(orderDetail).payFailReason
+        c: common_vendor.unref(orderDetail).pkgName
+      }, common_vendor.unref(orderDetail).pkgName ? {
+        d: common_vendor.t(common_vendor.unref(orderDetail).pkgName),
+        e: common_vendor.t(getOrderStatusText()),
+        f: common_vendor.n(getStatusClass(getOrderStatusText()))
+      } : {}, {
+        g: common_vendor.unref(orderDetail).rechargeNo
+      }, common_vendor.unref(orderDetail).rechargeNo ? {
+        h: common_vendor.t(common_vendor.unref(orderDetail).rechargeNo)
+      } : {}, {
+        i: common_vendor.unref(orderDetail).orderNo
+      }, common_vendor.unref(orderDetail).orderNo ? {
+        j: common_vendor.t(common_vendor.unref(orderDetail).orderNo)
+      } : {}, {
+        k: common_vendor.unref(orderDetail).iccid
+      }, common_vendor.unref(orderDetail).iccid ? {
+        l: common_vendor.t(common_vendor.unref(orderDetail).iccid)
+      } : {}, {
+        m: common_vendor.unref(orderDetail).orderAmount
+      }, common_vendor.unref(orderDetail).orderAmount ? {
+        n: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0)
+      } : {}, {
+        o: common_vendor.unref(orderDetail).orderStatus
+      }, common_vendor.unref(orderDetail).orderStatus ? {
+        p: common_vendor.t(getOrderStatusText())
+      } : {}, {
+        q: common_vendor.unref(orderDetail).payMethod
+      }, common_vendor.unref(orderDetail).payMethod ? {
+        r: common_vendor.t(getPaymentMethod())
+      } : {}, {
+        s: common_vendor.unref(orderDetail).orderCreateTime
+      }, common_vendor.unref(orderDetail).orderCreateTime ? {
+        t: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).orderCreateTime))
+      } : {}, {
+        v: common_vendor.unref(orderDetail).payTime
+      }, common_vendor.unref(orderDetail).payTime ? {
+        w: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).payTime))
+      } : {}, {
+        x: common_vendor.unref(orderDetail).payFailReason
       }, common_vendor.unref(orderDetail).payFailReason ? {
-        o: common_vendor.t(common_vendor.unref(orderDetail).payFailReason)
+        y: common_vendor.t(common_vendor.unref(orderDetail).payFailReason)
       } : {}, {
-        p: common_vendor.unref(orderDetail).cancelTime
+        z: common_vendor.unref(orderDetail).cancelTime
       }, common_vendor.unref(orderDetail).cancelTime ? {
-        q: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).cancelTime))
+        A: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).cancelTime))
       } : {}, {
-        r: common_vendor.t(getPkgCategoryText()),
-        s: common_vendor.t(getPkgFlowText()),
-        t: common_vendor.t(common_vendor.unref(orderDetail).validityPeriod || "-"),
-        v: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).startDate) || "--"),
-        w: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).endDate) || "--"),
-        x: common_vendor.unref(orderDetail).usageInstructions || getNoticeText()
+        B: common_vendor.unref(orderDetail).pkgCategory
+      }, common_vendor.unref(orderDetail).pkgCategory ? {
+        C: common_vendor.t(getPkgCategoryText())
+      } : {}, {
+        D: common_vendor.unref(orderDetail).pkgFlow
+      }, common_vendor.unref(orderDetail).pkgFlow ? {
+        E: common_vendor.t(getPkgFlowText())
+      } : {}, {
+        F: common_vendor.unref(orderDetail).validityPeriod
+      }, common_vendor.unref(orderDetail).validityPeriod ? {
+        G: common_vendor.t(common_vendor.unref(orderDetail).validityPeriod)
+      } : {}, {
+        H: common_vendor.unref(orderDetail).startDate
+      }, common_vendor.unref(orderDetail).startDate ? {
+        I: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).startDate))
+      } : {}, {
+        J: common_vendor.unref(orderDetail).endDate
+      }, common_vendor.unref(orderDetail).endDate ? {
+        K: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).endDate))
+      } : {}, {
+        L: common_vendor.unref(orderDetail).usageInstructions || getNoticeText()
       }, common_vendor.unref(orderDetail).usageInstructions || getNoticeText() ? {
-        y: common_vendor.t(common_vendor.unref(orderDetail).usageInstructions || getNoticeText())
+        M: common_vendor.t(common_vendor.unref(orderDetail).usageInstructions || getNoticeText())
       } : {}, {
-        z: common_vendor.unref(orderDetail).status === "0"
+        N: common_vendor.unref(orderDetail).status === "0"
       }, common_vendor.unref(orderDetail).status === "0" ? {
-        A: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0),
-        B: common_vendor.o(choosePayment, "fc")
+        O: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0),
+        P: common_vendor.o(choosePayment, "ee")
       } : {}, {
-        C: `${_ctx.u_s_b_h}px`,
-        D: `${_ctx.u_s_a_i_b}px`,
-        E: common_vendor.o(handleCancelPayment, "52"),
-        F: common_vendor.o(handleConfirmPayment, "a9"),
-        G: common_vendor.p({
+        Q: `${_ctx.u_s_b_h}px`,
+        R: `${_ctx.u_s_a_i_b}px`,
+        S: common_vendor.o(handleCancelPayment, "01"),
+        T: common_vendor.o(handleConfirmPayment, "be"),
+        U: common_vendor.p({
           amount: common_vendor.unref(currentPrice),
           cardNumber: common_vendor.unref(orderDetail).rechargeNo,
           [","]: true,
@@ -396,11 +438,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           validityPeriod: common_vendor.unref(orderDetail).validityPeriod,
           class: "data-v-6ec85291"
         }),
-        H: common_vendor.o(onPopupClose, "18"),
-        I: common_vendor.o(($event) => {
+        V: common_vendor.o(onPopupClose, "38"),
+        W: common_vendor.o(($event) => {
           return common_vendor.isRef(showPopup) ? showPopup.value = $event : null;
-        }, "00"),
-        J: common_vendor.p({
+        }, "e5"),
+        X: common_vendor.p({
           position: "bottom",
           show: common_vendor.unref(showPopup),
           class: "data-v-6ec85291"

@@ -17,10 +17,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleBackCard = () => {
       common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:88", "返回卡片详情MP-WEIXIN");
+      common_vendor.index.navigateTo({
+        url: `/pages/cardDetail/cardDetail?cardNumber=${orderId.value}`
+      });
     };
     common_vendor.onLoad((options) => {
       var _a;
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:96", "orderId:", options.orderId);
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:99", "orderId:", options);
       orderId.value = (_a = options.orderId) !== null && _a !== void 0 ? _a : "";
     });
     return (_ctx, _cache) => {

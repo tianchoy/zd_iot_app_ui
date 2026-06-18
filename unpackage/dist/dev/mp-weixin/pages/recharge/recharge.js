@@ -138,7 +138,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!data)
         return null;
       const res = data;
-      orderId.value = res.id;
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:291", "添加订单成功:", res);
+      orderId.value = res.orderSn;
       if (res.payWxType == "wechat_pay") {
         common_vendor.index.requestPayment({
           provider: "wxpay",

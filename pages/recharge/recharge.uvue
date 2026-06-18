@@ -212,7 +212,6 @@
 		const flowBytes = parseFloat(flow);
 		if (isNaN(flowBytes)) return '未知';
 		
-		// 转换为GB（假设流量以字节为单位）
 		const flowGB = flowBytes / (1024 * 1024);
 		
 		if (flowGB >= 1024) {
@@ -289,7 +288,8 @@
 	const toPay = (data:any) => {
 		if(!data) return
 		const res = data as any
-		orderId.value = res.id
+		console.log('添加订单成功:', res)
+		orderId.value = res.orderSn
 		if(res.payWxType == 'wechat_pay'){
 			uni.requestPayment({
 				provider: 'wxpay',
