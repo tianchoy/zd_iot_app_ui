@@ -232,15 +232,15 @@
 	
 	// 去支付
 	const handlePay = (order: OrderListXcxItem) => {
-		console.log('去支付:', order.orderNo)
+		console.log('去支付:', order)
 		// #ifdef MP-WEIXIN
 		// 微信小程序支付逻辑
 		uni.showToast({
-			title: `支付订单 ${order.orderNo}`,
+			title: `支付订单 ${order.id}`,
 			icon: 'none'
 		})
 		uni.navigateTo({
-			url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
+			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
 		})
 		// #endif
 		// #ifdef APP

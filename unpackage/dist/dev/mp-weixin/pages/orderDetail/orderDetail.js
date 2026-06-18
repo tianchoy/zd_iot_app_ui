@@ -206,7 +206,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             signtype: res.signtype,
             sign: res.sign
           });
-          common_vendor.wx$1.navigateToMiniProgram(new common_vendor.UTSJSONObject({
+          common_vendor.index.navigateToMiniProgram(new common_vendor.UTSJSONObject({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {

@@ -9,24 +9,24 @@
 		<view class="payment-info">
 			<text class="info-title">确认支付信息</text>
 
-			<view class="info-item">
+			<view class="info-item" v-if="props.cardNumber">
 				<text class="item-label">卡号</text>
-				<text class="item-value">{{ cardNumber }}</text>
+				<text class="item-value">{{ props.cardNumber }}</text>
 			</view>
 
-			<view class="info-item">
+			<view class="info-item" v-if="props.productName">
 				<text class="item-label">商品</text>
-				<text class="item-value">{{ productName }}</text>
+				<text class="item-value">{{ props.productName }}</text>
 			</view>
 
-			<view class="info-item">
+			<view class="info-item" v-if="props.traffic">
 				<text class="item-label">流量</text>
-				<text class="item-value">{{ traffic }}</text>
+				<text class="item-value">{{ props.traffic }}</text>
 			</view>
 
-			<view class="info-item">
+			<view class="info-item" v-if="props.validityPeriod">
 				<text class="item-label">有效期</text>
-				<text class="item-value">{{ validityPeriod }}</text>
+				<text class="item-value">{{ props.validityPeriod }}</text>
 			</view>
 
 			<!-- 支付方式区域：根据平台条件渲染 -->
@@ -81,15 +81,10 @@ const props = defineProps<{
 	traffic?: string;
 	// 有效期描述（可选，有默认值）
 	validityPeriod?: string;
-	// 应付金额 (数字，单位：元)
-	amount: number;
+	// 应付金额
+	amount: string | number;
 }>();
 
-// 设置默认值
-const cardNumber = props.cardNumber ?? '1064916585160';
-const productName = props.productName ?? '车联网月包20G';
-const traffic = props.traffic ?? '20GB';
-const validityPeriod = props.validityPeriod ?? '30天';
 
 // 定义组件事件
 const emit = defineEmits<{

@@ -31,6 +31,7 @@ page .container.data-v-4b5f1e90 {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  height: 100%;
 }
 page .status-section.data-v-4b5f1e90 {
   display: flex;

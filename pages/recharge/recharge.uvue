@@ -45,7 +45,7 @@
 						:key="item.pkgId || index" 
 						class="pkg-card"
 						:class="{ 'pkg-card-selected': selectedPackageIndex === index }"
-						@click="selectPackage(index)"
+						@click="selectPackage(index,item)"
 					>
 						<view class="pkg-info">
 							<view class="pkg-name">
@@ -112,10 +112,10 @@
 			:amount="currentPrice" 
 			@cancel="handleCancelPayment"
 			@confirm="handleConfirmPayment"
-			:cardNumber="cardDetail.rechargeNo",
-			:productName="cardDetail.pkgName"
-			:traffic="cardDetail.pkgFlow"
-			:validityPeriod="cardDetail.validityPeriod"
+			:cardNumber="cardDetail?.rechargeNo"
+			:productName="currentPackage?.pkgName"
+			:traffic="currentPackage?.pkgFlow"
+			:validityPeriod="currentPackage?.validityPeriod"
 		/>
 	</rice-popup>
 	<view class="bottom-box">
@@ -184,6 +184,16 @@
 	const selectedPackageIndex = ref<number>(0);
 	// 选中的加油包索引
 	const selectedRefillIndex = ref<number>(0);
+	// 选中的套餐包
+	const selectedPackage = ref<PkgXcxVo | null>(null);
+	
+	// 当前选中的套餐/加油包
+	const currentPackage = computed<PkgXcxVo | null>((): PkgXcxVo | null => {
+		if (active.value === 0) {
+			return packageList.value[selectedPackageIndex.value] ?? null;
+		}
+		return refillList.value[selectedRefillIndex.value] ?? null;
+	});
 	
 	// 当前价格（根据选中的套餐/加油包计算）
 	const currentPrice = computed<string>((): string => {
@@ -242,8 +252,9 @@
 		active.value = e.index;
 	}
 	
-	const selectPackage = (index: number) => {
+	const selectPackage = (index: number, item: PkgXcxVo) => {
 		selectedPackageIndex.value = index;
+		selectedPackage.value = item;
 	}
 	
 	const selectRefill = (index: number) => {

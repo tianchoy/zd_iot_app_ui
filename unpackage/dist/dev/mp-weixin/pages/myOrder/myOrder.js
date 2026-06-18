@@ -157,13 +157,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePay = (order) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:235", "去支付:", order.orderNo);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:235", "去支付:", order);
       common_vendor.index.showToast({
-        title: `支付订单 ${order.orderNo}`,
+        title: `支付订单 ${order.id}`,
         icon: "none"
       });
       common_vendor.index.navigateTo({
-        url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
+        url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
       });
     };
     const getOrderList = (status) => {

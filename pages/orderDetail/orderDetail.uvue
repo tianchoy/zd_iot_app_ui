@@ -347,7 +347,7 @@
 					sign: res.sign,
 				}
 
-				wx.navigateToMiniProgram({
+				uni.navigateToMiniProgram({
 					appId: config.api.auth.appID,
 					extraData: param,
 					success(res) { 

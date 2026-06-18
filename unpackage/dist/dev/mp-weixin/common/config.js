@@ -130,7 +130,7 @@ class ProjectConfig extends common_vendor.UTS.UTSType {
 const ENV = "dev";
 const API_CONFIG = new common_vendor.UTSJSONObject({
   dev: new common_vendor.UTSJSONObject({
-    baseUrl: "http://192.168.0.4:8081",
+    baseUrl: "http://10.147.20.3:8081",
     timeout: 3e4
   }),
   prod: new common_vendor.UTSJSONObject({
