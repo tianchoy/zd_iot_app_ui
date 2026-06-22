@@ -4,13 +4,15 @@ const api_http = require("../../api/http.js");
 const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
+  const _easycom_rice_tag_1 = common_vendor.resolveComponent("rice-tag");
   const _easycom_rice_popup_1 = common_vendor.resolveComponent("rice-popup");
-  (_easycom_topNavBar_1 + _easycom_rice_popup_1)();
+  (_easycom_topNavBar_1 + _easycom_rice_tag_1 + _easycom_rice_popup_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
+const _easycom_rice_tag = () => "../../uni_modules/rice-ui/components/rice-tag/rice-tag.js";
 const _easycom_rice_popup = () => "../../uni_modules/rice-ui/components/rice-popup/rice-popup.js";
 if (!Math) {
-  (_easycom_topNavBar + common_vendor.unref(Payment) + _easycom_rice_popup)();
+  (_easycom_topNavBar + _easycom_rice_tag + common_vendor.unref(Payment) + _easycom_rice_popup)();
 }
 const Payment = () => "../../components/payment.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -42,34 +44,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       usageInstructions: "",
       currentSeconds: 0
     }));
-    const getOrderStatusText = () => {
-      const status = orderDetail.value.status;
-      switch (status) {
-        case "0":
-          return "待支付";
-        case "1":
-          return "已完成";
-        case "2":
-          return "已退款";
-        case "3":
-          return "已取消";
-        default:
-          return "未知状态";
-      }
+    const getOrderStatusText = (status) => {
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:164", "getOrderStatusText", status);
+      const statusMap = {
+        "0": "待支付",
+        "1": "已完成",
+        "2": "已取消",
+        "3": "支付失败",
+        "4": "部分退款",
+        "5": "全部退款"
+      };
+      return statusMap[status] || status || "未知";
     };
-    const getStatusClass = (status) => {
-      switch (status) {
-        case "已完成":
-          return "status-completed";
-        case "待支付":
-          return "status-pending";
-        case "已退款":
-          return "status-refunded";
-        case "已取消":
-          return "status-cancelled";
-        default:
-          return "";
-      }
+    const getOrderStatusType = (status) => {
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:178", "getOrderStatusType", status);
+      const typeMap = {
+        "0": "primary",
+        "1": "success",
+        "2": "error",
+        "3": "danger",
+        "4": "warning",
+        "5": "warning"
+      };
+      return typeMap[status] || "primary";
     };
     const getPkgCategoryText = () => {
       const category = orderDetail.value.pkgCategory;
@@ -210,7 +207,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:354", "支付成功:", res2);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:355", "支付成功:", res2);
               common_vendor.index.navigateTo({
                 url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value
               });
@@ -229,7 +226,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleConfirmPayment = (e = null) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:374", e);
+        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:375", e);
         showPopup.value = false;
         try {
           const res = yield api_http.addOrderXcx(new common_vendor.UTSJSONObject({
@@ -245,7 +242,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:390", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:391", "支付失败:", error);
           common_vendor.index.showToast({
             title: "支付失败，请稍后重试",
             icon: "none"
@@ -269,7 +266,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_http.queryOrderDetailXcx(orderId.value);
           if (res.code == 200) {
             orderDetail.value = res.data;
-            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:417", "订单详情:", orderDetail.value);
+            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:418", "订单详情:", orderDetail.value);
           } else {
             common_vendor.index.showToast({
               title: res.msg || "查询订单详情失败",
@@ -277,7 +274,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:425", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:426", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"
@@ -287,7 +284,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onLoad((options) => {
       const orderNo = options === null || options === void 0 ? null : options.orderNo;
-      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:435", orderNo);
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:436", orderNo);
       if (orderNo != null) {
         orderId.value = orderNo;
         getOrderDetail();
@@ -341,7 +338,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(handleBack, "d9"),
+        a: common_vendor.o(handleBack, "d6"),
         b: common_vendor.p({
           title: "订单详情",
           ["show-back"]: true,
@@ -353,83 +350,89 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.unref(orderDetail).pkgName
       }, common_vendor.unref(orderDetail).pkgName ? {
         d: common_vendor.t(common_vendor.unref(orderDetail).pkgName),
-        e: common_vendor.t(getOrderStatusText()),
-        f: common_vendor.n(getStatusClass(getOrderStatusText()))
+        e: common_vendor.p({
+          type: getOrderStatusType(common_vendor.unref(orderDetail).status),
+          text: getOrderStatusText(common_vendor.unref(orderDetail).status),
+          round: true,
+          ["plain-fill"]: true,
+          size: "small",
+          class: "data-v-6ec85291"
+        })
       } : {}, {
-        g: common_vendor.unref(orderDetail).rechargeNo
+        f: common_vendor.unref(orderDetail).rechargeNo
       }, common_vendor.unref(orderDetail).rechargeNo ? {
-        h: common_vendor.t(common_vendor.unref(orderDetail).rechargeNo)
+        g: common_vendor.t(common_vendor.unref(orderDetail).rechargeNo)
       } : {}, {
-        i: common_vendor.unref(orderDetail).orderNo
+        h: common_vendor.unref(orderDetail).orderNo
       }, common_vendor.unref(orderDetail).orderNo ? {
-        j: common_vendor.t(common_vendor.unref(orderDetail).orderNo)
+        i: common_vendor.t(common_vendor.unref(orderDetail).orderNo)
       } : {}, {
-        k: common_vendor.unref(orderDetail).iccid
+        j: common_vendor.unref(orderDetail).iccid
       }, common_vendor.unref(orderDetail).iccid ? {
-        l: common_vendor.t(common_vendor.unref(orderDetail).iccid)
+        k: common_vendor.t(common_vendor.unref(orderDetail).iccid)
       } : {}, {
-        m: common_vendor.unref(orderDetail).orderAmount
+        l: common_vendor.unref(orderDetail).orderAmount
       }, common_vendor.unref(orderDetail).orderAmount ? {
-        n: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0)
+        m: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0)
       } : {}, {
-        o: common_vendor.unref(orderDetail).orderStatus
+        n: common_vendor.unref(orderDetail).orderStatus
       }, common_vendor.unref(orderDetail).orderStatus ? {
-        p: common_vendor.t(getOrderStatusText())
+        o: common_vendor.t(getOrderStatusText(common_vendor.unref(orderDetail).status))
       } : {}, {
-        q: common_vendor.unref(orderDetail).payMethod
+        p: common_vendor.unref(orderDetail).payMethod
       }, common_vendor.unref(orderDetail).payMethod ? {
-        r: common_vendor.t(getPaymentMethod())
+        q: common_vendor.t(getPaymentMethod())
       } : {}, {
-        s: common_vendor.unref(orderDetail).orderCreateTime
+        r: common_vendor.unref(orderDetail).orderCreateTime
       }, common_vendor.unref(orderDetail).orderCreateTime ? {
-        t: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).orderCreateTime))
+        s: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).orderCreateTime))
       } : {}, {
-        v: common_vendor.unref(orderDetail).payTime
+        t: common_vendor.unref(orderDetail).payTime
       }, common_vendor.unref(orderDetail).payTime ? {
-        w: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).payTime))
+        v: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).payTime))
       } : {}, {
-        x: common_vendor.unref(orderDetail).payFailReason
+        w: common_vendor.unref(orderDetail).payFailReason
       }, common_vendor.unref(orderDetail).payFailReason ? {
-        y: common_vendor.t(common_vendor.unref(orderDetail).payFailReason)
+        x: common_vendor.t(common_vendor.unref(orderDetail).payFailReason)
       } : {}, {
-        z: common_vendor.unref(orderDetail).cancelTime
+        y: common_vendor.unref(orderDetail).cancelTime
       }, common_vendor.unref(orderDetail).cancelTime ? {
-        A: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).cancelTime))
+        z: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).cancelTime))
       } : {}, {
-        B: common_vendor.unref(orderDetail).pkgCategory
+        A: common_vendor.unref(orderDetail).pkgCategory
       }, common_vendor.unref(orderDetail).pkgCategory ? {
-        C: common_vendor.t(getPkgCategoryText())
+        B: common_vendor.t(getPkgCategoryText())
       } : {}, {
-        D: common_vendor.unref(orderDetail).pkgFlow
+        C: common_vendor.unref(orderDetail).pkgFlow
       }, common_vendor.unref(orderDetail).pkgFlow ? {
-        E: common_vendor.t(getPkgFlowText())
+        D: common_vendor.t(getPkgFlowText())
       } : {}, {
-        F: common_vendor.unref(orderDetail).validityPeriod
+        E: common_vendor.unref(orderDetail).validityPeriod
       }, common_vendor.unref(orderDetail).validityPeriod ? {
-        G: common_vendor.t(common_vendor.unref(orderDetail).validityPeriod)
+        F: common_vendor.t(common_vendor.unref(orderDetail).validityPeriod)
       } : {}, {
-        H: common_vendor.unref(orderDetail).startDate
+        G: common_vendor.unref(orderDetail).startDate
       }, common_vendor.unref(orderDetail).startDate ? {
-        I: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).startDate))
+        H: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).startDate))
       } : {}, {
-        J: common_vendor.unref(orderDetail).endDate
+        I: common_vendor.unref(orderDetail).endDate
       }, common_vendor.unref(orderDetail).endDate ? {
-        K: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).endDate))
+        J: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).endDate))
       } : {}, {
-        L: common_vendor.unref(orderDetail).usageInstructions || getNoticeText()
+        K: common_vendor.unref(orderDetail).usageInstructions || getNoticeText()
       }, common_vendor.unref(orderDetail).usageInstructions || getNoticeText() ? {
-        M: common_vendor.t(common_vendor.unref(orderDetail).usageInstructions || getNoticeText())
+        L: common_vendor.t(common_vendor.unref(orderDetail).usageInstructions || getNoticeText())
       } : {}, {
-        N: common_vendor.unref(orderDetail).status === "0"
+        M: common_vendor.unref(orderDetail).status === "0"
       }, common_vendor.unref(orderDetail).status === "0" ? {
-        O: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0),
-        P: common_vendor.o(choosePayment, "ee")
+        N: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0),
+        O: common_vendor.o(choosePayment, "72")
       } : {}, {
-        Q: `${_ctx.u_s_b_h}px`,
-        R: `${_ctx.u_s_a_i_b}px`,
-        S: common_vendor.o(handleCancelPayment, "01"),
-        T: common_vendor.o(handleConfirmPayment, "be"),
-        U: common_vendor.p({
+        P: `${_ctx.u_s_b_h}px`,
+        Q: `${_ctx.u_s_a_i_b}px`,
+        R: common_vendor.o(handleCancelPayment, "ce"),
+        S: common_vendor.o(handleConfirmPayment, "70"),
+        T: common_vendor.p({
           amount: common_vendor.unref(currentPrice),
           cardNumber: common_vendor.unref(orderDetail).rechargeNo,
           [","]: true,
@@ -438,11 +441,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           validityPeriod: common_vendor.unref(orderDetail).validityPeriod,
           class: "data-v-6ec85291"
         }),
-        V: common_vendor.o(onPopupClose, "38"),
-        W: common_vendor.o(($event) => {
+        U: common_vendor.o(onPopupClose, "d7"),
+        V: common_vendor.o(($event) => {
           return common_vendor.isRef(showPopup) ? showPopup.value = $event : null;
-        }, "e5"),
-        X: common_vendor.p({
+        }, "e0"),
+        W: common_vendor.p({
           position: "bottom",
           show: common_vendor.unref(showPopup),
           class: "data-v-6ec85291"

@@ -224,28 +224,19 @@ const checkToken = (): boolean => {
 }
 
 const platform = async () => {
-
 	// #ifdef MP-WEIXIN
-	if (checkToken()) {
-		const [allList, inUseList, abnormalList] = await Promise.all([
-			getCardList('0'),
-			getCardList('1'),
-			getCardList('2')
-		])
-		cardCounts.value = [allList.length, inUseList.length, abnormalList.length]
-		cardList.value = allList
-	}
+	if (!checkToken()) return;
 	// #endif
-	// #ifdef H5
-		const [allList, inUseList, abnormalList] = await Promise.all([
-			getCardList('0'),
-			getCardList('1'),
-			getCardList('2')
-		])
-		cardCounts.value = [allList.length, inUseList.length, abnormalList.length]
-		cardList.value = allList
-	
-	// #endif
+
+	// 公共数据获取逻辑
+	const [allList, inUseList, abnormalList] = await Promise.all([
+	getCardList('0'),
+	getCardList('1'),
+	getCardList('2')
+	]);
+
+	cardCounts.value = [allList.length, inUseList.length, abnormalList.length];
+	cardList.value = allList;
 }
 
 onLoad(() => {

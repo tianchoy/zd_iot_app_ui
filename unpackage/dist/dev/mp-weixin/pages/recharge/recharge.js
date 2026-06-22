@@ -283,7 +283,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const toOrderRecord = () => {
       common_vendor.index.navigateTo({
-        url: "/pages/orderRecord/orderRecord"
+        url: "/pages/myOrder/myOrder"
       });
     };
     const cardDetail = common_vendor.ref(null);

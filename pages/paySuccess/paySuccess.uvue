@@ -72,6 +72,9 @@
 		// #endif
 		// #ifdef MP-WEIXIN
 		console.log('查看订单MP-WEIXIN');
+		uni.reLaunch({
+			url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}`
+		})
 		// #endif
 		// #ifdef H5
 		console.log('查看订单H5');
@@ -86,7 +89,7 @@
 		// #endif
 		// #ifdef MP-WEIXIN
 		console.log('返回卡片详情MP-WEIXIN');
-		uni.navigateTo({
+		uni.reLaunch({
 			url: `/pages/cardDetail/cardDetail?cardNumber=${orderId.value}`
 		})
 		// #endif

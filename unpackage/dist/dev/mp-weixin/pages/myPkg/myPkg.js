@@ -67,8 +67,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       current.value = e.index;
     };
     const handlePkgDetail = (item = null) => {
+      common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:145", item);
       common_vendor.index.navigateTo({
-        url: "/pages/orderDetail/orderDetail?item=" + common_vendor.UTS.JSON.stringify(item)
+        url: "/pages/pkgDetail/pkgDetail?item=" + common_vendor.UTS.JSON.stringify(item)
       });
     };
     const getStatusClass = (status) => {

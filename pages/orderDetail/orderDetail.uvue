@@ -1,12 +1,18 @@
 <template>
-	<view>
+	<view style="height: 100%;">
 		<topNavBar title="订单详情" @back="handleBack" :show-back="true" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 		<scroll-view class="container" scroll-y :enhanced="true">
 			<!-- 套餐名称卡片 -->
 			<view class="package-card">
 				<view class="package-header" v-if="orderDetail.pkgName">
 					<text class="package-name">{{ orderDetail.pkgName }}</text>
-					<text class="status-tag" :class="getStatusClass(getOrderStatusText())">{{ getOrderStatusText() }}</text>
+					<rice-tag 
+						:type="getOrderStatusType(orderDetail.status)" 
+						:text="getOrderStatusText(orderDetail.status)" 
+						:round="true" 
+						plain-fill 
+						size="small"
+					></rice-tag>
 				</view>
 				<view class="card-number-row" v-if="orderDetail.rechargeNo">
 					<text class="card-number-label">当前卡号：</text>
@@ -30,7 +36,7 @@
 				</view>
 				<view class="info-row" v-if="orderDetail.orderStatus">
 					<text class="info-label">订单状态</text>
-					<text class="info-value status">{{ getOrderStatusText() }}</text>
+					<text class="info-value status">{{ getOrderStatusText(orderDetail.status) }}</text>
 				</view>
 				<view class="info-row" v-if="orderDetail.payMethod">
 					<text class="info-label">支付方式</text>
@@ -152,38 +158,33 @@
 		usageInstructions: '',
 		currentSeconds: 0
 	});
-	
-	// 获取订单状态文本
-	const getOrderStatusText = (): string => {
-		const status = orderDetail.value.status;
-		switch (status) {
-			case '0':
-				return '待支付'
-			case '1':
-				return '已完成'
-			case '2':
-				return '已退款'
-			case '3':
-				return '已取消'
-			default:
-				return '未知状态'
+
+		// 获取订单状态对应的文本
+	const getOrderStatusText = (status: string): string => {
+		console.log('getOrderStatusText',status)
+		const statusMap: Record<string, string> = {
+			'0': '待支付',
+			'1': '已完成',
+			'2': '已取消',
+			'3': '支付失败',
+			'4': '部分退款',
+			'5': '全部退款',
 		}
+		return statusMap[status] || status || '未知'
 	}
-	
-	// 获取状态样式类
-	const getStatusClass = (status: string): string => {
-		switch (status) {
-			case '已完成':
-				return 'status-completed'
-			case '待支付':
-				return 'status-pending'
-			case '已退款':
-				return 'status-refunded'
-			case '已取消':
-				return 'status-cancelled'
-			default:
-				return ''
+
+	// 获取订单状态对应的标签类型
+	const getOrderStatusType = (status: string): string => {
+		console.log('getOrderStatusType',status)
+		const typeMap: Record<string, string> = {
+			'0': 'primary',
+			'1': 'success',
+			'2': 'error',
+			'3': 'danger',
+			'4': 'warning',
+			'5': 'warning',
 		}
+		return typeMap[status] || 'primary'
 	}
 	
 	// 获取套餐类型文本
@@ -493,7 +494,7 @@
 <style lang="scss" scoped>
 	.container {
 		background-color: #f4f7fb;
-		min-height: 1000rpx;
+		height: 100%;
 		padding: 24rpx;
 		box-sizing: border-box;
 	}

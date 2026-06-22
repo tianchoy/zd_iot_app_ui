@@ -14,16 +14,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const orderId = common_vendor.ref("");
     const handleViewOrder = () => {
       common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:74", "查看订单MP-WEIXIN");
+      common_vendor.index.reLaunch({
+        url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}`
+      });
     };
     const handleBackCard = () => {
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:88", "返回卡片详情MP-WEIXIN");
-      common_vendor.index.navigateTo({
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:91", "返回卡片详情MP-WEIXIN");
+      common_vendor.index.reLaunch({
         url: `/pages/cardDetail/cardDetail?cardNumber=${orderId.value}`
       });
     };
     common_vendor.onLoad((options) => {
       var _a;
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:99", "orderId:", options);
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:102", "orderId:", options);
       orderId.value = (_a = options.orderId) !== null && _a !== void 0 ? _a : "";
     });
     return (_ctx, _cache) => {

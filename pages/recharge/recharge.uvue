@@ -448,7 +448,7 @@
 	// 跳转订单记录
 	const toOrderRecord = () => {
 		uni.navigateTo({
-			url: '/pages/orderRecord/orderRecord'
+			url: '/pages/myOrder/myOrder'
 		})
 	}
 	

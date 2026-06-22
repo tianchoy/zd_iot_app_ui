@@ -98,9 +98,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return "";
       }
     };
-    const handleSearch = () => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:167", "搜索关键词:", card_number.value);
-    };
     const getStatusClass = (status) => {
       switch (status) {
         case "已完成":
@@ -116,7 +113,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleOrderClick = (order) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:188", order);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:182", order);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
       });
@@ -145,7 +142,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:221", result);
+        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:215", result);
         if (result.length > 0) {
           card_number.value = result;
           common_vendor.index.showToast({
@@ -157,7 +154,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePay = (order) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:235", "去支付:", order);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:229", "去支付:", order);
       common_vendor.index.showToast({
         title: `支付订单 ${order.id}`,
         icon: "none"
@@ -190,7 +187,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:286", "获取订单列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:280", "获取订单列表失败:", error);
           orderList.value = [];
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
@@ -230,7 +227,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           icon: "scan",
           class: "scan-btn data-v-87fe8731"
         }),
-        g: common_vendor.o(handleSearch, "bc"),
+        g: common_vendor.o(handleQuery, "a9"),
         h: common_vendor.p({
           type: "primary",
           color: "#1989fa",
@@ -238,10 +235,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "100%",
           class: "data-v-87fe8731"
         }),
-        i: common_vendor.o(handleTabClick, "ac"),
+        i: common_vendor.o(handleTabClick, "c9"),
         j: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "d3"),
+        }, "6a"),
         k: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,

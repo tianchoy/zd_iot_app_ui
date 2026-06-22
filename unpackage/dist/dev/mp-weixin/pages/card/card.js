@@ -156,15 +156,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const platform = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        if (checkToken()) {
-          const _a = common_vendor.__read(yield Promise.all([
-            getCardList("0"),
-            getCardList("1"),
-            getCardList("2")
-          ]), 3), allList = _a[0], inUseList = _a[1], abnormalList = _a[2];
-          cardCounts.value = [allList.length, inUseList.length, abnormalList.length];
-          cardList.value = allList;
-        }
+        if (!checkToken())
+          return Promise.resolve(null);
+        const _a = common_vendor.__read(yield Promise.all([
+          getCardList("0"),
+          getCardList("1"),
+          getCardList("2")
+        ]), 3), allList = _a[0], inUseList = _a[1], abnormalList = _a[2];
+        cardCounts.value = [allList.length, inUseList.length, abnormalList.length];
+        cardList.value = allList;
       });
     };
     common_vendor.onLoad(() => {

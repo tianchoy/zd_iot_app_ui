@@ -27,7 +27,7 @@
 /* 文章场景相关 */
 page .container.data-v-6ec85291 {
   background-color: #f4f7fb;
-  min-height: 1000rpx;
+  height: 100%;
   padding: 24rpx;
   box-sizing: border-box;
 }
