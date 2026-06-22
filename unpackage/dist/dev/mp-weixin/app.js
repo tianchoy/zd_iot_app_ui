@@ -20,6 +20,7 @@ if (!Math) {
   "./pages/login/login.js";
   "./uni_modules/rice-ui/pages/action-sheet/action-sheet.js";
   "./uni_modules/rice-ui/pages/dialog/dialog.js";
+  "./pages/pkgDetail/pkgDetail.js";
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App",

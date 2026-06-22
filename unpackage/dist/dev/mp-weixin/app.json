@@ -14,7 +14,8 @@
     "pages/myPkg/myPkg",
     "pages/login/login",
     "uni_modules/rice-ui/pages/action-sheet/action-sheet",
-    "uni_modules/rice-ui/pages/dialog/dialog"
+    "uni_modules/rice-ui/pages/dialog/dialog",
+    "pages/pkgDetail/pkgDetail"
   ],
   "window": {
     "navigationStyle": "custom",

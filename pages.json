@@ -83,6 +83,12 @@
 		},
 		{
 			"path": "uni_modules/rice-ui/pages/dialog/dialog"
+		},
+		{
+			"path": "pages/pkgDetail/pkgDetail",
+			"style": {
+				"navigationBarTitleText": ""
+			}
 		}
 	],
 	"tabBar": {

@@ -1,0 +1,315 @@
+<template>
+	<topNavBar title="订单详情" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<view class="container">
+		<view class="card-box">
+			<!-- 头部：套餐名称和状态 -->
+			<view class="card-header">
+				<text class="package-name">车联网月包20G</text>
+				<view class="status-badge">
+					<text class="status-text">在用</text>
+				</view>
+			</view>
+
+			<!-- 卡号 -->
+			<view class="card-number">
+				<text class="number-label">当前卡号：</text>
+				<text class="number-value">1064916585160</text>
+			</view>
+
+			<!-- 流量使用进度 -->
+			<view class="traffic-section">
+				<view class="traffic-text">
+					<view class="traffic-header">
+						<text class="traffic-title">流量使用</text>
+					</view>
+					<view class="traffic-progress">
+						<text class="used-text">已用11.34GB</text>
+						<text class="divider">/</text>
+						<text class="total-text">剩余8.66GB</text>
+					</view>
+				</view>
+
+				<!-- 进度条 -->
+				<view class="progress-bar">
+					<rice-progress :percentage="60" show-text />
+				</view>
+			</view>
+
+
+			<!-- 套餐信息 -->
+			<view class="info-grid">
+				<view class="info-item">
+					<text class="info-label">套餐流量</text>
+					<text class="info-value">20GB</text>
+				</view>
+				<view class="info-item">
+					<text class="info-label">生效时间</text>
+					<text class="info-value">2026-04-01</text>
+				</view>
+				<view class="info-item">
+					<text class="info-label">有效期</text>
+					<text class="info-value">30天</text>
+				</view>
+				<view class="info-item">
+					<text class="info-label">到期时间</text>
+					<text class="info-value">2026-04-30</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 关联订单信息 -->
+		<view class="card-box order-card">
+			<view class="order-title">
+				<text class="order-title-text">关联订单信息</text>
+				<text class="order-desc">用于帮助用户快速了解该套餐来自哪笔订单</text>
+			</view>
+			<view class="order-detail">
+				<view class="order-row">
+					<text class="order-label">关联订单号</text>
+					<text class="order-value">0202604280001</text>
+				</view>
+				<view class="order-row">
+					<text class="order-label">订单状态</text>
+					<text class="order-value status-completed">已完成</text>
+				</view>
+				<view class="order-row">
+					<text class="order-label">支付金额</text>
+					<text class="order-value price">￥90</text>
+				</view>
+				<view class="order-row">
+					<text class="order-label">下单时间</text>
+					<text class="order-value">2026-04-28 10:12:30</text>
+				</view>
+			</view>
+		</view>
+		<view class="card-box footer-note">
+			<text class="note-text">说明</text>
+			<text class="note-content">我的套餐详情页展示套餐使用视角；关联订单信息用于帮助用户快速了解该套餐来自哪笔订单。</text>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	// 返回事件
+	const handleBack = () => {
+		// 处理返回逻辑
+		uni.navigateBack()
+	}
+</script>
+
+<style lang="scss" scoped>
+	.container {
+		display: flex;
+		flex-direction: column;
+		min-height: 100%;
+		background-color: #f4f7fb;
+		padding-bottom: 40rpx;
+	}
+
+	.card-box {
+		display: flex;
+		flex-direction: column;
+		margin: 0 24rpx 24rpx 24rpx;
+		background-color: #ffffff;
+		border: 1rpx solid #e7edf5;
+		border-radius: 24rpx;
+		padding: 24rpx;
+	}
+
+	// 套餐卡片
+	.card-header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 16rpx;
+	}
+
+	.package-name {
+		font-size: 36rpx;
+		font-weight: bold;
+		color: #1a2332;
+	}
+
+	.status-badge {
+		background-color: #e8f5e9;
+		border-radius: 30rpx;
+		padding: 6rpx 20rpx;
+	}
+
+	.status-text {
+		font-size: 24rpx;
+		color: #2e7d32;
+		font-weight: 500;
+	}
+
+	.card-number {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-start;
+		margin-bottom: 24rpx;
+	}
+
+	.number-label {
+		font-size: 26rpx;
+		color: #8c9aa8;
+	}
+
+	.number-value {
+		font-size: 26rpx;
+		color: #1a2332;
+		font-weight: 500;
+	}
+
+	.traffic-section {
+		background-color: #f8fafc;
+		border-radius: 16rpx;
+		padding: 20rpx;
+		margin-bottom: 24rpx;
+	}
+
+	.traffic-text{
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.traffic-header {
+		margin-bottom: 12rpx;
+	}
+
+	.traffic-title {
+		font-size: 28rpx;
+		color: #1a2332;
+		font-weight: 600;
+	}
+
+	.traffic-progress {
+		display: flex;
+		flex-direction: row;
+		align-items: baseline;
+		margin-bottom: 12rpx;
+	}
+
+	.used-text {
+		font-size: 24rpx;
+		color: #8c9aa8;
+	}
+
+	.divider {
+		font-size: 28rpx;
+		color: #8c9aa8;
+		margin: 0 8rpx;
+	}
+
+	.total-text {
+		font-size: 24rpx;
+		color: #8c9aa8;
+	}
+	// 信息网格
+	.info-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 20rpx 0;
+	}
+
+	.info-item {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.info-label {
+		font-size: 24rpx;
+		color: #8c9aa8;
+		margin-bottom: 6rpx;
+	}
+
+	.info-value {
+		font-size: 28rpx;
+		color: #1a2332;
+		font-weight: 500;
+	}
+
+	// 关联订单卡片
+	.order-card {
+		margin-top: 0;
+	}
+
+	.order-title {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 20rpx;
+	}
+
+	.order-title-text {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #1a2332;
+		margin-bottom: 6rpx;
+	}
+
+	.order-desc {
+		font-size: 24rpx;
+		color: #8c9aa8;
+	}
+
+	.order-detail {
+		display: flex;
+		flex-direction: column;
+		gap: 16rpx;
+	}
+
+	.order-row {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 10rpx 0;
+		border-bottom: 1rpx solid #f0f2f5;
+	}
+
+	.order-row:last-child {
+		border-bottom: none;
+	}
+
+	.order-label {
+		font-size: 26rpx;
+		color: #8c9aa8;
+	}
+
+	.order-value {
+		font-size: 26rpx;
+		color: #1a2332;
+		font-weight: 500;
+	}
+
+	.price{
+		color: #ef4444;
+		font-weight: bold;
+	}
+
+	.status-completed {
+		color: #2e7d32;
+	}
+
+	// 底部说明
+	.footer-note {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.note-text {
+		font-size: 26rpx;
+		color: #1a2332;
+		font-weight: 600;
+		margin-bottom: 8rpx;
+	}
+
+	.note-content {
+		font-size: 24rpx;
+		color: #8c9aa8;
+		line-height: 1.6;
+	}
+</style>

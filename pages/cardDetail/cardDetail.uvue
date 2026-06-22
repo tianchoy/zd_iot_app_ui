@@ -1,6 +1,6 @@
 <template>
+	<topNavBar :title="card_number" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="page-container">
-		<topNavBar :title="card_number" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 		<view v-if="cardDetail">
 			<view class="card-box fixed-tabs" :style="fixedTabsStyle">
 				<rice-tabs
@@ -84,7 +84,7 @@
 							<view v-if="orderList.length === 0" class="empty-order">
 								<view class="empty-text">暂无订单记录</view>
 							</view>
-							<view class="item" v-for="(order, index) in orderList" :key="order.id || index">
+							<view class="item" v-for="(order, index) in orderList" :key="order.id || index"  @click="handlePkgDetail(order.id)">
 								<view class="item-head">
 									<text class="item-label">{{ order.pkgName || '未知套餐' }}</text>
 									<rice-tag 
@@ -245,6 +245,14 @@
 		})
 	}
 
+	// 处理套餐详情点击
+	const handlePkgDetail = (pkgId: string) => {
+		console.log(pkgId)
+		uni.navigateTo({
+			url: `/pages/pkgDetail/pkgDetail?pkgId=${pkgId}`
+		})
+	}
+
 	const getNavBarInfo = () => {
 		// #ifdef MP-WEIXIN
 		try {
@@ -389,7 +397,7 @@
 .page-container {
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh;
+	height: 100%;
 	background-color: #f4f7fb;
 }
 

@@ -28,7 +28,7 @@
 page .page-container.data-v-2bc48812 {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
   background-color: #f4f7fb;
 }
 page .fixed-tabs.data-v-2bc48812 {
