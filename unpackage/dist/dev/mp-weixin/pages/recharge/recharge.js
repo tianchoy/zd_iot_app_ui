@@ -245,7 +245,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         showPopup.value = false;
         const currentItem = active.value === 0 ? packageList.value[selectedPackageIndex.value] : refillList.value[selectedRefillIndex.value];
         try {
-          const res = yield api_http.addOrderXcx(new common_vendor.UTSJSONObject({
+          const res = yield api_http.addOrder(new common_vendor.UTSJSONObject({
             pkgId: currentItem.pkgId,
             rechargeNo: cardNumber.value
           }));

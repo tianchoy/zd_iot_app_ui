@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="uts">
-	import {queryOrderListXcx} from '@/api/http'
+	import {queryOrderList} from '@/api/http'
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref, computed, onMounted } from 'vue'
 	
@@ -260,7 +260,7 @@
 			if (status !== '') {
 				params.status = status
 			}
-			const resp = await queryOrderListXcx(params)
+			const resp = await queryOrderList(params)
 			if (resp.code == 200) {
 				if (resp.rows && Array.isArray(resp.rows)) {
 					orderList.value = resp.rows

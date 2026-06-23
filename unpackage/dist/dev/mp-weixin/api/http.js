@@ -193,7 +193,9 @@ function queryPkgInfoList(data, withToken = true) {
     withToken: token
   }));
 }
-function queryOrderListXcx(data, withToken = true) {
+function queryOrderList(data, withToken = true) {
+  const url = api_url.ApiUrl.queryOrderListXcx;
+  const token = true;
   return api_Request.request(new api_Request.RequestOptions({
     header: null,
     baseUrl: null,
@@ -206,13 +208,15 @@ function queryOrderListXcx(data, withToken = true) {
     successCodes: null,
     unauthorizedCodes: null,
     onErrorCode: null,
-    url: api_url.ApiUrl.queryOrderListXcx,
+    url,
     method: "GET",
     data,
-    withToken
+    withToken: token
   }));
 }
-function addOrderXcx(data, withToken = true) {
+function addOrder(data, withToken = true) {
+  const url = api_url.ApiUrl.addOrderXcx;
+  const token = true;
   return api_Request.request(new api_Request.RequestOptions({
     header: null,
     baseUrl: null,
@@ -225,13 +229,15 @@ function addOrderXcx(data, withToken = true) {
     successCodes: null,
     unauthorizedCodes: null,
     onErrorCode: null,
-    url: api_url.ApiUrl.addOrderXcx,
+    url,
     method: "POST",
     data,
-    withToken
+    withToken: token
   }));
 }
-function queryOrderDetailXcx(id, withToken = true) {
+function queryOrderDetail(id, withToken = true) {
+  const url = api_url.ApiUrl.queryOrderDetailXcx + id;
+  const token = true;
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,
@@ -245,20 +251,20 @@ function queryOrderDetailXcx(id, withToken = true) {
     successCodes: null,
     unauthorizedCodes: null,
     onErrorCode: null,
-    url: api_url.ApiUrl.queryOrderDetailXcx + id,
+    url,
     method: "GET",
-    withToken
+    withToken: token
   }));
 }
-exports.addOrderXcx = addOrderXcx;
+exports.addOrder = addOrder;
 exports.getCountryList = getCountryList;
 exports.getTenantInfo = getTenantInfo;
 exports.login = login;
 exports.queryCardDetail = queryCardDetail;
 exports.queryCardList = queryCardList;
 exports.queryCardListSum = queryCardListSum;
-exports.queryOrderDetailXcx = queryOrderDetailXcx;
-exports.queryOrderListXcx = queryOrderListXcx;
+exports.queryOrderDetail = queryOrderDetail;
+exports.queryOrderList = queryOrderList;
 exports.queryPkgInfoList = queryPkgInfoList;
 exports.userBindCard = userBindCard;
 exports.userUnBindCard = userUnBindCard;

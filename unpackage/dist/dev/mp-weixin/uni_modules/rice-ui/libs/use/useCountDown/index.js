@@ -79,4 +79,113 @@ class UseCountDownResult extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+const SECOND = 1e3;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const parseTime = (time) => {
+  const days = Math.floor(time / DAY);
+  const hours = Math.floor(time % DAY / HOUR);
+  const minutes = Math.floor(time % HOUR / MINUTE);
+  const seconds = Math.floor(time % MINUTE / SECOND);
+  const milliseconds = Math.floor(time % SECOND);
+  return new CurrentTime({
+    days,
+    hours,
+    minutes,
+    seconds,
+    milliseconds,
+    remainTime: time
+  });
+};
+const isSameSecond = (time1, time2) => {
+  return Math.floor(time1 / 1e3) == Math.floor(time2 / 1e3);
+};
+function useCountDown(options) {
+  let timerId = common_vendor.ref(null);
+  const runing = common_vendor.ref(false);
+  const remainTime = common_vendor.ref(options.time);
+  const endTime = common_vendor.ref(0);
+  const current = common_vendor.computed(() => {
+    return parseTime(remainTime.value);
+  });
+  const clearTimer = () => {
+    if (timerId.value != null) {
+      clearTimeout(timerId.value);
+      timerId.value = null;
+    }
+  };
+  const pause = () => {
+    runing.value = false;
+    clearTimer();
+  };
+  const setRemainTime = (remain) => {
+    var _a, _b;
+    remainTime.value = remain;
+    (_a = options.onChange) === null || _a === void 0 ? null : _a.call(options, current.value);
+    if (remain <= 0) {
+      pause();
+      (_b = options.onFinish) === null || _b === void 0 ? null : _b.call(options);
+    }
+  };
+  const getRemainTime = () => {
+    return Math.max(endTime.value - Date.now(), 0);
+  };
+  let millisecondTick = null;
+  let secondTick = null;
+  millisecondTick = () => {
+    clearTimer();
+    timerId.value = setTimeout(() => {
+      setRemainTime(getRemainTime());
+      if (remainTime.value > 0) {
+        millisecondTick();
+      }
+    }, 30);
+  };
+  secondTick = () => {
+    clearTimer();
+    timerId.value = setTimeout(() => {
+      const remain = getRemainTime();
+      if (!isSameSecond(remain, remainTime.value) || remain == 0) {
+        setRemainTime(remain);
+      }
+      if (remainTime.value > 0) {
+        secondTick();
+      }
+    }, 30);
+  };
+  const toTick = () => {
+    if (options.millisecond == true) {
+      millisecondTick();
+    } else {
+      secondTick();
+    }
+  };
+  const start = () => {
+    if (!runing.value) {
+      endTime.value = Date.now() + remainTime.value;
+      runing.value = true;
+      toTick();
+    }
+  };
+  function reset(totalTime = null) {
+    if (totalTime == null)
+      totalTime = options.time;
+    pause();
+    remainTime.value = totalTime;
+  }
+  common_vendor.onUnmounted(() => {
+    clearTimer();
+  });
+  return new UseCountDownResult({
+    start,
+    reset: (totalTime = null) => {
+      return reset(totalTime);
+    },
+    pause,
+    current
+  });
+}
+exports.UseCountDownOptions = UseCountDownOptions;
+exports.useCountDown = useCountDown;
 //# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/uni_modules/rice-ui/libs/use/useCountDown/index.js.map

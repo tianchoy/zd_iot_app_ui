@@ -187,30 +187,78 @@ export function queryPkgInfoDetail(id: string, withToken: boolean = true): Promi
 }
 
 // 查询订单列表Xcx
-export function queryOrderListXcx(data: UTSJSONObject, withToken: boolean = true): Promise<ApiResponse<QueryOrderListXcxData>> {
+export function queryOrderList(data: UTSJSONObject, withToken: boolean = true): Promise<ApiResponse<QueryOrderListXcxData>> {
+
+  // #ifdef MP-WEIXIN
+  const url = (ApiUrl.queryOrderListXcx as string)
+  const token = true
+  // #endif
+
+  // #ifdef H5
+  const url = (ApiUrl.queryOrderList as string)
+  const token = false
+  // #endif
+
+  // #ifndef MP-WEIXIN || H5
+  // 其他平台默认使用H5配置
+  const url = (ApiUrl.queryOrderList as string)
+  const token = false
+  // #endif
+
   return request<QueryOrderListXcxData>({
-    url: ApiUrl.queryOrderListXcx as string,
+    url: url,
     method: 'GET',
     data: data,
-    withToken: withToken
+    withToken: token
   })
 }
 
 // 添加订单Xcx
-export function addOrderXcx(data: UTSJSONObject, withToken: boolean = true): Promise<ApiResponse<any>> {
+export function addOrder(data: UTSJSONObject, withToken: boolean = true): Promise<ApiResponse<any>> {
+  // #ifdef MP-WEIXIN
+  const url = (ApiUrl.addOrderXcx as string)
+  const token = true
+  // #endif
+
+  // #ifdef H5
+  const url = (ApiUrl.addOrder as string)
+  const token = false
+  // #endif
+
+  // #ifndef MP-WEIXIN || H5
+  // 其他平台默认使用H5配置
+  const url = (ApiUrl.addOrder as string)
+  const token = false
+  // #endif
+
   return request<any>({
-    url: ApiUrl.addOrderXcx as string,
+    url: url,
     method: 'POST',
     data: data,
-    withToken: withToken
+    withToken: token
   })
 }
 
 // 查询订单详情Xcx
-export function queryOrderDetailXcx(id: string, withToken: boolean = true): Promise<ApiResponse<QueryOrderDetailXcxData>> {
+export function queryOrderDetail(id: string, withToken: boolean = true): Promise<ApiResponse<QueryOrderDetailXcxData>> {
+  // #ifdef MP-WEIXIN
+  const url = (ApiUrl.queryOrderDetailXcx as string) + id
+  const token = true
+  // #endif
+
+  // #ifdef H5
+  const url = (ApiUrl.queryOrderPackInfo as string) + id
+  const token = false
+  // #endif
+  // #ifndef MP-WEIXIN || H5
+  // 其他平台默认使用H5配置
+  const url = (ApiUrl.queryOrderPackInfo as string) + id
+  const token = false
+  // #endif
+
   return request<QueryOrderDetailXcxData>({
-    url: (ApiUrl.queryOrderDetailXcx as string) + id,
+    url: url,
     method: 'GET',
-    withToken: withToken
+    withToken: token
   })
 }

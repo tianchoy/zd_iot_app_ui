@@ -170,7 +170,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           if (status !== "") {
             params.status = status;
           }
-          const resp = yield api_http.queryOrderListXcx(params);
+          const resp = yield api_http.queryOrderList(params);
           if (resp.code == 200) {
             if (resp.rows && Array.isArray(resp.rows)) {
               orderList.value = resp.rows;

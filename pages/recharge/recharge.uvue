@@ -129,7 +129,7 @@
 
 <script setup lang="uts">
 	import { ref, computed } from 'vue';
-	import { queryCardDetail, addOrderXcx } from '@/api/http.uts';
+	import { queryCardDetail, addOrder } from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
 	import { config } from '@/common/config.uts';
 
@@ -405,7 +405,7 @@
 
 		// 处理确认逻辑
 		try {
-			const res = await addOrderXcx({
+			const res = await addOrder({
 				pkgId: currentItem.pkgId,
 				rechargeNo: cardNumber.value,
 			})

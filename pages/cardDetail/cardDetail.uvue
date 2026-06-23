@@ -121,7 +121,7 @@
 </template>
 
 <script setup lang="uts">
-	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderListXcx,userUnBindCard} from '@/api/http'
+	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderList,userUnBindCard} from '@/api/http'
 	import type {CardDetail,BindCard,OrderListXcxItem,PkgInfoItem} from '@/api/types'
 
 	type CardDetailTabItem = {
@@ -295,7 +295,7 @@
 	// 查询订单列表Xcx
 	const getOrderList = async () => {
 		try {
-			const resp = await queryOrderListXcx({
+			const resp = await queryOrderList({
 				rechargeNo: card_number.value,
 			})
 			if (resp.code == 200) {
@@ -366,24 +366,40 @@
 
 	// 解绑卡片
 	const handleUnbind = async () => {
-		console.log('解绑卡片')
-		const res = await userUnBindCard(card_number.value)
-		console.log(res)
-		if(res.code == 200){
-			uni.showToast({
-			title: '解绑成功',
-			icon: 'success'
+		uni.showModal({
+			title: '确认解绑',
+			content: '确定解绑该卡片吗？',
+			success: async (res) => {
+				if (res.confirm) {
+					try {
+						const result = await userUnBindCard(card_number.value)
+						console.log(result)
+						
+						if (result.code == 200) {
+							uni.showToast({
+								title: '解绑成功',
+								icon: 'success'
+							})
+							isBinded.value = false
+							uni.navigateBack({
+								delta: 1
+							})
+						} else {
+							uni.showToast({
+								title: result.msg ?? '解绑失败',
+								icon: 'none'
+							})
+						}
+					} catch (error) {
+						console.error('解绑请求失败:', error)
+						uni.showToast({
+							title: '网络异常，请重试',
+							icon: 'none'
+						})
+					}
+				}
+			}
 		})
-		isBinded.value = false
-		uni.navigateBack({
-			delta: 1
-		})
-		}else{
-			uni.showToast({
-				title: res.msg ?? '解绑失败',
-				icon: 'none'
-			})
-		}
 	}
 
 	onMounted(() => {

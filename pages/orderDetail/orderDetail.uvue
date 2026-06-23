@@ -105,6 +105,10 @@
 				<text class="amount-label">待支付金额</text>
 				<text class="amount-value">¥{{ orderDetail.payAmount || orderDetail.orderAmount || 0 }}</text>
 			</view>
+			<view class="amount-time">
+				<text class="amount-label">支付剩余时间</text>
+				<rice-count-down :time="orderDetail.currentSeconds * 1000 || 0" font-size="28rpx" color="#f56c6c" @finish="handleCountDownFinish"/>
+			</view>
 			<view class="pay-button" @click="choosePayment">
 				<text class="pay-button-text">去支付</text>
 			</view>
@@ -123,12 +127,12 @@
 			:productName="orderDetail.pkgName"
 			:traffic="orderDetail.pkgFlow"
 			:validityPeriod="orderDetail.validityPeriod"
-			/>
+		/>
 	</rice-popup>
 </template>
 
 <script setup lang="uts">
-	import { addOrderXcx , queryOrderDetailXcx } from '@/api/http.uts';
+	import { addOrder , queryOrderDetail } from '@/api/http.uts';
 	import { config } from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	
@@ -161,7 +165,6 @@
 
 		// 获取订单状态对应的文本
 	const getOrderStatusText = (status: string): string => {
-		console.log('getOrderStatusText',status)
 		const statusMap: Record<string, string> = {
 			'0': '待支付',
 			'1': '已完成',
@@ -175,7 +178,6 @@
 
 	// 获取订单状态对应的标签类型
 	const getOrderStatusType = (status: string): string => {
-		console.log('getOrderStatusType',status)
 		const typeMap: Record<string, string> = {
 			'0': 'primary',
 			'1': 'success',
@@ -258,6 +260,15 @@
 	const choosePayment = () => {
 		currentPrice.value = orderDetail.value.payAmount || orderDetail.value.orderAmount || 0
 		showPopup.value = true
+	}
+
+	// 倒计时结束
+	const handleCountDownFinish = () => {
+		uni.showToast({
+			title: "支付已过期，请重新下单",
+			icon: 'none',
+			duration: 3000
+		});
 	}
 	
 	// 取消支付
@@ -352,7 +363,6 @@
 					appId: config.api.auth.appID,
 					extraData: param,
 					success(res) { 
-						console.log('支付成功:', res);
 						uni.navigateTo({
 							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value
 						})
@@ -372,10 +382,9 @@
 	
 	// 确认支付
 	const handleConfirmPayment = async (e: any) => {
-		console.log(e)
 		showPopup.value = false
 		try {
-			const res = await addOrderXcx({
+			const res = await addOrder({
 				pkgId: orderDetail.value.pkgId,
 				rechargeNo: orderDetail.value.rechargeNo,
 			})
@@ -412,10 +421,9 @@
 	const getOrderDetail = async () => {
 		if (!orderId.value) return
 		try {
-			const res = await queryOrderDetailXcx(orderId.value)
+			const res = await queryOrderDetail(orderId.value)
 			if (res.code == 200) {
 				orderDetail.value = res.data
-				console.log('订单详情:', orderDetail.value)
 			} else {
 				uni.showToast({
 					title: res.msg || '查询订单详情失败',
@@ -433,7 +441,6 @@
 	
 	onLoad((options) => {
 		const orderNo = options?.orderNo as string | null
-		console.log(orderNo)
 		if (orderNo != null) {
 			orderId.value = orderNo
 			getOrderDetail()
@@ -674,6 +681,22 @@
 				font-size: 48rpx;
 				font-weight: bold;
 				color: #ef4444;
+				.amount-label {
+					font-size: 24rpx;
+					color: #64748b;
+					margin-right: 16rpx;
+				}
+			}
+		}
+		.amount-time{
+			display: flex;
+			flex-direction: row; 
+			align-items: center;
+			justify-content: flex-end;
+			.amount-label{
+				font-size: 24rpx;
+				color: #64748b;
+				margin-right: 16rpx;
 			}
 		}
 		

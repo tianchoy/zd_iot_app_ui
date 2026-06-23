@@ -3,6 +3,7 @@
   "usingComponents": {
     "top-nav-bar": "../../components/topNavBar/topNavBar",
     "rice-tag": "../../uni_modules/rice-ui/components/rice-tag/rice-tag",
+    "rice-count-down": "../../uni_modules/rice-ui/components/rice-count-down/rice-count-down",
     "rice-popup": "../../uni_modules/rice-ui/components/rice-popup/rice-popup",
     "payment": "../../components/payment"
   }

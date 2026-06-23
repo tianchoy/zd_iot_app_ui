@@ -61,6 +61,10 @@ const isThemeColor = (type = null) => {
     return false;
   return ["primary", "success", "warning", "error"].includes(type);
 };
+function padZero(number, len = 2) {
+  const num = typeof number == "number" ? number.toString() : number;
+  return num.padStart(len, "0");
+}
 class SplitCssPropertyResult extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -162,5 +166,6 @@ exports.getRandomStr = getRandomStr;
 exports.hasStrValue = hasStrValue;
 exports.isGradientColor = isGradientColor;
 exports.isThemeColor = isThemeColor;
+exports.padZero = padZero;
 exports.toNum = toNum;
 //# sourceMappingURL=../../../../../.sourcemap/mp-weixin/uni_modules/rice-ui/libs/utils/basic.js.map

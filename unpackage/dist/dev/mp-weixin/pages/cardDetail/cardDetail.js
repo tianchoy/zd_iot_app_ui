@@ -213,7 +213,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getOrderList = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
-          const resp = yield api_http.queryOrderListXcx(new common_vendor.UTSJSONObject({
+          const resp = yield api_http.queryOrderList(new common_vendor.UTSJSONObject({
             rechargeNo: card_number.value
           }));
           if (resp.code == 200) {
@@ -285,25 +285,42 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleUnbind = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        var _a;
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:369", "解绑卡片");
-        const res = yield api_http.userUnBindCard(card_number.value);
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:371", res);
-        if (res.code == 200) {
-          common_vendor.index.showToast({
-            title: "解绑成功",
-            icon: "success"
-          });
-          isBinded.value = false;
-          common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
-            delta: 1
-          }));
-        } else {
-          common_vendor.index.showToast({
-            title: (_a = res.msg) !== null && _a !== void 0 ? _a : "解绑失败",
-            icon: "none"
-          });
-        }
+        common_vendor.index.showModal(new common_vendor.UTSJSONObject({
+          title: "确认解绑",
+          content: "确定解绑该卡片吗？",
+          success: (res) => {
+            return common_vendor.__awaiter(this, void 0, void 0, function* () {
+              var _a;
+              if (res.confirm) {
+                try {
+                  const result = yield api_http.userUnBindCard(card_number.value);
+                  common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:376", result);
+                  if (result.code == 200) {
+                    common_vendor.index.showToast({
+                      title: "解绑成功",
+                      icon: "success"
+                    });
+                    isBinded.value = false;
+                    common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
+                      delta: 1
+                    }));
+                  } else {
+                    common_vendor.index.showToast({
+                      title: (_a = result.msg) !== null && _a !== void 0 ? _a : "解绑失败",
+                      icon: "none"
+                    });
+                  }
+                } catch (error) {
+                  common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:394", "解绑请求失败:", error);
+                  common_vendor.index.showToast({
+                    title: "网络异常，请重试",
+                    icon: "none"
+                  });
+                }
+              }
+            });
+          }
+        }));
       });
     };
     common_vendor.onMounted(() => {
