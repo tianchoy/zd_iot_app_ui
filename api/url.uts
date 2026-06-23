@@ -22,7 +22,7 @@ export const ApiUrl = {
     queryXcxCardList: '/card/pkgInfo/xcxList', // 查询卡列表
     queryCardList: '/app/card/list',//小程序首页 查询卡列表
     queryCardDetailXcx: '/app/card/infoXcx/',//小程序首页 查询卡详情Xcx
-    userBindCard:'/system/appUserCard/bind', // 绑定卡
+    userBindCard:'/system/appUserCard/add', // 绑定卡
     userUnBindCard:'/system/appUserCard/', // 解绑卡
     queryOrderListXcx:'/order/pkgOrder/xcxList', // 查询订单列表Xcx
 

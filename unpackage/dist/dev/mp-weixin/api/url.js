@@ -20,7 +20,7 @@ const ApiUrl = new common_vendor.UTSJSONObject({
   queryXcxCardList: "/card/pkgInfo/xcxList",
   queryCardList: "/app/card/list",
   queryCardDetailXcx: "/app/card/infoXcx/",
-  userBindCard: "/system/appUserCard/bind",
+  userBindCard: "/system/appUserCard/add",
   userUnBindCard: "/system/appUserCard/",
   queryOrderListXcx: "/order/pkgOrder/xcxList",
   addOrderXcx: "/order/pkgOrder/xcx/add",

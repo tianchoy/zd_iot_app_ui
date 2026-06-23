@@ -84,6 +84,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return `${used} / ${total}`;
     };
     const handleClick = (e) => {
+      if (!checkToken())
+        return null;
       if (e.index != null) {
         current.value = e.index;
         getCardList(current.value.toString()).then((list) => {
@@ -137,7 +139,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             status: state,
             isSort: true
           }));
-          if (res.code == 0) {
+          if (res.code == 200) {
             return Array.isArray(res.data) ? res.data : [];
           }
           return [];
@@ -148,6 +150,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           return [];
         }
+      });
+    };
+    const handleRecharge = (rechargeNo) => {
+      common_vendor.index.navigateTo({
+        url: "/pages/recharge/recharge?cardNumber=" + rechargeNo
       });
     };
     const checkToken = () => {
@@ -229,43 +236,70 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-a89086b7"
         }),
         l: common_vendor.f(cardList.value, (card, index, i0) => {
-          return {
-            a: common_vendor.t(card.rechargeNo || "-"),
-            b: common_vendor.t(card.pkgName || "-"),
-            c: common_vendor.t(card.statusStr || "未知"),
-            d: common_vendor.n(getStatusClass(card.statusStr)),
-            e: common_vendor.t(getFlowText(card)),
-            f: "a89086b7-5-" + i0,
-            g: common_vendor.t(card.effectiveTime || "-"),
-            h: common_vendor.t(card.expirationTime || "-"),
-            i: common_vendor.t(getCycleText(card)),
-            j: "a89086b7-6-" + i0,
-            k: index,
-            l: common_vendor.o(($event) => {
+          return common_vendor.e({
+            a: card.rechargeNo
+          }, card.rechargeNo ? {
+            b: common_vendor.t(card.rechargeNo || "-")
+          } : {}, {
+            c: card.pkgName
+          }, card.pkgName ? {
+            d: common_vendor.t(card.pkgName || "-")
+          } : {}, {
+            e: card.statusStr
+          }, card.statusStr ? {
+            f: common_vendor.t(card.statusStr || "未知"),
+            g: common_vendor.n(getStatusClass(card.statusStr))
+          } : {}, {
+            h: card.usedFlow || card.totalFlow
+          }, card.usedFlow || card.totalFlow ? {
+            i: common_vendor.t(getFlowText(card))
+          } : {}, {
+            j: "a89086b7-5-" + i0,
+            k: common_vendor.p({
+              dashed: true,
+              customStyle: {
+                margin: card.totalFlow ? "0" : "20rpx 0 0 0"
+              },
+              class: "data-v-a89086b7"
+            }),
+            l: card.effectiveTime
+          }, card.effectiveTime ? {
+            m: common_vendor.t(card.effectiveTime || "-")
+          } : {}, {
+            n: card.expirationTime
+          }, card.expirationTime ? {
+            o: common_vendor.t(card.expirationTime || "-")
+          } : {}, {
+            p: card.usedPeriod || card.totalPeriod
+          }, card.usedPeriod || card.totalPeriod ? {
+            q: common_vendor.t(getCycleText(card))
+          } : {}, {
+            r: common_vendor.o(($event) => {
+              return handleRecharge(card.rechargeNo);
+            }, index),
+            s: "a89086b7-6-" + i0,
+            t: index,
+            v: common_vendor.o(($event) => {
               return handleDetail(card);
             }, index)
-          };
+          });
         }),
         m: common_vendor.p({
-          dashed: true,
+          type: "primary",
+          size: "mini",
           customStyle: {
-            margin: "0"
+            fontSize: "24rpx"
           },
           class: "data-v-a89086b7"
         }),
-        n: common_vendor.p({
-          type: "primary",
-          size: "small",
-          class: "data-v-a89086b7"
-        }),
-        o: scrollViewHeight.value + "px",
-        p: cardList.value.length === 0
+        n: scrollViewHeight.value + "px",
+        o: cardList.value.length === 0
       }, cardList.value.length === 0 ? {} : {}, {
-        q: common_vendor.p({
+        p: common_vendor.p({
           class: "data-v-a89086b7"
         }),
-        r: `${_ctx.u_s_b_h}px`,
-        s: `${_ctx.u_s_a_i_b}px`
+        q: `${_ctx.u_s_b_h}px`,
+        r: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

@@ -52,21 +52,24 @@ export function login(data: UTSJSONObject, withToken: boolean = true): Promise<A
 export function getTenantInfo(tenantId: string, withToken: boolean = true): Promise<ApiResponse<TenantInfoData>> {
 	// #ifdef MP-WEIXIN
 	const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + config.api.auth.tenantId
+  const token = true
 	// #endif
 
 	// #ifdef H5
 	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
+  const token = false
 	// #endif
 
 	// #ifndef MP-WEIXIN || H5
 	// 其他平台默认使用H5配置
 	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
+  const token = false
 	// #endif
 
 	return request<TenantInfoData>({
 		url: url,
 		method: 'GET',
-		withToken: withToken
+		withToken: token
 	})
 }
 

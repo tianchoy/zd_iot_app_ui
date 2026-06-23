@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
 const api_ProjectConfig = require("./ProjectConfig.js");
-require("./Storage.js");
+const api_Storage = require("./Storage.js");
 const api_Upload = require("./Upload.js");
 const common_config = require("../common/config.js");
 var _a;
@@ -146,6 +146,20 @@ function hideLoadingModal() {
 function showErrorToast(msg) {
   common_vendor.index.showToast({ title: msg || "请求失败", icon: "none" });
 }
+let isRedirectingToLogin = false;
+function navigateToLogin(loginPage) {
+  if (isRedirectingToLogin) {
+    return null;
+  }
+  isRedirectingToLogin = true;
+  common_config.clearToken();
+  api_Storage.storage.clearAuth();
+  common_vendor.index.showToast({ title: "登录已过期，请重新登录", icon: "none" });
+  setTimeout(() => {
+    common_vendor.index.reLaunch({ url: loginPage });
+    isRedirectingToLogin = false;
+  }, 1200);
+}
 function createRequestOptions(url, method, data = null, options = null) {
   const out = new RequestOptions({
     header: null,
@@ -212,9 +226,7 @@ function copyRequestOptions(options) {
 function request(options) {
   const url = options.url, _a2 = options.method, method = _a2 == void 0 ? "GET" : _a2, data = options.data;
   options.header;
-  const baseUrl = options.baseUrl, _b = options.timeout, timeout = _b == void 0 ? DEFAULT_TIMEOUT : _b, _c = options.withToken, withToken = _c == void 0 ? false : _c, _d = options.showError, showError = _d == void 0 ? true : _d, _e = options.showLoading, showLoading = _e == void 0 ? false : _e, loadingText = options.loadingText;
-  options.redirectOnUnauthorized;
-  const loginPage = options.loginPage, successCodes = options.successCodes, unauthorizedCodes = options.unauthorizedCodes, onErrorCode = options.onErrorCode;
+  const baseUrl = options.baseUrl, _b = options.timeout, timeout = _b == void 0 ? DEFAULT_TIMEOUT : _b, _c = options.withToken, withToken = _c == void 0 ? false : _c, _d = options.showError, showError = _d == void 0 ? true : _d, _e = options.showLoading, showLoading = _e == void 0 ? false : _e, loadingText = options.loadingText, _f = options.redirectOnUnauthorized, redirectOnUnauthorized = _f == void 0 ? true : _f, loginPage = options.loginPage, successCodes = options.successCodes, unauthorizedCodes = options.unauthorizedCodes, onErrorCode = options.onErrorCode;
   if (showLoading) {
     showLoadingModal(loadingText !== null && loadingText !== void 0 ? loadingText : "加载中...");
   }
@@ -232,7 +244,7 @@ function request(options) {
       "Content-Language": DEFAULT_LANGUAGE,
       "clientId": common_config.config.api.auth.clientId
     }
-    // 添加 Token
+    // 如果 withToken 为 true，检查 token 是否存在
   );
   if (withToken) {
     const token = common_config.getToken();
@@ -243,7 +255,7 @@ function request(options) {
   const finalSuccessCodes = successCodes !== null && successCodes !== void 0 ? successCodes : DEFAULT_SUCCESS_CODES;
   const finalUnauthorizedCodes = unauthorizedCodes !== null && unauthorizedCodes !== void 0 ? unauthorizedCodes : DEFAULT_UNAUTHORIZED_CODES;
   const hpLogin = api_ProjectConfig.getHostProjectConfig().loginPagePath;
-  loginPage !== null && loginPage !== void 0 ? loginPage : hpLogin.length > 0 ? hpLogin : DEFAULT_LOGIN_PAGE;
+  const finalLoginPage = loginPage !== null && loginPage !== void 0 ? loginPage : hpLogin.length > 0 ? hpLogin : DEFAULT_LOGIN_PAGE;
   return new Promise((resolve, reject) => {
     common_vendor.index.request({
       url: fullUrl,
@@ -292,7 +304,11 @@ function request(options) {
             break;
           }
         }
-        if (isUnauthorizedCode) {
+        if (isUnauthorizedCode && redirectOnUnauthorized) {
+          if (showError) {
+            showErrorToast(msg || "登录已过期，请重新登录");
+          }
+          navigateToLogin(finalLoginPage);
           reject(result);
           return null;
         }

@@ -40,32 +40,32 @@
 				<view class="card-item" v-for="(card, index) in cardList" :key="index" @click="handleDetail(card)">
 					<view class="item-head">
 						<view class="item-head-label">
-							<text class="card-item-title">{{ card.rechargeNo || '-' }}</text>
-							<text class="card-item-content">套餐：{{ card.pkgName || '-' }}</text>
+							<text class="card-item-title" v-if="card.rechargeNo">{{ card.rechargeNo || '-' }}</text>
+							<text class="card-item-content" v-if="card.pkgName">套餐：{{ card.pkgName || '-' }}</text>
 						</view>
-						<text class="status-tag" :class="getStatusClass(card.statusStr)">{{ card.statusStr || '未知' }}</text>
+						<text class="status-tag" :class="getStatusClass(card.statusStr)" v-if="card.statusStr">{{ card.statusStr || '未知' }}</text>
 					</view>
-					<view class="item-package">
+					<view class="item-package" v-if="card.usedFlow || card.totalFlow">
 						<text class="package-label">流量：</text>
 						<text class="package-value">{{ getFlowText(card) }}</text>
 					</view>
-					<rice-divider dashed :customStyle="{margin:'0'}"></rice-divider>
+					<rice-divider dashed :customStyle="{margin: card.totalFlow ? '0' : '20rpx 0 0 0'}"></rice-divider>
 					<view class="card-metrics">
-						<view class="metric-box mr-24">
+						<view class="metric-box mr-24" v-if="card.effectiveTime">
 							<view class="metric-label">生效时间</view>
 							<view class="metric-value">{{ card.effectiveTime || '-' }}</view>
 						</view>
-						<view class="metric-box">
+						<view class="metric-box" v-if="card.expirationTime">
 							<view class="metric-label">到期时间</view>
 							<view class="metric-value">{{ card.expirationTime || '-' }}</view>
 						</view>
 					</view>
 					<view class="card-bottom">
-						<view class="card-cycle-text">
+						<view class="card-cycle-text" v-if="card.usedPeriod || card.totalPeriod">
 							<text class="cycle-label">当前周期：</text>
 							<text class="cycle-value">{{ getCycleText(card) }}</text>
 						</view>
-						<rice-button type="primary" size="small" >去充值</rice-button>
+						<rice-button type="primary" size="mini" :customStyle="{fontSize:'24rpx'}" @click="handleRecharge(card.rechargeNo)" >去充值</rice-button>
 					</view>
 				</view>
 			</scroll-view>
@@ -133,6 +133,10 @@ const getCycleText = (card: RechargeData): string => {
 }
 
 const handleClick = (e: UTSJSONObject) => {
+	// #ifdef MP-WEIXIN
+	if (!checkToken()) return;
+	// #endif
+
 	if (e.index != null) {
 		current.value = e.index as number
 		getCardList(current.value.toString()).then((list) => {
@@ -205,7 +209,7 @@ const getCardList = async (state: string) => {
 			status: state,
 			isSort: true
 		})
-		if (res.code == 0) {
+		if (res.code == 200) {
 			return Array.isArray(res.data) ? res.data : []
 		}
 		return []
@@ -216,6 +220,13 @@ const getCardList = async (state: string) => {
 		})
 		return []
 	}
+}
+
+// 去充值
+const handleRecharge = (rechargeNo: string) => {
+	uni.navigateTo({
+			url: '/pages/recharge/recharge?cardNumber=' + rechargeNo
+		})
 }
 
 const checkToken = (): boolean => {
