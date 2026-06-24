@@ -29,7 +29,7 @@ page .container.data-v-722cdacb {
   display: flex;
   flex-direction: column;
   background-color: #f4f7fb;
-  height: 100%;
+  min-height: 100%;
 }
 page .container .card-info.data-v-722cdacb {
   background: #ffffff;
@@ -110,12 +110,10 @@ page .container .pkg-box.data-v-722cdacb {
   border: 1rpx solid #e7edf5;
   border-radius: 20rpx;
   padding: 24rpx;
-  margin: 24rpx;
-  flex: 1;
+  margin: 24rpx 24rpx 120rpx 24rpx;
 }
 page .container .pkg-content.data-v-722cdacb {
-  margin-top: 20rpx;
-  padding-bottom: 120rpx;
+  margin: 24rpx 0 0 0;
 }
 page .container .pkg-card.data-v-722cdacb {
   display: flex;

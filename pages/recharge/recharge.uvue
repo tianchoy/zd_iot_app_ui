@@ -53,7 +53,7 @@
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ formatFlow(item.pkgFlow) }}</text>
+								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ item.pkgFlow }}</text>
 								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod || '无固定期限' }}天</text>
 							</view>
 						</view>
@@ -84,7 +84,7 @@
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ formatFlow(item.pkgFlow) }}</text>
+								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ item.pkgFlow }}</text>
 								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod || '无固定期限' }}天</text>
 							</view>
 						</view>
@@ -132,8 +132,6 @@
 	import { queryCardDetail, addOrder } from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
 	import { config } from '@/common/config.uts';
-
-	import LinearProgress from '@/components/progress.uvue';
 	import Payment from '@/components/payment.uvue';
 	
 	const showPopup = ref<boolean>(false);
@@ -205,24 +203,6 @@
 			return item ? item.sellingPrice : '0.00';
 		}
 	});
-	
-	// 格式化流量显示（将字节转换为GB）
-	const formatFlow = (flow: string | null): string => {
-		if (!flow) return '未知';
-		const flowBytes = parseFloat(flow);
-		if (isNaN(flowBytes)) return '未知';
-		
-		const flowGB = flowBytes / (1024 * 1024);
-		
-		if (flowGB >= 1024) {
-			return `${(flowGB / 1024).toFixed(2)}TB`;
-		} else if (flowGB >= 1) {
-			return `${flowGB.toFixed(2)}GB`;
-		} else {
-			const flowMB = flowBytes / (1024);
-			return `${flowMB.toFixed(2)}MB`;
-		}
-	};
 	
 	// 根据 pkgCategory 分类套餐和加油包
 	const classifyPackages = (packages: Array<PkgXcxVo>) => {
@@ -557,7 +537,7 @@
 		display: flex;
 		flex-direction: column;
 		background-color: #f4f7fb;
-		height: 100%;
+		min-height: 100%;
 		.card-info{
 			background: #ffffff;
 			border: 1rpx solid #e7edf5;
@@ -637,12 +617,10 @@
 			border: 1rpx solid #e7edf5;
 			border-radius: 20rpx;
 			padding: 24rpx;
-			margin: 24rpx;
-			flex: 1;
+			margin: 24rpx 24rpx 120rpx 24rpx;
 		}
 		.pkg-content {
-			margin-top: 20rpx;
-			padding-bottom: 120rpx;
+			margin: 24rpx 0 0 0;
 		}
 		.pkg-card {
 			display: flex;

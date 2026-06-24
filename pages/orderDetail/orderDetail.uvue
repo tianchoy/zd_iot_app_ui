@@ -75,7 +75,7 @@
 				</view>
 				<view class="info-row" v-if="orderDetail.validityPeriod">
 					<text class="info-label">有效期</text>
-					<text class="info-value">{{ orderDetail.validityPeriod }}</text>
+					<text class="info-value">{{ orderDetail.validityPeriod }}{{ orderDetail?.pkgType == '1' ? '天' : '个月' }}</text>
 				</view>
 				<view class="info-row" v-if="orderDetail.startDate">
 					<text class="info-label">生效时间</text>
@@ -85,7 +85,7 @@
 					<text class="info-label">失效时间</text>
 					<text class="info-value">{{ formatDateTime(orderDetail.endDate)}}</text>
 				</view>
-				<rice-divider dashed :customStyle="{margin: '0'}"></rice-divider>
+				<rice-divider v-if="orderDetail.refunds && orderDetail.refunds.length > 0" dashed :customStyle="{margin: '0'}"></rice-divider>
 				<view class="info-refunds" v-if="orderDetail.refunds && orderDetail.refunds.length > 0" v-for="(item, index) in orderDetail.refunds" :key="index">
 					<view class="times">
 						<text class="info-label">退款时间</text>
@@ -692,8 +692,6 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 24rpx 32rpx;
-		padding-bottom: calc(24rpx + constant(safe-area-inset-bottom));
-		padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
 		box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
 		
 		.amount-section {

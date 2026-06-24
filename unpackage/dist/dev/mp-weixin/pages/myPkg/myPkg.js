@@ -120,11 +120,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, pkgInfoList.value.length == 0 ? {} : {}, {
         h: common_vendor.f(pkgInfoList.value, (item, index, i0) => {
           return common_vendor.e({
-            a: common_vendor.t(item.pkgName),
-            b: item.status
+            a: item.pkgName
+          }, item.pkgName ? {
+            b: common_vendor.t(item.pkgName)
+          } : {}, {
+            c: item.status
           }, item.status ? {
-            c: "8137f92d-2-" + i0,
-            d: common_vendor.p({
+            d: "8137f92d-2-" + i0,
+            e: common_vendor.p({
               text: getPackageStatusText(item.status),
               round: true,
               ["plain-fill"]: true,
@@ -133,13 +136,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               class: "data-v-8137f92d"
             })
           } : {}, {
-            e: common_vendor.t(item.effectiveTime),
-            f: common_vendor.t(item.expirationTime),
-            g: common_vendor.t(item.unUsedFlow),
-            h: common_vendor.t(item.usedFlow),
-            i: common_vendor.t(item.pkgFlow),
-            j: index,
-            k: common_vendor.o(($event) => {
+            f: item.effectiveTime
+          }, item.effectiveTime ? {
+            g: common_vendor.t(item.effectiveTime)
+          } : {}, {
+            h: item.expirationTime
+          }, item.expirationTime ? {
+            i: common_vendor.t(item.expirationTime)
+          } : {}, {
+            j: item.unUsedFlow
+          }, item.unUsedFlow ? {
+            k: common_vendor.t(item.unUsedFlow)
+          } : {}, {
+            l: item.usedFlow
+          }, item.usedFlow ? {
+            m: common_vendor.t(item.usedFlow)
+          } : {}, {
+            n: item.pkgFlow
+          }, item.pkgFlow ? {
+            o: common_vendor.t(item.pkgFlow)
+          } : {}, {
+            p: index,
+            q: common_vendor.o(($event) => {
               return handlePkgDetail(item);
             }, index)
           });
