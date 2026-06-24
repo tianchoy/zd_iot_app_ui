@@ -5,16 +5,18 @@ const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_tag_1 = common_vendor.resolveComponent("rice-tag");
+  const _easycom_rice_divider_1 = common_vendor.resolveComponent("rice-divider");
   const _easycom_rice_count_down_1 = common_vendor.resolveComponent("rice-count-down");
   const _easycom_rice_popup_1 = common_vendor.resolveComponent("rice-popup");
-  (_easycom_topNavBar_1 + _easycom_rice_tag_1 + _easycom_rice_count_down_1 + _easycom_rice_popup_1)();
+  (_easycom_topNavBar_1 + _easycom_rice_tag_1 + _easycom_rice_divider_1 + _easycom_rice_count_down_1 + _easycom_rice_popup_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
 const _easycom_rice_tag = () => "../../uni_modules/rice-ui/components/rice-tag/rice-tag.js";
+const _easycom_rice_divider = () => "../../uni_modules/rice-ui/components/rice-divider/rice-divider.js";
 const _easycom_rice_count_down = () => "../../uni_modules/rice-ui/components/rice-count-down/rice-count-down.js";
 const _easycom_rice_popup = () => "../../uni_modules/rice-ui/components/rice-popup/rice-popup.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_rice_tag + _easycom_rice_count_down + common_vendor.unref(Payment) + _easycom_rice_popup)();
+  (_easycom_topNavBar + _easycom_rice_tag + _easycom_rice_divider + _easycom_rice_count_down + common_vendor.unref(Payment) + _easycom_rice_popup)();
 }
 const Payment = () => "../../components/payment.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -162,7 +164,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               icon: "none",
               duration: 3e3
             });
-            return null;
+            common_vendor.index.navigateTo({
+              url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
+            });
           }
         });
       } else if (res.payWxType == "allin_pay") {
@@ -193,7 +197,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 icon: "none",
                 duration: 3e3
               });
-              return null;
+              common_vendor.index.navigateTo({
+                url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
+              });
             }
           });
         } else {
@@ -227,6 +233,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 icon: "none",
                 duration: 3e3
               });
+              common_vendor.index.navigateTo({
+                url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
+              });
             }
           }));
         }
@@ -236,10 +245,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         showPopup.value = false;
         try {
-          const res = yield api_http.addOrder(new common_vendor.UTSJSONObject({
-            pkgId: orderDetail.value.pkgId,
-            rechargeNo: orderDetail.value.rechargeNo
-          }));
+          const res = yield api_http.goPayXcx(orderId.value);
           if (res.code == 200) {
             toPay(res.data);
           } else {
@@ -249,7 +255,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:402", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:417", "支付失败:", error);
           common_vendor.index.showToast({
             title: "支付失败，请稍后重试",
             icon: "none"
@@ -261,9 +267,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleBack = () => {
-      common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
-        delta: 1
-      }));
+      common_vendor.index.navigateBack();
     };
     const getOrderDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -280,7 +284,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:436", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:449", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"
@@ -424,27 +428,44 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(orderDetail).endDate ? {
         J: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).endDate))
       } : {}, {
-        K: common_vendor.unref(orderDetail).usageInstructions || getNoticeText()
-      }, common_vendor.unref(orderDetail).usageInstructions || getNoticeText() ? {
-        L: common_vendor.t(common_vendor.unref(orderDetail).usageInstructions || getNoticeText())
+        K: common_vendor.p({
+          dashed: true,
+          customStyle: {
+            margin: "0"
+          },
+          class: "data-v-6ec85291"
+        }),
+        L: common_vendor.unref(orderDetail).refunds && common_vendor.unref(orderDetail).refunds.length > 0
+      }, common_vendor.unref(orderDetail).refunds && common_vendor.unref(orderDetail).refunds.length > 0 ? {
+        M: common_vendor.f(common_vendor.unref(orderDetail).refunds, (item, index, i0) => {
+          return {
+            a: common_vendor.t(formatDateTime(item.refundTime)),
+            b: common_vendor.t(item.refundAmount || 0),
+            c: index
+          };
+        })
       } : {}, {
-        M: common_vendor.unref(orderDetail).status === "0"
+        N: common_vendor.unref(orderDetail).usageInstructions || getNoticeText()
+      }, common_vendor.unref(orderDetail).usageInstructions || getNoticeText() ? {
+        O: common_vendor.t(common_vendor.unref(orderDetail).usageInstructions || getNoticeText())
+      } : {}, {
+        P: common_vendor.unref(orderDetail).status === "0"
       }, common_vendor.unref(orderDetail).status === "0" ? {
-        N: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0),
-        O: common_vendor.o(handleCountDownFinish, "d2"),
-        P: common_vendor.p({
+        Q: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0),
+        R: common_vendor.o(handleCountDownFinish, "9b"),
+        S: common_vendor.p({
           time: common_vendor.unref(orderDetail).currentSeconds * 1e3 || 0,
           ["font-size"]: "28rpx",
           color: "#f56c6c",
           class: "data-v-6ec85291"
         }),
-        Q: common_vendor.o(choosePayment, "52")
+        T: common_vendor.o(choosePayment, "01")
       } : {}, {
-        R: `${_ctx.u_s_b_h}px`,
-        S: `${_ctx.u_s_a_i_b}px`,
-        T: common_vendor.o(handleCancelPayment, "fa"),
-        U: common_vendor.o(handleConfirmPayment, "6e"),
-        V: common_vendor.p({
+        U: `${_ctx.u_s_b_h}px`,
+        V: `${_ctx.u_s_a_i_b}px`,
+        W: common_vendor.o(handleCancelPayment, "99"),
+        X: common_vendor.o(handleConfirmPayment, "f3"),
+        Y: common_vendor.p({
           amount: common_vendor.unref(currentPrice),
           cardNumber: common_vendor.unref(orderDetail).rechargeNo,
           [","]: true,
@@ -453,11 +474,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           validityPeriod: common_vendor.unref(orderDetail).validityPeriod,
           class: "data-v-6ec85291"
         }),
-        W: common_vendor.o(onPopupClose, "68"),
-        X: common_vendor.o(($event) => {
+        Z: common_vendor.o(onPopupClose, "0e"),
+        aa: common_vendor.o(($event) => {
           return common_vendor.isRef(showPopup) ? showPopup.value = $event : null;
-        }, "3f"),
-        Y: common_vendor.p({
+        }, "79"),
+        ab: common_vendor.p({
           position: "bottom",
           show: common_vendor.unref(showPopup),
           class: "data-v-6ec85291"

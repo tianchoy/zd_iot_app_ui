@@ -275,3 +275,21 @@ export function queryOrderSuccess(id: string, payChannelId: string, withToken: b
     withToken: withToken
   })
 }
+
+// 订单详情里去支付Xcx
+export function goPayXcx(orderId:string, withToken: boolean = true): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: (ApiUrl.goPayXcx as string) + orderId,
+    method: 'POST',
+    withToken: withToken
+  })
+}
+
+// 查询套餐信息详情Xcx  
+export function queryPkgInfoXcx(id: string, withToken: boolean = true): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: (ApiUrl.queryPkgInfoXcx as string) + id,
+    method: 'GET',
+    withToken: withToken
+  })
+}

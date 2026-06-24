@@ -232,22 +232,40 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, filteredOrders.value.length === 0 ? {} : {
         g: common_vendor.f(filteredOrders.value, (order, index, i0) => {
           return common_vendor.e({
-            a: common_vendor.t(order.pkgName || "套餐名称"),
-            b: common_vendor.t(getStatusText(order.status)),
-            c: common_vendor.n(getStatusClass(getStatusText(order.status))),
-            d: common_vendor.t(order.orderNo || "-"),
-            e: common_vendor.t(order.cardNo || "-"),
-            f: common_vendor.t(order.iccid || "-"),
-            g: common_vendor.t(order.createTime || "-"),
-            h: common_vendor.t(order.payCurrencyAmount || "0.00"),
-            i: order.status === "0"
+            a: order.pkgName
+          }, order.pkgName ? {
+            b: common_vendor.t(order.pkgName || "套餐名称")
+          } : {}, {
+            c: order.status
+          }, order.status ? {
+            d: common_vendor.t(getStatusText(order.status)),
+            e: common_vendor.n(getStatusClass(getStatusText(order.status)))
+          } : {}, {
+            f: order.orderNo
+          }, order.orderNo ? {
+            g: common_vendor.t(order.orderNo || "-")
+          } : {}, {
+            h: order.cardNo
+          }, order.cardNo ? {
+            i: common_vendor.t(order.cardNo || "-")
+          } : {}, {
+            j: order.iccid
+          }, order.iccid ? {
+            k: common_vendor.t(order.iccid || "-")
+          } : {}, {
+            l: order.createTime
+          }, order.createTime ? {
+            m: common_vendor.t(order.createTime || "-")
+          } : {}, {
+            n: common_vendor.t(order.payCurrencyAmount || "0.00"),
+            o: order.status === "0"
           }, order.status === "0" ? {
-            j: common_vendor.o(($event) => {
+            p: common_vendor.o(($event) => {
               return handlePay(order);
             }, index)
           } : {}, {
-            k: index,
-            l: common_vendor.o(($event) => {
+            q: index,
+            r: common_vendor.o(($event) => {
               return handleOrderClick(order);
             }, index)
           });

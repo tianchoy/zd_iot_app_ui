@@ -543,7 +543,8 @@ class QueryOrderSuccessParams extends common_vendor.UTS.UTSType {
           payCurrencyAmount: { type: String, optional: false },
           symbol: { type: String, optional: false },
           signPosition: { type: String, optional: false },
-          payType: { type: String, optional: false }
+          payType: { type: String, optional: false },
+          rechargeNo: { type: String, optional: false }
         };
       },
       name: "QueryOrderSuccessParams"
@@ -570,6 +571,7 @@ class QueryOrderSuccessParams extends common_vendor.UTS.UTSType {
     this.symbol = this.__props__.symbol;
     this.signPosition = this.__props__.signPosition;
     this.payType = this.__props__.payType;
+    this.rechargeNo = this.__props__.rechargeNo;
     delete this.__props__;
   }
 }

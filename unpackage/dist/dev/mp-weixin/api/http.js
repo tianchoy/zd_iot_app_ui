@@ -276,9 +276,48 @@ function queryOrderSuccess(id, payChannelId, withToken = true) {
     withToken
   }));
 }
+function goPayXcx(orderId, withToken = true) {
+  return api_Request.request(new api_Request.RequestOptions({
+    data: null,
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.goPayXcx + orderId,
+    method: "POST",
+    withToken
+  }));
+}
+function queryPkgInfoXcx(id, withToken = true) {
+  return api_Request.request(new api_Request.RequestOptions({
+    data: null,
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.queryPkgInfoXcx + id,
+    method: "GET",
+    withToken
+  }));
+}
 exports.addOrder = addOrder;
 exports.getCountryList = getCountryList;
 exports.getTenantInfo = getTenantInfo;
+exports.goPayXcx = goPayXcx;
 exports.login = login;
 exports.queryCardDetail = queryCardDetail;
 exports.queryCardList = queryCardList;
@@ -287,6 +326,7 @@ exports.queryOrderDetail = queryOrderDetail;
 exports.queryOrderList = queryOrderList;
 exports.queryOrderSuccess = queryOrderSuccess;
 exports.queryPkgInfoList = queryPkgInfoList;
+exports.queryPkgInfoXcx = queryPkgInfoXcx;
 exports.userBindCard = userBindCard;
 exports.userUnBindCard = userUnBindCard;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

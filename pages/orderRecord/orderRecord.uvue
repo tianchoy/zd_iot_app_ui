@@ -29,26 +29,26 @@
 				>
 					<!-- 订单头部：套餐名称和状态 -->
 					<view class="order-header">
-						<text class="package-name">{{ order.pkgName || '套餐名称' }}</text>
-						<text class="status-tag" :class="getStatusClass(getStatusText(order.status))">{{ getStatusText(order.status) }}</text>
+						<text class="package-name" v-if="order.pkgName">{{ order.pkgName || '套餐名称' }}</text>
+						<text class="status-tag" v-if="order.status"  :class="getStatusClass(getStatusText(order.status))">{{ getStatusText(order.status) }}</text>
 					</view>
 					
 					<!-- 订单详情 -->
 					<view class="order-details">
-						<view class="detail-row">
+						<view class="detail-row" v-if="order.orderNo">
 							<text class="detail-label">订单号</text>
 							<text class="detail-value">{{ order.orderNo || '-' }}</text>
 						</view>
-						<view class="detail-row">
+						<view class="detail-row" v-if="order.cardNo">
 							<text class="detail-label">卡号</text>
 							<text class="detail-value">{{ order.cardNo || '-' }}</text>
 						</view>
-						<view class="detail-row">
+						<view class="detail-row" v-if="order.iccid">
 							<text class="detail-label">ICCID</text>
 							<text class="detail-value">{{ order.iccid || '-' }}</text>
 						</view>
 						<view class="detail-row">
-							<text class="detail-value">{{ order.createTime || '-' }}</text>
+							<text class="detail-value" v-if="order.createTime">{{ order.createTime || '-' }}</text>
 							<view class="order-footer">
 								<text class="price">¥{{ order.payCurrencyAmount || '0.00' }}</text>
 								<text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>

@@ -298,6 +298,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }));
       });
     };
+    const handlePkgDetail = (pkgId) => {
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:390", pkgId);
+      common_vendor.index.navigateTo({
+        url: `/pages/pkgDetail/pkgDetail?pkgId=${pkgId}`
+      });
+    };
     common_vendor.onMounted(() => {
       getNavBarInfo();
     });
@@ -452,7 +458,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, item.unUsedFlow ? {
             o: common_vendor.t(item.unUsedFlow)
           } : {}, {
-            p: index
+            p: index,
+            q: common_vendor.o(($event) => {
+              return handlePkgDetail(item.id);
+            }, index)
           });
         })
       }) : {}, {
@@ -484,7 +493,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }) : {}, {
         P: common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded)
       }, common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded) ? {
-        Q: common_vendor.o(handleUnbind, "7e"),
+        Q: common_vendor.o(handleUnbind, "bb"),
         R: common_vendor.p({
           type: "error",
           ["plain-fill"]: true,
@@ -507,7 +516,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        U: common_vendor.o(handleBindCard, "5e"),
+        U: common_vendor.o(handleBindCard, "ea"),
         V: common_vendor.p({
           height: "100rpx",
           bold: true,
@@ -517,7 +526,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        W: common_vendor.o(handleRecharge, "9a"),
+        W: common_vendor.o(handleRecharge, "66"),
         X: common_vendor.p({
           height: "100rpx",
           type: "primary",

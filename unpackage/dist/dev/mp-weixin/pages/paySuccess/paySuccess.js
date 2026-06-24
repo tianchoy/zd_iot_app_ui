@@ -16,13 +16,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const payChannelId = common_vendor.ref("");
     const orderDetail = common_vendor.ref(new common_vendor.UTSJSONObject({}));
     const handleViewOrder = () => {
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:79", "查看订单MP-WEIXIN");
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:84", "查看订单MP-WEIXIN");
       common_vendor.index.reLaunch({
         url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}`
       });
     };
     const handleBackCard = () => {
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:96", "返回卡片详情MP-WEIXIN");
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:101", "返回卡片详情MP-WEIXIN");
       common_vendor.index.reLaunch({
         url: `/pages/cardDetail/cardDetail?cardNumber=${orderId.value}`
       });
@@ -31,14 +31,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.queryOrderSuccess(orderId.value, payChannelId.value);
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:109", "订单详情:", res);
+          common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:114", "订单详情:", res);
           orderDetail.value = res.data;
         }
       });
     };
     common_vendor.onLoad((options) => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:115", "orderId:", options);
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:120", "orderId:", options);
       orderId.value = (_a = options.orderId) !== null && _a !== void 0 ? _a : "";
       payChannelId.value = (_b = options.payChannelId) !== null && _b !== void 0 ? _b : "";
       getOrderDetail();
@@ -54,9 +54,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-4b5f1e90"
         }),
-        b: common_vendor.unref(orderDetail).msisdn
-      }, common_vendor.unref(orderDetail).msisdn ? {
-        c: common_vendor.t(common_vendor.unref(orderDetail).msisdn)
+        b: common_vendor.unref(orderDetail).rechargeNo
+      }, common_vendor.unref(orderDetail).rechargeNo ? {
+        c: common_vendor.t(common_vendor.unref(orderDetail).rechargeNo)
       } : {}, {
         d: common_vendor.unref(orderDetail).iccid
       }, common_vendor.unref(orderDetail).iccid ? {
@@ -78,10 +78,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(orderDetail).payAmount ? {
         m: common_vendor.t(common_vendor.unref(orderDetail).payAmount)
       } : {}, {
-        n: common_vendor.o(handleViewOrder, "1d"),
-        o: common_vendor.o(handleBackCard, "b8"),
-        p: `${_ctx.u_s_b_h}px`,
-        q: `${_ctx.u_s_a_i_b}px`
+        n: common_vendor.unref(orderDetail).payTime
+      }, common_vendor.unref(orderDetail).payTime ? {
+        o: common_vendor.t(common_vendor.unref(orderDetail).payTime)
+      } : {}, {
+        p: common_vendor.o(handleViewOrder, "7a"),
+        q: common_vendor.o(handleBackCard, "a7"),
+        r: `${_ctx.u_s_b_h}px`,
+        s: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

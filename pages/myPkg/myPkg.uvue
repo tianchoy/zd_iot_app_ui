@@ -137,7 +137,7 @@
 	const handlePkgDetail = (item: any) => {
 		console.log(item)
 		uni.navigateTo({
-			url: '/pages/pkgDetail/pkgDetail?item=' + JSON.stringify(item)
+			url: '/pages/pkgDetail/pkgDetail?pkgId=' + item.id
 		})
 	}
 	

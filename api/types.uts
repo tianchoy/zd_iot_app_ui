@@ -190,4 +190,5 @@ export type QueryOrderSuccessParams = {
   symbol: string;
   signPosition: string;
   payType: string;
+  rechargeNo: string;
 }

@@ -85,6 +85,17 @@
 					<text class="info-label">失效时间</text>
 					<text class="info-value">{{ formatDateTime(orderDetail.endDate)}}</text>
 				</view>
+				<rice-divider dashed :customStyle="{margin: '0'}"></rice-divider>
+				<view class="info-refunds" v-if="orderDetail.refunds && orderDetail.refunds.length > 0" v-for="(item, index) in orderDetail.refunds" :key="index">
+					<view class="times">
+						<text class="info-label">退款时间</text>
+						<text class="info-value">{{ formatDateTime(item.refundTime)}}</text>
+					</view>
+					<view class="money">
+						<text class="info-label">退款金额</text>
+						<text class="info-value">¥{{ item.refundAmount || 0 }}</text>
+					</view>
+				</view>
 			</view>
 			
 			<!-- 说明卡片 -->
@@ -132,7 +143,7 @@
 </template>
 
 <script setup lang="uts">
-	import { addOrder , queryOrderDetail } from '@/api/http.uts';
+	import { goPayXcx , queryOrderDetail } from '@/api/http';
 	import { config } from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	
@@ -309,7 +320,9 @@
 						icon: 'none',
 						duration: 3000
 					});
-					return
+					uni.navigateTo({
+						url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+					})
 				},
 			})
 		}
@@ -341,7 +354,9 @@
 							icon: 'none',
 							duration: 3000
 						});
-						return
+						uni.navigateTo({
+						url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+					})
 					},
 				});
 			}else{
@@ -376,6 +391,9 @@
 							icon: 'none',
 							duration: 3000
 						});
+						uni.navigateTo({
+							url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+						})
 					}
 				})
 			}
@@ -386,10 +404,7 @@
 	const handleConfirmPayment = async (e: any) => {
 		showPopup.value = false
 		try {
-			const res = await addOrder({
-				pkgId: orderDetail.value.pkgId,
-				rechargeNo: orderDetail.value.rechargeNo,
-			})
+			const res = await goPayXcx(orderId.value)
 			if (res.code == 200) {
 				toPay(res.data)
 			} else {
@@ -414,9 +429,7 @@
 	
 	// 返回上一页
 	const handleBack = () => {
-		uni.navigateBack({
-			delta: 1
-		})
+		uni.navigateBack()
 	}
 	
 	// 查询订单详情
@@ -619,6 +632,21 @@
 				&.status-fail {
 					color: #ef4444;
 				}
+			}
+		}
+		.info-refunds{
+			display: flex;
+			flex-direction: column; 
+			padding: 20rpx 0;
+			.times,
+			.money{
+				display: flex;
+				flex-direction: row; 
+				align-items: center;
+				justify-content: space-between;
+				margin:10rpx 0;
+				font-size: 24rpx;
+				color: #64748b;
 			}
 		}
 	}

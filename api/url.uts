@@ -28,4 +28,6 @@ export const ApiUrl = {
     addOrderXcx:'/order/pkgOrder/xcx/add', // 添加订单Xcx
     queryOrderDetailXcx:'/order/pkgOrder/getOrderPackInfo/xcx/', // 查询订单详情Xcx
     queryOrderSuccess:'/order/pkgOrder/xcxSuccess/', // 查询订单成功Xcx
+    goPayXcx:'/pay/orderGn/xcx/goPayment/', // 订单详情里去支付Xcx
+    queryPkgInfoXcx:'/card/pkgInfo/xcxInfo/', // 查询套餐信息详情Xcx
 } 

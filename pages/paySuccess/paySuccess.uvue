@@ -12,9 +12,9 @@
 		<!-- 卡片详情区域 -->
 		<view class="card-container">
 			<!-- 卡号 -->
-			<view class="info-row" v-if="orderDetail.msisdn">
+			<view class="info-row" v-if="orderDetail.rechargeNo">
 				<text class="label">卡号</text>
-				<text class="value">{{orderDetail.msisdn}}</text>
+				<text class="value">{{orderDetail.rechargeNo}}</text>
 			</view>
 			
 			<!-- ICCID -->
@@ -53,6 +53,11 @@
 			<view class="info-row" v-if="orderDetail.payAmount">
 				<text class="label">支付金额</text>
 				<text class="value amount">￥{{orderDetail.payAmount}}</text>
+			</view>
+
+			<view class="info-row" v-if="orderDetail.payTime">
+				<text class="label">支付时间</text>
+				<text class="value">{{orderDetail.payTime}}</text>
 			</view>
 		</view>
 		

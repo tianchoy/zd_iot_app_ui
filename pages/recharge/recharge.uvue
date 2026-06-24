@@ -318,7 +318,9 @@
 						icon: 'none',
 						duration: 3000
 					});
-					return
+					uni.navigateTo({
+						url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+					})
 				},
 			})
 		}
@@ -350,7 +352,9 @@
 							icon: 'none',
 							duration: 3000
 						});
-						return
+						uni.navigateTo({
+							url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+						})
 					},
 				});
 			}else{
@@ -386,6 +390,9 @@
 							icon: 'none',
 							duration: 3000
 						});
+						uni.navigateTo({
+							url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+						})
 					}
 				})
 			}
