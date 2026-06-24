@@ -109,7 +109,7 @@ function queryCardListSum(withToken = true) {
 function queryCardDetail(id, countryCode = null, isFind = null, withToken = true) {
   const url = api_url.ApiUrl.queryCardDetailXcx + id + "/" + isFind;
   const token = true;
-  common_vendor.index.__f__("log", "at api/http.uts:118", "查询卡详情Xcx", "id:", id, "countryCode:", countryCode, "isFind:", isFind);
+  common_vendor.index.__f__("log", "at api/http.uts:119", "查询卡详情Xcx", "id:", id, "countryCode:", countryCode, "isFind:", isFind);
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,
@@ -257,6 +257,25 @@ function queryOrderDetail(id, withToken = true) {
     withToken: token
   }));
 }
+function queryOrderSuccess(id, payChannelId, withToken = true) {
+  return api_Request.request(new api_Request.RequestOptions({
+    data: null,
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.queryOrderSuccess + id + "/" + payChannelId,
+    method: "GET",
+    withToken
+  }));
+}
 exports.addOrder = addOrder;
 exports.getCountryList = getCountryList;
 exports.getTenantInfo = getTenantInfo;
@@ -266,6 +285,7 @@ exports.queryCardList = queryCardList;
 exports.queryCardListSum = queryCardListSum;
 exports.queryOrderDetail = queryOrderDetail;
 exports.queryOrderList = queryOrderList;
+exports.queryOrderSuccess = queryOrderSuccess;
 exports.queryPkgInfoList = queryPkgInfoList;
 exports.userBindCard = userBindCard;
 exports.userUnBindCard = userUnBindCard;

@@ -139,6 +139,7 @@
 	const showPopup = ref(false);
 	const currentPrice = ref(0);
 	const orderId = ref('');
+	const payChannelId = ref('');
 	const orderDetail = ref<any>({
 		orderNo: '',
 		rechargeNo: '',
@@ -279,7 +280,8 @@
 	const toPay = (data:any) => {
 		if(!data) return
 		const res = data as any
-		orderId.value = res.id
+		orderId.value = res.orderId
+		payChannelId.value = res.payChannelId
 		if(res.payWxType == 'wechat_pay'){
 			uni.requestPayment({
 				provider: 'wxpay',
@@ -297,7 +299,7 @@
 						duration: 3000,
 					})
 					uni.navigateTo({
-						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value
+						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
 					})
 				},
 				fail: (res) => {
@@ -327,7 +329,7 @@
 							duration: 3000,
 							success() {
 								uni.navigateTo({
-									url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value
+									url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
 								})
 							}
 						});
@@ -364,7 +366,7 @@
 					extraData: param,
 					success(res) { 
 						uni.navigateTo({
-							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value
+							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
 						})
 					},
 					fail(res) {

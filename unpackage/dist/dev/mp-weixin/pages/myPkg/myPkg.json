@@ -2,6 +2,7 @@
   "navigationBarTitleText": "",
   "usingComponents": {
     "top-nav-bar": "../../components/topNavBar/topNavBar",
-    "rice-tabs": "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs"
+    "rice-tabs": "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs",
+    "rice-tag": "../../uni_modules/rice-ui/components/rice-tag/rice-tag"
   }
 }

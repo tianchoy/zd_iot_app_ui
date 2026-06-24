@@ -134,12 +134,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const orderId = common_vendor.ref("");
+    const payChannelId = common_vendor.ref("");
     const toPay = (data = null) => {
       if (!data)
         return null;
       const res = data;
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:291", "添加订单成功:", res);
-      orderId.value = res.orderSn;
+      orderId.value = res.orderId;
+      payChannelId.value = res.payChannelId;
       if (res.payWxType == "wechat_pay") {
         common_vendor.index.requestPayment({
           provider: "wxpay",
@@ -156,7 +157,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               duration: 3e3
             });
             common_vendor.index.navigateTo({
-              url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value
+              url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
             });
           },
           fail: (res2) => {
@@ -185,7 +186,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 duration: 3e3,
                 success() {
                   common_vendor.index.navigateTo({
-                    url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value
+                    url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
                   });
                 }
               });
@@ -220,9 +221,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:376", "支付成功:", res2);
+              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:377", "支付成功:", res2);
               common_vendor.index.navigateTo({
-                url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value
+                url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
               });
             },
             fail(res2 = null) {
@@ -259,7 +260,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:422", "添加订单失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:423", "添加订单失败:", error);
           common_vendor.index.hideLoading();
           common_vendor.index.showToast({
             title: "添加订单失败",
@@ -269,7 +270,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const onPopupClose = () => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:432", "弹窗关闭");
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:433", "弹窗关闭");
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -278,12 +279,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const toMyPackage = () => {
       common_vendor.index.navigateTo({
-        url: "/pages/myPkg/myPkg"
+        url: "/pages/myPkg/myPkg?card_number=" + cardNumber.value
       });
     };
     const toOrderRecord = () => {
       common_vendor.index.navigateTo({
-        url: "/pages/myOrder/myOrder"
+        url: "/pages/orderRecord/orderRecord"
       });
     };
     const cardDetail = common_vendor.ref(null);
@@ -299,7 +300,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:468", "获取卡片详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:469", "获取卡片详情失败:", error);
           common_vendor.index.showToast({
             title: "获取卡片信息失败",
             icon: "none"
@@ -310,7 +311,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const cardNumber = common_vendor.ref("");
     const country = common_vendor.ref("");
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:479", "options:", options);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:480", "options:", options);
       const opt = options;
       const cardNumberValue = opt.cardNumber;
       const countryValue = opt.country;
@@ -319,7 +320,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         country.value = countryValue !== null && countryValue !== void 0 ? countryValue : "";
         getCardDetail(cardNumber.value, country.value);
       } else {
-        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:489", "未获取到卡片号码");
+        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:490", "未获取到卡片号码");
         common_vendor.index.showToast({
           title: "卡片号码不存在",
           icon: "none"

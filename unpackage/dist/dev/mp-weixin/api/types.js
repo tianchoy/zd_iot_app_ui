@@ -520,6 +520,59 @@ class QueryOrderDetailXcxData extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
+class QueryOrderSuccessParams extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          orderNo: { type: String, optional: false },
+          validityPeriod: { type: String, optional: false },
+          availableRegions: { type: common_vendor.UTS.UTSType.withGenerics(Array, [String]), optional: false },
+          pkgName: { type: String, optional: false },
+          pkgCategory: { type: String, optional: false },
+          pkgType: { type: String, optional: false },
+          msisdn: { type: String, optional: false },
+          iccid: { type: String, optional: false },
+          payTypeVos: { type: common_vendor.UTS.UTSType.withGenerics(Array, ["Any"]), optional: false },
+          currencyCode: { type: String, optional: false },
+          payAmount: { type: String, optional: false },
+          createTime: { type: String, optional: false },
+          payTime: { type: String, optional: false },
+          status: { type: String, optional: false },
+          payCurrencyAmount: { type: String, optional: false },
+          symbol: { type: String, optional: false },
+          signPosition: { type: String, optional: false },
+          payType: { type: String, optional: false }
+        };
+      },
+      name: "QueryOrderSuccessParams"
+    };
+  }
+  constructor(options, metadata = QueryOrderSuccessParams.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.orderNo = this.__props__.orderNo;
+    this.validityPeriod = this.__props__.validityPeriod;
+    this.availableRegions = this.__props__.availableRegions;
+    this.pkgName = this.__props__.pkgName;
+    this.pkgCategory = this.__props__.pkgCategory;
+    this.pkgType = this.__props__.pkgType;
+    this.msisdn = this.__props__.msisdn;
+    this.iccid = this.__props__.iccid;
+    this.payTypeVos = this.__props__.payTypeVos;
+    this.currencyCode = this.__props__.currencyCode;
+    this.payAmount = this.__props__.payAmount;
+    this.createTime = this.__props__.createTime;
+    this.payTime = this.__props__.payTime;
+    this.status = this.__props__.status;
+    this.payCurrencyAmount = this.__props__.payCurrencyAmount;
+    this.symbol = this.__props__.symbol;
+    this.signPosition = this.__props__.signPosition;
+    this.payType = this.__props__.payType;
+    delete this.__props__;
+  }
+}
 exports.BindCard = BindCard;
 exports.CardDetail = CardDetail;
 exports.CardListSumData = CardListSumData;

@@ -85,44 +85,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       new common_vendor.UTSJSONObject({ name: "卡片套餐" }),
       new common_vendor.UTSJSONObject({ name: "卡片订单" })
     ]);
-    const pkgTabs = common_vendor.ref([new common_vendor.UTSJSONObject({ name: "全部" }), new common_vendor.UTSJSONObject({ name: "在用套餐" }), new common_vendor.UTSJSONObject({ name: "待生效" }), new common_vendor.UTSJSONObject({ name: "已失效" })]);
+    const pkgTabs = common_vendor.ref([new common_vendor.UTSJSONObject({ name: "全部", value: "" }), new common_vendor.UTSJSONObject({ name: "在用套餐", value: "1" }), new common_vendor.UTSJSONObject({ name: "生效中", value: "0" }), new common_vendor.UTSJSONObject({ name: "已失效", value: "2" })]);
     const current = common_vendor.ref(0);
-    const filteredPackageList = common_vendor.computed(() => {
-      if (current.value == 0)
-        return pkgInfoList.value;
-      if (current.value == 1)
-        return pkgInfoList.value.filter((item) => {
-          return item.status === "active";
-        });
-      if (current.value == 2)
-        return pkgInfoList.value.filter((item) => {
-          return item.status === "pending";
-        });
-      if (current.value == 3)
-        return pkgInfoList.value.filter((item) => {
-          return item.status === "expired";
-        });
-      return pkgInfoList.value;
-    });
     const getPackageStatusText = (status) => {
       const statusMap = {
-        "active": "在用",
-        "pending": "待生效",
-        "expired": "已失效",
-        "using": "在用",
-        "waiting": "待生效",
-        "invalid": "已失效"
+        "0": "未生效",
+        "1": "生效中",
+        "2": "已失效"
       };
       return statusMap[status] || status || "未知";
     };
     const getPackageStatusType = (status) => {
       const typeMap = {
-        "active": "success",
-        "using": "success",
-        "pending": "primary",
-        "waiting": "primary",
-        "expired": "error",
-        "invalid": "error"
+        "0": "success",
+        "1": "primary",
+        "2": "error"
       };
       return typeMap[status] || "primary";
     };
@@ -151,7 +128,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handleClick = (e) => {
       if (e.index != null) {
         current.value = e.index;
-        getPkgInfoList(e.index.toString());
+        getPkgInfoList(e.value.toString());
       }
     };
     const changeTab = (e) => {
@@ -163,7 +140,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return getCardDetail();
         },
         1: () => {
-          return getPkgInfoList("0");
+          return getPkgInfoList();
         },
         2: () => {
           return getOrderList();
@@ -178,7 +155,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     const handleOrderDetail = (pkgId) => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:254", pkgId);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:239", pkgId);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${pkgId}`
       });
@@ -193,7 +170,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = navHeight > 0 ? navHeight : 44;
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:271", "获取导航栏信息失败", e);
+        common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:256", "获取导航栏信息失败", e);
       }
     };
     const handleRecharge = () => {
@@ -204,7 +181,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getCardDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.queryCardDetail(card_number.value, "", "1");
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:289", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:274", res);
         if (res.code == 200) {
           cardDetail.value = res.data;
         }
@@ -225,11 +202,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               orderList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:310", "查询订单列表失败:", resp.msg);
+            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:295", "查询订单列表失败:", resp.msg);
             orderList.value = [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:314", "查询订单列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:299", "查询订单列表异常:", error);
           orderList.value = [];
         }
       });
@@ -241,22 +218,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             rechargeNo: card_number.value,
             status: state
           }));
-          common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:326", "套餐列表返回:", res);
           if (res.code == 200) {
             if (res.rows && Array.isArray(res.rows)) {
               pkgInfoList.value = res.rows;
-              common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:330", "套餐列表数量:", pkgInfoList.value.length);
             } else if (res.data && Array.isArray(res.data)) {
               pkgInfoList.value = res.data;
             } else {
               pkgInfoList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:337", "查询套餐列表失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:320", "查询套餐列表失败:", res.msg);
             pkgInfoList.value = [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:341", "查询套餐列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:324", "查询套餐列表异常:", error);
           pkgInfoList.value = [];
         }
       });
@@ -268,7 +243,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_http.userBindCard(new api_types.BindCard({
           rechargeNo: card_number.value
         }));
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:352", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:335", res);
         if (res.code == 200) {
           common_vendor.index.showToast({
             title: "绑定成功",
@@ -294,7 +269,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               if (res.confirm) {
                 try {
                   const result = yield api_http.userUnBindCard(card_number.value);
-                  common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:376", result);
+                  common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:359", result);
                   if (result.code == 200) {
                     common_vendor.index.showToast({
                       title: "解绑成功",
@@ -311,7 +286,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     });
                   }
                 } catch (error) {
-                  common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:394", "解绑请求失败:", error);
+                  common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:377", "解绑请求失败:", error);
                   common_vendor.index.showToast({
                     title: "网络异常，请重试",
                     icon: "none"
@@ -437,29 +412,47 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: common_vendor.unref(current),
           class: "data-v-2bc48812"
         }),
-        K: common_vendor.unref(filteredPackageList).length === 0
-      }, common_vendor.unref(filteredPackageList).length === 0 ? {} : {}, {
-        L: common_vendor.f(common_vendor.unref(filteredPackageList), (item, index, i0) => {
+        K: common_vendor.unref(pkgInfoList).length === 0
+      }, common_vendor.unref(pkgInfoList).length === 0 ? {} : {}, {
+        L: common_vendor.f(common_vendor.unref(pkgInfoList), (item, index, i0) => {
           return common_vendor.e({
-            a: common_vendor.t(item.pkgName),
-            b: "2bc48812-5-" + i0,
-            c: common_vendor.p({
+            a: item.pkgName
+          }, item.pkgName ? {
+            b: common_vendor.t(item.pkgName)
+          } : {}, {
+            c: item.status
+          }, item.status ? {
+            d: "2bc48812-5-" + i0,
+            e: common_vendor.p({
               text: getPackageStatusText(item.status),
               round: true,
               ["plain-fill"]: true,
               size: "small",
               type: getPackageStatusType(item.status),
               class: "data-v-2bc48812"
-            }),
-            d: common_vendor.t(item.effectiveTime),
-            e: item.expirationTime
-          }, item.expirationTime ? {
-            f: common_vendor.t(item.expirationTime)
+            })
           } : {}, {
-            g: common_vendor.t(item.pkgFlow),
-            h: common_vendor.t(item.usedFlow),
-            i: common_vendor.t(item.unUsedFlow),
-            j: index
+            f: item.effectiveTime
+          }, item.effectiveTime ? {
+            g: common_vendor.t(item.effectiveTime)
+          } : {}, {
+            h: item.expirationTime
+          }, item.expirationTime ? {
+            i: common_vendor.t(item.expirationTime)
+          } : {}, {
+            j: item.pkgFlow
+          }, item.pkgFlow ? {
+            k: common_vendor.t(item.pkgFlow)
+          } : {}, {
+            l: item.usedFlow
+          }, item.usedFlow ? {
+            m: common_vendor.t(item.usedFlow)
+          } : {}, {
+            n: item.unUsedFlow
+          }, item.unUsedFlow ? {
+            o: common_vendor.t(item.unUsedFlow)
+          } : {}, {
+            p: index
           });
         })
       }) : {}, {
@@ -491,7 +484,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }) : {}, {
         P: common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded)
       }, common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded) ? {
-        Q: common_vendor.o(handleUnbind, "f3"),
+        Q: common_vendor.o(handleUnbind, "7e"),
         R: common_vendor.p({
           type: "error",
           ["plain-fill"]: true,
@@ -514,7 +507,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        U: common_vendor.o(handleBindCard, "27"),
+        U: common_vendor.o(handleBindCard, "5e"),
         V: common_vendor.p({
           height: "100rpx",
           bold: true,
@@ -524,7 +517,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        W: common_vendor.o(handleRecharge, "dc"),
+        W: common_vendor.o(handleRecharge, "9a"),
         X: common_vendor.p({
           height: "100rpx",
           type: "primary",

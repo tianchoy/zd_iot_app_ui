@@ -170,3 +170,24 @@ export type QueryOrderDetailXcxData = {
   usageInstructions: string;
   currentSeconds: number;
 }
+
+export type QueryOrderSuccessParams = {
+  orderNo: string;
+  validityPeriod: string; 
+  availableRegions: string[]; 
+  pkgName: string;
+  pkgCategory: string;
+  pkgType: string;
+  msisdn: string;
+  iccid: string;
+  payTypeVos: any[]; 
+  currencyCode: string;
+  payAmount: string; 
+  createTime: string; 
+  payTime: string; 
+  status: string;
+  payCurrencyAmount: string;
+  symbol: string;
+  signPosition: string;
+  payType: string;
+}

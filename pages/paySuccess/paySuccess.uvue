@@ -12,45 +12,47 @@
 		<!-- 卡片详情区域 -->
 		<view class="card-container">
 			<!-- 卡号 -->
-			<view class="info-row">
+			<view class="info-row" v-if="orderDetail.msisdn">
 				<text class="label">卡号</text>
-				<text class="value">1064916585160</text>
+				<text class="value">{{orderDetail.msisdn}}</text>
 			</view>
 			
 			<!-- ICCID -->
-			<view class="info-row">
+			<view class="info-row" v-if="orderDetail.iccid">
 				<text class="label">ICCID</text>
-				<text class="value">89860421123456789012</text>
+				<text class="value">{{orderDetail.iccid}}</text>
 			</view>
 			
 			<!-- 订单编号 -->
-			<view class="info-row">
+			<view class="info-row" v-if="orderDetail.orderNo">
 				<text class="label">订单编号</text>
-				<text class="value">0202604280001</text>
+				<text class="value">{{orderDetail.orderNo}}</text>
 			</view>
 			
 			<!-- 套餐名称 -->
-			<view class="info-row">
+			<view class="info-row" v-if="orderDetail.pkgName">
 				<text class="label">套餐名称</text>
-				<text class="value">车联网月包20G</text>
+				<text class="value">{{orderDetail.pkgName}}</text>
 			</view>
 			
 			<!-- 套餐类型 -->
-			<view class="info-row">
+			<view class="info-row" v-if="orderDetail.pkgType">
 				<text class="label">套餐类型</text>
-				<text class="value">套餐包</text>
+				<text class="value">{{orderDetail.pkgType}}</text>
 			</view>
 			
 			<!-- 支付方式 -->
-			<view class="info-row">
+			<!-- #ifndef MP-WEIXIN -->
+			<view class="info-row" v-if="orderDetail.payType">
 				<text class="label">支付方式</text>
-				<text class="value">微信小程序支付</text>
+				<text class="value">{{orderDetail.payType}}</text>
 			</view>
+			<!-- #endif -->
 			
 			<!-- 支付金额 (突出显示) -->
-			<view class="info-row">
+			<view class="info-row" v-if="orderDetail.payAmount">
 				<text class="label">支付金额</text>
-				<text class="value amount">￥90</text>
+				<text class="value amount">￥{{orderDetail.payAmount}}</text>
 			</view>
 		</view>
 		
@@ -63,7 +65,10 @@
 </template>
 
 <script setup lang="uts">
+	import {queryOrderSuccess} from '@/api/http'
 	const orderId = ref<string>('')
+	const payChannelId = ref<string>('')
+	const orderDetail = ref<any>({})
 	// 查看订单点击处理
 	const handleViewOrder = () => {
 		// 平台兼容处理
@@ -98,9 +103,19 @@
 		// #endif
 	}
 
+	const getOrderDetail = async () => {
+		const res = await queryOrderSuccess(orderId.value,payChannelId.value)
+		if(res.code == 200){
+			console.log('订单详情:',res)
+			orderDetail.value = res.data
+		}
+	}
+
 	onLoad((options)=>{
 		console.log('orderId:',options)	
 		orderId.value = options.orderId ?? ''
+		payChannelId.value = options.payChannelId ?? ''
+		getOrderDetail()
 	})
 </script>
 

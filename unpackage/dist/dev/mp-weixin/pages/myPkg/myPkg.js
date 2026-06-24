@@ -1,94 +1,91 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const api_types = require("../../api/types.js");
+const api_http = require("../../api/http.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
-  (_easycom_topNavBar_1 + _easycom_rice_tabs_1)();
+  const _easycom_rice_tag_1 = common_vendor.resolveComponent("rice-tag");
+  (_easycom_topNavBar_1 + _easycom_rice_tabs_1 + _easycom_rice_tag_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
 const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
+const _easycom_rice_tag = () => "../../uni_modules/rice-ui/components/rice-tag/rice-tag.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_rice_tabs)();
+  (_easycom_topNavBar + _easycom_rice_tabs + _easycom_rice_tag)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "myPkg",
   setup(__props) {
-    const pkgTabs = common_vendor.ref([{ name: "全部" }, { name: "在用套餐" }, { name: "待生效" }, { name: "已失效" }]);
+    const card_number = common_vendor.ref("");
+    const pkgTabs = common_vendor.ref([{ name: "全部", value: "" }, { name: "在用套餐", value: "1" }, { name: "待生效", value: "0" }, { name: "已失效", value: "2" }]);
     const current = common_vendor.ref(0);
-    const packageList = common_vendor.ref([
-      new common_vendor.UTSJSONObject({
-        name: "车联网月包20G",
-        status: "在用套餐",
-        effectiveTime: "2026-04-01",
-        totalTraffic: "20GB",
-        remainingTraffic: "8.66GB",
-        expireDate: "2026-04-30"
-      }),
-      new common_vendor.UTSJSONObject({
-        name: "车联网月包10G",
-        status: "待生效",
-        effectiveTime: "待生效",
-        totalTraffic: "10GB",
-        remainingTraffic: "10GB",
-        expireDate: "2026-05-30"
-      }),
-      new common_vendor.UTSJSONObject({
-        name: "工业设备月包5G",
-        status: "待生效",
-        effectiveTime: "待生效",
-        totalTraffic: "5GB",
-        remainingTraffic: "5GB",
-        expireDate: "2026-06-30"
-      }),
-      new common_vendor.UTSJSONObject({
-        name: "测试套餐1G",
-        status: "已失效",
-        effectiveTime: "2026-03-01",
-        totalTraffic: "1GB",
-        remainingTraffic: "0",
-        expireDate: "2026-03-31"
-      })
-    ]);
-    const getPackageText = (item = null, key) => {
-      const value = item[key];
-      return value == null ? "" : "" + value;
-    };
-    const filteredPackages = common_vendor.computed(() => {
-      const currentTab = pkgTabs.value[current.value];
-      const currentStatus = currentTab == null ? "全部" : currentTab.name;
-      if (currentStatus === "全部") {
-        return packageList.value;
-      }
-      return packageList.value.filter((item = null) => {
-        return getPackageText(item, "status") === currentStatus;
-      });
-    });
+    const pkgInfoList = common_vendor.ref([]);
     const handleClick = (e) => {
-      current.value = e.index;
+      common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:104", e.value);
+      if (e.index != null) {
+        current.value = e.index;
+        getPkgInfoList(e.value.toString());
+      }
+    };
+    const getPkgInfoList = (state) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const res = yield api_http.queryPkgInfoList(new api_types.PkgInfoListParams({
+            rechargeNo: card_number.value,
+            status: state
+          }));
+          if (res.code == 200) {
+            if (res.rows && Array.isArray(res.rows)) {
+              pkgInfoList.value = res.rows;
+            } else if (res.data && Array.isArray(res.data)) {
+              pkgInfoList.value = res.data;
+            } else {
+              pkgInfoList.value = [];
+            }
+          } else {
+            common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:127", "查询套餐列表失败:", res.msg);
+            pkgInfoList.value = [];
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/myPkg/myPkg.uvue:131", "查询套餐列表异常:", error);
+          pkgInfoList.value = [];
+        }
+      });
     };
     const handlePkgDetail = (item = null) => {
-      common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:145", item);
+      common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:138", item);
       common_vendor.index.navigateTo({
         url: "/pages/pkgDetail/pkgDetail?item=" + common_vendor.UTS.JSON.stringify(item)
       });
     };
-    const getStatusClass = (status) => {
-      switch (status) {
-        case "在用套餐":
-          return "status-active";
-        case "待生效":
-          return "status-pending";
-        case "已失效":
-          return "status-expired";
-        default:
-          return "";
-      }
+    const getPackageStatusText = (status) => {
+      const statusMap = {
+        "0": "未生效",
+        "1": "生效中",
+        "2": "已失效"
+      };
+      return statusMap[status] || status || "未知";
+    };
+    const getPackageStatusType = (status) => {
+      const typeMap = {
+        "0": "success",
+        "1": "primary",
+        "2": "error"
+      };
+      return typeMap[status] || "primary";
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
         delta: 1
       }));
     };
+    common_vendor.onLoad((options) => {
+      var _a;
+      const cardNumber = (_a = options.card_number) !== null && _a !== void 0 ? _a : "";
+      card_number.value = cardNumber;
+      getPkgInfoList();
+    });
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
@@ -101,11 +98,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-8137f92d"
         }),
-        c: common_vendor.o(handleClick, "62"),
-        d: common_vendor.o(($event) => {
+        c: common_vendor.t(card_number.value),
+        d: common_vendor.o(handleClick, "69"),
+        e: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "95"),
-        e: common_vendor.p({
+        }, "88"),
+        f: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: pkgTabs.value,
           ["line-width"]: 0,
@@ -118,25 +116,36 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: current.value,
           class: "data-v-8137f92d"
         }),
-        f: filteredPackages.value.length === 0
-      }, filteredPackages.value.length === 0 ? {} : {}, {
-        g: common_vendor.f(filteredPackages.value, (item, index, i0) => {
-          return {
-            a: common_vendor.t(getPackageText(item, "name")),
-            b: common_vendor.t(getPackageText(item, "status")),
-            c: common_vendor.n(getStatusClass(getPackageText(item, "status"))),
-            d: common_vendor.t(getPackageText(item, "effectiveTime")),
-            e: common_vendor.t(getPackageText(item, "totalTraffic")),
-            f: common_vendor.t(getPackageText(item, "remainingTraffic")),
-            g: common_vendor.t(getPackageText(item, "expireDate")),
-            h: index,
-            i: common_vendor.o(($event) => {
+        g: pkgInfoList.value.length == 0
+      }, pkgInfoList.value.length == 0 ? {} : {}, {
+        h: common_vendor.f(pkgInfoList.value, (item, index, i0) => {
+          return common_vendor.e({
+            a: common_vendor.t(item.pkgName),
+            b: item.status
+          }, item.status ? {
+            c: "8137f92d-2-" + i0,
+            d: common_vendor.p({
+              text: getPackageStatusText(item.status),
+              round: true,
+              ["plain-fill"]: true,
+              size: "small",
+              type: getPackageStatusType(item.status),
+              class: "data-v-8137f92d"
+            })
+          } : {}, {
+            e: common_vendor.t(item.effectiveTime),
+            f: common_vendor.t(item.expirationTime),
+            g: common_vendor.t(item.unUsedFlow),
+            h: common_vendor.t(item.usedFlow),
+            i: common_vendor.t(item.pkgFlow),
+            j: index,
+            k: common_vendor.o(($event) => {
               return handlePkgDetail(item);
             }, index)
-          };
+          });
         }),
-        h: `${_ctx.u_s_b_h}px`,
-        i: `${_ctx.u_s_a_i_b}px`
+        i: `${_ctx.u_s_b_h}px`,
+        j: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };
