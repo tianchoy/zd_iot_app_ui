@@ -54,7 +54,7 @@
 							</view>
 							<view class="pkg-desc">
 								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ item.pkgFlow }}</text>
-								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod || '无固定期限' }}天</text>
+								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod }}{{ item?.pkgType == '1' ? '天' : '个月' }}</text>
 							</view>
 						</view>
 						<view class="pkg-price">
@@ -85,7 +85,7 @@
 							</view>
 							<view class="pkg-desc">
 								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ item.pkgFlow }}</text>
-								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod || '无固定期限' }}天</text>
+								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod }}{{ item?.pkgType == '1' ? '天' : '个月' }}</text>
 							</view>
 						</view>
 						<view class="pkg-price">
@@ -116,6 +116,7 @@
 			:productName="currentPackage?.pkgName"
 			:traffic="currentPackage?.pkgFlow"
 			:validityPeriod="currentPackage?.validityPeriod"
+			:pkgType="currentPackage?.pkgType"
 		/>
 	</rice-popup>
 	<view class="bottom-box">
@@ -281,26 +282,11 @@
 				signType: res.signType,
 
 				success: (res) => {
+					console.log('支付成功',res)
 					uni.hideLoading()
-					uni.showToast({
-						title: "支付成功",
-						icon: 'success',
-						duration: 3000,
-					})
-					uni.navigateTo({
-						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
-					})
 				},
 				fail: (res) => {
 					uni.hideLoading()
-					uni.showToast({
-						title: "支付失败，请您重新支付",
-						icon: 'none',
-						duration: 3000
-					});
-					uni.navigateTo({
-						url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
-					})
 				},
 			})
 		}
@@ -313,28 +299,11 @@
 					paySign: res.paySign,
 					signType: res.signType,
 					success: function (res) {
+						console.log('支付成功',res)
 						uni.hideLoading()
-						uni.showToast({
-							title: "支付成功",
-							icon: 'success',
-							duration: 3000,
-							success() {
-								uni.navigateTo({
-									url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
-								})
-							}
-						});
 					},
 					fail: function (err) {
 						uni.hideLoading()
-						uni.showToast({
-							title: "支付失败，请您重新支付",
-							icon: 'none',
-							duration: 3000
-						});
-						uni.navigateTo({
-							url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
-						})
 					},
 				});
 			}else{
@@ -358,22 +327,12 @@
 					appId: config.api.auth.appID,
 					extraData: param,
 					success(res) { 
-						console.log('支付成功:', res);
-						uni.navigateTo({
-							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
-						})
+						console.log('支付成功0000:', res);
 					},
 					fail(res) {
+						console.log('支付失败:', res);
 						uni.hideLoading()
-						uni.showToast({
-							title: "支付取消，请您重新支付",
-							icon: 'none',
-							duration: 3000
-						});
-						uni.navigateTo({
-							url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
-						})
-					}
+					},
 				})
 			}
 		}
@@ -504,8 +463,8 @@
 						icon: 'success',
 						duration: 3000,
 						success() {
-							uni.navigateBack({
-								delta: 1
+							uni.navigateTo({
+								url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
 							})
 						}
 					});

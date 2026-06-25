@@ -82,8 +82,11 @@
 		// #endif
 		// #ifdef MP-WEIXIN
 		console.log('查看订单MP-WEIXIN');
-		uni.reLaunch({
-			url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}`
+		// uni.reLaunch({
+		// 	url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}`
+		// })
+		uni.navigateBack({
+			delta: 1
 		})
 		// #endif
 		// #ifdef H5
@@ -100,7 +103,7 @@
 		// #ifdef MP-WEIXIN
 		console.log('返回卡片详情MP-WEIXIN');
 		uni.reLaunch({
-			url: `/pages/cardDetail/cardDetail?cardNumber=${orderId.value}`
+			url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
 		})
 		// #endif
 		// #ifdef H5

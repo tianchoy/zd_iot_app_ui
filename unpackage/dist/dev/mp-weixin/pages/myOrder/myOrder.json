@@ -3,6 +3,7 @@
   "usingComponents": {
     "top-nav-bar": "../../components/topNavBar/topNavBar",
     "rice-button": "../../uni_modules/rice-ui/components/rice-button/rice-button",
-    "rice-tabs": "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs"
+    "rice-tabs": "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs",
+    "rice-tag": "../../uni_modules/rice-ui/components/rice-tag/rice-tag"
   }
 }

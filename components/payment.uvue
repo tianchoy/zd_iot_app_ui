@@ -21,7 +21,7 @@
 
 			<view class="info-item" v-if="props.validityPeriod">
 				<text class="item-label">有效期</text>
-				<text class="item-value">{{ props.validityPeriod }}</text>
+				<text class="item-value">{{ props.validityPeriod }}{{ props?.pkgType == '1' ? '天' : '个月' }}</text>
 			</view>
 
 			<!-- 支付方式区域：根据平台条件渲染 -->
@@ -78,6 +78,7 @@ const props = defineProps<{
 	validityPeriod?: string;
 	// 应付金额
 	amount: string | number;
+	pkgType?: string;
 }>();
 
 

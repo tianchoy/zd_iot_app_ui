@@ -38,7 +38,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     productName: {},
     traffic: {},
     validityPeriod: {},
-    amount: {}
+    amount: {},
+    pkgType: {}
   },
   emits: ["cancel", "confirm"],
   setup(__props, _a) {
@@ -77,22 +78,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         g: props.validityPeriod
       }, props.validityPeriod ? {
-        h: common_vendor.t(props.validityPeriod)
+        h: common_vendor.t(props.validityPeriod),
+        i: common_vendor.t((props == null ? void 0 : props.pkgType) == "1" ? "天" : "个月")
       } : {}, {
-        i: common_vendor.t(common_vendor.unref(formattedAmount)),
-        j: common_vendor.o(handleCancel, "28"),
-        k: common_vendor.p({
+        j: common_vendor.t(common_vendor.unref(formattedAmount)),
+        k: common_vendor.o(handleCancel, "10"),
+        l: common_vendor.p({
           class: "btn cancel-btn mr-24 data-v-0c94e3a5"
         }),
-        l: common_vendor.o(handleConfirm, "26"),
-        m: common_vendor.p({
+        m: common_vendor.o(handleConfirm, "26"),
+        n: common_vendor.p({
           textColor: "#fff",
           class: "btn confirm-btn ml-24 data-v-0c94e3a5"
         }),
-        n: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
-        o: `${_ctx.u_s_b_h}px`,
-        p: `${_ctx.u_s_a_i_b}px`,
-        q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
+        p: `${_ctx.u_s_b_h}px`,
+        q: `${_ctx.u_s_a_i_b}px`,
+        r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

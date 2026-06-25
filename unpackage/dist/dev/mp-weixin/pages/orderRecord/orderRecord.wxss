@@ -93,32 +93,6 @@ page .container .order-list .orders-container .order-card .order-header .package
   font-weight: 600;
   color: #1f2937;
 }
-page .container .order-list .orders-container .order-card .order-header .status-tag.data-v-a151b594 {
-  font-size: 24rpx;
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
-  background-color: #f3f4f6;
-  color: #6b7280;
-}
-page .container .order-list .orders-container .order-card .order-header .status-completed.data-v-a151b594 {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-page .container .order-list .orders-container .order-card .order-header .status-pending.data-v-a151b594 {
-  background-color: #fff3e0;
-  color: #ed6c02;
-}
-page .container .order-list .orders-container .order-card .order-header .status-refunded.data-v-a151b594 {
-  background-color: #fce4ec;
-  color: #c62828;
-}
-page .container .order-list .orders-container .order-card .order-header .status-cancelled.data-v-a151b594 {
-  background-color: #eeeeee;
-  color: #757575;
-}
-page .container .order-list .orders-container .order-card .order-details.data-v-a151b594 {
-  margin-bottom: 20rpx;
-}
 page .container .order-list .orders-container .order-card .order-details .detail-row.data-v-a151b594 {
   display: flex;
   flex-direction: row;
@@ -135,6 +109,9 @@ page .container .order-list .orders-container .order-card .order-details .detail
   flex: 1;
   font-size: 26rpx;
   color: #374151;
+}
+page .container .order-list .orders-container .order-card .order-details .last.data-v-a151b594 {
+  margin-bottom: 0;
 }
 page .container .order-list .orders-container .order-card .order-footer.data-v-a151b594 {
   display: flex;

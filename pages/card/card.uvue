@@ -32,10 +32,8 @@
 				>
 				</rice-tabs>
 			</view>
-			<scroll-view
+			<view
 				class="card-list"
-				scroll-y="true"
-				:style="{ height: scrollViewHeight + 'px' }"
 			>
 				<view class="card-item" v-for="(card, index) in cardList" :key="index" @click="handleDetail(card)">
 					<view class="item-head">
@@ -68,7 +66,7 @@
 						<rice-button type="primary" size="mini" :customStyle="{fontSize:'24rpx'}" @click="handleRecharge(card.rechargeNo)" >去充值</rice-button>
 					</view>
 				</view>
-			</scroll-view>
+			</view>
 		</view>
 
 		<!-- 空状态 -->
@@ -184,25 +182,6 @@ const onScanResult = async (data: UTSJSONObject) => {
 	}
 }
 
-const calculateScrollHeight = () => {
-	// #ifdef APP-ANDROID
-	nextTick(() => {
-		const systemInfo = uni.getSystemInfoSync()
-		const windowHeight = systemInfo.windowHeight
-		uni.createSelectorQuery().select('.container').boundingClientRect((rect) => {
-			if (rect) {
-				uni.createSelectorQuery().select('.card-box').boundingClientRect((searchRect) => {
-					if (searchRect) {
-						const paddingBottom = 40 / 750 * systemInfo.windowWidth
-						scrollViewHeight.value = windowHeight - searchRect.top - paddingBottom - 20
-					}
-				}).exec()
-			}
-		}).exec()
-	})
-	// #endif
-}
-
 const getCardList = async (state: string) => {
 	try {
 		const res = await queryCardList({
@@ -251,12 +230,11 @@ const platform = async () => {
 }
 
 onLoad(() => {
-	platform()
 	uni.$on('scanResult', onScanResult)
 })
 
-onMounted(() => {
-	calculateScrollHeight()
+onShow(() => {
+	platform()
 })
 
 onUnload(() => {

@@ -5,12 +5,14 @@ require("../../api/types.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
-  (_easycom_topNavBar_1 + _easycom_rice_tabs_1)();
+  const _easycom_rice_tag_1 = common_vendor.resolveComponent("rice-tag");
+  (_easycom_topNavBar_1 + _easycom_rice_tabs_1 + _easycom_rice_tag_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
 const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
+const _easycom_rice_tag = () => "../../uni_modules/rice-ui/components/rice-tag/rice-tag.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_rice_tabs)();
+  (_easycom_topNavBar + _easycom_rice_tabs + _easycom_rice_tag)();
 }
 class OrderStatusTab extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -72,20 +74,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const getStatusClass = (status) => {
       switch (status) {
-        case "已完成":
-          return "status-completed";
-        case "待支付":
-          return "status-pending";
-        case "已退款":
-          return "status-refunded";
-        case "已取消":
-          return "status-cancelled";
+        case "0":
+          return "success";
+        case "1":
+          return "primary";
+        case "2":
+          return "warning";
+        case "3":
+          return "error";
+        case "4":
+          return "error";
+        case "5":
+          return "error";
         default:
           return "";
       }
     };
     const handleOrderClick = (order) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:137", order);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:141", order);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
       });
@@ -109,7 +115,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:170", result);
+        common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:174", result);
         if (result.length > 0) {
           card_number.value = result;
           common_vendor.index.showToast({
@@ -121,7 +127,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePay = (order) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:184", "去支付:", order);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:188", "去支付:", order);
       common_vendor.index.showToast({
         title: `支付订单 ${order.id}`,
         icon: "none"
@@ -154,7 +160,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:235", "获取订单列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:239", "获取订单列表失败:", error);
           orderList.value = [];
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
@@ -212,8 +218,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           } : {}, {
             c: order.status
           }, order.status ? {
-            d: common_vendor.t(getStatusText(order.status)),
-            e: common_vendor.n(getStatusClass(getStatusText(order.status)))
+            d: "a151b594-2-" + i0,
+            e: common_vendor.p({
+              text: getStatusText(order.status),
+              round: true,
+              ["plain-fill"]: true,
+              size: "small",
+              type: getStatusClass(order.status),
+              class: "data-v-a151b594"
+            })
           } : {}, {
             f: order.orderNo
           }, order.orderNo ? {

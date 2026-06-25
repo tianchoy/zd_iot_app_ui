@@ -148,25 +148,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           signType: res.signType,
           success: (res2) => {
             common_vendor.index.hideLoading();
-            common_vendor.index.showToast({
-              title: "支付成功",
-              icon: "success",
-              duration: 3e3
-            });
-            common_vendor.index.navigateTo({
-              url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
-            });
           },
           fail: (res2) => {
             common_vendor.index.hideLoading();
-            common_vendor.index.showToast({
-              title: "支付失败，请您重新支付",
-              icon: "none",
-              duration: 3e3
-            });
-            common_vendor.index.navigateTo({
-              url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
-            });
           }
         });
       } else if (res.payWxType == "allin_pay") {
@@ -179,27 +163,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             signType: res.signType,
             success: function(res2) {
               common_vendor.index.hideLoading();
-              common_vendor.index.showToast({
-                title: "支付成功",
-                icon: "success",
-                duration: 3e3,
-                success() {
-                  common_vendor.index.navigateTo({
-                    url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
-                  });
-                }
-              });
             },
             fail: function(err) {
               common_vendor.index.hideLoading();
-              common_vendor.index.showToast({
-                title: "支付失败，请您重新支付",
-                icon: "none",
-                duration: 3e3
-              });
-              common_vendor.index.navigateTo({
-                url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
-              });
             }
           });
         } else {
@@ -222,20 +188,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {
-              common_vendor.index.navigateTo({
-                url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
-              });
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:350", "打开支付小程序成功:", res2);
             },
             fail(res2 = null) {
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:353", "打开支付小程序失败:", res2);
               common_vendor.index.hideLoading();
-              common_vendor.index.showToast({
-                title: "支付取消，请您重新支付",
-                icon: "none",
-                duration: 3e3
-              });
-              common_vendor.index.navigateTo({
-                url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
-              });
             }
           }));
         }
@@ -255,7 +212,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:417", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:375", "支付失败:", error);
           common_vendor.index.showToast({
             title: "支付失败，请稍后重试",
             icon: "none"
@@ -284,7 +241,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:449", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:407", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"
@@ -319,9 +276,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               icon: "success",
               duration: 3e3,
               success() {
-                common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
-                  delta: 1
-                }));
+                common_vendor.index.navigateTo({
+                  url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
+                });
               }
             });
           } else if (extraData.code == "cancel") {
@@ -477,6 +434,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           productName: common_vendor.unref(orderDetail).pkgName,
           traffic: common_vendor.unref(orderDetail).pkgFlow,
           validityPeriod: common_vendor.unref(orderDetail).validityPeriod,
+          pkgType: common_vendor.unref(orderDetail).pkgType,
           class: "data-v-6ec85291"
         }),
         ab: common_vendor.o(onPopupClose, "35"),

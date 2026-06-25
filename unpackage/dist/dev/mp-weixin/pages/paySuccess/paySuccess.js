@@ -17,28 +17,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const orderDetail = common_vendor.ref(new common_vendor.UTSJSONObject({}));
     const handleViewOrder = () => {
       common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:84", "查看订单MP-WEIXIN");
-      common_vendor.index.reLaunch({
-        url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}`
-      });
+      common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
+        delta: 1
+      }));
     };
     const handleBackCard = () => {
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:101", "返回卡片详情MP-WEIXIN");
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:104", "返回卡片详情MP-WEIXIN");
       common_vendor.index.reLaunch({
-        url: `/pages/cardDetail/cardDetail?cardNumber=${orderId.value}`
+        url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
       });
     };
     const getOrderDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.queryOrderSuccess(orderId.value, payChannelId.value);
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:114", "订单详情:", res);
+          common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:117", "订单详情:", res);
           orderDetail.value = res.data;
         }
       });
     };
     common_vendor.onLoad((options) => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:120", "orderId:", options);
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:123", "orderId:", options);
       orderId.value = (_a = options.orderId) !== null && _a !== void 0 ? _a : "";
       payChannelId.value = (_b = options.payChannelId) !== null && _b !== void 0 ? _b : "";
       getOrderDetail();

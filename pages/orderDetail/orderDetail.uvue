@@ -138,6 +138,7 @@
 			:productName="orderDetail.pkgName"
 			:traffic="orderDetail.pkgFlow"
 			:validityPeriod="orderDetail.validityPeriod"
+			:pkgType="orderDetail.pkgType"
 		/>
 	</rice-popup>
 </template>
@@ -304,25 +305,9 @@
 
 				success: (res) => {
 					uni.hideLoading()
-					uni.showToast({
-						title: "支付成功",
-						icon: 'success',
-						duration: 3000,
-					})
-					uni.navigateTo({
-						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
-					})
 				},
 				fail: (res) => {
 					uni.hideLoading()
-					uni.showToast({
-						title: "支付失败，请您重新支付",
-						icon: 'none',
-						duration: 3000
-					});
-					uni.navigateTo({
-						url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
-					})
 				},
 			})
 		}
@@ -336,27 +321,9 @@
 					signType: res.signType,
 					success: function (res) {
 						uni.hideLoading()
-						uni.showToast({
-							title: "支付成功",
-							icon: 'success',
-							duration: 3000,
-							success() {
-								uni.navigateTo({
-									url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
-								})
-							}
-						});
 					},
 					fail: function (err) {
 						uni.hideLoading()
-						uni.showToast({
-							title: "支付失败，请您重新支付",
-							icon: 'none',
-							duration: 3000
-						});
-						uni.navigateTo({
-						url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
-					})
 					},
 				});
 			}else{
@@ -380,21 +347,12 @@
 					appId: config.api.auth.appID,
 					extraData: param,
 					success(res) { 
-						uni.navigateTo({
-							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
-						})
+						console.log('打开支付小程序成功:', res)
 					},
 					fail(res) {
+						console.log('打开支付小程序失败:', res);
 						uni.hideLoading()
-						uni.showToast({
-							title: "支付取消，请您重新支付",
-							icon: 'none',
-							duration: 3000
-						});
-						uni.navigateTo({
-							url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
-						})
-					}
+					},
 				})
 			}
 		}
@@ -485,8 +443,8 @@
 						icon: 'success',
 						duration: 3000,
 						success() {
-							uni.navigateBack({
-								delta: 1
+							uni.navigateTo({
+								url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
 							})
 						}
 					});

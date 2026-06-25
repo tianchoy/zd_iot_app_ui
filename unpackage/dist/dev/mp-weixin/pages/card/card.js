@@ -46,7 +46,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const card_number = common_vendor.ref("gn20260603164757");
     const queryKeyword = common_vendor.ref("");
     const current = common_vendor.ref(0);
-    const scrollViewHeight = common_vendor.ref(0);
+    common_vendor.ref(0);
     const cardList = common_vendor.ref([]);
     const cardCounts = common_vendor.ref([0, 0, 0]);
     const tabs = common_vendor.computed(() => {
@@ -175,10 +175,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad(() => {
-      platform();
       common_vendor.index.$on("scanResult", onScanResult);
     });
-    common_vendor.onMounted(() => {
+    common_vendor.onShow(() => {
+      platform();
     });
     common_vendor.onUnload(() => {
       common_vendor.index.$off("scanResult", onScanResult);
@@ -292,14 +292,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           class: "data-v-a89086b7"
         }),
-        n: scrollViewHeight.value + "px",
-        o: cardList.value.length === 0
+        n: cardList.value.length === 0
       }, cardList.value.length === 0 ? {} : {}, {
-        p: common_vendor.p({
+        o: common_vendor.p({
           class: "data-v-a89086b7"
         }),
-        q: `${_ctx.u_s_b_h}px`,
-        r: `${_ctx.u_s_a_i_b}px`
+        p: `${_ctx.u_s_b_h}px`,
+        q: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

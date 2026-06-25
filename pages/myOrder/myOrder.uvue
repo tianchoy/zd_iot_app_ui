@@ -39,25 +39,25 @@
 				>
 					<!-- 订单头部：套餐名称和状态 -->
 					<view class="order-header">
-						<text class="package-name">{{ order.pkgName || '套餐名称' }}</text>
-						<text class="status-tag" :class="getStatusClass(getStatusText(order.status))">{{ getStatusText(order.status) }}</text>
+						<text class="package-name" v-if="order.pkgName">{{ order.pkgName || '套餐名称' }}</text>
+						<rice-tag v-if="order.status" :text="getStatusText(order.status) " :round="true" plain-fill size="small" :type="getStatusClass(order.status)"></rice-tag>
 					</view>
 					
 					<!-- 订单详情 -->
 					<view class="order-details">
-						<view class="detail-row">
+						<view class="detail-row" v-if="order.orderNo">
 							<text class="detail-label">订单号</text>
 							<text class="detail-value">{{ order.orderNo || '-' }}</text>
 						</view>
-						<view class="detail-row">
+						<view class="detail-row" v-if="order.cardNo">
 							<text class="detail-label">卡号</text>
 							<text class="detail-value">{{ order.cardNo || '-' }}</text>
 						</view>
-						<view class="detail-row">
-							<text class="detail-label">ICCID</text>
-							<text class="detail-value">{{ order.iccid || '-' }}</text>
+						<view class="detail-row" v-if="order.id">
+							<text class="detail-label">订单Id</text>
+							<text class="detail-value">{{ order.id || '-' }}</text>
 						</view>
-						<view class="detail-row">
+						<view class="detail-row last">
 							<text class="detail-value">{{ order.createTime || '-' }}</text>
 							<view class="order-footer">
 								<text class="price">¥{{ order.payCurrencyAmount || '0.00' }}</text>
@@ -129,14 +129,18 @@
 	// 获取状态样式类
 	const getStatusClass = (status: string): string => {
 		switch (status) {
-			case '已完成':
-				return 'status-completed'
-			case '待支付':
-				return 'status-pending'
-			case '已退款':
-				return 'status-refunded'
-			case '已取消':
-				return 'status-cancelled'
+			case '0':
+				return 'success'
+			case '1':
+				return 'primary'
+			case '2':
+				return 'warning'
+			case '3':
+				return 'error'
+			case '4':
+				return 'error'
+			case '5':
+				return 'error'
 			default:
 				return ''
 		}
@@ -341,38 +345,9 @@
 							font-weight: 600;
 							color: #1f2937;
 						}
-						
-						.status-tag {
-							font-size: 24rpx;
-							padding: 6rpx 16rpx;
-							border-radius: 20rpx;
-							background-color: #f3f4f6;
-							color: #6b7280;
-						}
-						
-						.status-completed {
-							background-color: #e8f5e9;
-							color: #2e7d32;
-						}
-						
-						.status-pending {
-							background-color: #fff3e0;
-							color: #ed6c02;
-						}
-						
-						.status-refunded {
-							background-color: #fce4ec;
-							color: #c62828;
-						}
-						
-						.status-cancelled {
-							background-color: #eeeeee;
-							color: #757575;
-						}
 					}
 					
 					.order-details {
-						margin-bottom: 20rpx;
 						
 						.detail-row {
 							display: flex;
@@ -392,6 +367,9 @@
 								font-size: 26rpx;
 								color: #374151;
 							}
+						}
+						.last{
+							margin-bottom: 0;
 						}
 					}
 					
