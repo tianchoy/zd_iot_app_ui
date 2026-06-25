@@ -254,8 +254,8 @@
 			})
 		}
 	}
-	
-	onLoad(() => {
+
+	onShow(() => {
 		getOrderList('')
 	})
 	

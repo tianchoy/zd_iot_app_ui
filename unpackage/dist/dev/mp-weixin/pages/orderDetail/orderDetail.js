@@ -26,6 +26,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentPrice = common_vendor.ref(0);
     const orderId = common_vendor.ref("");
     const payChannelId = common_vendor.ref("");
+    const isFromPaySuccess = common_vendor.ref(false);
+    const isInPaymentProcess = common_vendor.ref(false);
     const orderDetail = common_vendor.ref(new common_vendor.UTSJSONObject({
       orderNo: "",
       rechargeNo: "",
@@ -138,6 +140,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const res = data;
       orderId.value = res.orderId;
       payChannelId.value = res.payChannelId;
+      isInPaymentProcess.value = true;
       if (res.payWxType == "wechat_pay") {
         common_vendor.index.requestPayment({
           provider: "wxpay",
@@ -151,6 +154,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           fail: (res2) => {
             common_vendor.index.hideLoading();
+            isInPaymentProcess.value = false;
           }
         });
       } else if (res.payWxType == "allin_pay") {
@@ -166,6 +170,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             },
             fail: function(err) {
               common_vendor.index.hideLoading();
+              isInPaymentProcess.value = false;
             }
           });
         } else {
@@ -188,11 +193,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:350", "打开支付小程序成功:", res2);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:361", "打开支付小程序成功:", res2);
             },
             fail(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:353", "打开支付小程序失败:", res2);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:364", "打开支付小程序失败:", res2);
               common_vendor.index.hideLoading();
+              isInPaymentProcess.value = false;
             }
           }));
         }
@@ -212,7 +218,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:375", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:388", "支付失败:", error);
           common_vendor.index.showToast({
             title: "支付失败，请稍后重试",
             icon: "none"
@@ -241,7 +247,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:407", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:420", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"
@@ -253,10 +259,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const orderNo = options === null || options === void 0 ? null : options.orderNo;
       if (orderNo != null) {
         orderId.value = orderNo;
+        if ((options === null || options === void 0 ? null : options.from) === "paySuccess") {
+          isFromPaySuccess.value = true;
+        }
         getOrderDetail();
       }
     });
     common_vendor.onShow(() => {
+      if (isFromPaySuccess.value) {
+        isFromPaySuccess.value = false;
+        return null;
+      }
+      if (!isInPaymentProcess.value) {
+        return null;
+      }
       let options = common_vendor.index.getEnterOptionsSync();
       if (options.scene == "1038" && options.referrerInfo.appId == common_config.config.api.auth.appID) {
         let extraData = options.referrerInfo.extraData;
@@ -267,6 +283,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             icon: "none",
             duration: 3e3
           });
+          isInPaymentProcess.value = false;
           return null;
         } else {
           if (extraData.code == "success") {
@@ -276,7 +293,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               icon: "success",
               duration: 3e3,
               success() {
-                common_vendor.index.navigateTo({
+                isInPaymentProcess.value = false;
+                common_vendor.index.redirectTo({
                   url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
                 });
               }
@@ -288,6 +306,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               icon: "none",
               duration: 3e3
             });
+            isInPaymentProcess.value = false;
             return null;
           } else {
             common_vendor.index.hideLoading();
@@ -296,6 +315,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               icon: "none",
               duration: 3e3
             });
+            isInPaymentProcess.value = false;
             return null;
           }
         }

@@ -74,40 +74,43 @@
 	const orderId = ref<string>('')
 	const payChannelId = ref<string>('')
 	const orderDetail = ref<any>({})
+	
 	// 查看订单点击处理
 	const handleViewOrder = () => {
-		// 平台兼容处理
-		// #ifdef APP
-		console.log('查看订单APP');
-		// #endif
+		// 使用 redirectTo 替换当前页面，避免页面栈累积和循环跳转
 		// #ifdef MP-WEIXIN
-		console.log('查看订单MP-WEIXIN');
-		// uni.reLaunch({
-		// 	url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}`
-		// })
-		uni.navigateBack({
-			delta: 1
+		uni.redirectTo({
+			url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}&from=paySuccess`
+		})
+		// #endif
+		// #ifdef APP
+		uni.redirectTo({
+			url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}&from=paySuccess`
 		})
 		// #endif
 		// #ifdef H5
-		console.log('查看订单H5');
+		uni.redirectTo({
+			url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}&from=paySuccess`
+		})
 		// #endif
 	}
 	
 	// 返回卡片详情点击处理
 	const handleBackCard = () => {
-		// 平台兼容处理
-		// #ifdef APP
-		console.log('返回卡片详情APP');
-		// #endif
 		// #ifdef MP-WEIXIN
-		console.log('返回卡片详情MP-WEIXIN');
+		uni.reLaunch({
+			url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
+		})
+		// #endif
+		// #ifdef APP
 		uni.reLaunch({
 			url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
 		})
 		// #endif
 		// #ifdef H5
-		console.log('返回卡片详情H5');
+		uni.reLaunch({
+			url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
+		})
 		// #endif
 	}
 

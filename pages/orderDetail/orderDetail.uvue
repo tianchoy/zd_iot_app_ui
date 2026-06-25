@@ -152,6 +152,10 @@
 	const currentPrice = ref(0);
 	const orderId = ref('');
 	const payChannelId = ref('');
+	// 添加标记：是否从支付成功页面返回
+	const isFromPaySuccess = ref(false);
+	// 添加标记：是否正在支付流程中
+	const isInPaymentProcess = ref(false);
 	const orderDetail = ref<any>({
 		orderNo: '',
 		rechargeNo: '',
@@ -176,7 +180,7 @@
 		currentSeconds: 0
 	});
 
-		// 获取订单状态对应的文本
+	// 获取订单状态对应的文本
 	const getOrderStatusText = (status: string): string => {
 		const statusMap: Record<string, string> = {
 			'0': '待支付',
@@ -294,6 +298,9 @@
 		const res = data as any
 		orderId.value = res.orderId
 		payChannelId.value = res.payChannelId
+		// 设置正在支付流程中
+		isInPaymentProcess.value = true
+		
 		if(res.payWxType == 'wechat_pay'){
 			uni.requestPayment({
 				provider: 'wxpay',
@@ -308,6 +315,8 @@
 				},
 				fail: (res) => {
 					uni.hideLoading()
+					// 支付失败，重置标记
+					isInPaymentProcess.value = false
 				},
 			})
 		}
@@ -324,6 +333,8 @@
 					},
 					fail: function (err) {
 						uni.hideLoading()
+						// 支付失败，重置标记
+						isInPaymentProcess.value = false
 					},
 				});
 			}else{
@@ -352,6 +363,8 @@
 					fail(res) {
 						console.log('打开支付小程序失败:', res);
 						uni.hideLoading()
+						// 支付失败，重置标记
+						isInPaymentProcess.value = false
 					},
 				})
 			}
@@ -416,11 +429,27 @@
 		const orderNo = options?.orderNo as string | null
 		if (orderNo != null) {
 			orderId.value = orderNo
+			// 检查是否从支付成功页面跳转过来
+			if (options?.from === 'paySuccess') {
+				isFromPaySuccess.value = true
+			}
 			getOrderDetail()
 		}
 	})
 
 	onShow(() => {
+		// 如果是从支付成功页面返回的，跳过支付回调处理
+		if (isFromPaySuccess.value) {
+			// 重置标记，避免下次进入时再次跳过
+			isFromPaySuccess.value = false
+			return
+		}
+		
+		// 只有在支付流程中才处理支付回调
+		if (!isInPaymentProcess.value) {
+			return
+		}
+		
 		let options = uni.getEnterOptionsSync();
 		if (options.scene == '1038' &&
 			options.referrerInfo.appId == config.api.auth.appID) {
@@ -434,6 +463,8 @@
 					icon: 'none',
 					duration: 3000
 				});
+				// 重置支付流程标记
+				isInPaymentProcess.value = false
 				return
 			} else {
 				if (extraData.code == 'success') {
@@ -443,7 +474,10 @@
 						icon: 'success',
 						duration: 3000,
 						success() {
-							uni.navigateTo({
+							// 重置支付流程标记
+							isInPaymentProcess.value = false
+							// 使用 redirectTo 替换当前页面，避免页面栈累积
+							uni.redirectTo({
 								url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
 							})
 						}
@@ -456,6 +490,8 @@
 						icon: 'none',
 						duration: 3000
 					});
+					// 重置支付流程标记
+					isInPaymentProcess.value = false
 					return
 				} else {
 					uni.hideLoading()
@@ -464,6 +500,8 @@
 						icon: 'none',
 						duration: 3000
 					});
+					// 重置支付流程标记
+					isInPaymentProcess.value = false
 					return
 				}
 			}
