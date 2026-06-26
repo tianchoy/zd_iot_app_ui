@@ -8,16 +8,18 @@ if (!Array) {
   const _easycom_rice_input_1 = common_vendor.resolveComponent("rice-input");
   const _easycom_rice_button_1 = common_vendor.resolveComponent("rice-button");
   const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
+  const _easycom_rice_divider_1 = common_vendor.resolveComponent("rice-divider");
   const _easycom_customService_1 = common_vendor.resolveComponent("customService");
-  (_easycom_topNavBar_1 + _easycom_rice_input_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1 + _easycom_customService_1)();
+  (_easycom_topNavBar_1 + _easycom_rice_input_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1 + _easycom_rice_divider_1 + _easycom_customService_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
 const _easycom_rice_input = () => "../../uni_modules/rice-ui/components/rice-input/rice-input.js";
 const _easycom_rice_button = () => "../../uni_modules/rice-ui/components/rice-button/rice-button.js";
 const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
+const _easycom_rice_divider = () => "../../uni_modules/rice-ui/components/rice-divider/rice-divider.js";
 const _easycom_customService = () => "../../components/customService/customService.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_rice_input + _easycom_rice_button + _easycom_rice_tabs + _easycom_customService)();
+  (_easycom_topNavBar + _easycom_rice_input + _easycom_rice_button + _easycom_rice_tabs + _easycom_rice_divider + _easycom_customService)();
 }
 class TabItem extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -77,8 +79,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const getCycleText = (card) => {
       var _a, _b;
-      const used = (_a = card.usedPeriod) !== null && _a !== void 0 ? _a : 0;
-      const total = (_b = card.totalPeriod) !== null && _b !== void 0 ? _b : 0;
+      const used = (_a = card.usedPeriod) !== null && _a !== void 0 ? _a : "-";
+      const total = (_b = card.totalPeriod) !== null && _b !== void 0 ? _b : "-";
       return `${used} / ${total}`;
     };
     const handleClick = (e) => {
@@ -215,10 +217,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "100%",
           class: "data-v-a89086b7"
         }),
-        i: common_vendor.o(handleClick, "43"),
+        i: common_vendor.o(handleClick, "86"),
         j: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "39"),
+        }, "6b"),
         k: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
@@ -252,29 +254,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, card.usedFlow || card.totalFlow ? {
             i: common_vendor.t(getFlowText(card))
           } : {}, {
-            j: card.effectiveTime
-          }, card.effectiveTime ? {
-            k: common_vendor.t(card.effectiveTime || "-")
-          } : {}, {
-            l: card.expirationTime
-          }, card.expirationTime ? {
-            m: common_vendor.t(card.expirationTime || "-")
-          } : {}, {
-            n: card.usedPeriod || card.totalPeriod
-          }, card.usedPeriod || card.totalPeriod ? {
-            o: common_vendor.t(getCycleText(card))
-          } : {}, {
-            p: common_vendor.o(($event) => {
+            j: "a89086b7-5-" + i0,
+            k: common_vendor.t(card.effectiveTime || "-"),
+            l: common_vendor.t(card.expirationTime || "-"),
+            m: common_vendor.t(getCycleText(card)),
+            n: common_vendor.o(($event) => {
               return handleRecharge(card.rechargeNo);
             }, index),
-            q: "a89086b7-5-" + i0,
-            r: index,
-            s: common_vendor.o(($event) => {
+            o: "a89086b7-6-" + i0,
+            p: index,
+            q: common_vendor.o(($event) => {
               return handleDetail(card);
             }, index)
           });
         }),
         m: common_vendor.p({
+          dashed: true,
+          customStyle: {
+            margin: "0"
+          },
+          class: "data-v-a89086b7"
+        }),
+        n: common_vendor.p({
           type: "primary",
           size: "mini",
           customStyle: {
@@ -282,13 +283,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           class: "data-v-a89086b7"
         }),
-        n: cardList.value.length === 0
+        o: cardList.value.length === 0
       }, cardList.value.length === 0 ? {} : {}, {
-        o: common_vendor.p({
+        p: common_vendor.p({
           class: "data-v-a89086b7"
         }),
-        p: `${_ctx.u_s_b_h}px`,
-        q: `${_ctx.u_s_a_i_b}px`
+        q: `${_ctx.u_s_b_h}px`,
+        r: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

@@ -5,6 +5,7 @@
     "rice-input": "../../uni_modules/rice-ui/components/rice-input/rice-input",
     "rice-button": "../../uni_modules/rice-ui/components/rice-button/rice-button",
     "rice-tabs": "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs",
+    "rice-divider": "../../uni_modules/rice-ui/components/rice-divider/rice-divider",
     "custom-service": "../../components/customService/customService"
   }
 }

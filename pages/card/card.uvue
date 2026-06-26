@@ -18,7 +18,7 @@
 
 		</view>
 
-		<view class="card-box">
+		<view class="card-box card-list-box">
 			<view class="card-tabs">
 				<rice-tabs
 				  v-model="current"
@@ -32,9 +32,7 @@
 				>
 				</rice-tabs>
 			</view>
-			<view
-				class="card-list"
-			>
+			<view class="card-list">
 				<view class="card-item" v-for="(card, index) in cardList" :key="index" @click="handleDetail(card)">
 					<view class="item-head">
 						<view class="item-head-label">
@@ -47,18 +45,19 @@
 						<text class="package-label">流量：</text>
 						<text class="package-value">{{ getFlowText(card) }}</text>
 					</view>
+					<rice-divider dashed :customStyle="{margin: '0'}"/>
 					<view class="card-metrics">
-						<view class="metric-box mr-24" v-if="card.effectiveTime">
+						<view class="metric-box mr-24">
 							<view class="metric-label">生效时间</view>
 							<view class="metric-value">{{ card.effectiveTime || '-' }}</view>
 						</view>
-						<view class="metric-box" v-if="card.expirationTime">
+						<view class="metric-box">
 							<view class="metric-label">到期时间</view>
 							<view class="metric-value">{{ card.expirationTime || '-' }}</view>
 						</view>
 					</view>
 					<view class="card-bottom">
-						<view class="card-cycle-text" v-if="card.usedPeriod || card.totalPeriod">
+						<view class="card-cycle-text">
 							<text class="cycle-label">当前周期：</text>
 							<text class="cycle-value">{{ getCycleText(card) }}</text>
 						</view>
@@ -124,8 +123,8 @@ const getFlowText = (card: RechargeData): string => {
 }
 
 const getCycleText = (card: RechargeData): string => {
-	const used = card.usedPeriod ?? 0
-	const total = card.totalPeriod ?? 0
+	const used = card.usedPeriod ?? '-'
+	const total = card.totalPeriod ?? '-'
 	return `${used} / ${total}`
 }
 
@@ -259,7 +258,8 @@ onUnload(() => {
 			padding: 24rpx;
 
 			.card-tabs{
-				margin-bottom: 30rpx;
+				margin:24rpx;
+				margin-bottom: 0;
 			}
 			
 			.search-value{
@@ -286,7 +286,7 @@ onUnload(() => {
 				display: flex;
 				flex-direction: column;
 				border-bottom: 1px solid #e7edf5;
-				padding-bottom: 30rpx;
+				padding: 24rpx 24rpx 30rpx 24rpx;
 				margin-bottom: 30rpx;
 				
 				.item-head{
@@ -294,6 +294,7 @@ onUnload(() => {
 					flex-direction: row;
 					align-items: flex-start;
 					justify-content: space-between;
+					margin-bottom: 18rpx;
 					
 					.card-item-title{
 						font-size: 32rpx;
@@ -412,9 +413,11 @@ onUnload(() => {
 			.card-item:last-child{
 				border-bottom: none;
 				margin-bottom: 0;
-				padding-bottom: 0;
 			}
 
+		}
+		.card-list-box{
+			padding:0;
 		}
 		
 		.card-list {
