@@ -27,7 +27,7 @@
 							<view class="base-info-box">
 								<view class="base-info">
 									<view class="info-item" v-if="cardDetail.rechargeNo"><text class="info-label">充值号</text><text class="info-value">{{cardDetail.rechargeNo}}</text></view>
-									<view class="info-item" v-if="cardDetail.statusStr"><text class="info-label">状态</text><rice-tag type="success" plain-fill :text="cardDetail.statusStr" /></view>
+									<view class="info-item" v-if="cardDetail.statusStr"><text class="info-label">状态</text><rice-tag type="success" plain-fill :text="cardDetail.statusStr" size="small"/></view>
 									<view class="info-item" v-if="cardDetail.pkgName"><text class="info-label">套餐名称</text><text class="info-value">{{cardDetail.pkgName}}</text></view>
 									<view class="info-item" v-if="cardDetail.effectiveTime"><text class="info-label">生效时间</text><text class="info-value">{{cardDetail.effectiveTime}}</text></view>
 									<view class="info-item" v-if="cardDetail.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail.expirationTime}}</text></view>

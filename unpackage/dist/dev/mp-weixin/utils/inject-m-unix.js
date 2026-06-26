@@ -22,6 +22,4 @@ const mUnixConfig = new common_vendor.UTSJSONObject({
   mUi: null
 });
 api_ProjectConfig.injectMUnixHostProjectConfig(mUnixConfig);
-const injectedConfig = api_ProjectConfig.getHostProjectConfig();
-common_vendor.index.__f__("log", "at utils/inject-m-unix.uts:30", "配置注入成功:", injectedConfig.baseUrl);
 //# sourceMappingURL=../../.sourcemap/mp-weixin/utils/inject-m-unix.js.map

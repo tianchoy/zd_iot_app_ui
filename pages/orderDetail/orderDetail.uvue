@@ -44,11 +44,11 @@
 				</view>
 				<view class="info-row" v-if="orderDetail.orderCreateTime">
 					<text class="info-label">下单时间</text>
-					<text class="info-value">{{ formatDateTime(orderDetail.orderCreateTime) }}</text>
+					<text class="info-value">{{ orderDetail.orderCreateTime }}</text>
 				</view>
 				<view class="info-row" v-if="orderDetail.payTime">
 					<text class="info-label">支付时间</text>
-					<text class="info-value">{{ formatDateTime(orderDetail.payTime)}}</text>
+					<text class="info-value">{{ orderDetail.payTime}}</text>
 				</view>
 				<view v-if="orderDetail.payFailReason" class="info-row">
 					<text class="info-label">支付失败原因</text>
@@ -56,7 +56,7 @@
 				</view>
 				<view v-if="orderDetail.cancelTime" class="info-row">
 					<text class="info-label">取消时间</text>
-					<text class="info-value">{{ formatDateTime(orderDetail.cancelTime) }}</text>
+					<text class="info-value">{{ orderDetail.cancelTime }}</text>
 				</view>
 				<rice-divider></rice-divider>
 				<view class="info-row" v-if="orderDetail.pkgCategory">
@@ -65,7 +65,7 @@
 				</view>
 				<view class="info-row" v-if="orderDetail.pkgFlow">
 					<text class="info-label">套餐流量</text>
-					<text class="info-value">{{ getPkgFlowText() }}</text>
+					<text class="info-value">{{ orderDetail.pkgFlow }} GB</text>
 				</view>
 				<view class="info-row" v-if="orderDetail.validityPeriod">
 					<text class="info-label">有效期</text>
@@ -73,17 +73,17 @@
 				</view>
 				<view class="info-row" v-if="orderDetail.startDate">
 					<text class="info-label">生效时间</text>
-					<text class="info-value">{{ formatDateTime(orderDetail.startDate) }}</text>
+					<text class="info-value">{{ orderDetail.startDate }}</text>
 				</view>
 				<view class="info-row" v-if="orderDetail.endDate">
 					<text class="info-label">失效时间</text>
-					<text class="info-value">{{ formatDateTime(orderDetail.endDate)}}</text>
+					<text class="info-value">{{ orderDetail.endDate}}</text>
 				</view>
 				<rice-divider v-if="orderDetail.refunds && orderDetail.refunds.length > 0" dashed :customStyle="{margin: '0'}"></rice-divider>
 				<view class="info-refunds" v-if="orderDetail.refunds && orderDetail.refunds.length > 0" v-for="(item, index) in orderDetail.refunds" :key="index">
 					<view class="times">
 						<text class="info-label">退款时间</text>
-						<text class="info-value">{{ formatDateTime(item.refundTime)}}</text>
+						<text class="info-value">{{ item.refundTime}}</text>
 					</view>
 					<view class="money">
 						<text class="info-label">退款金额</text>
@@ -197,25 +197,14 @@
 		const category = orderDetail.value.pkgCategory;
 		switch (category) {
 			case '1':
-				return '套餐包'
+				return '日包'
 			case '2':
-				return '加油包'
+				return '非自然月包'
+			case '3':
+				return '自然月包'
 			default:
 				return orderDetail.value.pkgCategory || '-'
 		}
-	}
-	
-	// 获取套餐流量文本
-	const getPkgFlowText = (): string => {
-		const flow = orderDetail.value.pkgFlow;
-		if (!flow && flow !== 0) return '-';
-		
-		// 根据套餐类型判断单位
-		const pkgType = orderDetail.value.pkgType;
-		if (flow >= 1024) {
-			return `${(flow / 1024).toFixed(2)}GB`;
-		}
-		return `${flow}MB`;
 	}
 	
 	// 获取支付方式
@@ -247,16 +236,6 @@
 			default:
 				return ''
 		}
-	}
-	
-	// 格式化日期时间（不转换时区，直接显示原值）
-	const formatDateTime = (dateTime: string): string => {
-		if (!dateTime) return ''
-		// 如果是 ISO 格式，提取前面部分
-		if (dateTime.includes('T')) {
-			return dateTime.replace('T', ' ').substring(0, 19)
-		}
-		return dateTime
 	}
 	
 	// 选择支付方式
@@ -402,9 +381,17 @@
 	}
 	
 	// 返回上一页
-	const handleBack = () => {
+	// 返回上一页或首页
+const handleBack = () => {
+	const pages = getCurrentPages();
+	if (pages.length > 1) {
 		uni.navigateBack()
+	} else {
+		uni.reLaunch({
+			url: '/pages/card/card'
+		})
 	}
+}
 	
 	// 查询订单详情
 	const getOrderDetail = async () => {

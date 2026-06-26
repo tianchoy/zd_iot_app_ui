@@ -77,33 +77,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const category = orderDetail.value.pkgCategory;
       switch (category) {
         case "1":
-          return "套餐包";
+          return "日包";
         case "2":
-          return "加油包";
+          return "非自然月包";
+        case "3":
+          return "自然月包";
         default:
           return orderDetail.value.pkgCategory || "-";
       }
     };
-    const getPkgFlowText = () => {
-      const flow = orderDetail.value.pkgFlow;
-      if (!flow && flow !== 0)
-        return "-";
-      orderDetail.value.pkgType;
-      if (flow >= 1024) {
-        return `${(flow / 1024).toFixed(2)}GB`;
-      }
-      return `${flow}MB`;
-    };
     const getPaymentMethod = () => {
       return "微信小程序支付";
-    };
-    const formatDateTime = (dateTime) => {
-      if (!dateTime)
-        return "";
-      if (dateTime.includes("T")) {
-        return dateTime.replace("T", " ").substring(0, 19);
-      }
-      return dateTime;
     };
     const choosePayment = () => {
       currentPrice.value = orderDetail.value.payAmount || orderDetail.value.orderAmount || 0;
@@ -194,10 +178,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:364", "打开支付小程序成功:", res2);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:343", "打开支付小程序成功:", res2);
             },
             fail(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:367", "打开支付小程序失败:", res2);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:346", "打开支付小程序失败:", res2);
               common_vendor.index.hideLoading();
               isInPaymentProcess.value = false;
             }
@@ -219,7 +203,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:391", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:370", "支付失败:", error);
           common_vendor.index.showToast({
             title: "支付失败，请稍后重试",
             icon: "none"
@@ -231,7 +215,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPopup.value = false;
     };
     const handleBack = () => {
-      common_vendor.index.navigateBack();
+      const pages = getCurrentPages();
+      if (pages.length > 1) {
+        common_vendor.index.navigateBack();
+      } else {
+        common_vendor.index.reLaunch({
+          url: "/pages/card/card"
+        });
+      }
     };
     const getOrderDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -248,7 +239,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:423", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:410", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"
@@ -373,11 +364,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         r: common_vendor.unref(orderDetail).orderCreateTime
       }, common_vendor.unref(orderDetail).orderCreateTime ? {
-        s: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).orderCreateTime))
+        s: common_vendor.t(common_vendor.unref(orderDetail).orderCreateTime)
       } : {}, {
         t: common_vendor.unref(orderDetail).payTime
       }, common_vendor.unref(orderDetail).payTime ? {
-        v: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).payTime))
+        v: common_vendor.t(common_vendor.unref(orderDetail).payTime)
       } : {}, {
         w: common_vendor.unref(orderDetail).payFailReason
       }, common_vendor.unref(orderDetail).payFailReason ? {
@@ -385,7 +376,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         y: common_vendor.unref(orderDetail).cancelTime
       }, common_vendor.unref(orderDetail).cancelTime ? {
-        z: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).cancelTime))
+        z: common_vendor.t(common_vendor.unref(orderDetail).cancelTime)
       } : {}, {
         A: common_vendor.p({
           class: "data-v-6ec85291"
@@ -396,7 +387,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         D: common_vendor.unref(orderDetail).pkgFlow
       }, common_vendor.unref(orderDetail).pkgFlow ? {
-        E: common_vendor.t(getPkgFlowText())
+        E: common_vendor.t(common_vendor.unref(orderDetail).pkgFlow)
       } : {}, {
         F: common_vendor.unref(orderDetail).validityPeriod
       }, common_vendor.unref(orderDetail).validityPeriod ? {
@@ -405,11 +396,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}, {
         I: common_vendor.unref(orderDetail).startDate
       }, common_vendor.unref(orderDetail).startDate ? {
-        J: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).startDate))
+        J: common_vendor.t(common_vendor.unref(orderDetail).startDate)
       } : {}, {
         K: common_vendor.unref(orderDetail).endDate
       }, common_vendor.unref(orderDetail).endDate ? {
-        L: common_vendor.t(formatDateTime(common_vendor.unref(orderDetail).endDate))
+        L: common_vendor.t(common_vendor.unref(orderDetail).endDate)
       } : {}, {
         M: common_vendor.unref(orderDetail).refunds && common_vendor.unref(orderDetail).refunds.length > 0
       }, common_vendor.unref(orderDetail).refunds && common_vendor.unref(orderDetail).refunds.length > 0 ? {
@@ -425,7 +416,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(orderDetail).refunds && common_vendor.unref(orderDetail).refunds.length > 0 ? {
         P: common_vendor.f(common_vendor.unref(orderDetail).refunds, (item, index, i0) => {
           return {
-            a: common_vendor.t(formatDateTime(item.refundTime)),
+            a: common_vendor.t(item.refundTime),
             b: common_vendor.t(item.refundAmount || 0),
             c: index
           };
@@ -434,19 +425,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         Q: common_vendor.unref(orderDetail).status === "0"
       }, common_vendor.unref(orderDetail).status === "0" ? {
         R: common_vendor.t(common_vendor.unref(orderDetail).payAmount || common_vendor.unref(orderDetail).orderAmount || 0),
-        S: common_vendor.o(handleCountDownFinish, "8d"),
+        S: common_vendor.o(handleCountDownFinish, "61"),
         T: common_vendor.p({
           time: common_vendor.unref(orderDetail).currentSeconds * 1e3 || 0,
           ["font-size"]: "28rpx",
           color: "#f56c6c",
           class: "data-v-6ec85291"
         }),
-        U: common_vendor.o(choosePayment, "fd")
+        U: common_vendor.o(choosePayment, "45")
       } : {}, {
         V: `${_ctx.u_s_b_h}px`,
         W: `${_ctx.u_s_a_i_b}px`,
-        X: common_vendor.o(handleCancelPayment, "45"),
-        Y: common_vendor.o(handleConfirmPayment, "bb"),
+        X: common_vendor.o(handleCancelPayment, "0a"),
+        Y: common_vendor.o(handleConfirmPayment, "dd"),
         Z: common_vendor.p({
           amount: common_vendor.unref(currentPrice),
           cardNumber: common_vendor.unref(orderDetail).rechargeNo,
@@ -457,10 +448,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pkgType: common_vendor.unref(orderDetail).pkgType,
           class: "data-v-6ec85291"
         }),
-        aa: common_vendor.o(onPopupClose, "15"),
+        aa: common_vendor.o(onPopupClose, "99"),
         ab: common_vendor.o(($event) => {
           return common_vendor.isRef(showPopup) ? showPopup.value = $event : null;
-        }, "25"),
+        }, "ea"),
         ac: common_vendor.p({
           position: "bottom",
           show: common_vendor.unref(showPopup),
