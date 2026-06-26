@@ -55,6 +55,8 @@ export type CardItem = {
 	usedTraffic: string
 	totalTraffic: string
 	currentCycle: string
+  usedPeriod: string
+  totalPeriod: string
 }
 
 /** 查询卡列表返回数据 */

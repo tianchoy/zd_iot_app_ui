@@ -196,7 +196,7 @@ page .container .pkg-card .pkg-price .price-original.data-v-722cdacb {
 }
 page .container .pkg-card-selected.data-v-722cdacb {
   border: 2rpx solid #3b82f6;
-  background: #f8fafc;
+  background: #f8fbff;
   box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.08);
 }
 page .container .empty-state.data-v-722cdacb {

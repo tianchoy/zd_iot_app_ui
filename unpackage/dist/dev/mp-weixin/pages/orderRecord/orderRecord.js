@@ -47,7 +47,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       new OrderStatusTab({ name: "已取消", value: "2" })
     ]);
     const current = common_vendor.ref(0);
-    const card_number = common_vendor.ref("");
+    common_vendor.ref("");
     const orderList = common_vendor.ref([]);
     const getStatusText = (status) => {
       switch (status) {
@@ -92,7 +92,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleOrderClick = (order) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:142", order);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
       });
@@ -102,33 +101,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         delta: 1
       }));
     };
-    const handleQuery = () => {
-      const keyword = card_number.value.trim();
-      if (!keyword) {
-        common_vendor.index.showToast({
-          title: "请输入卡号",
-          icon: "none"
-        });
-        return null;
-      }
-    };
-    const onScanResult = (data) => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        var _a;
-        const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:175", result);
-        if (result.length > 0) {
-          card_number.value = result;
-          common_vendor.index.showToast({
-            title: "扫码成功",
-            icon: "success"
-          });
-          yield handleQuery();
-        }
-      });
-    };
     const handlePay = (order) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:189", "去支付:", order);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:156", "去支付:", order);
       common_vendor.index.showToast({
         title: `支付订单 ${order.id}`,
         icon: "none"
@@ -163,7 +137,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:242", "获取订单列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:209", "获取订单列表失败:", error);
           orderList.value = [];
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
@@ -175,12 +149,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onLoad((options) => {
       rechargeNo.value = options.rechargeNo;
       getOrderList("");
-    });
-    common_vendor.onMounted(() => {
-      common_vendor.index.$on("scanResult", onScanResult);
-    });
-    common_vendor.onUnload(() => {
-      common_vendor.index.$off("scanResult", onScanResult);
     });
     return (_ctx, _cache) => {
       "raw js";

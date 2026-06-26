@@ -123,9 +123,6 @@
 			const res = await queryCardListSum()
 			if (res.code === 200) {
 				cardListSum.value = res.data
-				console.log('查询卡列表统计成功:', res.data)
-			} else {
-				console.log('查询卡列表统计失败:', res.msg)
 			}
 		} catch (error) {
 			console.error('查询卡列表统计异常:', error)

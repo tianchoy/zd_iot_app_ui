@@ -1,5 +1,5 @@
 <template>
-	  <rice-float-fab default-position="bottom-right" icon="chat-fill" width="80rpx" height="80rpx" icon-size="50rpx" gap-bottom="200rpx" gap-right="50rpx" @click="handleClick" />
+	  <rice-float-fab default-position="bottom-right" icon="chat-fill" width="80rpx" height="80rpx" icon-size="50rpx" gap-bottom="200rpx" gap-right="20rpx" @click="handleClick" />
 </template>
 
 <script setup lang="uts">

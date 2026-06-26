@@ -150,7 +150,9 @@ class CardItem extends common_vendor.UTS.UTSType {
           expireDate: { type: String, optional: false },
           usedTraffic: { type: String, optional: false },
           totalTraffic: { type: String, optional: false },
-          currentCycle: { type: String, optional: false }
+          currentCycle: { type: String, optional: false },
+          usedPeriod: { type: String, optional: false },
+          totalPeriod: { type: String, optional: false }
         };
       },
       name: "CardItem"
@@ -169,6 +171,8 @@ class CardItem extends common_vendor.UTS.UTSType {
     this.usedTraffic = this.__props__.usedTraffic;
     this.totalTraffic = this.__props__.totalTraffic;
     this.currentCycle = this.__props__.currentCycle;
+    this.usedPeriod = this.__props__.usedPeriod;
+    this.totalPeriod = this.__props__.totalPeriod;
     delete this.__props__;
   }
 }

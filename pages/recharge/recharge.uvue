@@ -330,9 +330,6 @@
 							icon: 'none',
 							duration: 1000
 						});
-						uni.reLaunch({
-							url:'/pages/orderDetail/orderDetail?orderNo=' + orderId.value
-						})
 						// 支付失败，重置标记
 						isInPaymentProcess.value = false
 					},
@@ -488,7 +485,7 @@
 			if (!extraData) {
 				uni.hideLoading()
 				uni.showToast({
-					title: "支付取消，请您重新支付111",
+					title: "支付取消，请您重新支付",
 					icon: 'none',
 					duration: 1000
 				});
@@ -514,17 +511,20 @@
 				} else if (extraData.code == 'cancel') {
 					uni.hideLoading()
 					uni.showToast({
-						title: "支付取消，请您重新支付222",
+						title: "支付取消，请您重新支付",
 						icon: 'none',
 						duration: 1000
 					});
 					// 重置支付流程标记
+					uni.reLaunch({
+						url:'/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+					})
 					isInPaymentProcess.value = false
 					return
 				} else {
 					uni.hideLoading()
 					uni.showToast({
-						title: "支付失败，请您重新支付3333",
+						title: "支付失败，请您重新支付",
 						icon: 'none',
 						duration: 1000
 					});
@@ -709,7 +709,7 @@
 		}
 		.pkg-card-selected {
 			border: 2rpx solid #3b82f6;
-			background: #f8fafc;
+			background: #f8fbff;
 			box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.08);
 		}
 		.empty-state {

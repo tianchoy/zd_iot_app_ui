@@ -22,7 +22,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const current = common_vendor.ref(0);
     const pkgInfoList = common_vendor.ref([]);
     const handleClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:104", e.value);
       if (e.index != null) {
         current.value = e.index;
         getPkgInfoList(e.value.toString());
@@ -44,17 +43,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               pkgInfoList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:127", "查询套餐列表失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:126", "查询套餐列表失败:", res.msg);
             pkgInfoList.value = [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/myPkg/myPkg.uvue:131", "查询套餐列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/myPkg/myPkg.uvue:130", "查询套餐列表异常:", error);
           pkgInfoList.value = [];
         }
       });
     };
     const handlePkgDetail = (item = null) => {
-      common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:138", item);
+      common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:137", item);
       common_vendor.index.navigateTo({
         url: "/pages/pkgDetail/pkgDetail?pkgId=" + item.id
       });

@@ -177,9 +177,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 icon: "none",
                 duration: 1e3
               });
-              common_vendor.index.reLaunch({
-                url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
-              });
               isInPaymentProcess.value = false;
             }
           });
@@ -203,10 +200,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:361", "支付成功0000:", res2);
+              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:358", "支付成功0000:", res2);
             },
             fail(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:364", "支付失败:", res2);
+              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:361", "支付失败:", res2);
               common_vendor.index.hideLoading();
               isInPaymentProcess.value = false;
             }
@@ -236,7 +233,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:402", "添加订单失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:399", "添加订单失败:", error);
           common_vendor.index.hideLoading();
           common_vendor.index.showToast({
             title: "添加订单失败",
@@ -246,7 +243,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const onPopupClose = () => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:412", "弹窗关闭");
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:409", "弹窗关闭");
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -276,7 +273,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:448", "获取卡片详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:445", "获取卡片详情失败:", error);
           common_vendor.index.showToast({
             title: "获取卡片信息失败",
             icon: "none"
@@ -287,7 +284,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const cardNumber = common_vendor.ref("");
     const country = common_vendor.ref("");
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:459", "options:", options);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:456", "options:", options);
       const opt = options;
       const cardNumberValue = opt.cardNumber;
       const countryValue = opt.country;
@@ -296,7 +293,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         country.value = countryValue !== null && countryValue !== void 0 ? countryValue : "";
         getCardDetail(cardNumber.value, country.value);
       } else {
-        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:469", "未获取到卡片号码");
+        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:466", "未获取到卡片号码");
         common_vendor.index.showToast({
           title: "卡片号码不存在",
           icon: "none"
@@ -313,7 +310,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (!extraData) {
           common_vendor.index.hideLoading();
           common_vendor.index.showToast({
-            title: "支付取消，请您重新支付111",
+            title: "支付取消，请您重新支付",
             icon: "none",
             duration: 1e3
           });
@@ -336,16 +333,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           } else if (extraData.code == "cancel") {
             common_vendor.index.hideLoading();
             common_vendor.index.showToast({
-              title: "支付取消，请您重新支付222",
+              title: "支付取消，请您重新支付",
               icon: "none",
               duration: 1e3
+            });
+            common_vendor.index.reLaunch({
+              url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
             });
             isInPaymentProcess.value = false;
             return null;
           } else {
             common_vendor.index.hideLoading();
             common_vendor.index.showToast({
-              title: "支付失败，请您重新支付3333",
+              title: "支付失败，请您重新支付",
               icon: "none",
               duration: 1e3
             });

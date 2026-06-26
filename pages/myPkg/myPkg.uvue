@@ -101,7 +101,6 @@
 	
 	// Tab 切换处理
 	const handleClick = (e: UTSJSONObject) => {
-		console.log(e.value)
 		if (e.index != null) {
 			current.value = e.index as number
 			getPkgInfoList(e.value.toString())

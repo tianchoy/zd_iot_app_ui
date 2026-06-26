@@ -325,12 +325,6 @@ onUnload(() => {
 						color: #ea580c;
 						border: 1rpx solid #fdba74;
 					}
-					
-					.status-refunded {
-						background: #fef2f2;
-						color: #dc2626;
-						border: 1rpx solid #fecaca;
-					}
 				}
 				.item-package{
 					margin: 20rpx 0;

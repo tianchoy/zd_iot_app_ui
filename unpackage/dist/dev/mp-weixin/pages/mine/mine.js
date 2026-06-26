@@ -85,12 +85,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const res = yield api_http.queryCardListSum();
           if (res.code === 200) {
             cardListSum.value = res.data;
-            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:126", "查询卡列表统计成功:", res.data);
-          } else {
-            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:128", "查询卡列表统计失败:", res.msg);
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:131", "查询卡列表统计异常:", error);
+          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:128", "查询卡列表统计异常:", error);
         }
       });
     };

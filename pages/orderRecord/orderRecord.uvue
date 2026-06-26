@@ -65,7 +65,7 @@
 <script setup lang="uts">
 	import {queryOrderList} from '@/api/http'
 	import type {OrderListXcxItem} from '@/api/types'
-	import { ref, computed, onMounted } from 'vue'
+	import { ref } from 'vue'
 	const rechargeNo = ref<string>('')
 	
 	// 订单状态映射
@@ -139,7 +139,6 @@
 	
 	// 处理订单点击
 	const handleOrderClick = (order: OrderListXcxItem) => {
-		console.log(order)
 		uni.navigateTo({
 			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
 		})
@@ -150,38 +149,6 @@
 		uni.navigateBack({
 			delta: 1
 		})
-	}
-	
-	const scanCode = () => {
-		uni.navigateTo({
-			url: '/pages/scanCode/scanCode'
-		})
-	}
-	
-	const handleQuery = () => {
-		const keyword = card_number.value.trim()
-		if (!keyword) {
-			uni.showToast({
-				title: '请输入卡号',
-				icon: 'none'
-			})
-			return
-		}
-	}
-	
-	// 接收扫码结果
-	const onScanResult = async (data: UTSJSONObject) => {
-		const result = data.getString('result') ?? ''
-		console.log(result)
-		if (result.length > 0) {
-			card_number.value = result
-			uni.showToast({
-				title: '扫码成功',
-				icon: 'success'
-			})
-			// 自动查询
-			await handleQuery()
-		}
 	}
 	
 	// 去支付
@@ -252,15 +219,7 @@
 		rechargeNo.value = options.rechargeNo
 		getOrderList('')
 	})
-	
-	onMounted(() => {
-		uni.$on('scanResult', onScanResult)
-	})
-	
-	onUnload(() => {
-		// 移除事件监听
-		uni.$off('scanResult', onScanResult)
-	})
+
 </script>
 
 <style lang="scss" scoped>

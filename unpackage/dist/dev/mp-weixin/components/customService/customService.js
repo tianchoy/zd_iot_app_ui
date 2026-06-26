@@ -31,7 +31,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "80rpx",
           ["icon-size"]: "50rpx",
           ["gap-bottom"]: "200rpx",
-          ["gap-right"]: "50rpx",
+          ["gap-right"]: "20rpx",
           id: common_vendor.gei(_ctx, "")
         }),
         d: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
