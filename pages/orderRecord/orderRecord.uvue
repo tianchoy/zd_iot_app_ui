@@ -66,6 +66,7 @@
 	import {queryOrderList} from '@/api/http'
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref, computed, onMounted } from 'vue'
+	const rechargeNo = ref<string>('')
 	
 	// 订单状态映射
 	type OrderStatus = '全部' | '待支付' | '已完成' | '已退款' | '已取消'
@@ -215,7 +216,9 @@
 	// 获取订单列表
 	const getOrderList = async (status: string) => {
 		try {
-			const params: any = {}
+			const params: any = {
+				rechargeNo: rechargeNo.value
+			}
 			if (status !== '') {
 				params.status = status
 			}
@@ -245,7 +248,8 @@
 		}
 	}
 	
-	onLoad(() => {
+	onLoad((options: UTSJSONObject) => {
+		rechargeNo.value = options.rechargeNo
 		getOrderList('')
 	})
 	

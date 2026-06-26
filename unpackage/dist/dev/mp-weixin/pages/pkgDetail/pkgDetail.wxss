@@ -187,18 +187,3 @@ page .price.data-v-36efee10 {
 page .status-completed.data-v-36efee10 {
   color: #2e7d32;
 }
-page .footer-note.data-v-36efee10 {
-  display: flex;
-  flex-direction: column;
-}
-page .note-text.data-v-36efee10 {
-  font-size: 26rpx;
-  color: #1a2332;
-  font-weight: 600;
-  margin-bottom: 8rpx;
-}
-page .note-content.data-v-36efee10 {
-  font-size: 24rpx;
-  color: #8c9aa8;
-  line-height: 1.6;
-}

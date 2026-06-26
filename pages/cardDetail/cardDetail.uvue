@@ -8,10 +8,13 @@
 					line-color="#ffffff" 
 					:list="tabs" 
 					:line-width="0" 
+					::item-style="{ overflow: 'hidden' }"
 					:title-active-color="'#2563eb'" 
 					:title-inactive-color="'#334155'"
+					:active-style="{ backgroundColor: '#ffffff',border:'1rpx solid #e5edf6',borderRadius:'24rpx'}"
+					:inactive-style="{ backgroundColor: '#f3f7fb',border:'1rpx solid #e5edf6',borderRadius:'24rpx' }"
 					@change="changeTab" 
-					:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
+					:customStyle="{height:'85rpx',padding:'10rpx',backgroundColor:'#ffffff',border:'1rpx solid #ffffff'}"
 					>
 				</rice-tabs>
 			</view>
@@ -24,12 +27,11 @@
 							<view class="base-info-box">
 								<view class="base-info">
 									<view class="info-item" v-if="cardDetail.rechargeNo"><text class="info-label">充值号</text><text class="info-value">{{cardDetail.rechargeNo}}</text></view>
+									<view class="info-item" v-if="cardDetail.statusStr"><text class="info-label">状态</text><rice-tag type="success" plain-fill :text="cardDetail.statusStr" /></view>
 									<view class="info-item" v-if="cardDetail.pkgName"><text class="info-label">套餐名称</text><text class="info-value">{{cardDetail.pkgName}}</text></view>
 									<view class="info-item" v-if="cardDetail.effectiveTime"><text class="info-label">生效时间</text><text class="info-value">{{cardDetail.effectiveTime}}</text></view>
 									<view class="info-item" v-if="cardDetail.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail.expirationTime}}</text></view>
-									<view class="info-item" v-if="cardDetail.statusStr"><text class="info-label">状态</text><rice-tag type="success" plain-fill :text="cardDetail.statusStr" /></view>
 									<view class="info-item" v-if="cardDetail.usedPeriod && cardDetail.totalPeriod"><text class="info-label">周期</text><text class="info-value">{{cardDetail.usedPeriod}} / {{cardDetail.totalPeriod}}</text></view>
-									<view class="info-item" v-if="cardDetail.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail.expirationTime}}</text></view>
 								</view>
 								<rice-divider v-if="cardDetail.pkgFlow" dashed />
 							</view>
@@ -418,13 +420,13 @@
 	right: 0;
 	z-index: 99;
 	flex-shrink: 0;
-	background-color: #f4f7fb;
-	padding: 12rpx 24rpx 0 24rpx;
+	background-color: #ffffff;
+	padding: 12rpx !important;
 }
 .container {
 	display: flex;
 	flex-direction: column;
-	padding: 150rpx 0;
+	padding: 130rpx 0;
 }
 
 .card-box {

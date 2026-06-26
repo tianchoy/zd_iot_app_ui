@@ -8,18 +8,16 @@ if (!Array) {
   const _easycom_rice_input_1 = common_vendor.resolveComponent("rice-input");
   const _easycom_rice_button_1 = common_vendor.resolveComponent("rice-button");
   const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
-  const _easycom_rice_divider_1 = common_vendor.resolveComponent("rice-divider");
   const _easycom_customService_1 = common_vendor.resolveComponent("customService");
-  (_easycom_topNavBar_1 + _easycom_rice_input_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1 + _easycom_rice_divider_1 + _easycom_customService_1)();
+  (_easycom_topNavBar_1 + _easycom_rice_input_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1 + _easycom_customService_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
 const _easycom_rice_input = () => "../../uni_modules/rice-ui/components/rice-input/rice-input.js";
 const _easycom_rice_button = () => "../../uni_modules/rice-ui/components/rice-button/rice-button.js";
 const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
-const _easycom_rice_divider = () => "../../uni_modules/rice-ui/components/rice-divider/rice-divider.js";
 const _easycom_customService = () => "../../components/customService/customService.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_rice_input + _easycom_rice_button + _easycom_rice_tabs + _easycom_rice_divider + _easycom_customService)();
+  (_easycom_topNavBar + _easycom_rice_input + _easycom_rice_button + _easycom_rice_tabs + _easycom_customService)();
 }
 class TabItem extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -254,32 +252,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, card.usedFlow || card.totalFlow ? {
             i: common_vendor.t(getFlowText(card))
           } : {}, {
-            j: "a89086b7-5-" + i0,
-            k: common_vendor.p({
-              dashed: true,
-              customStyle: {
-                margin: card.totalFlow ? "0" : "20rpx 0 0 0"
-              },
-              class: "data-v-a89086b7"
-            }),
-            l: card.effectiveTime
+            j: card.effectiveTime
           }, card.effectiveTime ? {
-            m: common_vendor.t(card.effectiveTime || "-")
+            k: common_vendor.t(card.effectiveTime || "-")
           } : {}, {
-            n: card.expirationTime
+            l: card.expirationTime
           }, card.expirationTime ? {
-            o: common_vendor.t(card.expirationTime || "-")
+            m: common_vendor.t(card.expirationTime || "-")
           } : {}, {
-            p: card.usedPeriod || card.totalPeriod
+            n: card.usedPeriod || card.totalPeriod
           }, card.usedPeriod || card.totalPeriod ? {
-            q: common_vendor.t(getCycleText(card))
+            o: common_vendor.t(getCycleText(card))
           } : {}, {
-            r: common_vendor.o(($event) => {
+            p: common_vendor.o(($event) => {
               return handleRecharge(card.rechargeNo);
             }, index),
-            s: "a89086b7-6-" + i0,
-            t: index,
-            v: common_vendor.o(($event) => {
+            q: "a89086b7-5-" + i0,
+            r: index,
+            s: common_vendor.o(($event) => {
               return handleDetail(card);
             }, index)
           });

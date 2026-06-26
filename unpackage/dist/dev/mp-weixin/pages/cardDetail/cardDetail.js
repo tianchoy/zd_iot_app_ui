@@ -155,7 +155,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     const handleOrderDetail = (pkgId) => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:239", pkgId);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:241", pkgId);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${pkgId}`
       });
@@ -170,7 +170,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = navHeight > 0 ? navHeight : 44;
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:256", "获取导航栏信息失败", e);
+        common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:258", "获取导航栏信息失败", e);
       }
     };
     const handleRecharge = () => {
@@ -181,7 +181,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getCardDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.queryCardDetail(card_number.value, "", "1");
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:274", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:276", res);
         if (res.code == 200) {
           cardDetail.value = res.data;
         }
@@ -202,11 +202,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               orderList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:295", "查询订单列表失败:", resp.msg);
+            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:297", "查询订单列表失败:", resp.msg);
             orderList.value = [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:299", "查询订单列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:301", "查询订单列表异常:", error);
           orderList.value = [];
         }
       });
@@ -227,11 +227,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               pkgInfoList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:320", "查询套餐列表失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:322", "查询套餐列表失败:", res.msg);
             pkgInfoList.value = [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:324", "查询套餐列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:326", "查询套餐列表异常:", error);
           pkgInfoList.value = [];
         }
       });
@@ -243,7 +243,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_http.userBindCard(new api_types.BindCard({
           rechargeNo: card_number.value
         }));
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:335", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:337", res);
         if (res.code == 200) {
           common_vendor.index.showToast({
             title: "绑定成功",
@@ -269,7 +269,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               if (res.confirm) {
                 try {
                   const result = yield api_http.userUnBindCard(card_number.value);
-                  common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:359", result);
+                  common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:361", result);
                   if (result.code == 200) {
                     common_vendor.index.showToast({
                       title: "解绑成功",
@@ -286,7 +286,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     });
                   }
                 } catch (error) {
-                  common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:377", "解绑请求失败:", error);
+                  common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:379", "解绑请求失败:", error);
                   common_vendor.index.showToast({
                     title: "网络异常，请重试",
                     icon: "none"
@@ -299,7 +299,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePkgDetail = (pkgId) => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:390", pkgId);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:392", pkgId);
       common_vendor.index.navigateTo({
         url: `/pages/pkgDetail/pkgDetail?pkgId=${pkgId}`
       });
@@ -327,7 +327,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         c: common_vendor.unref(cardDetail)
       }, common_vendor.unref(cardDetail) ? common_vendor.e({
-        d: common_vendor.o(changeTab, "ed"),
+        d: common_vendor.o(changeTab, "af"),
         e: common_vendor.o(($event) => {
           return common_vendor.isRef(active) ? active.value = $event : null;
         }, "9d"),
@@ -335,12 +335,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["line-color"]: "#ffffff",
           list: common_vendor.unref(tabs),
           ["line-width"]: 0,
+          [":item-style"]: {
+            overflow: "hidden"
+          },
           ["title-active-color"]: "#2563eb",
           ["title-inactive-color"]: "#334155",
+          ["active-style"]: {
+            backgroundColor: "#ffffff",
+            border: "1rpx solid #e5edf6",
+            borderRadius: "24rpx"
+          },
+          ["inactive-style"]: {
+            backgroundColor: "#f3f7fb",
+            border: "1rpx solid #e5edf6",
+            borderRadius: "24rpx"
+          },
           customStyle: {
             height: "85rpx",
             padding: "10rpx",
-            border: "1rpx solid #e5edf6"
+            backgroundColor: "#ffffff",
+            border: "1rpx solid #ffffff"
           },
           modelValue: common_vendor.unref(active),
           class: "data-v-2bc48812"
@@ -353,58 +367,54 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(cardDetail).rechargeNo ? {
         k: common_vendor.t(common_vendor.unref(cardDetail).rechargeNo)
       } : {}, {
-        l: common_vendor.unref(cardDetail).pkgName
-      }, common_vendor.unref(cardDetail).pkgName ? {
-        m: common_vendor.t(common_vendor.unref(cardDetail).pkgName)
-      } : {}, {
-        n: common_vendor.unref(cardDetail).effectiveTime
-      }, common_vendor.unref(cardDetail).effectiveTime ? {
-        o: common_vendor.t(common_vendor.unref(cardDetail).effectiveTime)
-      } : {}, {
-        p: common_vendor.unref(cardDetail).expirationTime
-      }, common_vendor.unref(cardDetail).expirationTime ? {
-        q: common_vendor.t(common_vendor.unref(cardDetail).expirationTime)
-      } : {}, {
-        r: common_vendor.unref(cardDetail).statusStr
+        l: common_vendor.unref(cardDetail).statusStr
       }, common_vendor.unref(cardDetail).statusStr ? {
-        s: common_vendor.p({
+        m: common_vendor.p({
           type: "success",
           ["plain-fill"]: true,
           text: common_vendor.unref(cardDetail).statusStr,
           class: "data-v-2bc48812"
         })
       } : {}, {
+        n: common_vendor.unref(cardDetail).pkgName
+      }, common_vendor.unref(cardDetail).pkgName ? {
+        o: common_vendor.t(common_vendor.unref(cardDetail).pkgName)
+      } : {}, {
+        p: common_vendor.unref(cardDetail).effectiveTime
+      }, common_vendor.unref(cardDetail).effectiveTime ? {
+        q: common_vendor.t(common_vendor.unref(cardDetail).effectiveTime)
+      } : {}, {
+        r: common_vendor.unref(cardDetail).expirationTime
+      }, common_vendor.unref(cardDetail).expirationTime ? {
+        s: common_vendor.t(common_vendor.unref(cardDetail).expirationTime)
+      } : {}, {
         t: common_vendor.unref(cardDetail).usedPeriod && common_vendor.unref(cardDetail).totalPeriod
       }, common_vendor.unref(cardDetail).usedPeriod && common_vendor.unref(cardDetail).totalPeriod ? {
         v: common_vendor.t(common_vendor.unref(cardDetail).usedPeriod),
         w: common_vendor.t(common_vendor.unref(cardDetail).totalPeriod)
       } : {}, {
-        x: common_vendor.unref(cardDetail).expirationTime
-      }, common_vendor.unref(cardDetail).expirationTime ? {
-        y: common_vendor.t(common_vendor.unref(cardDetail).expirationTime)
-      } : {}, {
-        z: common_vendor.unref(cardDetail).pkgFlow
+        x: common_vendor.unref(cardDetail).pkgFlow
       }, common_vendor.unref(cardDetail).pkgFlow ? {
-        A: common_vendor.p({
+        y: common_vendor.p({
           dashed: true,
           class: "data-v-2bc48812"
         })
       } : {}, {
-        B: common_vendor.unref(cardDetail).pkgFlow
+        z: common_vendor.unref(cardDetail).pkgFlow
       }, common_vendor.unref(cardDetail).pkgFlow ? {} : {}, {
-        C: common_vendor.unref(cardDetail).pkgFlow
+        A: common_vendor.unref(cardDetail).pkgFlow
       }, common_vendor.unref(cardDetail).pkgFlow ? {
-        D: common_vendor.t(common_vendor.unref(cardDetail).usedFlow != null && common_vendor.unref(cardDetail).usedFlow !== "" ? common_vendor.unref(cardDetail).usedFlow : "0"),
-        E: common_vendor.t(common_vendor.unref(cardDetail).unUsedFlow != null && common_vendor.unref(cardDetail).unUsedFlow !== "" ? common_vendor.unref(cardDetail).unUsedFlow : "0"),
-        F: common_vendor.t(common_vendor.unref(cardDetail).pkgFlow != null && common_vendor.unref(cardDetail).pkgFlow !== "" ? common_vendor.unref(cardDetail).pkgFlow : "0")
+        B: common_vendor.t(common_vendor.unref(cardDetail).usedFlow != null && common_vendor.unref(cardDetail).usedFlow !== "" ? common_vendor.unref(cardDetail).usedFlow : "0"),
+        C: common_vendor.t(common_vendor.unref(cardDetail).unUsedFlow != null && common_vendor.unref(cardDetail).unUsedFlow !== "" ? common_vendor.unref(cardDetail).unUsedFlow : "0"),
+        D: common_vendor.t(common_vendor.unref(cardDetail).pkgFlow != null && common_vendor.unref(cardDetail).pkgFlow !== "" ? common_vendor.unref(cardDetail).pkgFlow : "0")
       } : {}) : {}, {
-        G: common_vendor.unref(activeName) == "卡片套餐"
+        E: common_vendor.unref(activeName) == "卡片套餐"
       }, common_vendor.unref(activeName) == "卡片套餐" ? common_vendor.e({
-        H: common_vendor.o(handleClick, "93"),
-        I: common_vendor.o(($event) => {
+        F: common_vendor.o(handleClick, "f4"),
+        G: common_vendor.o(($event) => {
           return common_vendor.isRef(current) ? current.value = $event : null;
-        }, "46"),
-        J: common_vendor.p({
+        }, "82"),
+        H: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: common_vendor.unref(pkgTabs),
           ["line-width"]: 0,
@@ -418,9 +428,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: common_vendor.unref(current),
           class: "data-v-2bc48812"
         }),
-        K: common_vendor.unref(pkgInfoList).length === 0
+        I: common_vendor.unref(pkgInfoList).length === 0
       }, common_vendor.unref(pkgInfoList).length === 0 ? {} : {}, {
-        L: common_vendor.f(common_vendor.unref(pkgInfoList), (item, index, i0) => {
+        J: common_vendor.f(common_vendor.unref(pkgInfoList), (item, index, i0) => {
           return common_vendor.e({
             a: item.pkgName
           }, item.pkgName ? {
@@ -465,11 +475,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }) : {}, {
-        M: common_vendor.unref(activeName) == "卡片订单"
+        K: common_vendor.unref(activeName) == "卡片订单"
       }, common_vendor.unref(activeName) == "卡片订单" ? common_vendor.e({
-        N: common_vendor.unref(orderList).length === 0
+        L: common_vendor.unref(orderList).length === 0
       }, common_vendor.unref(orderList).length === 0 ? {} : {}, {
-        O: common_vendor.f(common_vendor.unref(orderList), (order, index, i0) => {
+        M: common_vendor.f(common_vendor.unref(orderList), (order, index, i0) => {
           return {
             a: common_vendor.t(order.pkgName || "未知套餐"),
             b: "2bc48812-6-" + i0,
@@ -491,10 +501,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       }) : {}, {
-        P: common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded)
+        N: common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded)
       }, common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded) ? {
-        Q: common_vendor.o(handleUnbind, "bb"),
-        R: common_vendor.p({
+        O: common_vendor.o(handleUnbind, "83"),
+        P: common_vendor.p({
           type: "error",
           ["plain-fill"]: true,
           text: "解绑卡片",
@@ -504,9 +514,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "ml-24 mr-24 mt-24 mb-24 data-v-2bc48812"
         })
       } : {}, {
-        S: common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded)
+        Q: common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded)
       }, common_vendor.unref(cardDetail).isBind || common_vendor.unref(isBinded) ? {
-        T: common_vendor.p({
+        R: common_vendor.p({
           height: "100rpx",
           bold: true,
           disabled: true,
@@ -516,8 +526,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        U: common_vendor.o(handleBindCard, "ea"),
-        V: common_vendor.p({
+        S: common_vendor.o(handleBindCard, "81"),
+        T: common_vendor.p({
           height: "100rpx",
           bold: true,
           customStyle: {
@@ -526,8 +536,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        W: common_vendor.o(handleRecharge, "66"),
-        X: common_vendor.p({
+        U: common_vendor.o(handleRecharge, "eb"),
+        V: common_vendor.p({
           height: "100rpx",
           type: "primary",
           color: "#1989fa",
@@ -540,8 +550,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }) : {}, {
-        Y: `${_ctx.u_s_b_h}px`,
-        Z: `${_ctx.u_s_a_i_b}px`
+        W: `${_ctx.u_s_b_h}px`,
+        X: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

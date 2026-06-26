@@ -140,25 +140,6 @@ page .info-card .info-refunds .times.data-v-6ec85291,page
   font-size: 24rpx;
   color: #64748b;
 }
-page .notice-card.data-v-6ec85291 {
-  background-color: #ffffff;
-  border-radius: 24rpx;
-  padding: 32rpx;
-  margin-bottom: 24rpx;
-}
-page .notice-card .section-header.data-v-6ec85291 {
-  margin-bottom: 16rpx;
-}
-page .notice-card .section-header .section-title.data-v-6ec85291 {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1f2937;
-}
-page .notice-card .notice-text.data-v-6ec85291 {
-  font-size: 28rpx;
-  color: #6b7280;
-  line-height: 1.5;
-}
 page .bottom-placeholder.data-v-6ec85291 {
   height: 140rpx;
 }

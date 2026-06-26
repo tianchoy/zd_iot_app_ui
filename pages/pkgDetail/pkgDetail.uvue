@@ -59,7 +59,6 @@
 		<view class="card-box order-card">
 			<view class="order-title">
 				<text class="order-title-text">关联订单信息</text>
-				<text class="order-desc">用于帮助用户快速了解该套餐来自哪笔订单</text>
 			</view>
 			<view class="order-detail">
 				<view class="order-row" v-if="pkgInfo.orderNo">
@@ -79,10 +78,6 @@
 					<text class="order-value">{{ pkgInfo.orderCreateTime }}</text>
 				</view>
 			</view>
-		</view>
-		<view class="card-box footer-note">
-			<text class="note-text">说明</text>
-			<text class="note-content">{{ pkgInfo.usageInstructions }}</text>
 		</view>
 	</view>
 </template>
@@ -322,22 +317,4 @@
 		color: #2e7d32;
 	}
 
-	// 底部说明
-	.footer-note {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.note-text {
-		font-size: 26rpx;
-		color: #1a2332;
-		font-weight: 600;
-		margin-bottom: 8rpx;
-	}
-
-	.note-content {
-		font-size: 24rpx;
-		color: #8c9aa8;
-		line-height: 1.6;
-	}
 </style>

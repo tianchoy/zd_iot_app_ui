@@ -236,14 +236,14 @@
 		}
 		
 		.primary-btn {
-			background-color: #07c160;
+			background-color: #2563eb;
 			color: #ffffff;
 		}
 		
 		.secondary-btn {
 			background-color: #ffffff;
-			color: #07c160;
-			border: 2rpx solid #07c160;
+			color: #2563eb;
+			border: 2rpx solid #2563eb;
 		}
 	}
 </style>

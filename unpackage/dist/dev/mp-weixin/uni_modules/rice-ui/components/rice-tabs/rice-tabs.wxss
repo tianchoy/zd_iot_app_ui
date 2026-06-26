@@ -52,7 +52,7 @@
   justify-content: center;
   flex-grow: 1;
   flex-shrink: 0;
-  overflow: visible;
+  margin: 0 10rpx;
   height: 100%;
 }
 .rice-tabs__item__text.data-v-c0441e19 {

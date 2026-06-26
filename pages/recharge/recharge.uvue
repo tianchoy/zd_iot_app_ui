@@ -214,9 +214,9 @@
 		
 		packages.forEach((item, index) => {
 			// pkgCategory: 3为套餐，4为加油包
-			if (item.pkgCategory === '3') {
+			if (item.pkgCategory == '3') {
 				packagesList.push(item);
-			} else if (item.pkgCategory === '4') {
+			} else if (item.pkgCategory == '4') {
 				refillsList.push(item);
 			}
 		});
@@ -289,9 +289,17 @@
 				success: (res) => {
 					console.log('支付成功',res)
 					uni.hideLoading()
+					uni.redirectTo({
+						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+					})
 				},
 				fail: (res) => {
 					uni.hideLoading()
+					uni.showToast({
+						title: "支付失败，请您重新支付",
+						icon: 'none',
+						duration: 1000
+					});
 					// 支付失败，重置标记
 					isInPaymentProcess.value = false
 				},
@@ -308,9 +316,17 @@
 					success: function (res) {
 						console.log('支付成功',res)
 						uni.hideLoading()
+						uni.redirectTo({
+							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+						})
 					},
 					fail: function (err) {
 						uni.hideLoading()
+						uni.showToast({
+							title: "支付失败，请您重新支付",
+							icon: 'none',
+							duration: 1000
+						});
 						// 支付失败，重置标记
 						isInPaymentProcess.value = false
 					},
@@ -341,6 +357,7 @@
 					fail(res) {
 						console.log('支付失败:', res);
 						uni.hideLoading()
+						// 支付失败，重置标记
 						isInPaymentProcess.value = false
 					},
 				})
@@ -405,7 +422,7 @@
 	// 跳转订单记录
 	const toOrderRecord = () => {
 		uni.navigateTo({
-			url: '/pages/orderRecord/orderRecord'
+			url: '/pages/orderRecord/orderRecord?rechargeNo=' + cardNumber.value
 		})
 	}
 	
@@ -452,6 +469,7 @@
 	})
 
 	onShow(() => {
+		// 只有在支付流程中才处理支付回调
 		if (!isInPaymentProcess.value) {
 			return
 		}
@@ -466,7 +484,7 @@
 				uni.showToast({
 					title: "支付取消，请您重新支付",
 					icon: 'none',
-					duration: 3000
+					duration: 1000
 				});
 				// 重置支付流程标记
 				isInPaymentProcess.value = false
@@ -477,7 +495,7 @@
 					uni.showToast({
 						title: "支付成功",
 						icon: 'success',
-						duration: 3000,
+						duration: 1000,
 						success() {
 							// 重置支付流程标记
 							isInPaymentProcess.value = false
@@ -487,13 +505,12 @@
 							})
 						}
 					});
-					// "支付成功";
 				} else if (extraData.code == 'cancel') {
 					uni.hideLoading()
 					uni.showToast({
 						title: "支付取消，请您重新支付",
 						icon: 'none',
-						duration: 3000
+						duration: 1000
 					});
 					// 重置支付流程标记
 					isInPaymentProcess.value = false
@@ -503,7 +520,7 @@
 					uni.showToast({
 						title: "支付失败，请您重新支付",
 						icon: 'none',
-						duration: 3000
+						duration: 1000
 					});
 					// 重置支付流程标记
 					isInPaymentProcess.value = false

@@ -38,6 +38,7 @@ class OrderStatusTab extends common_vendor.UTS.UTSType {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "orderRecord",
   setup(__props) {
+    const rechargeNo = common_vendor.ref("");
     const tabs = common_vendor.ref([
       new OrderStatusTab({ name: "全部", value: "" }),
       new OrderStatusTab({ name: "待支付", value: "0" }),
@@ -67,7 +68,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleTabClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:113", e);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:114", e);
       const index = e.index;
       current.value = index;
       getOrderList(e.value);
@@ -91,7 +92,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleOrderClick = (order) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:141", order);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:142", order);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
       });
@@ -115,7 +116,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:174", result);
+        common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:175", result);
         if (result.length > 0) {
           card_number.value = result;
           common_vendor.index.showToast({
@@ -127,7 +128,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePay = (order) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:188", "去支付:", order);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:189", "去支付:", order);
       common_vendor.index.showToast({
         title: `支付订单 ${order.id}`,
         icon: "none"
@@ -139,7 +140,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getOrderList = (status) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
-          const params = new common_vendor.UTSJSONObject({});
+          const params = new common_vendor.UTSJSONObject({
+            rechargeNo: rechargeNo.value
+          });
           if (status !== "") {
             params.status = status;
           }
@@ -160,7 +163,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:239", "获取订单列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:242", "获取订单列表失败:", error);
           orderList.value = [];
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
@@ -169,7 +172,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
-    common_vendor.onLoad(() => {
+    common_vendor.onLoad((options) => {
+      rechargeNo.value = options.rechargeNo;
       getOrderList("");
     });
     common_vendor.onMounted(() => {

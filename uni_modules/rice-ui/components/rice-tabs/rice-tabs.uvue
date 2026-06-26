@@ -7,12 +7,10 @@
 			:scrollLeft="scrollLeft" :scroll-with-animation="true">
 			<view class="rice-tabs__scrollmp">
 			<!-- #endif -->
-
 				<!-- #ifndef MP -->
 				<scroll-view class="rice-tabs__scroll" ref="tabScrollRef" direction="horizontal" :show-scrollbar="false"
 					:scroll-with-animation="true">
 				<!-- #endif -->
-
 					<view v-for="(item,index) in list" :key="index" ref="tabsItemRef" class="rice-tabs__item"
 						:class="{'rice-tabs--shrink':props.shrink}" :style="getItemStyle(item,index)" @click="tabClick(item,index)">
 						<rice-badge v-if="item.badge!=null" :is-dot="item.badge!.isDot" :value="item.badge!.value"
@@ -25,10 +23,8 @@
 						<view v-if="lineMode=='zoom'" class="rice-tabs__item__line"
 							:style="[getActiveZoomStyle(index),indicatorStyle]"></view>
 					</view>
-
 					<view v-if="lineMode=='slide'" ref="indicatorRef" :style="indicatorStyle" class="rice-tabs__indicator"
 						:class="{'rice-tabs__indicator--animate':!initAnimate}"></view>
-
 			<!-- #ifdef MP -->
 			</view>
 			<!-- #endif -->
@@ -299,7 +295,8 @@
 			justify-content: center;
 			flex-grow: 1;
 			flex-shrink: 0;
-			overflow: visible;
+			margin: 0 10rpx;
+			// overflow: visible;
 			/* #ifdef WEB */
 			cursor: pointer;
 

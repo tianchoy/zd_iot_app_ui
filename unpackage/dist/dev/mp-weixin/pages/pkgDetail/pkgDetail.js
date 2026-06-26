@@ -45,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onLoad((options) => {
       var _a;
-      common_vendor.index.__f__("log", "at pages/pkgDetail/pkgDetail.uvue:122", "pkgDetail onLoad", options);
+      common_vendor.index.__f__("log", "at pages/pkgDetail/pkgDetail.uvue:117", "pkgDetail onLoad", options);
       pkgId.value = (_a = options.pkgId) !== null && _a !== void 0 ? _a : "";
       initPkgInfo();
     });
@@ -124,9 +124,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(pkgInfo).orderCreateTime ? {
         D: common_vendor.t(common_vendor.unref(pkgInfo).orderCreateTime)
       } : {}, {
-        E: common_vendor.t(common_vendor.unref(pkgInfo).usageInstructions),
-        F: `${_ctx.u_s_b_h}px`,
-        G: `${_ctx.u_s_a_i_b}px`
+        E: `${_ctx.u_s_b_h}px`,
+        F: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

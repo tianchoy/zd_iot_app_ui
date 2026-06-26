@@ -47,7 +47,6 @@
 						<text class="package-label">流量：</text>
 						<text class="package-value">{{ getFlowText(card) }}</text>
 					</view>
-					<rice-divider dashed :customStyle="{margin: card.totalFlow ? '0' : '20rpx 0 0 0'}"></rice-divider>
 					<view class="card-metrics">
 						<view class="metric-box mr-24" v-if="card.effectiveTime">
 							<view class="metric-label">生效时间</view>
@@ -78,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { queryCardList } from '@/api/http.uts'
 import { getToken } from '@/common/config.uts'
 import type { RechargeData } from '@/api/types.uts'

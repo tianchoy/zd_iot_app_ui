@@ -113,11 +113,11 @@ page .button-section .action-btn.data-v-4b5f1e90::after {
   border: none;
 }
 page .button-section .primary-btn.data-v-4b5f1e90 {
-  background-color: #07c160;
+  background-color: #2563eb;
   color: #ffffff;
 }
 page .button-section .secondary-btn.data-v-4b5f1e90 {
   background-color: #ffffff;
-  color: #07c160;
-  border: 2rpx solid #07c160;
+  color: #2563eb;
+  border: 2rpx solid #2563eb;
 }

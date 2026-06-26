@@ -15,7 +15,7 @@
 					></rice-tag>
 				</view>
 				<view class="card-number-row" v-if="orderDetail.rechargeNo">
-					<text class="card-number-label">当前卡号：</text>
+					<text class="card-number-label">充值号：</text>
 					<text class="card-number">{{ orderDetail.rechargeNo }}</text>
 				</view>
 			</view>
@@ -58,13 +58,7 @@
 					<text class="info-label">取消时间</text>
 					<text class="info-value">{{ formatDateTime(orderDetail.cancelTime) }}</text>
 				</view>
-			</view>
-			
-			<!-- 套餐信息卡片 -->
-			<view class="info-card">
-				<view class="section-header">
-					<text class="section-title">套餐信息</text>
-				</view>
+				<rice-divider></rice-divider>
 				<view class="info-row" v-if="orderDetail.pkgCategory">
 					<text class="info-label">套餐类型</text>
 					<text class="info-value">{{ getPkgCategoryText() }}</text>
@@ -96,14 +90,6 @@
 						<text class="info-value">¥{{ item.refundAmount || 0 }}</text>
 					</view>
 				</view>
-			</view>
-			
-			<!-- 说明卡片 -->
-			<view v-if="orderDetail.usageInstructions || getNoticeText()" class="notice-card">
-				<view class="section-header">
-					<text class="section-title">说明</text>
-				</view>
-				<text class="notice-text">{{ orderDetail.usageInstructions || getNoticeText() }}</text>
 			</view>
 			
 			<!-- 底部占位 -->
@@ -298,7 +284,7 @@
 		const res = data as any
 		orderId.value = res.orderId
 		payChannelId.value = res.payChannelId
-		// 设置正在支付流程中
+		// 设置正在支付流程中 - 所有支付方式统一处理
 		isInPaymentProcess.value = true
 		
 		if(res.payWxType == 'wechat_pay'){
@@ -312,9 +298,17 @@
 
 				success: (res) => {
 					uni.hideLoading()
+					uni.redirectTo({
+						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+					})
 				},
 				fail: (res) => {
 					uni.hideLoading()
+					uni.showToast({
+						title: "支付失败，请您重新支付",
+						icon: 'none',
+						duration: 1000
+					});
 					// 支付失败，重置标记
 					isInPaymentProcess.value = false
 				},
@@ -330,9 +324,18 @@
 					signType: res.signType,
 					success: function (res) {
 						uni.hideLoading()
+						uni.redirectTo({
+							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+						})
+						// 注意：支付成功时不要立即重置标记，等待 onShow 回调
 					},
 					fail: function (err) {
 						uni.hideLoading()
+						uni.showToast({
+							title: "支付失败，请您重新支付",
+							icon: 'none',
+							duration: 1000
+						});
 						// 支付失败，重置标记
 						isInPaymentProcess.value = false
 					},
@@ -647,29 +650,6 @@
 		}
 	}
 	
-	// 说明卡片
-	.notice-card {
-		background-color: #ffffff;
-		border-radius: 24rpx;
-		padding: 32rpx;
-		margin-bottom: 24rpx;
-		
-		.section-header {
-			margin-bottom: 16rpx;
-			
-			.section-title {
-				font-size: 32rpx;
-				font-weight: 600;
-				color: #1f2937;
-			}
-		}
-		
-		.notice-text {
-			font-size: 28rpx;
-			color: #6b7280;
-			line-height: 1.5;
-		}
-	}
 	
 	// 底部占位
 	.bottom-placeholder {
