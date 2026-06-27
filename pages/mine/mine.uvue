@@ -32,19 +32,17 @@
 				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
 			</view>
 		</view>
-		<!-- #ifdef MP-WEIXIN -->
-		<view class="btn-box">
+		<view class="btn-box" v-if="isWechat()">
 			<rice-button v-if="!isLogin()" type="primary" width="100%" shape="round" @click="handleLogin">登录</rice-button>
 			<rice-button v-else type="error" width="100%" shape="round"  @click="handleLogout">退出登录</rice-button>
 		</view>
-		<!-- #endif -->
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { login,getTenantInfo,queryCardListSum} from '@/api/http.uts'
 	import type { CardListSumData } from '@/api/types.uts'
-	import { setStorageSync,getTenantId,getToken ,clearToken} from '@/common/config.uts'
+	import { setStorageSync,getTenantId,getToken ,clearToken,isWechat} from '@/common/config.uts'
 
 
 	const title = ref('用户');
@@ -149,11 +147,11 @@
 
 
 	onLoad(() => {
-		// 检查token状态
-		if (checkToken()) {
-			//加载统计数据
-			getCardListSum()
+		if (isWechat()) {
+			if (!checkToken()) return;
 		}
+		// 检查token状态
+		getCardListSum()
 	})
 </script>
 

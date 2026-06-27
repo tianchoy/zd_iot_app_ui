@@ -131,7 +131,7 @@
 
 <script setup lang="uts">
 	import { goPayXcx , queryOrderDetail } from '@/api/http';
-	import { config } from '@/common/config.uts';
+	import { config,isWechat,isH5 } from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	
 	const showPopup = ref(false);
@@ -182,12 +182,12 @@
 	// 获取订单状态对应的标签类型
 	const getOrderStatusType = (status: string): string => {
 		const typeMap: Record<string, string> = {
-			'0': 'primary',
-			'1': 'success',
-			'2': 'error',
-			'3': 'danger',
-			'4': 'warning',
-			'5': 'warning',
+			'0': 'success',
+			'1': 'primary',
+			'2': 'warning',
+			'3': 'error',
+			'4': 'error',
+			'5': 'error',
 		}
 		return typeMap[status] || 'primary'
 	}
@@ -209,16 +209,15 @@
 	
 	// 获取支付方式
 	const getPaymentMethod = (): string => {
-		// #ifdef MP-WEIXIN
-		return '微信小程序支付'
-		// #endif
-		// #ifdef APP
-		return 'App支付'
-		// #endif
-		// #ifdef H5
-		return 'H5支付'
-		// #endif
-		return '微信支付'
+
+		if(isWechat()){
+			return '微信小程序支付'
+		}
+
+		if(isH5()){
+			return 'H5支付'
+		}
+
 	}
 	
 	// 获取说明文本

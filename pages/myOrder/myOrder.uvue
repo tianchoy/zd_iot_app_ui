@@ -76,6 +76,7 @@
 	import {queryOrderList} from '@/api/http'
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref, computed, onMounted } from 'vue'
+	import {isWechat,isH5} from '@/common/config.uts'
 	
 	// 订单状态映射
 	type OrderStatus = '全部' | '待支付' | '已完成' | '已退款' | '已取消'
@@ -196,30 +197,22 @@
 	// 去支付
 	const handlePay = (order: OrderListXcxItem) => {
 		console.log('去支付:', order)
-		// #ifdef MP-WEIXIN
-		// 微信小程序支付逻辑
-		uni.showToast({
-			title: `支付订单 ${order.id}`,
-			icon: 'none'
-		})
-		uni.navigateTo({
-			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
-		})
-		// #endif
-		// #ifdef APP
-		// App支付逻辑
-		uni.showToast({
-			title: `支付订单 ${order.orderNo}`,
-			icon: 'none'
-		})
-		// #endif
-		// #ifdef H5
-		// H5支付逻辑
-		uni.showToast({
-			title: `支付订单 ${order.orderNo}`,
-			icon: 'none'
-		})
-		// #endif
+		if(isWechat()){
+			uni.showToast({
+				title: `支付订单 ${order.id}`,
+				icon: 'none'
+			})
+			uni.navigateTo({
+				url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+			})
+		}
+
+		if(isH5()){
+			uni.showToast({
+				title: `支付订单 ${order.orderNo}`,
+				icon: 'none'
+			})
+		}
 	}
 	
 	// 获取订单列表

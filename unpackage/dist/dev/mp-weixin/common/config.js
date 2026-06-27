@@ -192,10 +192,14 @@ function clearToken() {
 function setStorageSync(key, value = null) {
   common_vendor.index.setStorageSync(key, value);
 }
+function isWechat() {
+  return true;
+}
 exports.clearToken = clearToken;
 exports.config = config;
 exports.getTenantId = getTenantId;
 exports.getToken = getToken;
+exports.isWechat = isWechat;
 exports.setStorageSync = setStorageSync;
 exports.setToken = setToken;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/config.js.map

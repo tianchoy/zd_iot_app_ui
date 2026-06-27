@@ -84,8 +84,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return `${used} / ${total}`;
     };
     const handleClick = (e) => {
-      if (!checkToken())
-        return null;
+      if (common_config.isWechat()) {
+        if (!checkToken())
+          return null;
+      }
       if (e.index != null) {
         current.value = e.index;
         getCardList(current.value.toString()).then((list) => {
@@ -163,8 +165,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const platform = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        if (!checkToken())
-          return Promise.resolve(null);
+        if (common_config.isWechat()) {
+          if (!checkToken())
+            return Promise.resolve(null);
+        }
         const _a = common_vendor.__read(yield Promise.all([
           getCardList("0"),
           getCardList("1"),

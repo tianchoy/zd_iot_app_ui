@@ -77,7 +77,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { queryCardList } from '@/api/http.uts'
-import { getToken } from '@/common/config.uts'
+import { getToken,isWechat } from '@/common/config.uts'
 import type { RechargeData } from '@/api/types.uts'
 
 const card_number = ref('gn20260603164757')
@@ -128,9 +128,9 @@ const getCycleText = (card: RechargeData): string => {
 }
 
 const handleClick = (e: UTSJSONObject) => {
-	// #ifdef MP-WEIXIN
-	if (!checkToken()) return;
-	// #endif
+	if (isWechat()) {
+		if (!checkToken()) return;
+	}
 
 	if (e.index != null) {
 		current.value = e.index as number
@@ -211,9 +211,9 @@ const checkToken = (): boolean => {
 }
 
 const platform = async () => {
-	// #ifdef MP-WEIXIN
-	if (!checkToken()) return;
-	// #endif
+	if (isWechat()) {
+		if (!checkToken()) return;
+	}
 
 	// 公共数据获取逻辑
 	const [allList, inUseList, abnormalList] = await Promise.all([

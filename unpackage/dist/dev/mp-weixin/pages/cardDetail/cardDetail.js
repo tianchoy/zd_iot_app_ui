@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_types = require("../../api/types.js");
 const api_http = require("../../api/http.js");
+const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
@@ -155,22 +156,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     const handleOrderDetail = (pkgId) => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:241", pkgId);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:242", pkgId);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${pkgId}`
       });
     };
     const getNavBarInfo = () => {
-      try {
-        const systemInfo = common_vendor.index.getSystemInfoSync();
-        statusBarHeight.value = systemInfo.statusBarHeight || 20;
-        const menuButtonInfo = common_vendor.index.getMenuButtonBoundingClientRect();
-        if (menuButtonInfo) {
-          const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height;
-          navBarHeight.value = navHeight > 0 ? navHeight : 44;
+      if (common_config.isWechat()) {
+        try {
+          const systemInfo = common_vendor.index.getSystemInfoSync();
+          statusBarHeight.value = systemInfo.statusBarHeight || 20;
+          const menuButtonInfo = common_vendor.index.getMenuButtonBoundingClientRect();
+          if (menuButtonInfo) {
+            const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height;
+            navBarHeight.value = navHeight > 0 ? navHeight : 44;
+          }
+        } catch (e) {
+          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:260", "获取导航栏信息失败", e);
         }
-      } catch (e) {
-        common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:258", "获取导航栏信息失败", e);
       }
     };
     const handleRecharge = () => {
@@ -181,7 +184,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getCardDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.queryCardDetail(card_number.value, "", "1");
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:276", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:278", res);
         if (res.code == 200) {
           cardDetail.value = res.data;
         }
@@ -202,11 +205,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               orderList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:297", "查询订单列表失败:", resp.msg);
+            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:299", "查询订单列表失败:", resp.msg);
             orderList.value = [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:301", "查询订单列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:303", "查询订单列表异常:", error);
           orderList.value = [];
         }
       });
@@ -227,11 +230,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               pkgInfoList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:322", "查询套餐列表失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:324", "查询套餐列表失败:", res.msg);
             pkgInfoList.value = [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:326", "查询套餐列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:328", "查询套餐列表异常:", error);
           pkgInfoList.value = [];
         }
       });
@@ -243,7 +246,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_http.userBindCard(new api_types.BindCard({
           rechargeNo: card_number.value
         }));
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:337", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:339", res);
         if (res.code == 200) {
           common_vendor.index.showToast({
             title: "绑定成功",
@@ -269,7 +272,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               if (res.confirm) {
                 try {
                   const result = yield api_http.userUnBindCard(card_number.value);
-                  common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:361", result);
+                  common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:363", result);
                   if (result.code == 200) {
                     common_vendor.index.showToast({
                       title: "解绑成功",
@@ -286,7 +289,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                     });
                   }
                 } catch (error) {
-                  common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:379", "解绑请求失败:", error);
+                  common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:381", "解绑请求失败:", error);
                   common_vendor.index.showToast({
                     title: "网络异常，请重试",
                     icon: "none"
@@ -299,7 +302,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePkgDetail = (pkgId) => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:392", pkgId);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:394", pkgId);
       common_vendor.index.navigateTo({
         url: `/pages/pkgDetail/pkgDetail?pkgId=${pkgId}`
       });

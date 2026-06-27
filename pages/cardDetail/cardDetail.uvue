@@ -125,6 +125,7 @@
 <script setup lang="uts">
 	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderList,userUnBindCard} from '@/api/http'
 	import type {CardDetail,BindCard,OrderListXcxItem,PkgInfoItem} from '@/api/types'
+	import {isH5,isWechat} from '@/common/config.uts'
 
 	type CardDetailTabItem = {
 		name: string
@@ -245,24 +246,25 @@
 	}
 
 	const getNavBarInfo = () => {
-		// #ifdef MP-WEIXIN
-		try {
-			const systemInfo = uni.getSystemInfoSync()
-			statusBarHeight.value = systemInfo.statusBarHeight || 20
-			const menuButtonInfo = uni.getMenuButtonBoundingClientRect()
-			if (menuButtonInfo) {
-				const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height
-				navBarHeight.value = navHeight > 0 ? navHeight : 44
+		// 判断是否为微信环境（小程序）
+		if (isWechat()) {
+			try {
+				const systemInfo = uni.getSystemInfoSync()
+				statusBarHeight.value = systemInfo.statusBarHeight || 20
+				const menuButtonInfo = uni.getMenuButtonBoundingClientRect()
+				if (menuButtonInfo) {
+					const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height
+					navBarHeight.value = navHeight > 0 ? navHeight : 44
+				}
+			} catch (e) {
+				console.error('获取导航栏信息失败', e)
 			}
-		} catch (e) {
-			console.error('获取导航栏信息失败', e)
+		} 
+		if (isH5()) {
+			// H5 环境
+			statusBarHeight.value = 0
+			navBarHeight.value = 44
 		}
-		// #endif
-
-		// #ifdef H5
-		statusBarHeight.value = 0
-		navBarHeight.value = 44
-		// #endif
 	}
 
 	const handleRecharge = () => {

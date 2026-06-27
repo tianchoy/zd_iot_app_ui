@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_http = require("../../api/http.js");
+require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   _easycom_topNavBar_1();
@@ -29,14 +30,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.queryOrderSuccess(orderId.value, payChannelId.value);
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:120", "订单详情:", res);
+          common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:98", "订单详情:", res);
           orderDetail.value = res.data;
         }
       });
     };
     common_vendor.onLoad((options) => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:126", "orderId:", options);
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:104", "orderId:", options);
       orderId.value = (_a = options.orderId) !== null && _a !== void 0 ? _a : "";
       payChannelId.value = (_b = options.payChannelId) !== null && _b !== void 0 ? _b : "";
       getOrderDetail();

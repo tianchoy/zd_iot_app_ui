@@ -4,7 +4,7 @@
 		<view class="card-info">
 			<view class="card-title">
 				<text class="title">卡片信息</text>
-				<rice-tag :text="cardDetail?.statusStr || '未知'" :round="true" plain-fill size="small" type="success"></rice-tag>
+				<rice-tag :text="cardDetail?.statusStr || '未知'" :round="true" plain-fill size="small" :type="getOrderStatusType(cardDetail?.statusStr)"></rice-tag>
 			</view>
 			<view class="card-number">{{ cardDetail?.rechargeNo || '未知' }}</view>
 			<view class="info-list">
@@ -229,6 +229,14 @@
 		selectedRefillIndex.value = 0;
 		
 	};
+
+	const getOrderStatusType = (status: string): string => {
+		const typeMap: Record<string, string> = {
+			'在用': 'success',
+			'停机': 'error',
+		}
+		return typeMap[status] || 'warning'
+	}
 	
 	const changeTab = (e: {index: number}) => {
 		active.value = e.index;

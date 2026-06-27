@@ -87,7 +87,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             cardListSum.value = res.data;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:128", "查询卡列表统计异常:", error);
+          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:126", "查询卡列表统计异常:", error);
         }
       });
     };
@@ -106,9 +106,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return true;
     };
     common_vendor.onLoad(() => {
-      if (checkToken()) {
-        getCardListSum();
+      if (common_config.isWechat()) {
+        if (!checkToken())
+          return null;
       }
+      getCardListSum();
     });
     return (_ctx, _cache) => {
       "raw js";
@@ -140,26 +142,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        i: !isLogin()
+        i: common_vendor.unref(common_config.isWechat)()
+      }, common_vendor.unref(common_config.isWechat)() ? common_vendor.e({
+        j: !isLogin()
       }, !isLogin() ? {
-        j: common_vendor.o(handleLogin, "32"),
-        k: common_vendor.p({
+        k: common_vendor.o(handleLogin, "53"),
+        l: common_vendor.p({
           type: "primary",
           width: "100%",
           shape: "round",
           class: "data-v-284ae985"
         })
       } : {
-        l: common_vendor.o(handleLogout, "26"),
-        m: common_vendor.p({
+        m: common_vendor.o(handleLogout, "33"),
+        n: common_vendor.p({
           type: "error",
           width: "100%",
           shape: "round",
           class: "data-v-284ae985"
         })
-      }, {
-        n: `${_ctx.u_s_b_h}px`,
-        o: `${_ctx.u_s_a_i_b}px`
+      }) : {}, {
+        o: `${_ctx.u_s_b_h}px`,
+        p: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

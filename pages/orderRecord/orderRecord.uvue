@@ -66,6 +66,7 @@
 	import {queryOrderList} from '@/api/http'
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref } from 'vue'
+	import { isWechat,isH5 } from '@/common/config.uts'
 	const rechargeNo = ref<string>('')
 	
 	// 订单状态映射
@@ -154,29 +155,20 @@
 	// 去支付
 	const handlePay = (order: OrderListXcxItem) => {
 		console.log('去支付:', order)
-		// #ifdef MP-WEIXIN
-		// 微信小程序支付逻辑
-		uni.showToast({
-			title: `支付订单 ${order.id}`,
-			icon: 'none'
-		})
-		uni.navigateTo({
-			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
-		})
-		// #endif
-		// #ifdef APP
-		// App支付逻辑
-		uni.showToast({
-			title: `支付订单 ${order.orderNo}`,
-			icon: 'none'
-		})
-		// #endif
-		// #ifdef H5
-		// H5支付逻辑
-		uni.navigateTo({
-			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
-		})
-		// #endif
+		if(isWechat()){
+			uni.showToast({
+				title: `支付订单 ${order.id}`,
+				icon: 'none'
+			})
+			uni.navigateTo({
+				url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+			})
+		}
+		if(isH5()){
+			uni.navigateTo({
+				url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+			})
+		}
 	}
 	
 	// 获取订单列表

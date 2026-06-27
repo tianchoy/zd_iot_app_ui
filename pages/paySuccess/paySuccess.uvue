@@ -71,47 +71,25 @@
 
 <script setup lang="uts">
 	import {queryOrderSuccess} from '@/api/http'
+	import { isWechat,isH5 } from '@/common/config.uts'
+
 	const orderId = ref<string>('')
 	const payChannelId = ref<string>('')
 	const orderDetail = ref<any>({})
 	
 	// 查看订单点击处理
 	const handleViewOrder = () => {
-		// 使用 redirectTo 替换当前页面，避免页面栈累积和循环跳转
-		// #ifdef MP-WEIXIN
 		uni.redirectTo({
 			url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}&from=paySuccess`
 		})
-		// #endif
-		// #ifdef APP
-		uni.redirectTo({
-			url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}&from=paySuccess`
-		})
-		// #endif
-		// #ifdef H5
-		uni.redirectTo({
-			url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}&from=paySuccess`
-		})
-		// #endif
+
 	}
 	
 	// 返回卡片详情点击处理
 	const handleBackCard = () => {
-		// #ifdef MP-WEIXIN
 		uni.reLaunch({
 			url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
 		})
-		// #endif
-		// #ifdef APP
-		uni.reLaunch({
-			url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
-		})
-		// #endif
-		// #ifdef H5
-		uni.reLaunch({
-			url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
-		})
-		// #endif
 	}
 
 	const getOrderDetail = async () => {

@@ -64,12 +64,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const getOrderStatusType = (status) => {
       const typeMap = {
-        "0": "primary",
-        "1": "success",
-        "2": "error",
-        "3": "danger",
-        "4": "warning",
-        "5": "warning"
+        "0": "success",
+        "1": "primary",
+        "2": "warning",
+        "3": "error",
+        "4": "error",
+        "5": "error"
       };
       return typeMap[status] || "primary";
     };
@@ -87,7 +87,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const getPaymentMethod = () => {
-      return "微信小程序支付";
+      if (common_config.isWechat()) {
+        return "微信小程序支付";
+      }
     };
     const choosePayment = () => {
       currentPrice.value = orderDetail.value.payAmount || orderDetail.value.orderAmount || 0;
@@ -179,10 +181,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:344", "打开支付小程序成功:", res2);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:343", "打开支付小程序成功:", res2);
             },
             fail(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:347", "打开支付小程序失败:", res2);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:346", "打开支付小程序失败:", res2);
               common_vendor.index.hideLoading();
               isInPaymentProcess.value = false;
             }
@@ -204,7 +206,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:371", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:370", "支付失败:", error);
           common_vendor.index.showToast({
             title: "支付失败，请稍后重试",
             icon: "none"
@@ -240,7 +242,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:410", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:409", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"

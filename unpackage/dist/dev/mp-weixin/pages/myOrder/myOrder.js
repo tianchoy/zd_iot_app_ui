@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_http = require("../../api/http.js");
 require("../../api/types.js");
+const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_button_1 = common_vendor.resolveComponent("rice-button");
@@ -69,7 +70,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleTabClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:123", e);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:124", e);
       const index = e.index;
       current.value = index;
       getOrderList(e.value);
@@ -93,7 +94,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleOrderClick = (order) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:151", order);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:152", order);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
       });
@@ -122,7 +123,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:184", result);
+        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:185", result);
         if (result.length > 0) {
           card_number.value = result;
           common_vendor.index.showToast({
@@ -134,14 +135,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePay = (order) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:198", "去支付:", order);
-      common_vendor.index.showToast({
-        title: `支付订单 ${order.id}`,
-        icon: "none"
-      });
-      common_vendor.index.navigateTo({
-        url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
-      });
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:199", "去支付:", order);
+      if (common_config.isWechat()) {
+        common_vendor.index.showToast({
+          title: `支付订单 ${order.id}`,
+          icon: "none"
+        });
+        common_vendor.index.navigateTo({
+          url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+        });
+      }
     };
     const getOrderList = (status) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -167,7 +170,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:249", "获取订单列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:242", "获取订单列表失败:", error);
           orderList.value = [];
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
