@@ -8,7 +8,7 @@
 					line-color="#ffffff" 
 					:list="tabs" 
 					:line-width="0" 
-					::item-style="{ overflow: 'hidden' }"
+					:item-style="{ overflow: 'hidden' }"
 					:title-active-color="'#2563eb'" 
 					:title-inactive-color="'#334155'"
 					:active-style="{ backgroundColor: '#ffffff',border:'1rpx solid #e5edf6',borderRadius:'24rpx'}"
@@ -56,7 +56,7 @@
 								>
 							</rice-tabs>
 							<view class="card-pkg-box">
-								<view v-if="pkgInfoList.length === 0" class="empty-order">暂无套餐记录</view>
+								<view v-if="pkgInfoList.length == 0" class="empty-order">暂无套餐记录</view>
 								<view class="item" v-for="(item, index) in pkgInfoList" :key="index" @click="handlePkgDetail(item.id)">
 									<view class="item-head">
 										<text class="item-label" v-if="item.pkgName">{{ item.pkgName }}</text>
@@ -83,7 +83,7 @@
 						</view>
 
 						<view class="section-content card-order" v-if="activeName == '卡片订单'">
-							<view v-if="orderList.length === 0" class="empty-order">
+							<view v-if="orderList.length == 0" class="empty-order">
 								<view class="empty-text">暂无订单记录</view>
 							</view>
 							<view class="item" v-for="(order, index) in orderList" :key="order.id || index"  @click="handleOrderDetail(order.id)">

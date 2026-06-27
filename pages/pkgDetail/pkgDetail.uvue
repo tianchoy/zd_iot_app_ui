@@ -31,9 +31,7 @@
 				</view>
 
 				<!-- 进度条 -->
-				<view class="progress-bar">
-					<rice-progress :percentage="pkgInfo.usedFlow / pkgInfo.pkgFlow * 100" show-text />
-				</view>
+				<view class="progress-bar"><rice-progress :percentage="flowPercentage" show-text /></view>
 			</view>
 
 
@@ -87,11 +85,23 @@
 
 <script setup lang="uts">
 	import {queryPkgInfoXcx} from '@/api/http';
+	import {ref, computed} from 'vue';
 
 	const showLoading = ref(false)
 	const pkgId = ref<string>('')
 	// 查询套餐信息详情
 	const pkgInfo = ref<any>({});
+
+	const flowPercentage = computed(() => {
+		if (!pkgInfo.value) return 0
+		
+		const usedFlow = Number(pkgInfo.value.usedFlow) || 0
+		const pkgFlow = Number(pkgInfo.value.pkgFlow) || 0
+		
+		if (pkgFlow <= 0) return 0
+		
+		return Math.min((usedFlow / pkgFlow) * 100, 100)
+	})
 	// 初始化查询套餐信息详情
 	const initPkgInfo = async () => {
 		if (!pkgId.value) return

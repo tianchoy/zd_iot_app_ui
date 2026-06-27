@@ -6,7 +6,7 @@
 			<view class="search-value">
 				<input
 					v-model="card_number"
-					placeholder="请输入 ICCID / MSISDN"
+					placeholder="请输入订单号/卡号"
 					class="search-input"
 				/>
 				<rice-button class="scan-btn" height="100%" @click="scanCode" icon="scan"></rice-button>
@@ -99,6 +99,9 @@
 	// 订单数据
 	const orderList = ref<OrderListXcxItem[]>([])
 	
+	// 查询状态标志
+	const isSearching = ref<boolean>(false)
+	
 	// 状态码映射
 	const getStatusText = (status: string): string => {
 		switch (status) {
@@ -119,12 +122,29 @@
 		}
 	}
 	
+	// 获取状态对应的tab索引
+	const getTabIndexByStatus = (status: string): number => {
+		if (status === '' || status === null || status === undefined) {
+			return 0 // 全部
+		}
+		const tabMap: Record<string, number> = {
+			'0': 1, // 待支付
+			'1': 2, // 已完成
+			'5': 3, // 已退款
+			'2': 4  // 已取消
+		}
+		return tabMap[status] ?? 0
+	}
+	
 	// 处理Tab切换
 	const handleTabClick = (e: UTSJSONObject) => {
 		console.log(e)
 		const index = e.index as number
 		current.value = index
-		getOrderList(e.value)
+		// 切换标签时重置查询状态和搜索框
+		isSearching.value = false
+		card_number.value = ''
+		getOrderList(e.value, false)
 	}
 	
 	// 获取状态样式类
@@ -168,15 +188,19 @@
 		})
 	}
 	
+	// 查询订单
 	const handleQuery = () => {
 		const keyword = card_number.value.trim()
 		if (!keyword) {
 			uni.showToast({
-				title: '请输入卡号',
+				title: '请输入订单号/卡号',
 				icon: 'none'
 			})
 			return
 		}
+		// 标记为查询状态
+		isSearching.value = true
+		getOrderList('', true)
 	}
 	
 	// 接收扫码结果
@@ -196,7 +220,6 @@
 	
 	// 去支付
 	const handlePay = (order: OrderListXcxItem) => {
-		console.log('去支付:', order)
 		if(isWechat()){
 			uni.showToast({
 				title: `支付订单 ${order.id}`,
@@ -216,20 +239,67 @@
 	}
 	
 	// 获取订单列表
-	const getOrderList = async (status: string) => {
+	const getOrderList = async (status: string, isSearch: boolean) => {
 		try {
 			const params: any = {}
 			if (status !== '') {
 				params.status = status
 			}
+			// 只有查询操作才传递查询参数
+			if (isSearch && card_number.value.trim()) {
+				params.rechargeNoAndOrderNo = card_number.value.trim()
+			}
 			const resp = await queryOrderList(params)
 			if (resp.code == 200) {
+				let data: OrderListXcxItem[] = []
 				if (resp.rows && Array.isArray(resp.rows)) {
-					orderList.value = resp.rows
+					data = resp.rows
 				} else if (resp.data && Array.isArray(resp.data)) {
-					orderList.value = resp.data
+					data = resp.data
 				} else {
-					orderList.value = []
+					data = []
+				}
+				
+				// 如果是查询操作
+				if (isSearch) {
+					if (data.length === 0) {
+						orderList.value = []
+						uni.showToast({
+							title: '未找到匹配的订单',
+							icon: 'none'
+						})
+						return
+					}
+					
+					// 统计各状态的订单数量
+					const statusCount: Record<string, number> = {}
+					data.forEach(order => {
+						const statusKey = order.status || ''
+						statusCount[statusKey] = (statusCount[statusKey] || 0) + 1
+					})
+					
+					// 获取不同的状态种类数
+					const statusKeys = Object.keys(statusCount)
+					
+					// 直接显示查询结果
+					orderList.value = data
+					
+					// 如果只有一种状态，切换到对应的tab
+					if (statusKeys.length === 1) {
+						const targetStatus = statusKeys[0]
+						if (targetStatus !== '') {
+							const targetIndex = getTabIndexByStatus(targetStatus)
+							current.value = targetIndex
+						} else {
+							current.value = 0
+						}
+					} else {
+						// 多种状态，显示在"全部"
+						current.value = 0
+					}
+				} else {
+					// 非查询操作，直接显示数据
+					orderList.value = data
 				}
 			} else {
 				orderList.value = []
@@ -249,7 +319,11 @@
 	}
 
 	onShow(() => {
-		getOrderList('')
+		// 页面显示时重置所有状态
+		isSearching.value = false
+		card_number.value = ''
+		current.value = 0
+		getOrderList('', false)
 	})
 	
 	onMounted(() => {

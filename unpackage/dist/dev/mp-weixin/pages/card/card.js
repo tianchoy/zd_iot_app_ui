@@ -65,7 +65,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       switch (status) {
         case "在用":
           return "status-completed";
-        case "异常":
+        case "停机":
           return "status-pending";
         default:
           return "";

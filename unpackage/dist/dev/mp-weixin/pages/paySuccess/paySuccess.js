@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_http = require("../../api/http.js");
-require("../../common/config.js");
+const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   _easycom_topNavBar_1();
@@ -30,14 +30,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.queryOrderSuccess(orderId.value, payChannelId.value);
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:98", "订单详情:", res);
+          common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:96", "订单详情:", res);
           orderDetail.value = res.data;
         }
       });
     };
     common_vendor.onLoad((options) => {
       var _a, _b;
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:104", "orderId:", options);
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:102", "orderId:", options);
       orderId.value = (_a = options.orderId) !== null && _a !== void 0 ? _a : "";
       payChannelId.value = (_b = options.payChannelId) !== null && _b !== void 0 ? _b : "";
       getOrderDetail();
@@ -73,18 +73,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, common_vendor.unref(orderDetail).pkgType ? {
         k: common_vendor.t(common_vendor.unref(orderDetail).pkgType)
       } : {}, {
-        l: common_vendor.unref(orderDetail).payAmount
+        l: common_vendor.unref(common_config.isWechat)() && common_vendor.unref(orderDetail).payType
+      }, common_vendor.unref(common_config.isWechat)() && common_vendor.unref(orderDetail).payType ? {
+        m: common_vendor.t(common_vendor.unref(orderDetail).payType)
+      } : {}, {
+        n: common_vendor.unref(orderDetail).payAmount
       }, common_vendor.unref(orderDetail).payAmount ? {
-        m: common_vendor.t(common_vendor.unref(orderDetail).payAmount)
+        o: common_vendor.t(common_vendor.unref(orderDetail).payAmount)
       } : {}, {
-        n: common_vendor.unref(orderDetail).payTime
+        p: common_vendor.unref(orderDetail).payTime
       }, common_vendor.unref(orderDetail).payTime ? {
-        o: common_vendor.t(common_vendor.unref(orderDetail).payTime)
+        q: common_vendor.t(common_vendor.unref(orderDetail).payTime)
       } : {}, {
-        p: common_vendor.o(handleViewOrder, "7a"),
-        q: common_vendor.o(handleBackCard, "a7"),
-        r: `${_ctx.u_s_b_h}px`,
-        s: `${_ctx.u_s_a_i_b}px`
+        r: common_vendor.o(handleViewOrder, "bd"),
+        s: common_vendor.o(handleBackCard, "5b"),
+        t: `${_ctx.u_s_b_h}px`,
+        v: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

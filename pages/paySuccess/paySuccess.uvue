@@ -42,12 +42,10 @@
 			</view>
 			
 			<!-- 支付方式 -->
-			<!-- #ifndef MP-WEIXIN -->
-			<view class="info-row" v-if="orderDetail.payType">
+			<view class="info-row" v-if="isWechat() && orderDetail.payType">
 				<text class="label">支付方式</text>
 				<text class="value">{{orderDetail.payType}}</text>
 			</view>
-			<!-- #endif -->
 			
 			<!-- 支付金额 (突出显示) -->
 			<view class="info-row" v-if="orderDetail.payAmount">
