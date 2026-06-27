@@ -322,16 +322,15 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 					}
 				}
 
-				// 未授权处理：
-				// 1. 如果 withToken 为 true（说明是登录态请求），才跳转登录
-				// 2. 或者接口明确返回 401/403 且 redirectOnUnauthorized 为 true
 				if (isUnauthorizedCode && redirectOnUnauthorized) {
 					// 显示错误提示
 					if (showError) {
 						showErrorToast(msg || '登录已过期，请重新登录')
 					}
 					// 跳转登录页
+					// #ifdef MP-WEIXIN
 					navigateToLogin(finalLoginPage)
+					// #endif
 					reject(result)
 					return
 				}

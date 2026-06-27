@@ -287,7 +287,7 @@
 				signType: res.signType,
 
 				success: (res) => {
-					console.log('支付成功',res)
+					console.log('微信支付成功',res)
 					uni.hideLoading()
 					uni.redirectTo({
 						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
@@ -296,13 +296,15 @@
 				fail: (res) => {
 					uni.hideLoading()
 					uni.showToast({
-						title: "支付失败，请您重新支付",
+						title: "微信支付失败，请您重新支付",
 						icon: 'none',
 						duration: 1000
 					});
-					uni.reLaunch({
-						url:'/pages/orderDetail/orderDetail?orderNo=' + orderId.value
-					})
+					setTimeout(() => {
+						uni.reLaunch({
+							url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+						});
+					}, 1000);
 					// 支付失败，重置标记
 					isInPaymentProcess.value = false
 				},
@@ -317,7 +319,7 @@
 					paySign: res.paySign,
 					signType: res.signType,
 					success: function (res) {
-						console.log('支付成功',res)
+						console.log('通联支付成功',res)
 						uni.hideLoading()
 						uni.redirectTo({
 							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
@@ -326,10 +328,15 @@
 					fail: function (err) {
 						uni.hideLoading()
 						uni.showToast({
-							title: "支付失败，请您重新支付",
+							title: "通联支付失败，请您重新支付",
 							icon: 'none',
 							duration: 1000
 						});
+						setTimeout(() => {
+							uni.reLaunch({
+								url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+							});
+						}, 1000);
 						// 支付失败，重置标记
 						isInPaymentProcess.value = false
 					},
@@ -355,7 +362,7 @@
 					appId: config.api.auth.appID,
 					extraData: param,
 					success(res) { 
-						console.log('支付成功0000:', res);
+						console.log('支付成功:', res);
 					},
 					fail(res) {
 						console.log('支付失败:', res);
@@ -516,9 +523,11 @@
 						duration: 1000
 					});
 					// 重置支付流程标记
-					uni.reLaunch({
-						url:'/pages/orderDetail/orderDetail?orderNo=' + orderId.value
-					})
+					setTimeout(() => {
+						uni.reLaunch({
+							url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+						});
+					}, 1000);
 					isInPaymentProcess.value = false
 					return
 				} else {
