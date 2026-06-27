@@ -381,18 +381,17 @@
 		showPopup.value = false
 	}
 	
-	// 返回上一页
 	// 返回上一页或首页
-const handleBack = () => {
-	const pages = getCurrentPages();
-	if (pages.length > 1) {
-		uni.navigateBack()
-	} else {
-		uni.reLaunch({
-			url: '/pages/card/card'
-		})
+	const handleBack = () => {
+		const pages = getCurrentPages();
+		if (pages.length > 1) {
+			uni.navigateBack()
+		} else {
+			uni.reLaunch({
+				url: '/pages/card/card'
+			})
+		}
 	}
-}
 	
 	// 查询订单详情
 	const getOrderDetail = async () => {

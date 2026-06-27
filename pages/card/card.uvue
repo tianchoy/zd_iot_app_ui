@@ -1,7 +1,6 @@
 <template>
 	<topNavBar title="卡片" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
-
 		<view class="card-box mb-24">
 			<view class="card-label">卡号查询</view>
 			<view class="search-value mt-24">

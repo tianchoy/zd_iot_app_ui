@@ -21,7 +21,7 @@
 				:title-inactive-color="'#334155'"
 				@change="handleTabClick" 
 				:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
-				>
+			>
 			</rice-tabs>
 		</view>
 		

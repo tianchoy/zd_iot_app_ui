@@ -173,9 +173,8 @@
 		// #endif
 		// #ifdef H5
 		// H5支付逻辑
-		uni.showToast({
-			title: `支付订单 ${order.orderNo}`,
-			icon: 'none'
+		uni.navigateTo({
+			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
 		})
 		// #endif
 	}

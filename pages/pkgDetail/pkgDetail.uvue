@@ -1,5 +1,8 @@
 <template>
 	<topNavBar title="套餐详情" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+		<rice-overlay v-model:show="showLoading" mode="snow" bg-color="rgba(255, 255, 255, 0.4)">
+			<rice-loading :customStyle="{height:'100rpx',width:'100rpx',position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)'}" />
+		</rice-overlay>
 	<view class="container">
 		<view class="card-box">
 			<!-- 头部：套餐名称和状态 -->
@@ -84,23 +87,29 @@
 
 <script setup lang="uts">
 	import {queryPkgInfoXcx} from '@/api/http';
+
+	const showLoading = ref(false)
 	const pkgId = ref<string>('')
 	// 查询套餐信息详情
 	const pkgInfo = ref<any>({});
 	// 初始化查询套餐信息详情
 	const initPkgInfo = async () => {
 		if (!pkgId.value) return
+		showLoading.value = true
 		try {
 			const res = await queryPkgInfoXcx(pkgId.value)
 			if (res.code == 200) {
 				pkgInfo.value = res.data
+				showLoading.value = false
 			} else {
+				showLoading.value = false
 				uni.showToast({
 					title: res.msg || '查询套餐信息详情失败',
 					icon: 'none'
 				})
 			}
 		} catch (error) {
+			showLoading.value = false
 			uni.showToast({
 				title: '查询套餐信息详情失败',
 				icon: 'none'
