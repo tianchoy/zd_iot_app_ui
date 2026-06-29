@@ -72,7 +72,7 @@ type QuickRequestParams = {
 const DEFAULT_TIMEOUT = 30000
 const DEFAULT_SUCCESS_CODES = [0, 200]
 const DEFAULT_UNAUTHORIZED_CODES = [401, 403]
-const DEFAULT_LOGIN_PAGE = '/pages/login/login'
+const DEFAULT_LOGIN_PAGE = '/pages/card/card'
 
 // ========== 工具函数 ==========
 
@@ -314,6 +314,7 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 				}
 
 				// 检查是否为未授权状态码
+				// #ifdef MP-WEIXIN
 				let isUnauthorizedCode = false
 				for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
 					if (('' + finalUnauthorizedCodes[i]) == ('' + code)) {
@@ -328,12 +329,13 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 						showErrorToast(msg || '登录已过期，请重新登录')
 					}
 					// 跳转登录页
-					// #ifdef MP-WEIXIN
 					navigateToLogin(finalLoginPage)
-					// #endif
+					
 					reject(result)
 					return
 				}
+
+				// #endif
 
 				// 自定义错误码处理
 				if (onErrorCode != null) {

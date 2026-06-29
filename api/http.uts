@@ -105,14 +105,13 @@ export function queryCardDetail(id: string,countryCode?: string, isFind?:string,
   const token = true
 	// #endif
 
-	// #ifdef H5
+	// #ifdef VERSION_INT
 	const url = (ApiUrl.card_detail as string) + id + '/' + countryCode
   const token = false
 	// #endif
 
-	// #ifndef MP-WEIXIN || H5
-	// 其他平台默认使用H5配置
-	const url = (ApiUrl.card_detail as string) + id + '/' + countryCode
+  // #ifdef VERSION_CN
+	const url = (ApiUrl.card_detail as string) + id
   const token = false
 	// #endif
 

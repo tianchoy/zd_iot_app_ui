@@ -163,12 +163,45 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const token = common_config.getToken();
       return !!token;
     };
-    const platform = () => {
+    const code = common_vendor.ref("");
+    const getCode = () => {
+      return new Promise((resolve) => {
+        common_vendor.index.login(new common_vendor.UTSJSONObject({
+          success: (res) => {
+            return common_vendor.__awaiter(this, void 0, void 0, function* () {
+              code.value = res.code;
+              const params = new common_vendor.UTSJSONObject({
+                isLogin: "1",
+                xcxCode: code.value
+              });
+              const loginRes = yield api_http.login(params);
+              if (loginRes.code == 200) {
+                common_config.setToken(loginRes.data.access_token, loginRes.data.refreshToken);
+                resolve(true);
+              } else {
+                resolve(false);
+              }
+            });
+          },
+          fail: (err) => {
+            common_vendor.index.__f__("error", "at pages/card/card.uvue:233", "登录失败:", err);
+            resolve(false);
+          }
+        }));
+      });
+    };
+    const wxGetPhoneLogin = common_vendor.ref("");
+    const getTenantInfos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        if (common_config.isWechat()) {
-          if (!checkToken())
-            return Promise.resolve(null);
+        const res = yield api_http.getTenantInfo(common_config.getTenantId(), false);
+        if (res.code == 200) {
+          const tenantInfo = res.data;
+          wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
         }
+      });
+    };
+    const loadCardData = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const _a = common_vendor.__read(yield Promise.all([
           getCardList("0"),
           getCardList("1"),
@@ -176,6 +209,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         ]), 3), allList = _a[0], inUseList = _a[1], abnormalList = _a[2];
         cardCounts.value = [allList.length, inUseList.length, abnormalList.length];
         cardList.value = allList;
+      });
+    };
+    const platform = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (common_config.isWechat()) {
+          if (!checkToken()) {
+            yield getTenantInfos();
+            if (wxGetPhoneLogin.value != "1") {
+              cardList.value = [];
+              cardCounts.value = [0, 0, 0];
+              return Promise.resolve(null);
+            }
+            const loginSuccess = yield getCode();
+            if (!loginSuccess) {
+              common_vendor.index.__f__("log", "at pages/card/card.uvue:280", "登录失败，跳过数据加载");
+              common_vendor.index.showToast({
+                title: "登录失败，请重试",
+                icon: "none"
+              });
+              return Promise.resolve(null);
+            }
+          }
+        }
+        yield loadCardData();
       });
     };
     common_vendor.onLoad(() => {

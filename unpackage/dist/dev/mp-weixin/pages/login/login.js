@@ -28,6 +28,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (res.code == 200) {
           common_vendor.index.__f__("log", "at pages/login/login.uvue:35", "登录成功:", res.data.access_token);
           common_config.setToken(res.data.access_token, res.data.refreshToken);
+          common_config.setStorageSync("usePhone", true);
           common_vendor.index.reLaunch({
             url: "/pages/card/card"
           });
@@ -36,7 +37,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleGetPhoneNumber = (res) => {
       const detail = res["detail"];
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:46", "点击登录按钮获取手机号:", detail);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:47", "点击登录按钮获取手机号:", detail);
       getLogin(detail["code"]);
     };
     const noNowLogin = () => {
@@ -45,7 +46,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:58", "登录参数:", options);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:59", "登录参数:", options);
       if (options["wxGetPhoneLogin"] != null) {
         wxGetPhoneLogin.value = options["wxGetPhoneLogin"];
         userId.value = options["userId"];

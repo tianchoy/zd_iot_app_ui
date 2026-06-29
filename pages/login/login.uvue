@@ -20,7 +20,7 @@
 
 <script setup lang="uts">
 	import {login} from '@/api/http.uts'
-	import {setToken} from '@/common/config.uts'
+	import {setToken,setStorageSync} from '@/common/config.uts'
 	const wxGetPhoneLogin = ref<string>('')
 	const userId = ref<string>('')
 
@@ -34,6 +34,7 @@
 		if(res.code == 200){
 			console.log('登录成功:', res.data.access_token)
 			setToken(res.data.access_token, res.data.refreshToken)
+			setStorageSync('usePhone', true)
 			uni.reLaunch({
 				url: '/pages/card/card'
 			})

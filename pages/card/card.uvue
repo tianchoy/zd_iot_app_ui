@@ -76,8 +76,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { queryCardList } from '@/api/http.uts'
-import { getToken,isWechat } from '@/common/config.uts'
+import { queryCardList, login, getTenantInfo } from '@/api/http.uts'
+import { getToken, getTenantId, isWechat, setToken } from '@/common/config.uts'
 import type { RechargeData } from '@/api/types.uts'
 
 const card_number = ref('gn20260603164757')
@@ -210,20 +210,85 @@ const checkToken = (): boolean => {
 	return !!token
 }
 
+// 获取 code
+const code = ref<string>('')
+const getCode = (): Promise<boolean> => {
+	return new Promise((resolve) => {
+		uni.login({
+			success: async (res) => {
+				code.value = res.code
+				const params = {
+					isLogin: "1",
+					xcxCode: code.value,
+				}
+				const loginRes = await login(params)
+				if (loginRes.code == 200) {
+					setToken(loginRes.data.access_token, loginRes.data.refreshToken)
+					resolve(true)
+				} else {
+					resolve(false)
+				}
+			},
+			fail: (err) => {
+				console.error('登录失败:', err)
+				resolve(false)
+			}
+		})
+	})
+}
+
+// 获取租户页面配置
+const wxGetPhoneLogin = ref<string>('')
+const getTenantInfos = async () => {
+	const res = await getTenantInfo(getTenantId(), false)
+	if (res.code == 200) {
+		const tenantInfo = res.data
+		wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
+	}
+}
+
+// 加载卡片数据
+const loadCardData = async () => {
+	const [allList, inUseList, abnormalList] = await Promise.all([
+		getCardList('0'),
+		getCardList('1'),
+		getCardList('2')
+	])
+
+	cardCounts.value = [allList.length, inUseList.length, abnormalList.length]
+	cardList.value = allList
+}
+
 const platform = async () => {
+	// 1. 微信环境且无token时，先完成登录
 	if (isWechat()) {
-		if (!checkToken()) return;
+		if (!checkToken()) {
+			await getTenantInfos()
+			
+			// 如果不需要手机号登录，直接跳过数据加载
+			if (wxGetPhoneLogin.value != '1') {
+				// 页面显示空状态
+				cardList.value = []
+				cardCounts.value = [0, 0, 0]
+				return
+			}
+			
+			const loginSuccess = await getCode()
+			
+			// 登录失败时，不加载数据
+			if (!loginSuccess) {
+				console.log('登录失败，跳过数据加载')
+				uni.showToast({
+					title: '登录失败，请重试',
+					icon: 'none'
+				})
+				return
+			}
+		}
 	}
 
-	// 公共数据获取逻辑
-	const [allList, inUseList, abnormalList] = await Promise.all([
-	getCardList('0'),
-	getCardList('1'),
-	getCardList('2')
-	]);
-
-	cardCounts.value = [allList.length, inUseList.length, abnormalList.length];
-	cardList.value = allList;
+	// 2. 登录完成后（或已有token），再请求数据
+	await loadCardData()
 }
 
 onLoad(() => {

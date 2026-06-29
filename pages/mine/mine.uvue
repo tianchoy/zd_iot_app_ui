@@ -34,7 +34,7 @@
 		</view>
 		<view class="btn-box" v-if="isWechat()">
 			<rice-button v-if="!isLogin()" type="primary" width="100%" shape="round" @click="handleLogin">登录</rice-button>
-			<rice-button v-else type="error" width="100%" shape="round"  @click="handleLogout">退出登录</rice-button>
+			<rice-button v-else-if="getStorageSync('usePhone')" type="error" width="100%" shape="round"  @click="handleLogout">退出登录</rice-button>
 		</view>
 	</view>
 </template>
@@ -42,7 +42,7 @@
 <script setup lang="uts">
 	import { login,getTenantInfo,queryCardListSum} from '@/api/http.uts'
 	import type { CardListSumData } from '@/api/types.uts'
-	import { setStorageSync,getTenantId,getToken ,clearToken,isWechat} from '@/common/config.uts'
+	import { getStorageSync,getTenantId,getToken ,clearToken,isWechat,config,setToken} from '@/common/config.uts'
 
 
 	const title = ref('用户');
@@ -61,7 +61,7 @@
 	const userLoginByOpenid = async (codes: string) => {
 		const res = await login({
 			xcxCode: codes,
-			isLogin: '1',
+			isLogin: '0',
 		})
 		
 		if(res.code == 200){
@@ -74,22 +74,36 @@
 
 	//获取 code
 	const code = ref<string>('')
-	const getCode = () => {
+	const getCode = async () => {
 		uni.login({
-			success: (res) => {
+			success: async (res) => {
 				code.value = res.code
-				userLoginByOpenid(res.code);
+				if( wxGetPhoneLogin.value == '1'){
+					const params = {
+						isLogin: "1",
+						xcxCode: code.value,
+					}
+					const res = await login(params)
+					if(res.code == 200){
+						console.log('登录成功:', res.data.access_token)
+						setToken(res.data.access_token, res.data.refreshToken)
+						uni.reLaunch({
+							url: '/pages/card/card'
+						})
+					}
+				}else{
+					userLoginByOpenid(res.code);
+				}
 			}
 		})
 	}
 
-		// 获取租户页面配置
+	// 获取租户页面配置
 	const getTenantInfos = async () => {
 		const res = await getTenantInfo(getTenantId(),false)
 		if(res.code == 200){
 			const tenantInfo = res.data
 			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
-			// setStorageSync('tenant_infos', tenantInfo)
 		}
 	}
 

@@ -32,7 +32,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.login(new common_vendor.UTSJSONObject({
           xcxCode: codes,
-          isLogin: "1"
+          isLogin: "0"
         }));
         if (res.code == 200) {
           userId.value = "" + res.data.id;
@@ -44,12 +44,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const code = common_vendor.ref("");
     const getCode = () => {
-      common_vendor.index.login(new common_vendor.UTSJSONObject({
-        success: (res) => {
-          code.value = res.code;
-          userLoginByOpenid(res.code);
-        }
-      }));
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.login(new common_vendor.UTSJSONObject({
+          success: (res) => {
+            return common_vendor.__awaiter(this, void 0, void 0, function* () {
+              code.value = res.code;
+              if (wxGetPhoneLogin.value == "1") {
+                const params = new common_vendor.UTSJSONObject({
+                  isLogin: "1",
+                  xcxCode: code.value
+                });
+                const res_1 = yield api_http.login(params);
+                if (res_1.code == 200) {
+                  common_vendor.index.__f__("log", "at pages/mine/mine.uvue:88", "登录成功:", res_1.data.access_token);
+                  common_config.setToken(res_1.data.access_token, res_1.data.refreshToken);
+                  common_vendor.index.reLaunch({
+                    url: "/pages/card/card"
+                  });
+                }
+              } else {
+                userLoginByOpenid(res.code);
+              }
+            });
+          }
+        }));
+      });
     };
     const getTenantInfos = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
@@ -87,7 +106,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             cardListSum.value = res.data;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:126", "查询卡列表统计异常:", error);
+          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:140", "查询卡列表统计异常:", error);
         }
       });
     };
@@ -153,17 +172,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           shape: "round",
           class: "data-v-284ae985"
         })
-      } : {
-        m: common_vendor.o(handleLogout, "33"),
-        n: common_vendor.p({
+      } : common_vendor.unref(common_config.getStorageSync)("usePhone") ? {
+        n: common_vendor.o(handleLogout, "b3"),
+        o: common_vendor.p({
           type: "error",
           width: "100%",
           shape: "round",
           class: "data-v-284ae985"
         })
+      } : {}, {
+        m: common_vendor.unref(common_config.getStorageSync)("usePhone")
       }) : {}, {
-        o: `${_ctx.u_s_b_h}px`,
-        p: `${_ctx.u_s_a_i_b}px`
+        p: `${_ctx.u_s_b_h}px`,
+        q: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };
