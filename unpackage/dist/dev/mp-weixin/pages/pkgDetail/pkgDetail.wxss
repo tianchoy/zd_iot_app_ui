@@ -25,14 +25,14 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-page .container.data-v-36efee10 {
+.container[class].data-v-36efee10 {
   display: flex;
   flex-direction: column;
   min-height: 100%;
   background-color: #f4f7fb;
   padding-bottom: 40rpx;
 }
-page .card-box.data-v-36efee10 {
+.card-box[class].data-v-36efee10 {
   display: flex;
   flex-direction: column;
   margin: 0 24rpx 24rpx 24rpx;
@@ -41,126 +41,126 @@ page .card-box.data-v-36efee10 {
   border-radius: 24rpx;
   padding: 24rpx;
 }
-page .card-header.data-v-36efee10 {
+.card-header[class].data-v-36efee10 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16rpx;
 }
-page .package-name.data-v-36efee10 {
+.package-name[class].data-v-36efee10 {
   font-size: 36rpx;
   font-weight: bold;
   color: #1a2332;
 }
-page .status-badge.data-v-36efee10 {
+.status-badge[class].data-v-36efee10 {
   background-color: #e8f5e9;
   border-radius: 30rpx;
   padding: 6rpx 20rpx;
 }
-page .status-text.data-v-36efee10 {
+.status-text[class].data-v-36efee10 {
   font-size: 24rpx;
   color: #2e7d32;
   font-weight: 500;
 }
-page .card-number.data-v-36efee10 {
+.card-number[class].data-v-36efee10 {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
   margin-bottom: 24rpx;
 }
-page .number-label.data-v-36efee10 {
+.number-label[class].data-v-36efee10 {
   font-size: 26rpx;
   color: #8c9aa8;
 }
-page .number-value.data-v-36efee10 {
+.number-value[class].data-v-36efee10 {
   font-size: 26rpx;
   color: #1a2332;
   font-weight: 500;
 }
-page .traffic-section.data-v-36efee10 {
+.traffic-section[class].data-v-36efee10 {
   background-color: #f8fafc;
   border-radius: 16rpx;
   padding: 20rpx;
   margin-bottom: 24rpx;
 }
-page .traffic-text.data-v-36efee10 {
+.traffic-text[class].data-v-36efee10 {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 }
-page .traffic-header.data-v-36efee10 {
+.traffic-header[class].data-v-36efee10 {
   margin-bottom: 12rpx;
 }
-page .traffic-title.data-v-36efee10 {
+.traffic-title[class].data-v-36efee10 {
   font-size: 28rpx;
   color: #1a2332;
   font-weight: 600;
 }
-page .traffic-progress.data-v-36efee10 {
+.traffic-progress[class].data-v-36efee10 {
   display: flex;
   flex-direction: row;
   align-items: baseline;
   margin-bottom: 12rpx;
 }
-page .used-text.data-v-36efee10 {
+.used-text[class].data-v-36efee10 {
   font-size: 24rpx;
   color: #8c9aa8;
 }
-page .divider.data-v-36efee10 {
+.divider[class].data-v-36efee10 {
   font-size: 28rpx;
   color: #8c9aa8;
   margin: 0 8rpx;
 }
-page .total-text.data-v-36efee10 {
+.total-text[class].data-v-36efee10 {
   font-size: 24rpx;
   color: #8c9aa8;
 }
-page .info-grid.data-v-36efee10 {
+.info-grid[class].data-v-36efee10 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20rpx 0;
 }
-page .info-item.data-v-36efee10 {
+.info-item[class].data-v-36efee10 {
   display: flex;
   flex-direction: column;
 }
-page .info-label.data-v-36efee10 {
+.info-label[class].data-v-36efee10 {
   font-size: 24rpx;
   color: #8c9aa8;
   margin-bottom: 6rpx;
 }
-page .info-value.data-v-36efee10 {
+.info-value[class].data-v-36efee10 {
   font-size: 28rpx;
   color: #1a2332;
   font-weight: 500;
 }
-page .order-card.data-v-36efee10 {
+.order-card[class].data-v-36efee10 {
   margin-top: 0;
 }
-page .order-title.data-v-36efee10 {
+.order-title[class].data-v-36efee10 {
   display: flex;
   flex-direction: column;
   margin-bottom: 20rpx;
 }
-page .order-title-text.data-v-36efee10 {
+.order-title-text[class].data-v-36efee10 {
   font-size: 30rpx;
   font-weight: bold;
   color: #1a2332;
   margin-bottom: 6rpx;
 }
-page .order-desc.data-v-36efee10 {
+.order-desc[class].data-v-36efee10 {
   font-size: 24rpx;
   color: #8c9aa8;
 }
-page .order-detail.data-v-36efee10 {
+.order-detail[class].data-v-36efee10 {
   display: flex;
   flex-direction: column;
   gap: 16rpx;
 }
-page .order-row.data-v-36efee10 {
+.order-row[class].data-v-36efee10 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -168,22 +168,22 @@ page .order-row.data-v-36efee10 {
   padding: 10rpx 0;
   border-bottom: 1rpx solid #f0f2f5;
 }
-page .order-row.data-v-36efee10:last-child {
+.order-row[class].data-v-36efee10:last-child {
   border-bottom: none;
 }
-page .order-label.data-v-36efee10 {
+.order-label[class].data-v-36efee10 {
   font-size: 26rpx;
   color: #8c9aa8;
 }
-page .order-value.data-v-36efee10 {
+.order-value[class].data-v-36efee10 {
   font-size: 26rpx;
   color: #1a2332;
   font-weight: 500;
 }
-page .price.data-v-36efee10 {
+.price[class].data-v-36efee10 {
   color: #ef4444;
   font-weight: bold;
 }
-page .status-completed.data-v-36efee10 {
+.status-completed[class].data-v-36efee10 {
   color: #2e7d32;
 }

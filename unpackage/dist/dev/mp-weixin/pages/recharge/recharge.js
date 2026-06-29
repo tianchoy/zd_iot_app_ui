@@ -27,6 +27,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const showPopup = common_vendor.ref(false);
     const isInPaymentProcess = common_vendor.ref(false);
+    const showBack = common_vendor.ref(true);
     const percentage = common_vendor.computed(() => {
       var _a, _b;
       const usedFlow = (_a = cardDetail.value) === null || _a === void 0 ? null : _a.usedPeriod;
@@ -143,7 +144,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           paySign: res.paySign,
           signType: res.signType,
           success: (res2) => {
-            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:298", "微信支付成功", res2);
+            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:300", "微信支付成功", res2);
             common_vendor.index.hideLoading();
             common_vendor.index.redirectTo({
               url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
@@ -173,7 +174,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             paySign: res.paySign,
             signType: res.signType,
             success: function(res2) {
-              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:330", "通联支付成功", res2);
+              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:332", "通联支付成功", res2);
               common_vendor.index.hideLoading();
               common_vendor.index.redirectTo({
                 url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
@@ -214,10 +215,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:373", "支付成功:", res2);
+              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:375", "支付成功:", res2);
             },
             fail(res2 = null) {
-              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:376", "支付失败:", res2);
+              common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:378", "支付失败:", res2);
               common_vendor.index.hideLoading();
               isInPaymentProcess.value = false;
             }
@@ -247,7 +248,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:414", "添加订单失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:416", "添加订单失败:", error);
           common_vendor.index.hideLoading();
           common_vendor.index.showToast({
             title: "添加订单失败",
@@ -257,7 +258,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const onPopupClose = () => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:424", "弹窗关闭");
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:426", "弹窗关闭");
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -287,7 +288,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:460", "获取卡片详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:462", "获取卡片详情失败:", error);
           common_vendor.index.showToast({
             title: "获取卡片信息失败",
             icon: "none"
@@ -298,16 +299,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const cardNumber = common_vendor.ref("");
     const country = common_vendor.ref("");
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:471", "options:", options);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:473", "options:", options);
       const opt = options;
       const cardNumberValue = opt.cardNumber;
       const countryValue = opt.country;
+      opt.from;
+      showBack.value = common_config.isH5();
       if (cardNumberValue) {
         cardNumber.value = cardNumberValue;
         country.value = countryValue !== null && countryValue !== void 0 ? countryValue : "";
         getCardDetail(cardNumber.value, country.value);
       } else {
-        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:481", "未获取到卡片号码");
+        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:486", "未获取到卡片号码");
         common_vendor.index.showToast({
           title: "卡片号码不存在",
           icon: "none"
@@ -375,10 +378,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(goBack, "f5"),
+        a: common_vendor.o(goBack, "29"),
         b: common_vendor.p({
           title: "充值首页",
-          ["show-back"]: true,
+          ["show-back"]: showBack.value,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
@@ -405,18 +408,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["show-text"]: true,
           class: "data-v-722cdacb"
         }),
-        k: common_vendor.o(toMyPackage, "f5"),
+        k: common_vendor.o(toMyPackage, "d8"),
         l: common_vendor.p({
           class: "btn mr-24 data-v-722cdacb"
         }),
-        m: common_vendor.o(toOrderRecord, "bf"),
+        m: common_vendor.o(toOrderRecord, "5d"),
         n: common_vendor.p({
           class: "btn data-v-722cdacb"
         }),
-        o: common_vendor.o(changeTab, "ca"),
+        o: common_vendor.o(changeTab, "7d"),
         p: common_vendor.o(($event) => {
           return active.value = $event;
-        }, "a4"),
+        }, "34"),
         q: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
@@ -495,8 +498,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, refillList.value.length == 0 ? {} : {}), {
         x: `${_ctx.u_s_b_h}px`,
         y: `${_ctx.u_s_a_i_b}px`,
-        z: common_vendor.o(handleCancelPayment, "36"),
-        A: common_vendor.o(handleConfirmPayment, "6a"),
+        z: common_vendor.o(handleCancelPayment, "9b"),
+        A: common_vendor.o(handleConfirmPayment, "4d"),
         B: common_vendor.p({
           amount: currentPrice.value,
           cardNumber: (_j = cardDetail.value) == null ? void 0 : _j.rechargeNo,
@@ -506,17 +509,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pkgType: (_n = currentPackage.value) == null ? void 0 : _n.pkgType,
           class: "data-v-722cdacb"
         }),
-        C: common_vendor.o(onPopupClose, "6d"),
+        C: common_vendor.o(onPopupClose, "d8"),
         D: common_vendor.o(($event) => {
           return showPopup.value = $event;
-        }, "d9"),
+        }, "f7"),
         E: common_vendor.p({
           position: "bottom",
           show: showPopup.value,
           class: "data-v-722cdacb"
         }),
         F: common_vendor.t(currentPrice.value),
-        G: common_vendor.o(choosePayment, "70"),
+        G: common_vendor.o(choosePayment, "5b"),
         H: common_vendor.p({
           type: "primary",
           width: "300rpx",

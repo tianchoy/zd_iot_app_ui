@@ -127,7 +127,7 @@ class ProjectConfig extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-const ENV = "dev";
+const ENV = "prod";
 const API_CONFIG = new common_vendor.UTSJSONObject({
   dev: new common_vendor.UTSJSONObject({
     baseUrl: "http://192.168.1.45:8081",
@@ -195,10 +195,14 @@ function setStorageSync(key, value = null) {
 function isWechat() {
   return true;
 }
+function isH5() {
+  return false;
+}
 exports.clearToken = clearToken;
 exports.config = config;
 exports.getTenantId = getTenantId;
 exports.getToken = getToken;
+exports.isH5 = isH5;
 exports.isWechat = isWechat;
 exports.setStorageSync = setStorageSync;
 exports.setToken = setToken;

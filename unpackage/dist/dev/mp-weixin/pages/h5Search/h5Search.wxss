@@ -25,18 +25,18 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-page .container.data-v-9fa4edd6 {
+.container[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   min-height: 1000rpx;
   background-color: #f5f7fa;
 }
-page .main-content.data-v-9fa4edd6 {
+.main-content[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   padding: 0 24rpx;
 }
-page .title-section.data-v-9fa4edd6 {
+.title-section[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   margin-bottom: 48rpx;
@@ -45,20 +45,20 @@ page .title-section.data-v-9fa4edd6 {
   padding: 24px 20rpx;
   color: #fff;
 }
-page .title-section .main-title.data-v-9fa4edd6 {
+.title-section .main-title[class].data-v-9fa4edd6 {
   font-size: 24rpx;
   font-weight: bold;
   margin-bottom: 16rpx;
 }
-page .title-section .sub-title.data-v-9fa4edd6 {
+.title-section .sub-title[class].data-v-9fa4edd6 {
   font-size: 50rpx;
   font-weight: bold;
   margin-bottom: 24rpx;
 }
-page .title-section .desc-text.data-v-9fa4edd6 {
+.title-section .desc-text[class].data-v-9fa4edd6 {
   font-size: 24rpx;
 }
-page .card-box.data-v-9fa4edd6 {
+.card-box[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
@@ -68,13 +68,13 @@ page .card-box.data-v-9fa4edd6 {
   margin-bottom: 48rpx;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
 }
-page .card-box .card-label.data-v-9fa4edd6 {
+.card-box .card-label[class].data-v-9fa4edd6 {
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 24rpx;
 }
-page .card-box .search-value.data-v-9fa4edd6 {
+.card-box .search-value[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -83,7 +83,7 @@ page .card-box .search-value.data-v-9fa4edd6 {
   background-color: #f9fafb;
   margin-bottom: 24rpx;
 }
-page .card-box .search-value .search-input.data-v-9fa4edd6 {
+.card-box .search-value .search-input[class].data-v-9fa4edd6 {
   flex: 1;
   padding: 24rpx 28rpx;
   height: 88rpx;
@@ -92,7 +92,7 @@ page .card-box .search-value .search-input.data-v-9fa4edd6 {
   color: #1f2937;
   font-size: 28rpx;
 }
-page .card-box .search-value .scan-btn.data-v-9fa4edd6 {
+.card-box .search-value .scan-btn[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -101,15 +101,15 @@ page .card-box .search-value .scan-btn.data-v-9fa4edd6 {
   height: 88rpx;
   border-left: 2rpx solid #e5e7eb;
 }
-page .card-box .select-country-wrapper.data-v-9fa4edd6 {
+.card-box .select-country-wrapper[class].data-v-9fa4edd6 {
   margin-bottom: 32rpx;
 }
-page .card-box .select-country-wrapper .select-label.data-v-9fa4edd6 {
+.card-box .select-country-wrapper .select-label[class].data-v-9fa4edd6 {
   font-size: 28rpx;
   color: #666;
   margin-bottom: 16rpx;
 }
-page .card-box .select-country-wrapper .select-trigger.data-v-9fa4edd6 {
+.card-box .select-country-wrapper .select-trigger[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -120,20 +120,20 @@ page .card-box .select-country-wrapper .select-trigger.data-v-9fa4edd6 {
   padding: 24rpx 28rpx;
   min-height: 88rpx;
 }
-page .card-box .select-country-wrapper .select-trigger .select-value.data-v-9fa4edd6 {
+.card-box .select-country-wrapper .select-trigger .select-value[class].data-v-9fa4edd6 {
   flex: 1;
   font-size: 28rpx;
   color: #1f2937;
 }
-page .card-box .select-country-wrapper .select-trigger .select-value.placeholder.data-v-9fa4edd6 {
+.card-box .select-country-wrapper .select-trigger .select-value.placeholder[class].data-v-9fa4edd6 {
   color: #999;
 }
-page .card-box .select-country-wrapper .select-trigger .select-arrow.data-v-9fa4edd6 {
+.card-box .select-country-wrapper .select-trigger .select-arrow[class].data-v-9fa4edd6 {
   font-size: 24rpx;
   color: #999;
   margin-left: 16rpx;
 }
-page .card-box .query-btn.data-v-9fa4edd6 {
+.card-box .query-btn[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -142,12 +142,12 @@ page .card-box .query-btn.data-v-9fa4edd6 {
   border-radius: 24rpx;
   padding: 20rpx 0;
 }
-page .card-box .query-btn .query-btn-text.data-v-9fa4edd6 {
+.card-box .query-btn .query-btn-text[class].data-v-9fa4edd6 {
   color: #ffffff;
   font-size: 32rpx;
   font-weight: 600;
 }
-page .instruction-box.data-v-9fa4edd6 {
+.instruction-box[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -156,22 +156,22 @@ page .instruction-box.data-v-9fa4edd6 {
   padding: 24rpx;
   box-shadow: 0 8rpx 20rpx rgba(15, 23, 42, 0.04);
 }
-page .instruction-box .instruction-title.data-v-9fa4edd6 {
+.instruction-box .instruction-title[class].data-v-9fa4edd6 {
   font-size: 30rpx;
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 24rpx;
 }
-page .instruction-box .instruction-list.data-v-9fa4edd6 {
+.instruction-box .instruction-list[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: column;
 }
-page .instruction-box .instruction-list .instruction-item.data-v-9fa4edd6 {
+.instruction-box .instruction-list .instruction-item[class].data-v-9fa4edd6 {
   font-size: 26rpx;
   color: #6b7280;
   line-height: 1.6;
 }
-page .popup-header.data-v-9fa4edd6 {
+.popup-header[class].data-v-9fa4edd6 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -180,12 +180,12 @@ page .popup-header.data-v-9fa4edd6 {
   border-bottom: 2rpx solid #f0f0f0;
   background-color: #ffffff;
 }
-page .popup-header .popup-title.data-v-9fa4edd6 {
+.popup-header .popup-title[class].data-v-9fa4edd6 {
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
 }
-page .popup-header .popup-close.data-v-9fa4edd6 {
+.popup-header .popup-close[class].data-v-9fa4edd6 {
   width: 56rpx;
   height: 56rpx;
   display: flex;

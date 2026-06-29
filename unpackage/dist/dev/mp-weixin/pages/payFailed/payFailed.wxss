@@ -25,20 +25,20 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-page .container.data-v-95bda543 {
+.container[class].data-v-95bda543 {
   min-height: 1000rpx;
   padding: 40rpx 32rpx;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
 }
-page .status-section.data-v-95bda543 {
+.status-section[class].data-v-95bda543 {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 40rpx;
 }
-page .status-section .fail-icon.data-v-95bda543 {
+.status-section .fail-icon[class].data-v-95bda543 {
   width: 120rpx;
   height: 120rpx;
   background-color: #f56c6c;
@@ -49,23 +49,23 @@ page .status-section .fail-icon.data-v-95bda543 {
   justify-content: center;
   margin-bottom: 20rpx;
 }
-page .status-section .fail-icon .close-icon.data-v-95bda543 {
+.status-section .fail-icon .close-icon[class].data-v-95bda543 {
   color: #ffffff;
   font-size: 80rpx;
   font-weight: 600;
   line-height: 1;
 }
-page .status-section .status-text.data-v-95bda543 {
+.status-section .status-text[class].data-v-95bda543 {
   font-size: 40rpx;
   font-weight: 500;
   color: #333333;
   margin-bottom: 16rpx;
 }
-page .status-section .fail-tip.data-v-95bda543 {
+.status-section .fail-tip[class].data-v-95bda543 {
   font-size: 26rpx;
   color: #f56c6c;
 }
-page .card-container.data-v-95bda543 {
+.card-container[class].data-v-95bda543 {
   background-color: #ffffff;
   border: 1px solid #e7edf5;
   border-radius: 24rpx;
@@ -73,7 +73,7 @@ page .card-container.data-v-95bda543 {
   margin-bottom: 60rpx;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
 }
-page .info-row.data-v-95bda543 {
+.info-row[class].data-v-95bda543 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -81,36 +81,36 @@ page .info-row.data-v-95bda543 {
   padding: 24rpx 0;
   border-bottom: 1rpx solid #f0f0f0;
 }
-page .info-row .label.data-v-95bda543 {
+.info-row .label[class].data-v-95bda543 {
   font-size: 24rpx;
   color: #64748b;
   flex-shrink: 0;
   width: 160rpx;
 }
-page .info-row .value.data-v-95bda543 {
+.info-row .value[class].data-v-95bda543 {
   font-size: 25rpx;
   color: #0f172a;
   font-weight: bold;
   text-align: right;
   flex: 1;
 }
-page .info-row .amount.data-v-95bda543 {
+.info-row .amount[class].data-v-95bda543 {
   font-weight: bold;
   color: #ff6b00;
 }
-page .info-row.fail-reason.data-v-95bda543 {
+.info-row.fail-reason[class].data-v-95bda543 {
   margin-top: 8rpx;
   padding-top: 16rpx;
 }
-page .info-row.fail-reason .fail-reason-text.data-v-95bda543 {
+.info-row.fail-reason .fail-reason-text[class].data-v-95bda543 {
   color: #f56c6c;
   font-weight: normal;
 }
-page .button-section.data-v-95bda543 {
+.button-section[class].data-v-95bda543 {
   display: flex;
   flex-direction: column;
 }
-page .button-section .action-btn.data-v-95bda543 {
+.button-section .action-btn[class].data-v-95bda543 {
   width: 100%;
   height: 88rpx;
   line-height: 88rpx;
@@ -121,14 +121,14 @@ page .button-section .action-btn.data-v-95bda543 {
   border: none;
   padding: 0;
 }
-page .button-section .action-btn.data-v-95bda543::after {
+.button-section .action-btn[class].data-v-95bda543::after {
   border: none;
 }
-page .button-section .primary-btn.data-v-95bda543 {
+.button-section .primary-btn[class].data-v-95bda543 {
   background-color: #f56c6c;
   color: #ffffff;
 }
-page .button-section .secondary-btn.data-v-95bda543 {
+.button-section .secondary-btn[class].data-v-95bda543 {
   background-color: #ffffff;
   color: #f56c6c;
   border: 2rpx solid #f56c6c;

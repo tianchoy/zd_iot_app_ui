@@ -151,7 +151,7 @@
 		})
 		// 跳转到充值页面
 		uni.navigateTo({
-			url: `/pages/recharge/recharge?cardNumber=${cardNumber.value}&country=${selectedCountry.value}`
+			url: `/pages/recharge/recharge?cardNumber=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
 		})
 	}
 	

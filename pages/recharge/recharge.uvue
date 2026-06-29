@@ -1,5 +1,5 @@
 <template>
-	<topNavBar title="充值首页" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<topNavBar title="充值首页" :show-back="showBack" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
 		<view class="card-info">
 			<view class="card-title">
@@ -132,12 +132,14 @@
 	import { ref, computed } from 'vue';
 	import { queryCardDetail, addOrder } from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
-	import { config } from '@/common/config.uts';
+	import { config , isWechat,isH5} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	
 	const showPopup = ref<boolean>(false);
 	// 添加标记：是否正在支付流程中
 	const isInPaymentProcess = ref<boolean>(false);
+	// 是否显示返回按钮
+	const showBack = ref<boolean>(true);
 	
 	// 计算流量使用百分比
 	const percentage = computed<number>((): number => {
@@ -472,6 +474,9 @@
 		const opt = options as any
 		const cardNumberValue = opt.cardNumber
 		const countryValue = opt.country
+		const from = opt.from
+		
+		showBack.value = isH5() && from == 'h5Search'
 		
 		if (cardNumberValue) {
 			cardNumber.value = cardNumberValue

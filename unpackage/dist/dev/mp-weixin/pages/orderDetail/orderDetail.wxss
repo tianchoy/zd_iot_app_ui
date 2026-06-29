@@ -25,113 +25,113 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-page .container.data-v-6ec85291 {
+.container[class].data-v-6ec85291 {
   background-color: #f4f7fb;
   height: 100%;
   padding: 24rpx;
   box-sizing: border-box;
 }
-page .package-card.data-v-6ec85291 {
+.package-card[class].data-v-6ec85291 {
   background-color: #ffffff;
   border-radius: 24rpx;
   padding: 32rpx;
   margin-bottom: 24rpx;
 }
-page .package-card .package-header.data-v-6ec85291 {
+.package-card .package-header[class].data-v-6ec85291 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16rpx;
 }
-page .package-card .package-header .package-name.data-v-6ec85291 {
+.package-card .package-header .package-name[class].data-v-6ec85291 {
   font-size: 36rpx;
   font-weight: 600;
   color: #1f2937;
 }
-page .package-card .package-header .status-tag.data-v-6ec85291 {
+.package-card .package-header .status-tag[class].data-v-6ec85291 {
   font-size: 24rpx;
   padding: 6rpx 16rpx;
   border-radius: 20rpx;
   font-weight: 500;
 }
-page .package-card .package-header .status-tag.status-pending.data-v-6ec85291 {
+.package-card .package-header .status-tag.status-pending[class].data-v-6ec85291 {
   background-color: #fff3e0;
   color: #ed6c02;
 }
-page .package-card .package-header .status-tag.status-completed.data-v-6ec85291 {
+.package-card .package-header .status-tag.status-completed[class].data-v-6ec85291 {
   background-color: #e8f5e9;
   color: #2e7d32;
 }
-page .package-card .package-header .status-tag.status-refunded.data-v-6ec85291 {
+.package-card .package-header .status-tag.status-refunded[class].data-v-6ec85291 {
   background-color: #fce4ec;
   color: #c62828;
 }
-page .package-card .package-header .status-tag.status-cancelled.data-v-6ec85291 {
+.package-card .package-header .status-tag.status-cancelled[class].data-v-6ec85291 {
   background-color: #eeeeee;
   color: #757575;
 }
-page .package-card .card-number-row.data-v-6ec85291 {
+.package-card .card-number-row[class].data-v-6ec85291 {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
-page .package-card .card-number-row .card-number-label.data-v-6ec85291 {
+.package-card .card-number-row .card-number-label[class].data-v-6ec85291 {
   font-size: 28rpx;
   color: #9ca3af;
 }
-page .package-card .card-number-row .card-number.data-v-6ec85291 {
+.package-card .card-number-row .card-number[class].data-v-6ec85291 {
   font-size: 28rpx;
   color: #374151;
   font-weight: 500;
 }
-page .info-card.data-v-6ec85291 {
+.info-card[class].data-v-6ec85291 {
   background-color: #ffffff;
   border-radius: 24rpx;
   padding: 32rpx;
   margin-bottom: 24rpx;
 }
-page .info-card .section-header.data-v-6ec85291 {
+.info-card .section-header[class].data-v-6ec85291 {
   margin-bottom: 24rpx;
   padding-bottom: 20rpx;
   border-bottom: 1rpx solid #f0f2f6;
 }
-page .info-card .section-header .section-title.data-v-6ec85291 {
+.info-card .section-header .section-title[class].data-v-6ec85291 {
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
 }
-page .info-card .info-row.data-v-6ec85291 {
+.info-card .info-row[class].data-v-6ec85291 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: 20rpx 0;
 }
-page .info-card .info-row .info-label.data-v-6ec85291 {
+.info-card .info-row .info-label[class].data-v-6ec85291 {
   font-size: 28rpx;
   color: #64748b;
 }
-page .info-card .info-row .info-value.data-v-6ec85291 {
+.info-card .info-row .info-value[class].data-v-6ec85291 {
   font-size: 28rpx;
   color: #374151;
   text-align: right;
 }
-page .info-card .info-row .info-value.price.data-v-6ec85291 {
+.info-card .info-row .info-value.price[class].data-v-6ec85291 {
   font-size: 36rpx;
   font-weight: bold;
   color: #ef4444;
 }
-page .info-card .info-row .info-value.status-fail.data-v-6ec85291 {
+.info-card .info-row .info-value.status-fail[class].data-v-6ec85291 {
   color: #ef4444;
 }
-page .info-card .info-refunds.data-v-6ec85291 {
+.info-card .info-refunds[class].data-v-6ec85291 {
   display: flex;
   flex-direction: column;
   padding: 20rpx 0;
 }
-page .info-card .info-refunds .times.data-v-6ec85291,page 
-.info-card .info-refunds .money.data-v-6ec85291 {
+.info-card .info-refunds .times[class].data-v-6ec85291,
+.info-card .info-refunds .money[class].data-v-6ec85291 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -140,10 +140,10 @@ page .info-card .info-refunds .times.data-v-6ec85291,page
   font-size: 24rpx;
   color: #64748b;
 }
-page .bottom-placeholder.data-v-6ec85291 {
+.bottom-placeholder[class].data-v-6ec85291 {
   height: 140rpx;
 }
-page .bottom-bar.data-v-6ec85291 {
+.bottom-bar[class].data-v-6ec85291 {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -156,43 +156,43 @@ page .bottom-bar.data-v-6ec85291 {
   padding: 24rpx 32rpx;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
 }
-page .bottom-bar .amount-section.data-v-6ec85291 {
+.bottom-bar .amount-section[class].data-v-6ec85291 {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
-page .bottom-bar .amount-section .amount-label.data-v-6ec85291 {
+.bottom-bar .amount-section .amount-label[class].data-v-6ec85291 {
   font-size: 24rpx;
   color: #64748b;
   margin-right: 16rpx;
 }
-page .bottom-bar .amount-section .amount-value.data-v-6ec85291 {
+.bottom-bar .amount-section .amount-value[class].data-v-6ec85291 {
   font-size: 48rpx;
   font-weight: bold;
   color: #ef4444;
 }
-page .bottom-bar .amount-section .amount-value .amount-label.data-v-6ec85291 {
+.bottom-bar .amount-section .amount-value .amount-label[class].data-v-6ec85291 {
   font-size: 24rpx;
   color: #64748b;
   margin-right: 16rpx;
 }
-page .bottom-bar .amount-time.data-v-6ec85291 {
+.bottom-bar .amount-time[class].data-v-6ec85291 {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
 }
-page .bottom-bar .amount-time .amount-label.data-v-6ec85291 {
+.bottom-bar .amount-time .amount-label[class].data-v-6ec85291 {
   font-size: 24rpx;
   color: #64748b;
   margin-right: 16rpx;
 }
-page .bottom-bar .pay-button.data-v-6ec85291 {
+.bottom-bar .pay-button[class].data-v-6ec85291 {
   background-color: #2563eb;
   padding: 20rpx 40rpx;
   border-radius: 24rpx;
 }
-page .bottom-bar .pay-button .pay-button-text.data-v-6ec85291 {
+.bottom-bar .pay-button .pay-button-text[class].data-v-6ec85291 {
   color: #ffffff;
   font-size: 30rpx;
   font-weight: 500;

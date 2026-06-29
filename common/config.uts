@@ -38,7 +38,7 @@ export type ProjectConfig = {
 }
 
 // 环境配置
-const ENV = 'dev' //  dev | prod
+const ENV = 'prod' //  dev | prod
 
 const API_CONFIG: UTSJSONObject = {
   dev: {

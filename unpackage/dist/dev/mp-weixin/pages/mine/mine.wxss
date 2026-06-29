@@ -25,13 +25,13 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-page .container.data-v-284ae985 {
+.container[class].data-v-284ae985 {
   display: flex;
   flex-direction: column;
   background-color: #f4f7fb;
   height: 100%;
 }
-page .container .card-info.data-v-284ae985 {
+.container .card-info[class].data-v-284ae985 {
   display: flex;
   flex-direction: column;
   padding: 24rpx;
@@ -42,16 +42,16 @@ page .container .card-info.data-v-284ae985 {
   color: #ffffff;
   box-shadow: 0 8rpx 18rpx rgba(37, 99, 235, 0.14);
 }
-page .container .card-info .persion-name.data-v-284ae985 {
+.container .card-info .persion-name[class].data-v-284ae985 {
   font-size: 30rpx;
   font-weight: bold;
   color: #ffffff;
 }
-page .container .card-info .persion-card.data-v-284ae985 {
+.container .card-info .persion-card[class].data-v-284ae985 {
   display: flex;
   flex-direction: row;
 }
-page .container .card-info .persion-card .persion-card-item.data-v-284ae985 {
+.container .card-info .persion-card .persion-card-item[class].data-v-284ae985 {
   flex: 1;
   margin: 0 10rpx;
   min-height: 120rpx;
@@ -60,25 +60,25 @@ page .container .card-info .persion-card .persion-card-item.data-v-284ae985 {
   background: rgba(255, 255, 255, 0.12);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
-page .container .card-info .persion-card .persion-card-item-title.data-v-284ae985 {
+.container .card-info .persion-card .persion-card-item-title[class].data-v-284ae985 {
   font-size: 22rpx;
   line-height: 1.4;
   color: #ffffff;
 }
-page .container .card-info .persion-card .persion-card-item-content.data-v-284ae985 {
+.container .card-info .persion-card .persion-card-item-content[class].data-v-284ae985 {
   margin-top: 20rpx;
   font-size: 40rpx;
   font-weight: 800;
   line-height: 1;
 }
-page .container .card-box.data-v-284ae985 {
+.container .card-box[class].data-v-284ae985 {
   display: flex;
   flex-direction: column;
   border-radius: 24rpx;
   margin: 0 24rpx;
   background-color: #ffffff;
 }
-page .container .card-box .item.data-v-284ae985 {
+.container .card-box .item[class].data-v-284ae985 {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -86,10 +86,10 @@ page .container .card-box .item.data-v-284ae985 {
   padding: 24rpx;
   border-bottom: 1px solid #e7edf5;
 }
-page .container .card-box .item .order-label.data-v-284ae985 {
+.container .card-box .item .order-label[class].data-v-284ae985 {
   font-weight: bold;
 }
-page .container .btn-box.data-v-284ae985 {
+.container .btn-box[class].data-v-284ae985 {
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -72,7 +72,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         icon: "loading"
       });
       common_vendor.index.navigateTo({
-        url: `/pages/recharge/recharge?cardNumber=${cardNumber.value}&country=${selectedCountry.value}`
+        url: `/pages/recharge/recharge?cardNumber=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
       });
     };
     const onScanResult = (data) => {

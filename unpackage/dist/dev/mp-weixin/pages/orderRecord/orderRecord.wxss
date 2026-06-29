@@ -25,27 +25,27 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-page .container.data-v-a151b594 {
+.container[class].data-v-a151b594 {
   background-color: #f4f7fb;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
-page .container .card-box.data-v-a151b594 {
+.container .card-box[class].data-v-a151b594 {
   margin: 0 24rpx;
   background-color: #ffffff;
   border: 1rpx solid #e7edf5;
   border-radius: 24rpx;
   padding: 24rpx;
 }
-page .container .card-box .search-value.data-v-a151b594 {
+.container .card-box .search-value[class].data-v-a151b594 {
   display: flex;
   flex-direction: row;
   border: 1rpx solid #dbe5f0;
   border-radius: 24rpx;
   margin-bottom: 24rpx;
 }
-page .container .card-box .search-value .search-input.data-v-a151b594 {
+.container .card-box .search-value .search-input[class].data-v-a151b594 {
   flex: 1;
   padding: 0 25rpx;
   height: 95rpx;
@@ -54,32 +54,32 @@ page .container .card-box .search-value .search-input.data-v-a151b594 {
   color: #0f172a;
   font-size: 30rpx;
 }
-page .container .card-box .search-value .scan-btn.data-v-a151b594 {
+.container .card-box .search-value .scan-btn[class].data-v-a151b594 {
   border-left: 1px solid #eef2f7;
 }
-page .container .order-list.data-v-a151b594 {
+.container .order-list[class].data-v-a151b594 {
   flex: 1;
   padding: 24rpx 24rpx 40rpx 24rpx;
   min-height: 700rpx;
 }
-page .container .order-list .empty-state.data-v-a151b594 {
+.container .order-list .empty-state[class].data-v-a151b594 {
   display: flex;
   justify-content: center;
   align-items: center;
   padding-top: 200rpx;
 }
-page .container .order-list .empty-state .empty-text.data-v-a151b594 {
+.container .order-list .empty-state .empty-text[class].data-v-a151b594 {
   font-size: 28rpx;
   color: #999999;
 }
-page .container .order-list .orders-container .order-card.data-v-a151b594 {
+.container .order-list .orders-container .order-card[class].data-v-a151b594 {
   background-color: #ffffff;
   border-radius: 24rpx;
   padding: 28rpx;
   margin-bottom: 24rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
-page .container .order-list .orders-container .order-card .order-header.data-v-a151b594 {
+.container .order-list .orders-container .order-card .order-header[class].data-v-a151b594 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -88,45 +88,45 @@ page .container .order-list .orders-container .order-card .order-header.data-v-a
   border-bottom: 1rpx solid #f0f2f6;
   margin-bottom: 20rpx;
 }
-page .container .order-list .orders-container .order-card .order-header .package-name.data-v-a151b594 {
+.container .order-list .orders-container .order-card .order-header .package-name[class].data-v-a151b594 {
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
 }
-page .container .order-list .orders-container .order-card .order-details .detail-row.data-v-a151b594 {
+.container .order-list .orders-container .order-card .order-details .detail-row[class].data-v-a151b594 {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin-bottom: 16rpx;
 }
-page .container .order-list .orders-container .order-card .order-details .detail-row .detail-label.data-v-a151b594 {
+.container .order-list .orders-container .order-card .order-details .detail-row .detail-label[class].data-v-a151b594 {
   width: 100rpx;
   font-size: 26rpx;
   color: #9ca3af;
   flex-shrink: 0;
 }
-page .container .order-list .orders-container .order-card .order-details .detail-row .detail-value.data-v-a151b594 {
+.container .order-list .orders-container .order-card .order-details .detail-row .detail-value[class].data-v-a151b594 {
   flex: 1;
   font-size: 26rpx;
   color: #374151;
 }
-page .container .order-list .orders-container .order-card .order-details .last.data-v-a151b594 {
+.container .order-list .orders-container .order-card .order-details .last[class].data-v-a151b594 {
   margin-bottom: 0;
 }
-page .container .order-list .orders-container .order-card .order-footer.data-v-a151b594 {
+.container .order-list .orders-container .order-card .order-footer[class].data-v-a151b594 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding-top: 20rpx;
 }
-page .container .order-list .orders-container .order-card .order-footer .price.data-v-a151b594 {
+.container .order-list .orders-container .order-card .order-footer .price[class].data-v-a151b594 {
   font-size: 28rpx;
   font-weight: bold;
   color: #ef4444;
   margin-right: 20rpx;
 }
-page .container .order-list .orders-container .order-card .order-footer .pay-btn.data-v-a151b594 {
+.container .order-list .orders-container .order-card .order-footer .pay-btn[class].data-v-a151b594 {
   background: #eff6ff;
   border: 1px solid #bfdbfe;
   color: #2563eb;

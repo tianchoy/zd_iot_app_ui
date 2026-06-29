@@ -25,7 +25,7 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-page .container.data-v-27a30816 {
+.container[class].data-v-27a30816 {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,24 +33,24 @@ page .container.data-v-27a30816 {
   padding-bottom: 40rpx;
   height: 100%;
 }
-page .container .logo.data-v-27a30816 {
+.container .logo[class].data-v-27a30816 {
   width: 200rpx;
   height: 200rpx;
   margin: 200rpx 0 80rpx 0;
   border-radius: 50%;
 }
-page .container .login-btn.data-v-27a30816 {
+.container .login-btn[class].data-v-27a30816 {
   width: 80%;
   margin: 0 40rpx;
 }
-page .container .no-login.data-v-27a30816 {
+.container .no-login[class].data-v-27a30816 {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 100rpx;
   width: 80%;
 }
-page .container .no-login .no-login-text.data-v-27a30816 {
+.container .no-login .no-login-text[class].data-v-27a30816 {
   width: 100%;
   border-top: 1rpx solid #e8eef7;
   padding-top: 40rpx;
