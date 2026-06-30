@@ -6,7 +6,7 @@
 				<text class="title">卡片信息</text>
 				<rice-tag :text="cardDetail?.statusStr || '未知'" :round="true" plain-fill size="small" :type="getOrderStatusType(cardDetail?.statusStr)"></rice-tag>
 			</view>
-			<view class="card-number">{{ cardDetail?.rechargeNo || '未知' }}</view>
+			<view class="card-number" v-if="cardDetail?.rechargeNo">{{ cardDetail?.rechargeNo || '未知' }}</view>
 			<view class="info-list">
 				<view class="info-item" v-if="cardDetail?.pkgName">
 					<text class="label">当前套餐</text>
@@ -32,7 +32,7 @@
 				:list="tabs" 
 				:line-width="0" 
 				:title-active-color="'#2563eb'" 
-				:title-inactive-color="'#334155'"
+				:title-inactive-color="'#64748b'"
 				@change="changeTab" 
 				:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
 			>
@@ -119,7 +119,7 @@
 			:pkgType="currentPackage?.pkgType"
 		/>
 	</rice-popup>
-	<view class="bottom-box">
+	<view class="bottom-box" v-if="packageList.length > 0 || refillList.length > 0">
 		<view class="price-box">
 			<text class="price-label">当前套餐金额</text>
 			<text class="price-value">¥{{ currentPrice }}</text>
@@ -567,7 +567,7 @@
 		min-height: 100%;
 		.card-info{
 			background: #ffffff;
-			border: 1rpx solid #e7edf5;
+			border: 1rpx solid #e2e8f0;
 			border-radius: 20rpx;
 			padding: 24rpx;
 			margin: 0 24rpx;

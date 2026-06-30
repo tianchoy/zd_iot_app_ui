@@ -212,29 +212,25 @@ const checkToken = (): boolean => {
 
 // 获取 code
 const code = ref<string>('')
-const getCode = (): Promise<boolean> => {
-	return new Promise((resolve) => {
-		uni.login({
-			success: async (res) => {
-				code.value = res.code
-				const params = {
-					isLogin: "1",
-					xcxCode: code.value,
-				}
-				const loginRes = await login(params)
-				if (loginRes.code == 200) {
-					setToken(loginRes.data.access_token, loginRes.data.refreshToken)
-					resolve(true)
-				} else {
-					resolve(false)
-				}
-			},
-			fail: (err) => {
-				console.error('登录失败:', err)
-				resolve(false)
-			}
+const getCode = async (): Promise<boolean> => {
+	try {
+		const res = await uni.login({ provider: 'weixin' })
+		code.value = res.code
+		
+		const loginRes = await login({
+			isLogin: "1",
+			xcxCode: code.value,
 		})
-	})
+		
+		if (loginRes.code == 200) {
+			setToken(loginRes.data.access_token, loginRes.data.refreshToken)
+			return true
+		}
+		return false
+	} catch (err) {
+		console.error('登录失败:', err)
+		return false
+	}
 }
 
 // 获取租户页面配置

@@ -297,20 +297,22 @@ function request(options) {
           resolve(result);
           return null;
         }
-        let isUnauthorizedCode = false;
-        for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
-          if ("" + finalUnauthorizedCodes[i] == "" + code) {
-            isUnauthorizedCode = true;
-            break;
+        if (common_config.isWechat()) {
+          let isUnauthorizedCode = false;
+          for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
+            if ("" + finalUnauthorizedCodes[i] == "" + code) {
+              isUnauthorizedCode = true;
+              break;
+            }
           }
-        }
-        if (isUnauthorizedCode && redirectOnUnauthorized) {
-          if (showError) {
-            showErrorToast(msg || "登录已过期，请重新登录");
+          if (isUnauthorizedCode && redirectOnUnauthorized) {
+            if (showError) {
+              showErrorToast(msg || "登录已过期，请重新登录");
+            }
+            navigateToLogin(finalLoginPage);
+            reject(result);
+            return null;
           }
-          navigateToLogin(finalLoginPage);
-          reject(result);
-          return null;
         }
         if (onErrorCode != null) {
           onErrorCode(result);

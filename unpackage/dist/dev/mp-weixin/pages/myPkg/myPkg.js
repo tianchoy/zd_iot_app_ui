@@ -83,7 +83,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       const cardNumber = (_a = options.card_number) !== null && _a !== void 0 ? _a : "";
       card_number.value = cardNumber;
-      getPkgInfoList();
+      getPkgInfoList("");
     });
     return (_ctx, _cache) => {
       "raw js";

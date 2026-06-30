@@ -171,7 +171,7 @@
 	onLoad((options) => {
 		const cardNumber = options.card_number ?? ''
 		card_number.value = cardNumber
-		getPkgInfoList()
+		getPkgInfoList('')
 	})
 		
 </script>

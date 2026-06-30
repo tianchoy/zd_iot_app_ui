@@ -109,7 +109,6 @@ function queryCardListSum(withToken = true) {
 function queryCardDetail(id, countryCode = null, isFind = null, withToken = true) {
   const url = api_url.ApiUrl.queryCardDetailXcx + id + "/" + isFind;
   const token = true;
-  common_vendor.index.__f__("log", "at api/http.uts:118", "查询卡详情Xcx", "id:", id, "countryCode:", countryCode, "isFind:", isFind);
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,

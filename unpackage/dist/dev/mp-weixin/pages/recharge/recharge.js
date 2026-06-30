@@ -376,7 +376,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     return (_ctx, _cache) => {
       "raw js";
-      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
       const __returned__ = common_vendor.e({
         a: common_vendor.o(goBack, "29"),
         b: common_vendor.p({
@@ -395,37 +395,40 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           type: getOrderStatusType((_b = cardDetail.value) == null ? void 0 : _b.statusStr),
           class: "data-v-722cdacb"
         }),
-        d: common_vendor.t(((_c = cardDetail.value) == null ? void 0 : _c.rechargeNo) || "未知"),
-        e: (_d = cardDetail.value) == null ? void 0 : _d.pkgName
-      }, ((_e = cardDetail.value) == null ? void 0 : _e.pkgName) ? {
-        f: common_vendor.t(((_f = cardDetail.value) == null ? void 0 : _f.pkgName) || "未知")
+        d: (_c = cardDetail.value) == null ? void 0 : _c.rechargeNo
+      }, ((_d = cardDetail.value) == null ? void 0 : _d.rechargeNo) ? {
+        e: common_vendor.t(((_e = cardDetail.value) == null ? void 0 : _e.rechargeNo) || "未知")
       } : {}, {
-        g: common_vendor.t(((_g = cardDetail.value) == null ? void 0 : _g.usedFlow) || 0),
-        h: common_vendor.t(((_h = cardDetail.value) == null ? void 0 : _h.unUsedFlow) || 0),
-        i: common_vendor.t(((_i = cardDetail.value) == null ? void 0 : _i.pkgFlow) || 0),
-        j: common_vendor.p({
+        f: (_f = cardDetail.value) == null ? void 0 : _f.pkgName
+      }, ((_g = cardDetail.value) == null ? void 0 : _g.pkgName) ? {
+        g: common_vendor.t(((_h = cardDetail.value) == null ? void 0 : _h.pkgName) || "未知")
+      } : {}, {
+        h: common_vendor.t(((_i = cardDetail.value) == null ? void 0 : _i.usedFlow) || 0),
+        i: common_vendor.t(((_j = cardDetail.value) == null ? void 0 : _j.unUsedFlow) || 0),
+        j: common_vendor.t(((_k = cardDetail.value) == null ? void 0 : _k.pkgFlow) || 0),
+        k: common_vendor.p({
           percentage: percentage.value,
           ["show-text"]: true,
           class: "data-v-722cdacb"
         }),
-        k: common_vendor.o(toMyPackage, "d8"),
-        l: common_vendor.p({
+        l: common_vendor.o(toMyPackage, "81"),
+        m: common_vendor.p({
           class: "btn mr-24 data-v-722cdacb"
         }),
-        m: common_vendor.o(toOrderRecord, "5d"),
-        n: common_vendor.p({
+        n: common_vendor.o(toOrderRecord, "45"),
+        o: common_vendor.p({
           class: "btn data-v-722cdacb"
         }),
-        o: common_vendor.o(changeTab, "7d"),
-        p: common_vendor.o(($event) => {
+        p: common_vendor.o(changeTab, "77"),
+        q: common_vendor.o(($event) => {
           return active.value = $event;
-        }, "34"),
-        q: common_vendor.p({
+        }, "d9"),
+        r: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
           ["line-width"]: 0,
           ["title-active-color"]: "#2563eb",
-          ["title-inactive-color"]: "#334155",
+          ["title-inactive-color"]: "#64748b",
           customStyle: {
             height: "85rpx",
             padding: "10rpx",
@@ -434,9 +437,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: active.value,
           class: "data-v-722cdacb"
         }),
-        r: active.value === 0
+        s: active.value === 0
       }, active.value === 0 ? common_vendor.e({
-        s: common_vendor.f(packageList.value, (item, index, i0) => {
+        t: common_vendor.f(packageList.value, (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.pkgName),
             b: item.tag
@@ -464,9 +467,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, item.pkgId || index)
           });
         }),
-        t: packageList.value.length == 0
+        v: packageList.value.length == 0
       }, packageList.value.length == 0 ? {} : {}) : common_vendor.e({
-        v: common_vendor.f(refillList.value, (item, index, i0) => {
+        w: common_vendor.f(refillList.value, (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.pkgName),
             b: item.tag
@@ -494,41 +497,43 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, item.pkgId || index)
           });
         }),
-        w: refillList.value.length == 0
+        x: refillList.value.length == 0
       }, refillList.value.length == 0 ? {} : {}), {
-        x: `${_ctx.u_s_b_h}px`,
-        y: `${_ctx.u_s_a_i_b}px`,
-        z: common_vendor.o(handleCancelPayment, "9b"),
-        A: common_vendor.o(handleConfirmPayment, "4d"),
-        B: common_vendor.p({
+        y: `${_ctx.u_s_b_h}px`,
+        z: `${_ctx.u_s_a_i_b}px`,
+        A: common_vendor.o(handleCancelPayment, "1a"),
+        B: common_vendor.o(handleConfirmPayment, "ab"),
+        C: common_vendor.p({
           amount: currentPrice.value,
-          cardNumber: (_j = cardDetail.value) == null ? void 0 : _j.rechargeNo,
-          productName: (_k = currentPackage.value) == null ? void 0 : _k.pkgName,
-          traffic: (_l = currentPackage.value) == null ? void 0 : _l.pkgFlow,
-          validityPeriod: (_m = currentPackage.value) == null ? void 0 : _m.validityPeriod,
-          pkgType: (_n = currentPackage.value) == null ? void 0 : _n.pkgType,
+          cardNumber: (_l = cardDetail.value) == null ? void 0 : _l.rechargeNo,
+          productName: (_m = currentPackage.value) == null ? void 0 : _m.pkgName,
+          traffic: (_n = currentPackage.value) == null ? void 0 : _n.pkgFlow,
+          validityPeriod: (_o = currentPackage.value) == null ? void 0 : _o.validityPeriod,
+          pkgType: (_p = currentPackage.value) == null ? void 0 : _p.pkgType,
           class: "data-v-722cdacb"
         }),
-        C: common_vendor.o(onPopupClose, "d8"),
-        D: common_vendor.o(($event) => {
+        D: common_vendor.o(onPopupClose, "f0"),
+        E: common_vendor.o(($event) => {
           return showPopup.value = $event;
-        }, "f7"),
-        E: common_vendor.p({
+        }, "a3"),
+        F: common_vendor.p({
           position: "bottom",
           show: showPopup.value,
           class: "data-v-722cdacb"
         }),
-        F: common_vendor.t(currentPrice.value),
-        G: common_vendor.o(choosePayment, "5b"),
-        H: common_vendor.p({
+        G: packageList.value.length > 0 || refillList.value.length > 0
+      }, packageList.value.length > 0 || refillList.value.length > 0 ? {
+        H: common_vendor.t(currentPrice.value),
+        I: common_vendor.o(choosePayment, "0b"),
+        J: common_vendor.p({
           type: "primary",
           width: "300rpx",
           height: "110rpx",
           class: "btn data-v-722cdacb"
         }),
-        I: `${_ctx.u_s_b_h}px`,
-        J: `${_ctx.u_s_a_i_b}px`
-      });
+        K: `${_ctx.u_s_b_h}px`,
+        L: `${_ctx.u_s_a_i_b}px`
+      } : {});
       return __returned__;
     };
   }

@@ -5,7 +5,7 @@
 import { getHostProjectConfig } from './ProjectConfig.uts'
 import { storage } from './Storage.uts'
 import { uploadFileRequest, type UploadApiResponse, type UploadFileOptions } from './Upload.uts'
-import { config, getToken, setToken, clearToken, setStorageSync } from '@/common/config'
+import { config, getToken, setToken, clearToken, setStorageSync,isWechat } from '@/common/config'
 
 // ========== 类型定义 ==========
 
@@ -313,29 +313,27 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 					return
 				}
 
-				// 检查是否为未授权状态码
-				// #ifdef MP-WEIXIN
-				let isUnauthorizedCode = false
-				for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
-					if (('' + finalUnauthorizedCodes[i]) == ('' + code)) {
-						isUnauthorizedCode = true
-						break
+				// 微信环境里，检查是否为未授权状态码
+				if(isWechat()){
+					let isUnauthorizedCode = false
+					for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
+						if (('' + finalUnauthorizedCodes[i]) == ('' + code)) {
+							isUnauthorizedCode = true
+							break
+						}
+					}
+					if (isUnauthorizedCode && redirectOnUnauthorized) {
+						// 显示错误提示
+						if (showError) {
+							showErrorToast(msg || '登录已过期，请重新登录')
+						}
+						// 跳转登录页
+						navigateToLogin(finalLoginPage)
+						
+						reject(result)
+						return
 					}
 				}
-
-				if (isUnauthorizedCode && redirectOnUnauthorized) {
-					// 显示错误提示
-					if (showError) {
-						showErrorToast(msg || '登录已过期，请重新登录')
-					}
-					// 跳转登录页
-					navigateToLogin(finalLoginPage)
-					
-					reject(result)
-					return
-				}
-
-				// #endif
 
 				// 自定义错误码处理
 				if (onErrorCode != null) {

@@ -165,29 +165,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const code = common_vendor.ref("");
     const getCode = () => {
-      return new Promise((resolve) => {
-        common_vendor.index.login(new common_vendor.UTSJSONObject({
-          success: (res) => {
-            return common_vendor.__awaiter(this, void 0, void 0, function* () {
-              code.value = res.code;
-              const params = new common_vendor.UTSJSONObject({
-                isLogin: "1",
-                xcxCode: code.value
-              });
-              const loginRes = yield api_http.login(params);
-              if (loginRes.code == 200) {
-                common_config.setToken(loginRes.data.access_token, loginRes.data.refreshToken);
-                resolve(true);
-              } else {
-                resolve(false);
-              }
-            });
-          },
-          fail: (err) => {
-            common_vendor.index.__f__("error", "at pages/card/card.uvue:233", "登录失败:", err);
-            resolve(false);
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const res = yield common_vendor.index.login(new common_vendor.UTSJSONObject({ provider: "weixin" }));
+          code.value = res.code;
+          const loginRes = yield api_http.login(new common_vendor.UTSJSONObject({
+            isLogin: "1",
+            xcxCode: code.value
+          }));
+          if (loginRes.code == 200) {
+            common_config.setToken(loginRes.data.access_token, loginRes.data.refreshToken);
+            return true;
           }
-        }));
+          return false;
+        } catch (err) {
+          common_vendor.index.__f__("error", "at pages/card/card.uvue:231", "登录失败:", err);
+          return false;
+        }
       });
     };
     const wxGetPhoneLogin = common_vendor.ref("");
@@ -223,7 +217,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
             const loginSuccess = yield getCode();
             if (!loginSuccess) {
-              common_vendor.index.__f__("log", "at pages/card/card.uvue:280", "登录失败，跳过数据加载");
+              common_vendor.index.__f__("log", "at pages/card/card.uvue:276", "登录失败，跳过数据加载");
               common_vendor.index.showToast({
                 title: "登录失败，请重试",
                 icon: "none"
