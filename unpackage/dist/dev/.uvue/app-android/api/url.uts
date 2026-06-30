@@ -2,7 +2,6 @@ function __uts_large_ApiUrl_fill_fill_1(__obj: UTSJSONObject): void {
     __obj["getTenantPageConfigXcx"] = '/system/tenantPageConfig/getTenantPageConfigXcx';
     __obj["getTenantPageConfigH"] = '/system/tenantPageConfig/getTenantPageConfigH';
     __obj["login"] = '/auth/login';
-    __obj["queryXcxCardList"] = '/card/pkgInfo/xcxList';
     __obj["queryCardListSum"] = '/app/card/listSum';
     __obj["card_detail"] = '/app/card/info/';
     __obj["countries"] = '/app/card/getH5CountryList';
@@ -10,15 +9,21 @@ function __uts_large_ApiUrl_fill_fill_1(__obj: UTSJSONObject): void {
     __obj["queryOrder"] = '/order/pkgOrder/';
     __obj["goPay"] = '/pay/order/goPayment';
     __obj["queryBySuccessId"] = '/order/pkgOrder/success/';
-    __obj["queryPkgInfoList"] = '/card/pkgInfo/list';
     __obj["queryPkgInfoDetail"] = '/card/pkgInfo/info/';
     __obj["queryOrderList"] = '/order/pkgOrder/list';
-    __obj["queryOrderPackInfo"] = '/order/pkgOrder/getOrderPackInfo/' // 查询订单套餐信息
-    ;
+    __obj["queryOrderPackInfo"] = '/order/pkgOrder/getOrderPackInfo/';
+    __obj["queryPkgInfoList"] = '/card/pkgInfo/list';
+    __obj["queryXcxCardList"] = '/card/pkgInfo/xcxList';
     __obj["queryCardList"] = '/app/card/list';
     __obj["queryCardDetailXcx"] = '/app/card/infoXcx/';
-    __obj["userBindCard"] = '/system/appUserCard/bind' // 绑定卡
-    ;
+    __obj["userBindCard"] = '/system/appUserCard/add';
+    __obj["userUnBindCard"] = '/system/appUserCard/';
+    __obj["queryOrderListXcx"] = '/order/pkgOrder/xcxList';
+    __obj["addOrderXcx"] = '/order/pkgOrder/xcx/add';
+    __obj["queryOrderDetailXcx"] = '/order/pkgOrder/getOrderPackInfo/xcx/';
+    __obj["queryOrderSuccess"] = '/order/pkgOrder/xcxSuccess/';
+    __obj["goPayXcx"] = '/pay/orderGn/xcx/goPayment/';
+    __obj["queryPkgInfoXcx"] = '/card/pkgInfo/xcxInfo/';
 }
 function __uts_large_ApiUrl_build_0(): UTSJSONObject {
     const __obj = {} as UTSJSONObject;

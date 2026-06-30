@@ -14,7 +14,7 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-	const cardNumber = ref<string>('1064916585160')
+	const cardNumber = ref<string>('gn20260603164757')
 	
 	// 国家/地区相关
 	const showCountryPopup = ref<boolean>(false)
@@ -48,7 +48,7 @@ const _cache = __ins.renderCache;
 		// console.log('选中国家/地区:', value, item)
 		showCountryPopup.value = false
 		resCountry.value = value as string
-		console.log('选中国家/地区:', resCountry.value, " at pages/h5Search/h5Search.uvue:115")
+		console.log('选中国家/地区:', resCountry.value, " at pages/h5Search/h5Search.uvue:117")
 	}
 	
 	// 关闭弹窗时重置搜索
@@ -79,16 +79,14 @@ const _cache = __ins.renderCache;
 			})
 			return
 		}
-		console.log('查询卡号:', cardNumber.value, " at pages/h5Search/h5Search.uvue:146")
-		console.log('国家/地区:', resCountry.value, " at pages/h5Search/h5Search.uvue:147")
 		uni.showToast({
 			title: '查询中...',
 			icon: 'loading'
 		})
 		// 跳转到充值页面
-		// uni.navigateTo({
-		// 	url: `/pages/recharge/recharge?cardNo=${cardNumber.value}&country=${selectedCountry.value}`
-		// })
+		uni.navigateTo({
+			url: `/pages/recharge/recharge?cardNumber=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
+		})
 	}
 	
 	// 监听扫码结果
@@ -212,6 +210,8 @@ const _component_rice_popup = resolveEasyComponent("rice-popup",_easycom_rice_po
           modelValue: selectedCountry.value,
           "onUpdate:modelValue": $event => {(selectedCountry).value = $event},
           options: countryOptions.value,
+          maxHeight: "800rpx",
+          minHeight: "800rpx",
           "search-placeholder": "搜索国家/地区名称",
           onChange: onCountryChange
         }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "options"])

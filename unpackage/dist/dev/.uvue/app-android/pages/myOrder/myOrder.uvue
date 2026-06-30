@@ -1,25 +1,18 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue';
-import _easycom_rice_icon from '@/uni_modules/rice-ui/components/rice-icon/rice-icon.uvue';
 import _easycom_rice_button from '@/uni_modules/rice-ui/components/rice-button/rice-button.uvue';
 import _easycom_rice_tabs from '@/uni_modules/rice-ui/components/rice-tabs/rice-tabs.uvue';
-import { ref, computed } from 'vue';
-// 订单状态类型
+import _easycom_rice_tag from '@/uni_modules/rice-ui/components/rice-tag/rice-tag.uvue';
+import { queryOrderList } from '@/api/http';
+import type { OrderListXcxItem } from '@/api/types';
+import { ref, computed, onMounted } from 'vue';
+import { isWechat, isH5 } from '@/common/config.uts';
+// 订单状态映射
 type OrderStatus = '全部' | '待支付' | '已完成' | '已退款' | '已取消';
-type OrderItemStatus = '待支付' | '已完成' | '已退款' | '已取消';
-// 订单数据结构
-interface Order {
-    packageName: string;
-    status: OrderItemStatus;
-    orderNo: string;
-    cardNo: string;
-    iccid: string;
-    time: string;
-    amount: number;
-}
 // Tab 列表
 type OrderStatusTab = {
-    __$originalPosition?: UTSSourceMapPosition<"OrderStatusTab", "pages/myOrder/myOrder.uvue", 96, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"OrderStatusTab", "pages/myOrder/myOrder.uvue", 85, 7>;
     name: OrderStatus;
+    value: string;
 };
 const __sfc__ = defineComponent({
     __name: 'myOrder',
@@ -27,100 +20,86 @@ const __sfc__ = defineComponent({
         const __ins = getCurrentInstance()!;
         const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
         const _cache = __ins.renderCache;
-        const tabs = ref<OrderStatusTab[]>([{ name: '全部' } as OrderStatusTab, { name: '待支付' } as OrderStatusTab, { name: '已完成' } as OrderStatusTab, { name: '已退款' } as OrderStatusTab, { name: '已取消' } as OrderStatusTab]);
+        const tabs = ref<OrderStatusTab[]>([
+            { name: '全部', value: '' } as OrderStatusTab,
+            { name: '待支付', value: '0' } as OrderStatusTab,
+            { name: '已完成', value: '1' } as OrderStatusTab,
+            { name: '已退款', value: '5' } as OrderStatusTab,
+            { name: '已取消', value: '2' } as OrderStatusTab
+        ]);
         const current = ref<number>(0);
         const card_number = ref<string>('');
-        // 订单数据（根据图片内容）
-        const orders = ref<any[]>([
-            {
-                packageName: '车联网月包20G',
-                status: '已完成',
-                orderNo: 'O202604280001',
-                cardNo: '1064916585160',
-                iccid: '89860421123456789012',
-                time: '2026-04-28 10:12:30',
-                amount: 90
-            },
-            {
-                packageName: '车联网月包10G',
-                status: '待支付',
-                orderNo: 'O202604280002',
-                cardNo: '1064916585160',
-                iccid: '89860421123456789012',
-                time: '2026-04-28 11:20:12',
-                amount: 50
-            },
-            {
-                packageName: '测试套餐1G',
-                status: '已退款',
-                orderNo: 'O202603010001',
-                cardNo: '1064916585160',
-                iccid: '89860421123456789012',
-                time: '2026-03-01 08:10:00',
-                amount: 10
-            },
-            {
-                packageName: '500MB加油包',
-                status: '已完成',
-                orderNo: 'PO202605120001',
-                cardNo: '14700002233',
-                iccid: '8986032044208356010',
-                time: '2026-05-12 11:02:00',
-                amount: 19
-            },
-            {
-                packageName: '1GB加油包',
-                status: '已取消',
-                orderNo: 'PO202605120002',
-                cardNo: '14700002233',
-                iccid: '8986032044208356010',
-                time: '2026-05-12 12:18:00',
-                amount: 29
+        // 订单数据
+        const orderList = ref<OrderListXcxItem[]>([]);
+        // 查询状态标志
+        const isSearching = ref<boolean>(false);
+        // 状态码映射
+        const getStatusText = (status: string): string => {
+            switch (status) {
+                case '0':
+                    return '待支付';
+                case '1':
+                    return '已完成';
+                case '2':
+                    return '已取消';
+                case '3':
+                    return '支付失败';
+                case '4':
+                    return '部分退款';
+                case '5':
+                    return '全部退款';
+                default:
+                    return '未知状态';
             }
-        ]);
-        const getOrderText = (order: any, key: string): string => {
-            const value = (order as UTSJSONObject)[key];
-            return value == null ? '' : '' + value;
         };
-        // 根据搜索词和Tab状态过滤订单
-        const filteredOrders = computed<any[]>((): any[] => {
-            let result = orders.value;
-            // 按Tab筛选
-            const currentStatus = tabs.value[current.value].name;
-            if (currentStatus !== '全部') {
-                result = result.filter((order: any): boolean => getOrderText(order, 'status') === currentStatus);
+        // 获取状态对应的tab索引
+        const getTabIndexByStatus = (status: string): number => {
+            if (status === '' || status == null || status === undefined) {
+                return 0; // 全部
             }
-            // 按搜索词筛选（ICCID或卡号）
-            if (card_number.value.trim().length > 0) {
-                const keyword = card_number.value.trim();
-                result = result.filter((order: any): boolean => getOrderText(order, 'iccid').includes(keyword) || getOrderText(order, 'cardNo').includes(keyword));
-            }
-            return result;
-        });
+            const tabMap: Record<string, number> = {
+                '0': 1,
+                '1': 2,
+                '5': 3,
+                '2': 4 // 已取消
+            };
+            return tabMap[status] ?? 0;
+        };
         // 处理Tab切换
         const handleTabClick = (e: UTSJSONObject) => {
+            console.log(e, " at pages/myOrder/myOrder.uvue:141");
             const index = e["index"] as number;
             current.value = index;
-        };
-        // 处理搜索
-        const handleSearch = () => {
-            // 搜索逻辑已通过computed实现，此处可添加额外逻辑如埋点等
-            console.log('搜索关键词:', card_number.value, " at pages/myOrder/myOrder.uvue:187");
+            // 切换标签时重置查询状态和搜索框
+            isSearching.value = false;
+            card_number.value = '';
+            getOrderList(e["value"], false);
         };
         // 获取状态样式类
         const getStatusClass = (status: string): string => {
             switch (status) {
-                case '已完成':
-                    return 'status-completed';
-                case '待支付':
-                    return 'status-pending';
-                case '已退款':
-                    return 'status-refunded';
-                case '已取消':
-                    return 'status-cancelled';
+                case '0':
+                    return 'success';
+                case '1':
+                    return 'primary';
+                case '2':
+                    return 'warning';
+                case '3':
+                    return 'error';
+                case '4':
+                    return 'error';
+                case '5':
+                    return 'error';
                 default:
                     return '';
             }
+        };
+        // 处理订单点击
+        const handleOrderClick = (order: OrderListXcxItem) => {
+            console.log(order, " at pages/myOrder/myOrder.uvue:172");
+            uni.navigateTo({
+                url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+            });
         };
         // 处理返回
         const handleBack = () => {
@@ -128,22 +107,158 @@ const __sfc__ = defineComponent({
                 delta: 1
             });
         };
-        // 去支付
-        const handlePay = (order: any) => {
-            const orderNo = getOrderText(order, 'orderNo');
-            console.log('去支付:', orderNo, " at pages/myOrder/myOrder.uvue:216");
-            // App支付逻辑
-            uni.showToast({
-                title: `支付订单 ${orderNo}`,
-                icon: 'none'
+        const scanCode = () => {
+            uni.navigateTo({
+                url: '/pages/scanCode/scanCode'
             });
         };
+        // 查询订单
+        const handleQuery = () => {
+            const keyword = card_number.value.trim();
+            if (!(keyword != "")) {
+                uni.showToast({
+                    title: '请输入订单号/卡号',
+                    icon: 'none'
+                });
+                return;
+            }
+            // 标记为查询状态
+            isSearching.value = true;
+            getOrderList('', true);
+        };
+        // 接收扫码结果
+        const onScanResult = async (data: UTSJSONObject): Promise<void> => {
+            const result = data.getString('result') ?? '';
+            console.log(result, " at pages/myOrder/myOrder.uvue:209");
+            if (result.length > 0) {
+                card_number.value = result;
+                uni.showToast({
+                    title: '扫码成功',
+                    icon: 'success'
+                });
+                // 自动查询
+                await handleQuery();
+            }
+        };
+        // 去支付
+        const handlePay = (order: OrderListXcxItem) => {
+            if (isWechat()) {
+                uni.showToast({
+                    title: `支付订单 ${order.id}`,
+                    icon: 'none'
+                });
+                uni.navigateTo({
+                    url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+                });
+            }
+            if (isH5()) {
+                uni.showToast({
+                    title: `支付订单 ${order.orderNo}`,
+                    icon: 'none'
+                });
+            }
+        };
+        // 获取订单列表
+        const getOrderList = async (status: string, isSearch: boolean): Promise<void> => {
+            try {
+                const params: any = {};
+                if (status !== '') {
+                    params.status = status;
+                }
+                // 只有查询操作才传递查询参数
+                if (isSearch && card_number.value.trim() != "") {
+                    params.rechargeNoAndOrderNo = card_number.value.trim();
+                }
+                const resp = await queryOrderList(params);
+                if (resp.code == 200) {
+                    let data: OrderListXcxItem[] = [];
+                    if (isTruthy(resp.rows) && Array.isArray(resp.rows)) {
+                        data = resp.rows!;
+                    }
+                    else if (resp.data != null && Array.isArray(resp.data)) {
+                        data = resp.data;
+                    }
+                    else {
+                        data = [];
+                    }
+                    // 如果是查询操作
+                    if (isSearch) {
+                        if (data.length === 0) {
+                            orderList.value = [];
+                            uni.showToast({
+                                title: '未找到匹配的订单',
+                                icon: 'none'
+                            });
+                            return;
+                        }
+                        // 统计各状态的订单数量
+                        const statusCount: Record<string, number> = {};
+                        data.forEach(order => {
+                            const statusKey = order.status != "" ? order.status : '';
+                            statusCount[statusKey] = (statusCount[statusKey] != 0 ? statusCount[statusKey] : 0) + 1;
+                        });
+                        // 获取不同的状态种类数
+                        const statusKeys = Object.keys(statusCount);
+                        // 直接显示查询结果
+                        orderList.value = data;
+                        // 如果只有一种状态，切换到对应的tab
+                        if (statusKeys.length === 1) {
+                            const targetStatus = statusKeys[0];
+                            if (targetStatus !== '') {
+                                const targetIndex = getTabIndexByStatus(targetStatus);
+                                current.value = targetIndex;
+                            }
+                            else {
+                                current.value = 0;
+                            }
+                        }
+                        else {
+                            // 多种状态，显示在"全部"
+                            current.value = 0;
+                        }
+                    }
+                    else {
+                        // 非查询操作，直接显示数据
+                        orderList.value = data;
+                    }
+                }
+                else {
+                    orderList.value = [];
+                    uni.showToast({
+                        title: resp.msg != "" ? resp.msg : '获取订单列表失败',
+                        icon: 'none'
+                    });
+                }
+            }
+            catch (error: any) {
+                console.error('获取订单列表失败:', error, " at pages/myOrder/myOrder.uvue:312");
+                orderList.value = [];
+                uni.showToast({
+                    title: '网络错误，请稍后重试',
+                    icon: 'none'
+                });
+            }
+        };
+        onShow(() => {
+            // 页面显示时重置所有状态
+            isSearching.value = false;
+            card_number.value = '';
+            current.value = 0;
+            getOrderList('', false);
+        });
+        onMounted(() => {
+            uni.$on('scanResult', onScanResult);
+        });
+        onUnload(() => {
+            // 移除事件监听
+            uni.$off('scanResult', onScanResult);
+        });
         return (): any | null => {
             const _component_topNavBar = resolveEasyComponent("topNavBar", _easycom_topNavBar);
-            const _component_rice_icon = resolveEasyComponent("rice-icon", _easycom_rice_icon);
             const _component_rice_button = resolveEasyComponent("rice-button", _easycom_rice_button);
             const _component_rice_tabs = resolveEasyComponent("rice-tabs", _easycom_rice_tabs);
-            return _cE("view", null, [
+            const _component_rice_tag = resolveEasyComponent("rice-tag", _easycom_rice_tag);
+            return _cE(Fragment, null, [
                 _cV(_component_topNavBar, _uM({
                     title: "我的订单",
                     "show-back": true,
@@ -158,28 +273,21 @@ const __sfc__ = defineComponent({
                             _cE("input", _uM({
                                 modelValue: card_number.value,
                                 onInput: ($event: UniInputEvent) => { (card_number).value = $event.detail.value; },
-                                placeholder: "请输入 ICCID / MSISDN",
+                                placeholder: "请输入订单号/卡号",
                                 class: "search-input"
                             }), null, 40 /* PROPS, NEED_HYDRATION */, ["modelValue", "onInput"]),
                             _cV(_component_rice_button, _uM({
                                 class: "scan-btn",
                                 height: "100%",
-                                onClick: _ctx.scanCode
-                            }), _uM({
-                                default: withSlotCtx((): any[] => [
-                                    _cV(_component_rice_icon, _uM({
-                                        name: "scan",
-                                        size: "40rpx"
-                                    }))
-                                ]),
-                                _: 1 /* STABLE */
-                            }), 8 /* PROPS */, ["onClick"]),
+                                onClick: scanCode,
+                                icon: "scan"
+                            })),
                             _cV(_component_rice_button, _uM({
                                 type: "primary",
                                 color: "#1989fa",
                                 textColor: "#ffffff",
                                 height: "100%",
-                                onClick: handleSearch
+                                onClick: handleQuery
                             }), _uM({
                                 default: withSlotCtx((): any[] => ["查询"]),
                                 _: 1 /* STABLE */
@@ -192,7 +300,8 @@ const __sfc__ = defineComponent({
                             list: tabs.value,
                             "line-width": 0,
                             "title-active-color": '#2563eb',
-                            onClick: handleTabClick,
+                            "title-inactive-color": '#334155',
+                            onChange: handleTabClick,
                             customStyle: { height: '85rpx', padding: '10rpx', border: '1rpx solid #e5edf6' }
                         }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "list"])
                     ]),
@@ -202,7 +311,7 @@ const __sfc__ = defineComponent({
                         enhanced: true,
                         "show-scrollbar": false
                     }), [
-                        filteredOrders.value.length === 0
+                        orderList.value.length === 0
                             ? _cE("view", _uM({
                                 key: 0,
                                 class: "empty-state"
@@ -213,53 +322,81 @@ const __sfc__ = defineComponent({
                                 key: 1,
                                 class: "orders-container"
                             }), [
-                                _cE(Fragment, null, RenderHelpers.renderList(filteredOrders.value, (order, index, __index, _cached): any => {
+                                _cE(Fragment, null, RenderHelpers.renderList(orderList.value, (order, index, __index, _cached): any => {
                                     return _cE("view", _uM({
                                         key: index,
-                                        class: "order-card"
+                                        class: "order-card",
+                                        onClick: () => { handleOrderClick(order); }
                                     }), [
                                         _cE("view", _uM({ class: "order-header" }), [
-                                            _cE("text", _uM({ class: "package-name" }), _tD(getOrderText(order, 'packageName')), 1 /* TEXT */),
-                                            _cE("text", _uM({
-                                                class: _nC(["status-tag", getStatusClass(getOrderText(order, 'status'))])
-                                            }), _tD(getOrderText(order, 'status')), 3 /* TEXT, CLASS */)
+                                            isTrue(order.pkgName)
+                                                ? _cE("text", _uM({
+                                                    key: 0,
+                                                    class: "package-name"
+                                                }), _tD(order.pkgName != "" ? order.pkgName : '套餐名称'), 1 /* TEXT */)
+                                                : _cC("v-if", true),
+                                            isTrue(order.status)
+                                                ? _cV(_component_rice_tag, _uM({
+                                                    key: 1,
+                                                    text: getStatusText(order.status),
+                                                    round: true,
+                                                    "plain-fill": "",
+                                                    size: "small",
+                                                    type: getStatusClass(order.status)
+                                                }), null, 8 /* PROPS */, ["text", "type"])
+                                                : _cC("v-if", true)
                                         ]),
                                         _cE("view", _uM({ class: "order-details" }), [
-                                            _cE("view", _uM({ class: "detail-row" }), [
-                                                _cE("text", _uM({ class: "detail-label" }), "订单号"),
-                                                _cE("text", _uM({ class: "detail-value" }), _tD(getOrderText(order, 'orderNo')), 1 /* TEXT */)
-                                            ]),
-                                            _cE("view", _uM({ class: "detail-row" }), [
-                                                _cE("text", _uM({ class: "detail-label" }), "卡号"),
-                                                _cE("text", _uM({ class: "detail-value" }), _tD(getOrderText(order, 'cardNo')), 1 /* TEXT */)
-                                            ]),
-                                            _cE("view", _uM({ class: "detail-row" }), [
-                                                _cE("text", _uM({ class: "detail-label" }), "ICCID"),
-                                                _cE("text", _uM({ class: "detail-value" }), _tD(getOrderText(order, 'iccid')), 1 /* TEXT */)
-                                            ]),
-                                            _cE("view", _uM({ class: "detail-row" }), [
-                                                _cE("text", _uM({ class: "detail-value" }), _tD(getOrderText(order, 'time')), 1 /* TEXT */),
+                                            isTrue(order.orderNo)
+                                                ? _cE("view", _uM({
+                                                    key: 0,
+                                                    class: "detail-row"
+                                                }), [
+                                                    _cE("text", _uM({ class: "detail-label" }), "订单号"),
+                                                    _cE("text", _uM({ class: "detail-value" }), _tD(order.orderNo != "" ? order.orderNo : '-'), 1 /* TEXT */)
+                                                ])
+                                                : _cC("v-if", true),
+                                            isTrue(order.cardNo)
+                                                ? _cE("view", _uM({
+                                                    key: 1,
+                                                    class: "detail-row"
+                                                }), [
+                                                    _cE("text", _uM({ class: "detail-label" }), "卡号"),
+                                                    _cE("text", _uM({ class: "detail-value" }), _tD(isTruthy(order.cardNo) ? order.cardNo : '-'), 1 /* TEXT */)
+                                                ])
+                                                : _cC("v-if", true),
+                                            isTrue(order.id)
+                                                ? _cE("view", _uM({
+                                                    key: 2,
+                                                    class: "detail-row"
+                                                }), [
+                                                    _cE("text", _uM({ class: "detail-label" }), "订单Id"),
+                                                    _cE("text", _uM({ class: "detail-value" }), _tD(order.id != 0 ? order.id : '-'), 1 /* TEXT */)
+                                                ])
+                                                : _cC("v-if", true),
+                                            _cE("view", _uM({ class: "detail-row last" }), [
+                                                _cE("text", _uM({ class: "detail-value" }), _tD(order.createTime != "" ? order.createTime : '-'), 1 /* TEXT */),
                                                 _cE("view", _uM({ class: "order-footer" }), [
-                                                    _cE("text", _uM({ class: "price" }), "¥" + _tD(getOrderText(order, 'amount')), 1 /* TEXT */),
-                                                    getOrderText(order, 'status') === '待支付'
+                                                    _cE("text", _uM({ class: "price" }), "¥" + _tD(order.payCurrencyAmount != "" ? order.payCurrencyAmount : '0.00'), 1 /* TEXT */),
+                                                    order.status === '0'
                                                         ? _cE("text", _uM({
                                                             key: 0,
                                                             class: "pay-btn",
-                                                            onClick: () => { handlePay(order); }
+                                                            onClick: withModifiers(() => { handlePay(order); }, ["stop"])
                                                         }), "去支付", 8 /* PROPS */, ["onClick"])
                                                         : _cC("v-if", true)
                                                 ])
                                             ])
                                         ])
-                                    ]);
+                                    ], 8 /* PROPS */, ["onClick"]);
                                 }), 128 /* KEYED_FRAGMENT */)
                             ])
                     ])
                 ])
-            ]);
+            ], 64 /* STABLE_FRAGMENT */);
         };
     }
 });
 export default __sfc__;
-const GenPagesMyOrderMyOrderStyles = [_uM([["container", _pS(_uM([["backgroundColor", "#f4f7fb"], ["minHeight", "1000rpx"], ["display", "flex"], ["flexDirection", "column"]]))], ["card-box", _uM([[".container ", _uM([["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]])]])], ["search-value", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dbe5f0"], ["borderRightColor", "#dbe5f0"], ["borderBottomColor", "#dbe5f0"], ["borderLeftColor", "#dbe5f0"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["marginBottom", "24rpx"]])]])], ["search-input", _uM([[".container .card-box .search-value ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "25rpx"], ["paddingBottom", 0], ["paddingLeft", "25rpx"], ["height", "95rpx"], ["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["backgroundImage", "none"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#0f172a"], ["fontSize", "30rpx"]])]])], ["scan-btn", _uM([[".container .card-box .search-value ", _uM([["borderLeftWidth", 1], ["borderLeftStyle", "solid"], ["borderLeftColor", "#eef2f7"]])]])], ["order-list", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "24rpx"], ["minHeight", "700rpx"]])]])], ["empty-state", _uM([[".container .order-list ", _uM([["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", "200rpx"]])]])], ["empty-text", _uM([[".container .order-list .empty-state ", _uM([["fontSize", "28rpx"], ["color", "#999999"]])]])], ["order-card", _uM([[".container .order-list .orders-container ", _uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "28rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "28rpx"], ["marginBottom", "24rpx"], ["boxShadow", "0 2rpx 12rpx rgba(0, 0, 0, 0.04)"]])]])], ["order-header", _uM([[".container .order-list .orders-container .order-card ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingBottom", "20rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f2f6"], ["marginBottom", "20rpx"]])]])], ["package-name", _uM([[".container .order-list .orders-container .order-card .order-header ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#1f2937"]])]])], ["status-tag", _uM([[".container .order-list .orders-container .order-card .order-header ", _uM([["fontSize", "24rpx"], ["paddingTop", "6rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#f3f4f6"], ["color", "#6b7280"]])]])], ["status-completed", _uM([[".container .order-list .orders-container .order-card .order-header .status-tag ", _uM([["backgroundColor", "#e8f5e9"], ["color", "#2e7d32"]])]])], ["status-pending", _uM([[".container .order-list .orders-container .order-card .order-header .status-tag ", _uM([["backgroundColor", "#fff3e0"], ["color", "#ed6c02"]])]])], ["status-refunded", _uM([[".container .order-list .orders-container .order-card .order-header .status-tag ", _uM([["backgroundColor", "#fce4ec"], ["color", "#c62828"]])]])], ["status-cancelled", _uM([[".container .order-list .orders-container .order-card .order-header .status-tag ", _uM([["backgroundColor", "#eeeeee"], ["color", "#757575"]])]])], ["order-details", _uM([[".container .order-list .orders-container .order-card ", _uM([["marginBottom", "20rpx"]])]])], ["detail-row", _uM([[".container .order-list .orders-container .order-card .order-details ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginBottom", "16rpx"]])]])], ["detail-label", _uM([[".container .order-list .orders-container .order-card .order-details .detail-row ", _uM([["width", "100rpx"], ["fontSize", "26rpx"], ["color", "#9ca3af"], ["flexShrink", 0]])]])], ["detail-value", _uM([[".container .order-list .orders-container .order-card .order-details .detail-row ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "26rpx"], ["color", "#374151"]])]])], ["order-footer", _uM([[".container .order-list .orders-container .order-card ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"]])]])], ["price", _uM([[".container .order-list .orders-container .order-card .order-footer ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#ef4444"], ["marginRight", "20rpx"]])]])], ["pay-btn", _uM([[".container .order-list .orders-container .order-card .order-footer ", _uM([["backgroundImage", "none"], ["backgroundColor", "#eff6ff"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#bfdbfe"], ["borderRightColor", "#bfdbfe"], ["borderBottomColor", "#bfdbfe"], ["borderLeftColor", "#bfdbfe"], ["color", "#2563eb"], ["fontSize", "24rpx"], ["paddingTop", "10rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "25rpx"], ["borderTopLeftRadius", "40rpx"], ["borderTopRightRadius", "40rpx"], ["borderBottomRightRadius", "40rpx"], ["borderBottomLeftRadius", "40rpx"], ["fontWeight", "bold"]])]])]])];
+const GenPagesMyOrderMyOrderStyles = [_uM([["container", _pS(_uM([["backgroundColor", "#f4f7fb"], ["height", "100%"], ["display", "flex"], ["flexDirection", "column"]]))], ["card-box", _uM([[".container ", _uM([["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]])]])], ["search-value", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dbe5f0"], ["borderRightColor", "#dbe5f0"], ["borderBottomColor", "#dbe5f0"], ["borderLeftColor", "#dbe5f0"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["marginBottom", "24rpx"]])]])], ["search-input", _uM([[".container .card-box .search-value ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "25rpx"], ["paddingBottom", 0], ["paddingLeft", "25rpx"], ["height", "95rpx"], ["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["backgroundImage", "none"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#0f172a"], ["fontSize", "30rpx"]])]])], ["scan-btn", _uM([[".container .card-box .search-value ", _uM([["borderLeftWidth", 1], ["borderLeftStyle", "solid"], ["borderLeftColor", "#eef2f7"]])]])], ["order-list", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "40rpx"], ["paddingLeft", "24rpx"], ["minHeight", "700rpx"]])]])], ["empty-state", _uM([[".container .order-list ", _uM([["display", "flex"], ["justifyContent", "center"], ["alignItems", "center"], ["paddingTop", "200rpx"]])]])], ["empty-text", _uM([[".container .order-list .empty-state ", _uM([["fontSize", "28rpx"], ["color", "#999999"]])]])], ["order-card", _uM([[".container .order-list .orders-container ", _uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "28rpx"], ["paddingRight", "28rpx"], ["paddingBottom", "28rpx"], ["paddingLeft", "28rpx"], ["marginBottom", "24rpx"], ["boxShadow", "0 2rpx 12rpx rgba(0, 0, 0, 0.04)"]])]])], ["order-header", _uM([[".container .order-list .orders-container .order-card ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingBottom", "20rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f2f6"], ["marginBottom", "20rpx"]])]])], ["package-name", _uM([[".container .order-list .orders-container .order-card .order-header ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#1f2937"]])]])], ["detail-row", _uM([[".container .order-list .orders-container .order-card .order-details ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginBottom", "16rpx"]])]])], ["detail-label", _uM([[".container .order-list .orders-container .order-card .order-details .detail-row ", _uM([["width", "100rpx"], ["fontSize", "26rpx"], ["color", "#9ca3af"], ["flexShrink", 0]])]])], ["detail-value", _uM([[".container .order-list .orders-container .order-card .order-details .detail-row ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "26rpx"], ["color", "#374151"]])]])], ["last", _uM([[".container .order-list .orders-container .order-card .order-details ", _uM([["marginBottom", 0]])]])], ["order-footer", _uM([[".container .order-list .orders-container .order-card ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"]])]])], ["price", _uM([[".container .order-list .orders-container .order-card .order-footer ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#ef4444"], ["marginRight", "20rpx"]])]])], ["pay-btn", _uM([[".container .order-list .orders-container .order-card .order-footer ", _uM([["backgroundImage", "none"], ["backgroundColor", "#eff6ff"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#bfdbfe"], ["borderRightColor", "#bfdbfe"], ["borderBottomColor", "#bfdbfe"], ["borderLeftColor", "#bfdbfe"], ["color", "#2563eb"], ["fontSize", "24rpx"], ["paddingTop", "10rpx"], ["paddingRight", "25rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "25rpx"], ["borderTopLeftRadius", "40rpx"], ["borderTopRightRadius", "40rpx"], ["borderBottomRightRadius", "40rpx"], ["borderBottomLeftRadius", "40rpx"], ["fontWeight", "bold"]])]])]])];
 //# sourceMappingURL=myOrder.uvue.map

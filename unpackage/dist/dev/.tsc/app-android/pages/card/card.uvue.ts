@@ -1,21 +1,18 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
 import _easycom_rice_input from '@/uni_modules/rice-ui/components/rice-input/rice-input.uvue'
-import _easycom_rice_icon from '@/uni_modules/rice-ui/components/rice-icon/rice-icon.uvue'
 import _easycom_rice_button from '@/uni_modules/rice-ui/components/rice-button/rice-button.uvue'
 import _easycom_rice_tabs from '@/uni_modules/rice-ui/components/rice-tabs/rice-tabs.uvue'
 import _easycom_rice_divider from '@/uni_modules/rice-ui/components/rice-divider/rice-divider.uvue'
 import _easycom_customService from '@/components/customService/customService.uvue'
-import { ref, computed, onMounted, nextTick } from 'vue'
-import { queryCardList,login,getTenantInfo } from '@/api/http.uts'
-import { getPageParams } from '@/utils/routerParams'
-import { getToken,getTenantId,isWechat,isH5 } from '@/common/config.uts'
-import { CardItem } from '@/api/types.uts'
+import { ref, computed, onMounted } from 'vue'
+import { queryCardList, login, getTenantInfo } from '@/api/http.uts'
+import { getToken, getTenantId, isWechat, setToken } from '@/common/config.uts'
+import type { RechargeData } from '@/api/types.uts'
 
-type TabItem = { __$originalPosition?: UTSSourceMapPosition<"TabItem", "pages/card/card.uvue", 92, 6>;
+type TabItem = { __$originalPosition?: UTSSourceMapPosition<"TabItem", "pages/card/card.uvue", 91, 6>;
 	name: string
 }
 
-// 计算每个 tab 对应的卡片数量
 
 const __sfc__ = defineComponent({
   __name: 'card',
@@ -26,74 +23,57 @@ const _cache = __ins.renderCache;
 
 const card_number = ref('gn20260603164757')
 const queryKeyword = ref('')
-const tabNumbers = computed<number[]>(() => {
-	const total = allCardList.value.length
-	const inUse = allCardList.value.filter((card: CardItem) => card.status === '在用').length
-	const abnormal = allCardList.value.filter((card: CardItem) => card.status !== '在用').length
-	return [total, inUse, abnormal]
-})
+const current = ref(0)
+const scrollViewHeight = ref(0)
 
-const tabs = computed<TabItem[]>(() => {
-	const numbers = tabNumbers.value
-	return [
-		{name: `全部 ${numbers[0]}`},
-		{name: `在用 ${numbers[1]}`},
-		{name: `异常 ${numbers[2]}`}
-	]
-})
+const cardList = ref<RechargeData[]>([])
+const cardCounts = ref<[number, number, number]>([0, 0, 0])
 
+const tabs = computed<TabItem[]>(() => ([
+	{name: `全部 ${cardCounts.value[0]}`},
+	{name: `在用 ${cardCounts.value[1]}`},
+	{name: `异常 ${cardCounts.value[2]}`}
+]))
 
-const handleDetail = (card: CardItem) => {
-	console.log(card, " at pages/card/card.uvue:115")
+const handleDetail = (card: RechargeData) => {
 	uni.navigateTo({
-		url: '/pages/cardDetail/cardDetail?cardNumber=' + card.cardNumber
+		url: '/pages/cardDetail/cardDetail?cardNumber=' + card.rechargeNo
 	})
 }
 
-// 根据选中的 tab 和查询卡号过滤卡片列表
-const filteredCardList = computed<CardItem[]>(() : CardItem[] => {
-	const currentStatus = tabStatuses[current.value]
-	let list = allCardList.value
-	if (currentStatus !== '全部') {
-		list = list.filter((card: CardItem) : boolean => {
-			const status = '' + card.status
-			if (currentStatus === '异常') {
-				return status !== '在用'
-			}
-			return status === currentStatus
-		})
-	}
-	if (queryKeyword.value !== '') {
-		list = list.filter((card: CardItem) : boolean => {
-			const cardNumber = '' + card.cardNumber
-			return cardNumber.indexOf(queryKeyword.value) !== -1
-		})
-	}
-	return list
-})
-
-const getCardText = (card: CardItem, key: string): string => {
-	const value = card[key]
-	return value == null ? '' : '' + value
-}
-
-// 获取状态样式类
 const getStatusClass = (status: string): string => {
 	switch (status) {
 		case '在用':
 			return 'status-completed'
-		case '异常':
-			return 'status-pending'
 		case '停机':
-			return 'status-refunded'
+			return 'status-pending'
 		default:
 			return ''
 	}
 }
 
+const getFlowText = (card: RechargeData): string => {
+	const used = card.usedFlow ?? 0
+	const total = card.pkgFlow ?? 0
+	return `${used} / ${total}`
+}
+
+const getCycleText = (card: RechargeData): string => {
+	const used = card.usedPeriod ?? '-'
+	const total = card.totalPeriod ?? '-'
+	return `${used} / ${total}`
+}
+
 const handleClick = (e: UTSJSONObject) => {
-	if(e.index != null){
+	if (isWechat()) {
+		if (!checkToken()) return;
+	}
+
+	if (e.index != null) {
 		current.value = e.index as number
+		getCardList(current.value.toString()).then((list) => {
+			cardList.value = list
+		})
 	}
 }
 
@@ -102,7 +82,6 @@ const scanCode = () => {
 		url: '/pages/scanCode/scanCode'
 	})
 }
-
 
 const handleInput = () => {
 	if (card_number.value.trim() === '') {
@@ -125,167 +104,142 @@ const handleQuery = () => {
 	})
 }
 
-// 接收扫码结果
 const onScanResult = async (data: UTSJSONObject) => {
 	const result = data.getString('result') ?? ''
-	console.log(result, " at pages/card/card.uvue:199")
 	if (result.length > 0) {
 		card_number.value = result
 		uni.showToast({
 			title: '扫码成功',
 			icon: 'success'
 		})
-		// 自动查询
 		await handleQuery()
 	}
 }
 
-// 计算 scroll-view 的高度
-const calculateScrollHeight = () => {
-
-	nextTick(() => {
-		const systemInfo = uni.getSystemInfoSync()
-		const windowHeight = systemInfo.windowHeight
-		const statusBarHeight = systemInfo.statusBarHeight || 0
-		uni.createSelectorQuery().select('.container').boundingClientRect((rect) => {
-			if (rect) {
-				// 获取顶部搜索框区域高度
-				uni.createSelectorQuery().select('.card-box').boundingClientRect((searchRect) => {
-					if (searchRect) {
-						// container 的 padding-bottom 40rpx 转换为 px
-						const paddingBottom = 40 / 750 * systemInfo.windowWidth
-						// 减去顶部搜索区域和容器内边距，剩余高度给 scroll-view
-						scrollViewHeight.value = windowHeight - searchRect.top - paddingBottom - 20
-					}
-				}).exec()
-			}
-		}).exec()
-	})
-
-}
-
-// 查询卡列表
-const getCardList = async () => {
-	loading.value = true
+const getCardList = async (state: string) => {
 	try {
 		const res = await queryCardList({
-			status: '0'
+			status: state,
+			isSort: true
 		})
-		if (res.code === 200) {
-			console.log('查询卡列表成功:', res.data, " at pages/card/card.uvue:243")
-			allCardList.value = res.data.list as CardItem[]
-		} else {
-			console.log('查询卡列表失败:', res.msg, " at pages/card/card.uvue:246")
-			allCardList.value = []
-			uni.showToast({
-				title: res.msg || '查询失败',
-				icon: 'none'
-			})
+		if (res.code == 200) {
+			return Array.isArray(res.data) ? res.data : []
 		}
+		return []
 	} catch (error) {
-		console.error('查询卡列表异常:', error, " at pages/card/card.uvue:254")
-		allCardList.value = []
 		uni.showToast({
-			title: '网络异常，请稍后重试',
+			title: '查询失败，请稍后重试',
 			icon: 'none'
 		})
-	} finally {
-		loading.value = false
+		return []
 	}
 }
 
-// 检查token状态
+// 去充值
+const handleRecharge = (rechargeNo: string) => {
+	uni.navigateTo({
+			url: '/pages/recharge/recharge?cardNumber=' + rechargeNo
+		})
+}
+
 const checkToken = (): boolean => {
 	const token = getToken()
 	return !!token
 }
 
-// 检查是否登录
-const isLogin = (): boolean => {
-	if (!checkToken()) {
-		uni.showToast({
-			title: '请先登录',
-			icon: 'none'
+// 获取 code
+const code = ref<string>('')
+const getCode = async (): Promise<boolean> => {
+	try {
+		const res = await uni.login({ provider: 'weixin' })
+		code.value = res.code
+		
+		const loginRes = await login({
+			isLogin: "1",
+			xcxCode: code.value,
 		})
+		
+		if (loginRes.code == 200) {
+			setToken(loginRes.data.access_token, loginRes.data.refreshToken)
+			return true
+		}
+		return false
+	} catch (err) {
+		console.error('登录失败:', err, " at pages/card/card.uvue:231")
 		return false
 	}
-	return true
 }
 
-//登录
-const userId = ref<string>('')
+// 获取租户页面配置
 const wxGetPhoneLogin = ref<string>('')
-const userLoginByOpenid = async (codes: string) => {
-	const res = await login({
-		xcxCode: codes,
-		isLogin: '1',
-	})
-	
-	if(res.code == 200){
-		userId.value = '' + res.data.id
-		uni.navigateTo({
-			url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value
-		})
-	}
-}
-
-//获取 code
-const code = ref<string>('')
-const getCode = () => {
-	uni.login({
-		success: (res) => {
-			code.value = res.code
-			userLoginByOpenid(res.code);
-		}
-	})
-}
-
-	// 获取租户页面配置
 const getTenantInfos = async () => {
-	const res = await getTenantInfo(getTenantId(),false)
-	if(res.code == 200){
+	const res = await getTenantInfo(getTenantId(), false)
+	if (res.code == 200) {
 		const tenantInfo = res.data
 		wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
 	}
 }
 
-//根据平台不一致，请求的方式不一致
-const platform = () => {
-	if(isWechat()){
-		// 检查token状态
-		if (checkToken()) {
-			//加载列表数据
-			getCardList()
-		}else{
-			// 获取租户页面配置
-			getTenantInfos().then(() => {
-				getCode()
-			})
-		}
-	}else if(isH5()){
-		getCardList()
-	}
+// 加载卡片数据
+const loadCardData = async () => {
+	const [allList, inUseList, abnormalList] = await Promise.all([
+		getCardList('0'),
+		getCardList('1'),
+		getCardList('2')
+	])
+
+	cardCounts.value = [allList.length, inUseList.length, abnormalList.length]
+	cardList.value = allList
 }
 
-onLoad((options) => {
-	platform()
+const platform = async () => {
+	// 1. 微信环境且无token时，先完成登录
+	if (isWechat()) {
+		if (!checkToken()) {
+			await getTenantInfos()
+			
+			// 如果不需要手机号登录，直接跳过数据加载
+			if (wxGetPhoneLogin.value != '1') {
+				// 页面显示空状态
+				cardList.value = []
+				cardCounts.value = [0, 0, 0]
+				return
+			}
+			
+			const loginSuccess = await getCode()
+			
+			// 登录失败时，不加载数据
+			if (!loginSuccess) {
+				console.log('登录失败，跳过数据加载', " at pages/card/card.uvue:276")
+				uni.showToast({
+					title: '登录失败，请重试',
+					icon: 'none'
+				})
+				return
+			}
+		}
+	}
+
+	// 2. 登录完成后（或已有token），再请求数据
+	await loadCardData()
+}
+
+onLoad(() => {
 	uni.$on('scanResult', onScanResult)
 })
 
-onMounted(() => {
-	calculateScrollHeight()
+onShow(() => {
+	platform()
 })
 
 onUnload(() => {
-		// 移除事件监听
-		uni.$off('scanResult', onScanResult)
-	})
+	uni.$off('scanResult', onScanResult)
+})
 
 return (): any | null => {
 
 const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar)
 const _component_rice_input = resolveEasyComponent("rice-input",_easycom_rice_input)
-const _component_rice_icon = resolveEasyComponent("rice-icon",_easycom_rice_icon)
 const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_button)
 const _component_rice_tabs = resolveEasyComponent("rice-tabs",_easycom_rice_tabs)
 const _component_rice_divider = resolveEasyComponent("rice-divider",_easycom_rice_divider)
@@ -313,15 +267,8 @@ const _component_customService = resolveEasyComponent("customService",_easycom_c
           _cV(_component_rice_button, _uM({
             class: "scan-btn",
             height: "100%",
+            icon: "scan",
             onClick: scanCode
-          }), _uM({
-            default: withSlotCtx((): any[] => [
-              _cV(_component_rice_icon, _uM({
-                name: "scan",
-                size: "40rpx"
-              }))
-            ]),
-            _: 1 /* STABLE */
           })),
           _cV(_component_rice_button, _uM({
             type: "primary",
@@ -335,25 +282,22 @@ const _component_customService = resolveEasyComponent("customService",_easycom_c
           }))
         ])
       ]),
-      _cE("view", _uM({ class: "card-box" }), [
+      _cE("view", _uM({ class: "card-box card-list-box" }), [
         _cE("view", _uM({ class: "card-tabs" }), [
           _cV(_component_rice_tabs, _uM({
-            modelValue: _ctx.current,
-            "onUpdate:modelValue": $event => {(_ctx.current) = $event},
+            modelValue: current.value,
+            "onUpdate:modelValue": $event => {(current).value = $event},
             "line-color": "#ffffff",
             list: tabs.value,
             "line-width": 0,
             "title-active-color": '#2563eb',
-            onClick: handleClick,
+            "title-inactive-color": '#334155',
+            onChange: handleClick,
             customStyle: {height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}
           }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "list"])
         ]),
-        _cE("scroll-view", _uM({
-          class: "card-list",
-          "scroll-y": "true",
-          style: _nS(_uM({ height: _ctx.scrollViewHeight + 'px' }))
-        }), [
-          _cE(Fragment, null, RenderHelpers.renderList(filteredCardList.value, (card, index, __index, _cached): any => {
+        _cE("view", _uM({ class: "card-list" }), [
+          _cE(Fragment, null, RenderHelpers.renderList(cardList.value, (card, index, __index, _cached): any => {
             return _cE("view", _uM({
               class: "card-item",
               key: index,
@@ -361,49 +305,69 @@ const _component_customService = resolveEasyComponent("customService",_easycom_c
             }), [
               _cE("view", _uM({ class: "item-head" }), [
                 _cE("view", _uM({ class: "item-head-label" }), [
-                  _cE("text", _uM({ class: "card-item-title" }), _tD(getCardText(card, 'cardNumber')), 1 /* TEXT */),
-                  _cE("text", _uM({ class: "card-item-content" }), "ICCID: " + _tD(getCardText(card, 'iccid')), 1 /* TEXT */)
+                  isTrue(card.rechargeNo)
+                    ? _cE("text", _uM({
+                        key: 0,
+                        class: "card-item-title"
+                      }), _tD(card.rechargeNo || '-'), 1 /* TEXT */)
+                    : _cC("v-if", true),
+                  isTrue(card.pkgName)
+                    ? _cE("text", _uM({
+                        key: 1,
+                        class: "card-item-content"
+                      }), "套餐：" + _tD(card.pkgName || '-'), 1 /* TEXT */)
+                    : _cC("v-if", true)
                 ]),
-                _cE("text", _uM({
-                  class: _nC(["status-tag", getStatusClass(getCardText(card, 'status'))])
-                }), _tD(getCardText(card, 'status')), 3 /* TEXT, CLASS */)
+                isTrue(card.statusStr)
+                  ? _cE("text", _uM({
+                      key: 0,
+                      class: _nC(["status-tag", getStatusClass(card.statusStr)])
+                    }), _tD(card.statusStr || '未知'), 3 /* TEXT, CLASS */)
+                  : _cC("v-if", true)
               ]),
-              _cE("view", _uM({ class: "item-package" }), [
-                _cE("text", _uM({ class: "package-label" }), "当前套餐:"),
-                _cE("text", _uM({ class: "package-value" }), _tD(getCardText(card, 'currentPackage')), 1 /* TEXT */)
-              ]),
+              isTrue(card.usedFlow || card.totalFlow)
+                ? _cE("view", _uM({
+                    key: 0,
+                    class: "item-package"
+                  }), [
+                    _cE("text", _uM({ class: "package-label" }), "流量："),
+                    _cE("text", _uM({ class: "package-value" }), _tD(getFlowText(card)), 1 /* TEXT */)
+                  ])
+                : _cC("v-if", true),
               _cV(_component_rice_divider, _uM({
                 dashed: "",
-                customStyle: {margin:'0'}
+                customStyle: {margin: '0'}
               })),
               _cE("view", _uM({ class: "card-metrics" }), [
                 _cE("view", _uM({ class: "metric-box mr-24" }), [
-                  _cE("view", _uM({ class: "metric-label" }), "到期时间"),
-                  _cE("view", _uM({ class: "metric-value" }), _tD(getCardText(card, 'expireDate')), 1 /* TEXT */)
+                  _cE("view", _uM({ class: "metric-label" }), "生效时间"),
+                  _cE("view", _uM({ class: "metric-value" }), _tD(card.effectiveTime || '-'), 1 /* TEXT */)
                 ]),
                 _cE("view", _uM({ class: "metric-box" }), [
-                  _cE("view", _uM({ class: "metric-label" }), "本月流量"),
-                  _cE("view", _uM({ class: "metric-value" }), _tD(getCardText(card, 'usedTraffic')) + " / " + _tD(getCardText(card, 'totalTraffic')), 1 /* TEXT */)
+                  _cE("view", _uM({ class: "metric-label" }), "到期时间"),
+                  _cE("view", _uM({ class: "metric-value" }), _tD(card.expirationTime || '-'), 1 /* TEXT */)
                 ])
               ]),
               _cE("view", _uM({ class: "card-bottom" }), [
                 _cE("view", _uM({ class: "card-cycle-text" }), [
                   _cE("text", _uM({ class: "cycle-label" }), "当前周期："),
-                  _cE("text", _uM({ class: "cycle-value" }), _tD(getCardText(card, 'currentCycle')), 1 /* TEXT */)
+                  _cE("text", _uM({ class: "cycle-value" }), _tD(getCycleText(card)), 1 /* TEXT */)
                 ]),
                 _cV(_component_rice_button, _uM({
                   type: "primary",
-                  size: "small"
+                  size: "mini",
+                  customStyle: {fontSize:'24rpx'},
+                  onClick: () => {handleRecharge(card.rechargeNo)}
                 }), _uM({
                   default: withSlotCtx((): any[] => ["去充值"]),
-                  _: 1 /* STABLE */
-                }))
+                  _: 2 /* DYNAMIC */
+                }), 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"])
               ])
             ], 8 /* PROPS */, ["onClick"])
           }), 128 /* KEYED_FRAGMENT */)
-        ], 4 /* STYLE */)
+        ])
       ]),
-      filteredCardList.value.length === 0
+      cardList.value.length === 0
         ? _cE("view", _uM({
             key: 0,
             class: "empty-state"
@@ -419,4 +383,4 @@ const _component_customService = resolveEasyComponent("customService",_easycom_c
 
 })
 export default __sfc__
-const GenPagesCardCardStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"], ["paddingBottom", "40rpx"]]))], ["card-box", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]])]])], ["card-tabs", _uM([[".container .card-box ", _uM([["marginBottom", "30rpx"]])]])], ["search-value", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dbe5f0"], ["borderRightColor", "#dbe5f0"], ["borderBottomColor", "#dbe5f0"], ["borderLeftColor", "#dbe5f0"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"]])]])], ["search-input", _uM([[".container .card-box .search-value ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "25rpx"], ["paddingBottom", 0], ["paddingLeft", "25rpx"], ["height", "95rpx"], ["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["backgroundImage", "none"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#0f172a"], ["fontSize", "30rpx"]])]])], ["scan-btn", _uM([[".container .card-box .search-value ", _uM([["borderLeftWidth", 1], ["borderLeftStyle", "solid"], ["borderLeftColor", "#eef2f7"]])]])], ["card-item", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "column"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#e7edf5"], ["paddingBottom", "30rpx"], ["marginBottom", "30rpx"], ["borderBottomWidth:last-child", "medium"], ["borderBottomStyle:last-child", "none"], ["borderBottomColor:last-child", "#000000"], ["marginBottom:last-child", 0], ["paddingBottom:last-child", 0]])]])], ["item-head", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "flex-start"], ["justifyContent", "space-between"]])]])], ["card-item-title", _uM([[".container .card-box .card-item .item-head ", _uM([["fontSize", "32rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.25]])]])], ["card-item-content", _uM([[".container .card-box .card-item .item-head ", _uM([["marginTop", 5], ["fontSize", 12], ["color", "#94a3b8"], ["lineHeight", 1.45]])]])], ["status-tag", _uM([[".container .card-box .card-item .item-head ", _uM([["fontSize", "24rpx"], ["paddingTop", "6rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["status-completed", _uM([[".container .card-box .card-item .item-head ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ecfdf5"], ["color", "#059669"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#a7f3d0"], ["borderRightColor", "#a7f3d0"], ["borderBottomColor", "#a7f3d0"], ["borderLeftColor", "#a7f3d0"]])]])], ["status-pending", _uM([[".container .card-box .card-item .item-head ", _uM([["backgroundImage", "none"], ["backgroundColor", "#fff7ed"], ["color", "#ea580c"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#fdba74"], ["borderRightColor", "#fdba74"], ["borderBottomColor", "#fdba74"], ["borderLeftColor", "#fdba74"]])]])], ["status-refunded", _uM([[".container .card-box .card-item .item-head ", _uM([["backgroundImage", "none"], ["backgroundColor", "#fef2f2"], ["color", "#dc2626"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#fecaca"], ["borderRightColor", "#fecaca"], ["borderBottomColor", "#fecaca"], ["borderLeftColor", "#fecaca"]])]])], ["item-package", _uM([[".container .card-box .card-item ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["minWidth", 0]])]])], ["package-label", _uM([[".container .card-box .card-item .item-package ", _uM([["fontSize", 12], ["color", "#64748b"], ["lineHeight", 1.4]])]])], ["package-value", _uM([[".container .card-box .card-item .item-package ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "25rpx"], ["fontWeight", 700], ["color", "#334155"], ["lineHeight", 1.45], ["whiteSpace", "nowrap"], ["overflow", "hidden"], ["textOverflow", "ellipsis"]])]])], ["card-metrics", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["gap", "24rpx"]])]])], ["metric-box", _uM([[".container .card-box .card-item .card-metrics ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["boxSizing", "border-box"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["minWidth", 0]])]])], ["metric-label", _uM([[".container .card-box .card-item .card-metrics .metric-box ", _uM([["fontSize", "25rpx"], ["color", "#94a3b8"], ["lineHeight", 1.4]])]])], ["metric-value", _uM([[".container .card-box .card-item .card-metrics .metric-box ", _uM([["marginTop", "15rpx"], ["fontSize", "25rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.4]])]])], ["card-bottom", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["card-cycle-text", _uM([[".container .card-box .card-item .card-bottom ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["cycle-label", _uM([[".container .card-box .card-item .card-bottom .card-cycle-text ", _uM([["fontSize", "25rpx"], ["color", "#64748b"], ["lineHeight", 1.45]])]])], ["cycle-value", _uM([[".container .card-box .card-item .card-bottom .card-cycle-text ", _uM([["fontSize", "25rpx"], ["color", "#334155"], ["fontWeight", 800]])]])], ["card-list", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"]])]])], ["empty-state", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "120rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "120rpx"], ["paddingLeft", "32rpx"], ["backgroundColor", "#ffffff"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"]])]])], ["empty-text", _uM([[".container .empty-state ", _uM([["fontSize", "28rpx"], ["color", "#9ca3af"]])]])]])]
+const GenPagesCardCardStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"], ["paddingBottom", "40rpx"]]))], ["card-box", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]])]])], ["card-tabs", _uM([[".container .card-box ", _uM([["marginTop", "24rpx"], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"]])]])], ["search-value", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "row"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#dbe5f0"], ["borderRightColor", "#dbe5f0"], ["borderBottomColor", "#dbe5f0"], ["borderLeftColor", "#dbe5f0"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"]])]])], ["search-input", _uM([[".container .card-box .search-value ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["paddingTop", 0], ["paddingRight", "25rpx"], ["paddingBottom", 0], ["paddingLeft", "25rpx"], ["height", "95rpx"], ["borderTopWidth", "medium"], ["borderRightWidth", "medium"], ["borderBottomWidth", "medium"], ["borderLeftWidth", "medium"], ["borderTopStyle", "none"], ["borderRightStyle", "none"], ["borderBottomStyle", "none"], ["borderLeftStyle", "none"], ["borderTopColor", "#000000"], ["borderRightColor", "#000000"], ["borderBottomColor", "#000000"], ["borderLeftColor", "#000000"], ["backgroundImage", "none"], ["backgroundColor", "rgba(0,0,0,0)"], ["color", "#0f172a"], ["fontSize", "30rpx"]])]])], ["scan-btn", _uM([[".container .card-box .search-value ", _uM([["borderLeftWidth", 1], ["borderLeftStyle", "solid"], ["borderLeftColor", "#eef2f7"]])]])], ["card-item", _uM([[".container .card-box ", _uM([["display", "flex"], ["flexDirection", "column"], ["borderBottomWidth", 1], ["borderBottomStyle", "solid"], ["borderBottomColor", "#e7edf5"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "30rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "30rpx"], ["borderBottomWidth:last-child", "medium"], ["borderBottomStyle:last-child", "none"], ["borderBottomColor:last-child", "#000000"], ["marginBottom:last-child", 0]])]])], ["item-head", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "flex-start"], ["justifyContent", "space-between"], ["marginBottom", "18rpx"]])]])], ["card-item-title", _uM([[".container .card-box .card-item .item-head ", _uM([["fontSize", "32rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.25]])]])], ["card-item-content", _uM([[".container .card-box .card-item .item-head ", _uM([["marginTop", 5], ["fontSize", 12], ["color", "#94a3b8"], ["lineHeight", 1.45]])]])], ["status-tag", _uM([[".container .card-box .card-item .item-head ", _uM([["fontSize", "24rpx"], ["paddingTop", "6rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"]])]])], ["status-completed", _uM([[".container .card-box .card-item .item-head ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ecfdf5"], ["color", "#059669"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#a7f3d0"], ["borderRightColor", "#a7f3d0"], ["borderBottomColor", "#a7f3d0"], ["borderLeftColor", "#a7f3d0"]])]])], ["status-pending", _uM([[".container .card-box .card-item .item-head ", _uM([["backgroundImage", "none"], ["backgroundColor", "#fff7ed"], ["color", "#ea580c"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#fdba74"], ["borderRightColor", "#fdba74"], ["borderBottomColor", "#fdba74"], ["borderLeftColor", "#fdba74"]])]])], ["item-package", _uM([[".container .card-box .card-item ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["minWidth", 0]])]])], ["package-label", _uM([[".container .card-box .card-item .item-package ", _uM([["fontSize", 12], ["color", "#64748b"], ["lineHeight", 1.4]])]])], ["package-value", _uM([[".container .card-box .card-item .item-package ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["fontSize", "25rpx"], ["fontWeight", 700], ["color", "#334155"], ["lineHeight", 1.45], ["whiteSpace", "nowrap"], ["overflow", "hidden"], ["textOverflow", "ellipsis"]])]])], ["card-metrics", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["gap", "24rpx"]])]])], ["metric-box", _uM([[".container .card-box .card-item .card-metrics ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["boxSizing", "border-box"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["minWidth", 0]])]])], ["metric-label", _uM([[".container .card-box .card-item .card-metrics .metric-box ", _uM([["fontSize", "25rpx"], ["color", "#94a3b8"], ["lineHeight", 1.4]])]])], ["metric-value", _uM([[".container .card-box .card-item .card-metrics .metric-box ", _uM([["marginTop", "15rpx"], ["fontSize", "25rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.4]])]])], ["card-bottom", _uM([[".container .card-box .card-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["card-cycle-text", _uM([[".container .card-box .card-item .card-bottom ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["cycle-label", _uM([[".container .card-box .card-item .card-bottom .card-cycle-text ", _uM([["fontSize", "25rpx"], ["color", "#64748b"], ["lineHeight", 1.45]])]])], ["cycle-value", _uM([[".container .card-box .card-item .card-bottom .card-cycle-text ", _uM([["fontSize", "25rpx"], ["color", "#334155"], ["fontWeight", 800]])]])], ["card-list-box", _uM([[".container ", _uM([["paddingTop", 0], ["paddingRight", 0], ["paddingBottom", 0], ["paddingLeft", 0]])]])], ["card-list", _uM([[".container ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["width", "100%"]])]])], ["empty-state", _uM([[".container ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "120rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "120rpx"], ["paddingLeft", "32rpx"], ["backgroundColor", "#ffffff"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"]])]])], ["empty-text", _uM([[".container .empty-state ", _uM([["fontSize", "28rpx"], ["color", "#9ca3af"]])]])]])]

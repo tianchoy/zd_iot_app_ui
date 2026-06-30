@@ -3,7 +3,7 @@ import _easycom_rice_icon from '@/uni_modules/rice-ui/components/rice-icon/rice-
 import _easycom_rice_button from '@/uni_modules/rice-ui/components/rice-button/rice-button.uvue'
 import { login,getTenantInfo,queryCardListSum} from '@/api/http.uts'
 	import type { CardListSumData } from '@/api/types.uts'
-	import { setStorageSync,getTenantId,getToken ,clearToken} from '@/common/config.uts'
+	import { getStorageSync,getTenantId,getToken ,clearToken,isWechat,config,setToken} from '@/common/config.uts'
 
 
 	
@@ -17,13 +17,6 @@ const _cache = __ins.renderCache;
 	const title = ref('用户');
 	const wxGetPhoneLogin = ref<string>('')
 
-	// 卡片类型切换
-	const cardType = (type: number) => {
-		if (!isLogin()) return 
-		uni.reLaunch({
-			url: '/pages/card/card?type=' + type
-		})
-	}
 	// 跳转订单记录
 	const toOrder = () => {
 		if (!isLogin()) return 
@@ -37,7 +30,7 @@ const _cache = __ins.renderCache;
 	const userLoginByOpenid = async (codes: string) => {
 		const res = await login({
 			xcxCode: codes,
-			isLogin: '1',
+			isLogin: '0',
 		})
 		
 		if(res.code == 200){
@@ -50,22 +43,36 @@ const _cache = __ins.renderCache;
 
 	//获取 code
 	const code = ref<string>('')
-	const getCode = () => {
+	const getCode = async () => {
 		uni.login({
-			success: (res) => {
+			success: async (res) => {
 				code.value = res.code
-				userLoginByOpenid(res.code);
+				if( wxGetPhoneLogin.value == '1'){
+					const params = {__$originalPosition: new UTSSourceMapPosition("params", "pages/mine/mine.uvue", 82, 12),
+						isLogin: "1",
+						xcxCode: code.value,
+					}
+					const res = await login(params)
+					if(res.code == 200){
+						console.log('登录成功:', res.data.access_token, " at pages/mine/mine.uvue:88")
+						setToken(res.data.access_token, res.data.refreshToken)
+						uni.reLaunch({
+							url: '/pages/card/card'
+						})
+					}
+				}else{
+					userLoginByOpenid(res.code);
+				}
 			}
 		})
 	}
 
-		// 获取租户页面配置
+	// 获取租户页面配置
 	const getTenantInfos = async () => {
 		const res = await getTenantInfo(getTenantId(),false)
 		if(res.code == 200){
 			const tenantInfo = res.data
 			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
-			// setStorageSync('tenant_infos', tenantInfo)
 		}
 	}
 
@@ -86,7 +93,7 @@ const _cache = __ins.renderCache;
 			icon: 'none'
 		})
 		uni.reLaunch({
-			url: '/pages/index/index'
+			url: '/pages/card/card'
 		})
 	}
 
@@ -97,12 +104,9 @@ const _cache = __ins.renderCache;
 			const res = await queryCardListSum()
 			if (res.code === 200) {
 				cardListSum.value = res.data
-				console.log('查询卡列表统计成功:', res.data, " at pages/mine/mine.uvue:131")
-			} else {
-				console.log('查询卡列表统计失败:', res.msg, " at pages/mine/mine.uvue:133")
 			}
 		} catch (error) {
-			console.error('查询卡列表统计异常:', error, " at pages/mine/mine.uvue:136")
+			console.error('查询卡列表统计异常:', error, " at pages/mine/mine.uvue:140")
 		}
 	}
 
@@ -126,11 +130,11 @@ const _cache = __ins.renderCache;
 
 
 	onLoad(() => {
-		// 检查token状态
-		if (checkToken()) {
-			//加载统计数据
-			getCardListSum()
+		if (isWechat()) {
+			if (!checkToken()) return;
 		}
+		// 检查token状态
+		getCardListSum()
 	})
 
 return (): any | null => {
@@ -150,27 +154,18 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
     _cE("view", _uM({ class: "container" }), [
       _cE("view", _uM({ class: "card-info mb-24" }), [
         _cE("view", _uM({ class: "persion-card" }), [
-          _cE("view", _uM({
-            class: "persion-card-item",
-            onClick: () => {cardType(0)}
-          }), [
+          _cE("view", _uM({ class: "persion-card-item" }), [
             _cE("text", _uM({ class: "persion-card-item-title" }), "我的卡片"),
             _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).all != null ? unref(cardListSum).all : 0), 1 /* TEXT */)
-          ], 8 /* PROPS */, ["onClick"]),
-          _cE("view", _uM({
-            class: "persion-card-item",
-            onClick: () => {cardType(1)}
-          }), [
+          ]),
+          _cE("view", _uM({ class: "persion-card-item" }), [
             _cE("text", _uM({ class: "persion-card-item-title" }), "在用卡片"),
             _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).inUse != null ? unref(cardListSum).inUse : 0), 1 /* TEXT */)
-          ], 8 /* PROPS */, ["onClick"]),
-          _cE("view", _uM({
-            class: "persion-card-item",
-            onClick: () => {cardType(2)}
-          }), [
+          ]),
+          _cE("view", _uM({ class: "persion-card-item" }), [
             _cE("text", _uM({ class: "persion-card-item-title" }), "异常卡片"),
             _cE("text", _uM({ class: "persion-card-item-content" }), _tD(unref(cardListSum).inNotUse != null ? unref(cardListSum).inNotUse : 0), 1 /* TEXT */)
-          ], 8 /* PROPS */, ["onClick"])
+          ])
         ])
       ]),
       _cE("view", _uM({ class: "card-box" }), [
@@ -199,29 +194,36 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
           }))
         ])
       ]),
-      _cE("view", _uM({ class: "btn-box" }), [
-        isTrue(!isLogin())
-          ? _cV(_component_rice_button, _uM({
-              key: 0,
-              type: "primary",
-              width: "100%",
-              shape: "round",
-              onClick: handleLogin
-            }), _uM({
-              default: withSlotCtx((): any[] => ["登录"]),
-              _: 1 /* STABLE */
-            }))
-          : _cV(_component_rice_button, _uM({
-              key: 1,
-              type: "error",
-              width: "100%",
-              shape: "round",
-              onClick: handleLogout
-            }), _uM({
-              default: withSlotCtx((): any[] => ["退出登录"]),
-              _: 1 /* STABLE */
-            }))
-      ])
+      isTrue(unref(isWechat)())
+        ? _cE("view", _uM({
+            key: 0,
+            class: "btn-box"
+          }), [
+            isTrue(!isLogin())
+              ? _cV(_component_rice_button, _uM({
+                  key: 0,
+                  type: "primary",
+                  width: "100%",
+                  shape: "round",
+                  onClick: handleLogin
+                }), _uM({
+                  default: withSlotCtx((): any[] => ["登录"]),
+                  _: 1 /* STABLE */
+                }))
+              : isTrue(unref(getStorageSync)('usePhoneNumber'))
+                ? _cV(_component_rice_button, _uM({
+                    key: 1,
+                    type: "error",
+                    width: "100%",
+                    shape: "round",
+                    onClick: handleLogout
+                  }), _uM({
+                    default: withSlotCtx((): any[] => ["退出登录"]),
+                    _: 1 /* STABLE */
+                  }))
+                : _cC("v-if", true)
+          ])
+        : _cC("v-if", true)
     ])
   ], 64 /* STABLE_FRAGMENT */)
 }

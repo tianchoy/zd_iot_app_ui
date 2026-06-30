@@ -1,0 +1,16 @@
+
+import { createI18n } from '@/uni_modules/lime-i18n'
+import zhCN from '../locales/zh-CN.uts'
+import enUS from '../locales/en_US.uts'
+
+const i18n = createI18n({
+  // 使用uni.getStorageSync('uVueI18nLocale') 能获取上次退出应用后保存的语言
+  locale: 'zh-CN', // 默认显示语言
+  fallbackLocale: 'en-US',
+  messages: {
+    'zh-CN': zhCN,
+    'en-US': enUS
+  }
+})
+
+export default i18n

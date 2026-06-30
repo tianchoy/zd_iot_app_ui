@@ -1,6 +1,12 @@
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue'
+import _easycom_rice_tag from '@/uni_modules/rice-ui/components/rice-tag/rice-tag.uvue'
+import _easycom_rice_divider from '@/uni_modules/rice-ui/components/rice-divider/rice-divider.uvue'
+import _easycom_rice_count_down from '@/uni_modules/rice-ui/components/rice-count-down/rice-count-down.uvue'
 import _easycom_rice_popup from '@/uni_modules/rice-ui/components/rice-popup/rice-popup.uvue'
-import Payment from '@/components/payment.uvue';
+import { goPayXcx , queryOrderDetail } from '@/api/http';
+	import { config,isWechat,isH5 } from '@/common/config.uts';
+	import Payment from '@/components/payment.uvue';
+	
 	
 const __sfc__ = defineComponent({
   __name: 'orderDetail',
@@ -10,18 +16,103 @@ const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
 	const showPopup = ref(false);
-	const currentPrice = ref(50);
+	const currentPrice = ref(0);
+	const orderId = ref('');
+	const payChannelId = ref('');
+	// 添加标记：是否从支付成功页面返回
+	const isFromPaySuccess = ref(false);
+	// 添加标记：是否正在支付流程中
+	const isInPaymentProcess = ref(false);
+	const orderDetail = ref<any>({
+		orderNo: '',
+		rechargeNo: '',
+		pkgName: '',
+		pkgCategory: '',
+		pkgType: '',
+		pkgFlow: 0,
+		validityPeriod: '',
+		startDate: '',
+		endDate: '',
+		status: '',
+		pkgRefundStatus: '',
+		orderAmount: 0,
+		payAmount: 0,
+		orderCreateTime: '',
+		payTime: '',
+		refunds: [],
+		cancelTime: '',
+		payFailTime: '',
+		payFailReason: '',
+		usageInstructions: '',
+		currentSeconds: 0
+	});
+
+	// 获取订单状态对应的文本
+	const getOrderStatusText = (status: string): string => {
+		const statusMap: Record<string, string> = {
+			'0': '待支付',
+			'1': '已完成',
+			'2': '已取消',
+			'3': '支付失败',
+			'4': '部分退款',
+			'5': '全部退款',
+		}
+		return statusMap[status] || status || '未知'
+	}
+
+	// 获取订单状态对应的标签类型
+	const getOrderStatusType = (status: string): string => {
+		const typeMap: Record<string, string> = {
+			'0': 'success',
+			'1': 'primary',
+			'2': 'warning',
+			'3': 'error',
+			'4': 'error',
+			'5': 'error',
+		}
+		return typeMap[status] || 'primary'
+	}
 	
-	const getStatusClass = (status: string): string => {
+	// 获取套餐类型文本
+	const getPkgCategoryText = (): string => {
+		const category = orderDetail.value.pkgCategory;
+		switch (category) {
+			case '1':
+				return '日包'
+			case '2':
+				return '非自然月包'
+			case '3':
+				return '自然月包'
+			default:
+				return orderDetail.value.pkgCategory || '-'
+		}
+	}
+	
+	// 获取支付方式
+	const getPaymentMethod = (): string => {
+
+		if(isWechat()){
+			return '微信小程序支付'
+		}
+
+		if(isH5()){
+			return 'H5支付'
+		}
+
+	}
+	
+	// 获取说明文本
+	const getNoticeText = (): string => {
+		const status = orderDetail.value.status;
 		switch (status) {
-			case '已完成':
-				return 'status-completed'
-			case '待支付':
-				return 'status-pending'
-			case '已退款':
-				return 'status-refunded'
-			case '已取消':
-				return 'status-cancelled'
+			case '0':
+				return '订单尚未支付，支付完成后套餐才会生效。'
+			case '1':
+				return '套餐已生效，可在有效期内使用。'
+			case '2':
+				return '订单已退款，金额将原路返回。'
+			case '3':
+				return '订单已取消。'
 			default:
 				return ''
 		}
@@ -29,35 +120,276 @@ const _cache = __ins.renderCache;
 	
 	// 选择支付方式
 	const choosePayment = () => {
-		showPopup.value = true;
+		currentPrice.value = orderDetail.value.payAmount || orderDetail.value.orderAmount || 0
+		showPopup.value = true
 	}
 
+	// 倒计时结束
+	const handleCountDownFinish = () => {
+		uni.showToast({
+			title: "支付已过期，请重新下单",
+			icon: 'none',
+			duration: 1000
+		});
+		getOrderDetail()
+	}
+	
 	// 取消支付
 	const handleCancelPayment = () => {
-		showPopup.value = false;
+		showPopup.value = false
 	}
 
+	const toPay = (data:any) => {
+		if(!data) return
+		const res = data as any
+		orderId.value = res.orderId
+		payChannelId.value = res.payChannelId
+		// 设置正在支付流程中 - 所有支付方式统一处理
+		isInPaymentProcess.value = true
+		
+		if(res.payWxType == 'wechat_pay'){
+			uni.requestPayment({
+				provider: 'wxpay',
+				timeStamp: res.timeStamp,
+				nonceStr: res.nonceStr,
+				package: res.package,
+				paySign: res.paySign,
+				signType: res.signType,
+
+				success: (res) => {
+					uni.hideLoading()
+					uni.redirectTo({
+						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+					})
+				},
+				fail: (res) => {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付失败，请您重新支付",
+						icon: 'none',
+						duration: 1000
+					});
+					// 支付失败，重置标记
+					isInPaymentProcess.value = false
+				},
+			})
+		}
+		else if(res.payWxType == 'allin_pay'){
+			if(res.payWxClass == '0'){
+				uni.requestPayment({
+					timeStamp: res.timeStamp,
+					nonceStr: res.nonceStr,
+					package: res.package,
+					paySign: res.paySign,
+					signType: res.signType,
+					success: function (res) {
+						uni.hideLoading()
+						uni.redirectTo({
+							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+						})
+						// 注意：支付成功时不要立即重置标记，等待 onShow 回调
+					},
+					fail: function (err) {
+						uni.hideLoading()
+						uni.showToast({
+							title: "支付失败，请您重新支付",
+							icon: 'none',
+							duration: 1000
+						});
+						// 支付失败，重置标记
+						isInPaymentProcess.value = false
+					},
+				});
+			}else{
+				let param = {__$originalPosition: new UTSSourceMapPosition("param", "pages/orderDetail/orderDetail.uvue", 323, 9),
+					cusid: res.cusid,
+					appid: res.appid,
+					orgid: res.orgid,
+					version: res.version,
+					trxamt: res.trxamt,
+					reqsn: res.reqsn,
+					notify_url: res.notify_url,
+					body: res.body,
+					remark: res.remark,
+					randomstr: res.randomstr,
+					paytype: res.paytype,
+					signtype: res.signtype,
+					sign: res.sign,
+				}
+
+				uni.navigateToMiniProgram({
+					appId: config.api.auth.appID,
+					extraData: param,
+					success(res) { 
+						console.log('打开支付小程序成功:', res, " at pages/orderDetail/orderDetail.uvue:343")
+					},
+					fail(res) {
+						console.log('打开支付小程序失败:', res, " at pages/orderDetail/orderDetail.uvue:346");
+						uni.hideLoading()
+						// 支付失败，重置标记
+						isInPaymentProcess.value = false
+					},
+				})
+			}
+		}
+	}
+	
 	// 确认支付
-	const handleConfirmPayment = (e: any) => {
-		console.log(e, " at pages/orderDetail/orderDetail.uvue:136");
-		// 处理确认逻辑
-		showPopup.value = false;
+	const handleConfirmPayment = async (e: any) => {
+		showPopup.value = false
+		try {
+			const res = await goPayXcx(orderId.value)
+			if (res.code == 200) {
+				toPay(res.data)
+			} else {
+				uni.showToast({
+					title: res.msg || '支付失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('支付失败:', error, " at pages/orderDetail/orderDetail.uvue:370")
+			uni.showToast({
+				title: '支付失败，请稍后重试',
+				icon: 'none'
+			})
+		}
 	}
-
-	// 返回上一页
+	
+	// 支付弹窗关闭
+	const onPopupClose = () => {
+		showPopup.value = false
+	}
+	
+	// 返回上一页或首页
 	const handleBack = () => {
-		uni.navigateBack({
-			delta: 1
-		})
+		const pages = getCurrentPages();
+		if (pages.length > 1) {
+			uni.navigateBack()
+		} else {
+			uni.reLaunch({
+				url: '/pages/card/card'
+			})
+		}
 	}
+	
+	// 查询订单详情
+	const getOrderDetail = async () => {
+		if (!orderId.value) return
+		try {
+			const res = await queryOrderDetail(orderId.value)
+			if (res.code == 200) {
+				orderDetail.value = res.data
+			} else {
+				uni.showToast({
+					title: res.msg || '查询订单详情失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('查询订单详情失败:', error, " at pages/orderDetail/orderDetail.uvue:409")
+			uni.showToast({
+				title: '网络错误，请稍后重试',
+				icon: 'none'
+			})
+		}
+	}
+	
+	onLoad((options) => {
+		const orderNo = options?.orderNo as string | null
+		if (orderNo != null) {
+			orderId.value = orderNo
+			// 检查是否从支付成功页面跳转过来
+			if (options?.from === 'paySuccess') {
+				isFromPaySuccess.value = true
+			}
+			getOrderDetail()
+		}
+	})
+
+	onShow(() => {
+		// 如果是从支付成功页面返回的，跳过支付回调处理
+		if (isFromPaySuccess.value) {
+			// 重置标记，避免下次进入时再次跳过
+			isFromPaySuccess.value = false
+			return
+		}
+		
+		// 只有在支付流程中才处理支付回调
+		if (!isInPaymentProcess.value) {
+			return
+		}
+		
+		let options = uni.getEnterOptionsSync();
+		if (options.scene == '1038' &&
+			options.referrerInfo.appId == config.api.auth.appID) {
+			// 代表从收银台小程序返回
+			let extraData = options.referrerInfo.extraData;
+			if (!extraData) {
+				// "当前通过物理按键返回，未接收到返参，建议自行查询交易结果";
+				uni.hideLoading()
+				uni.showToast({
+					title: "支付取消，请您重新支付",
+					icon: 'none',
+					duration: 1000
+				});
+				// 重置支付流程标记
+				isInPaymentProcess.value = false
+				return
+			} else {
+				if (extraData.code == 'success') {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付成功",
+						icon: 'success',
+						duration: 1000,
+						success() {
+							// 重置支付流程标记
+							isInPaymentProcess.value = false
+							// 使用 redirectTo 替换当前页面，避免页面栈累积
+							uni.redirectTo({
+								url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+							})
+						}
+					});
+					// "支付成功";
+				} else if (extraData.code == 'cancel') {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付取消，请您重新支付",
+						icon: 'none',
+						duration: 1000
+					});
+					// 重置支付流程标记
+					isInPaymentProcess.value = false
+					return
+				} else {
+					uni.hideLoading()
+					uni.showToast({
+						title: "支付失败，请您重新支付",
+						icon: 'none',
+						duration: 1000
+					});
+					// 重置支付流程标记
+					isInPaymentProcess.value = false
+					return
+				}
+			}
+		}
+	})
 
 return (): any | null => {
 
 const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar)
+const _component_rice_tag = resolveEasyComponent("rice-tag",_easycom_rice_tag)
+const _component_rice_divider = resolveEasyComponent("rice-divider",_easycom_rice_divider)
+const _component_rice_count_down = resolveEasyComponent("rice-count-down",_easycom_rice_count_down)
 const _component_rice_popup = resolveEasyComponent("rice-popup",_easycom_rice_popup)
 
   return _cE(Fragment, null, [
-    _cE("view", null, [
+    _cE("view", _uM({
+      style: _nS(_uM({"height":"100%"}))
+    }), [
       _cV(_component_topNavBar, _uM({
         title: "订单详情",
         onBack: handleBack,
@@ -72,104 +404,238 @@ const _component_rice_popup = resolveEasyComponent("rice-popup",_easycom_rice_po
         enhanced: true
       }), [
         _cE("view", _uM({ class: "package-card" }), [
-          _cE("view", _uM({ class: "package-header" }), [
-            _cE("text", _uM({ class: "package-name" }), "车联网月包10G"),
-            _cE("text", _uM({
-              class: _nC(["status-tag status-pending", getStatusClass('待支付')])
-            }), "待支付", 2 /* CLASS */)
-          ]),
-          _cE("view", _uM({ class: "card-number-row" }), [
-            _cE("text", _uM({ class: "card-number-label" }), "当前卡号："),
-            _cE("text", _uM({ class: "card-number" }), "1064916585160")
-          ])
+          isTrue(unref(orderDetail).pkgName)
+            ? _cE("view", _uM({
+                key: 0,
+                class: "package-header"
+              }), [
+                _cE("text", _uM({ class: "package-name" }), _tD(unref(orderDetail).pkgName), 1 /* TEXT */),
+                _cV(_component_rice_tag, _uM({
+                  type: getOrderStatusType(unref(orderDetail).status),
+                  text: getOrderStatusText(unref(orderDetail).status),
+                  round: true,
+                  "plain-fill": "",
+                  size: "small"
+                }), null, 8 /* PROPS */, ["type", "text"])
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).rechargeNo)
+            ? _cE("view", _uM({
+                key: 1,
+                class: "card-number-row"
+              }), [
+                _cE("text", _uM({ class: "card-number-label" }), "充值号："),
+                _cE("text", _uM({ class: "card-number" }), _tD(unref(orderDetail).rechargeNo), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true)
         ]),
         _cE("view", _uM({ class: "info-card" }), [
-          _cE("view", _uM({ class: "info-row" }), [
-            _cE("text", _uM({ class: "info-label" }), "订单编号"),
-            _cE("text", _uM({ class: "info-value" }), "0202604280002")
-          ]),
-          _cE("view", _uM({ class: "info-row" }), [
-            _cE("text", _uM({ class: "info-label" }), "ICCID"),
-            _cE("text", _uM({ class: "info-value" }), "89860421123456789012")
-          ]),
-          _cE("view", _uM({ class: "info-row" }), [
-            _cE("text", _uM({ class: "info-label" }), "支付金额"),
-            _cE("text", _uM({ class: "info-value price" }), "¥50")
-          ]),
-          _cE("view", _uM({ class: "info-row" }), [
-            _cE("text", _uM({ class: "info-label" }), "订单状态"),
-            _cE("text", _uM({ class: "info-value status" }), "待支付")
-          ]),
-          _cE("view", _uM({ class: "info-row" }), [
-            _cE("text", _uM({ class: "info-label" }), "支付方式"),
-            _cE("text", _uM({ class: "info-value" }), "微信小程序支付")
-          ]),
-          _cE("view", _uM({ class: "info-row" }), [
-            _cE("text", _uM({ class: "info-label" }), "下单时间"),
-            _cE("text", _uM({ class: "info-value" }), "2026-04-28 11:20:12")
-          ]),
-          _cE("view", _uM({ class: "info-row" }), [
-            _cE("text", _uM({ class: "info-label" }), "支付时间"),
-            _cE("text", _uM({ class: "info-value" }), "--")
-          ])
-        ]),
-        _cE("view", _uM({ class: "info-card" }), [
-          _cE("view", _uM({ class: "section-header" }), [
-            _cE("text", _uM({ class: "section-title" }), "套餐信息")
-          ]),
-          _cE("view", _uM({ class: "info-row" }), [
-            _cE("text", _uM({ class: "info-label" }), "套餐类型"),
-            _cE("text", _uM({ class: "info-value" }), "套餐包")
-          ]),
-          _cE("view", _uM({ class: "info-row" }), [
-            _cE("text", _uM({ class: "info-label" }), "套餐流量"),
-            _cE("text", _uM({ class: "info-value" }), "10GB")
-          ]),
-          _cE("view", _uM({ class: "info-row" }), [
-            _cE("text", _uM({ class: "info-label" }), "有效期"),
-            _cE("text", _uM({ class: "info-value" }), "30天")
-          ])
-        ]),
-        _cE("view", _uM({ class: "notice-card" }), [
-          _cE("view", _uM({ class: "section-header" }), [
-            _cE("text", _uM({ class: "section-title" }), "说明")
-          ]),
-          _cE("text", _uM({ class: "notice-text" }), "订单尚未支付，支付完成后套餐才会生效。")
+          isTrue(unref(orderDetail).orderNo)
+            ? _cE("view", _uM({
+                key: 0,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "订单编号"),
+                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).orderNo), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).iccid)
+            ? _cE("view", _uM({
+                key: 1,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "ICCID"),
+                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).iccid), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).orderAmount)
+            ? _cE("view", _uM({
+                key: 2,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "支付金额"),
+                _cE("text", _uM({ class: "info-value price" }), "¥" + _tD(unref(orderDetail).payAmount || unref(orderDetail).orderAmount || 0), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).orderStatus)
+            ? _cE("view", _uM({
+                key: 3,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "订单状态"),
+                _cE("text", _uM({ class: "info-value status" }), _tD(getOrderStatusText(unref(orderDetail).status)), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).payMethod)
+            ? _cE("view", _uM({
+                key: 4,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "支付方式"),
+                _cE("text", _uM({ class: "info-value" }), _tD(getPaymentMethod()), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).orderCreateTime)
+            ? _cE("view", _uM({
+                key: 5,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "下单时间"),
+                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).orderCreateTime), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).payTime)
+            ? _cE("view", _uM({
+                key: 6,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "支付时间"),
+                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).payTime), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).payFailReason)
+            ? _cE("view", _uM({
+                key: 7,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "支付失败原因"),
+                _cE("text", _uM({ class: "info-value status-fail" }), _tD(unref(orderDetail).payFailReason), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).cancelTime)
+            ? _cE("view", _uM({
+                key: 8,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "取消时间"),
+                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).cancelTime), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          _cV(_component_rice_divider),
+          isTrue(unref(orderDetail).pkgCategory)
+            ? _cE("view", _uM({
+                key: 9,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "套餐类型"),
+                _cE("text", _uM({ class: "info-value" }), _tD(getPkgCategoryText()), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).pkgFlow)
+            ? _cE("view", _uM({
+                key: 10,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "套餐流量"),
+                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).pkgFlow) + " GB", 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).validityPeriod)
+            ? _cE("view", _uM({
+                key: 11,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "有效期"),
+                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).validityPeriod) + _tD(unref(orderDetail)?.pkgType == '1' ? '天' : '个月'), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).startDate)
+            ? _cE("view", _uM({
+                key: 12,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "生效时间"),
+                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).startDate), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).endDate)
+            ? _cE("view", _uM({
+                key: 13,
+                class: "info-row"
+              }), [
+                _cE("text", _uM({ class: "info-label" }), "失效时间"),
+                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).endDate), 1 /* TEXT */)
+              ])
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).refunds && unref(orderDetail).refunds.length > 0)
+            ? _cV(_component_rice_divider, _uM({
+                key: 14,
+                dashed: "",
+                customStyle: {margin: '0'}
+              }))
+            : _cC("v-if", true),
+          isTrue(unref(orderDetail).refunds && unref(orderDetail).refunds.length > 0)
+            ? _cE(Fragment, _uM({ key: 15 }), RenderHelpers.renderList(unref(orderDetail).refunds, (item, index, __index, _cached): any => {
+                return _cE("view", _uM({
+                  class: "info-refunds",
+                  key: index
+                }), [
+                  _cE("view", _uM({ class: "times" }), [
+                    _cE("text", _uM({ class: "info-label" }), "退款时间"),
+                    _cE("text", _uM({ class: "info-value" }), _tD(item.refundTime), 1 /* TEXT */)
+                  ]),
+                  _cE("view", _uM({ class: "money" }), [
+                    _cE("text", _uM({ class: "info-label" }), "退款金额"),
+                    _cE("text", _uM({ class: "info-value" }), "¥" + _tD(item.refundAmount || 0), 1 /* TEXT */)
+                  ])
+                ])
+              }), 128 /* KEYED_FRAGMENT */)
+            : _cC("v-if", true)
         ]),
         _cE("view", _uM({ class: "bottom-placeholder" }))
       ]),
-      _cE("view", _uM({ class: "bottom-bar" }), [
-        _cE("view", _uM({ class: "amount-section" }), [
-          _cE("text", _uM({ class: "amount-label" }), "待支付金额"),
-          _cE("text", _uM({ class: "amount-value" }), "¥50")
-        ]),
-        _cE("view", _uM({
-          class: "pay-button",
-          onClick: choosePayment
-        }), [
-          _cE("text", _uM({ class: "pay-button-text" }), "去支付")
-        ])
-      ])
-    ]),
+      unref(orderDetail).status === '0'
+        ? _cE("view", _uM({
+            key: 0,
+            class: "bottom-bar"
+          }), [
+            _cE("view", _uM({ class: "amount-section" }), [
+              _cE("text", _uM({ class: "amount-label" }), "待支付金额"),
+              _cE("text", _uM({ class: "amount-value" }), "¥" + _tD(unref(orderDetail).payAmount || unref(orderDetail).orderAmount || 0), 1 /* TEXT */)
+            ]),
+            _cE("view", _uM({ class: "amount-time" }), [
+              _cE("text", _uM({ class: "amount-label" }), "支付剩余时间"),
+              _cV(_component_rice_count_down, _uM({
+                time: unref(orderDetail).currentSeconds * 1000 || 0,
+                "font-size": "28rpx",
+                color: "#f56c6c",
+                onFinish: handleCountDownFinish
+              }), null, 8 /* PROPS */, ["time"])
+            ]),
+            _cE("view", _uM({
+              class: "pay-button",
+              onClick: choosePayment
+            }), [
+              _cE("text", _uM({ class: "pay-button-text" }), "去支付")
+            ])
+          ])
+        : _cC("v-if", true)
+    ], 4 /* STYLE */),
     _cV(_component_rice_popup, _uM({
       show: unref(showPopup),
       "onUpdate:show": $event => {trySetRefValue(showPopup, $event)},
       position: "bottom",
-      onClose: _ctx.onPopupClose
+      onClose: onPopupClose
     }), _uM({
       default: withSlotCtx((): any[] => [
         _cV(unref(Payment), _uM({
           amount: unref(currentPrice),
           onCancel: handleCancelPayment,
-          onConfirm: handleConfirmPayment
-        }), null, 8 /* PROPS */, ["amount"])
+          onConfirm: handleConfirmPayment,
+          cardNumber: unref(orderDetail).rechargeNo,
+          ",": "",
+          productName: unref(orderDetail).pkgName,
+          traffic: unref(orderDetail).pkgFlow,
+          validityPeriod: unref(orderDetail).validityPeriod,
+          pkgType: unref(orderDetail).pkgType
+        }), null, 8 /* PROPS */, ["amount", "cardNumber", "productName", "traffic", "validityPeriod", "pkgType"])
       ]),
       _: 1 /* STABLE */
-    }), 8 /* PROPS */, ["show", "onClose"])
+    }), 8 /* PROPS */, ["show"])
   ], 64 /* STABLE_FRAGMENT */)
 }
 }
 
 })
 export default __sfc__
-const GenPagesOrderDetailOrderDetailStyles = [_uM([["container", _pS(_uM([["backgroundColor", "#f4f7fb"], ["minHeight", "1000rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["boxSizing", "border-box"]]))], ["package-card", _pS(_uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "32rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "32rpx"], ["paddingLeft", "32rpx"], ["marginBottom", "24rpx"]]))], ["package-header", _uM([[".package-card ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "16rpx"]])]])], ["package-name", _uM([[".package-card .package-header ", _uM([["fontSize", "36rpx"], ["fontWeight", 600], ["color", "#1f2937"]])]])], ["status-tag", _uM([[".package-card .package-header ", _uM([["fontSize", "24rpx"], ["paddingTop", "6rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["backgroundColor", "#fff3e0"], ["color", "#ed6c02"], ["fontWeight", 500]])], [".package-card .package-header .status-pending", _uM([["backgroundColor", "#fff3e0"], ["color", "#ed6c02"]])]])], ["card-number-row", _uM([[".package-card ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["card-number-label", _uM([[".package-card .card-number-row ", _uM([["fontSize", "28rpx"], ["color", "#9ca3af"]])]])], ["card-number", _uM([[".package-card .card-number-row ", _uM([["fontSize", "28rpx"], ["color", "#374151"], ["fontWeight", 500]])]])], ["info-card", _pS(_uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "32rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "32rpx"], ["paddingLeft", "32rpx"], ["marginBottom", "24rpx"]]))], ["section-header", _uM([[".info-card ", _uM([["marginBottom", "24rpx"], ["paddingBottom", "20rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f2f6"]])], [".notice-card ", _uM([["marginBottom", "16rpx"]])]])], ["section-title", _uM([[".info-card .section-header ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#1f2937"]])], [".notice-card .section-header ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#1f2937"]])]])], ["info-row", _uM([[".info-card ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0]])]])], ["info-label", _uM([[".info-card .info-row ", _uM([["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["info-value", _uM([[".info-card .info-row ", _uM([["fontSize", "28rpx"], ["color", "#374151"], ["textAlign", "right"], ["fontWeight", "bold"]])]])], ["price", _uM([[".info-card .info-row ", _uM([["fontSize", "36rpx"], ["fontWeight", "bold"], ["color", "#ef4444"]])]])], ["notice-card", _pS(_uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "32rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "32rpx"], ["paddingLeft", "32rpx"], ["marginBottom", "24rpx"]]))], ["notice-text", _uM([[".notice-card ", _uM([["fontSize", "28rpx"], ["color", "#6b7280"], ["lineHeight", 1.5]])]])], ["bottom-placeholder", _pS(_uM([["height", "140rpx"]]))], ["bottom-bar", _pS(_uM([["position", "fixed"], ["bottom", 0], ["left", 0], ["right", 0], ["backgroundColor", "#ffffff"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "32rpx"], ["boxShadow", "0 -4rpx 20rpx rgba(0, 0, 0, 0.05)"]]))], ["amount-section", _uM([[".bottom-bar ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-start"]])]])], ["amount-label", _uM([[".bottom-bar .amount-section ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginRight", "16rpx"]])]])], ["amount-value", _uM([[".bottom-bar .amount-section ", _uM([["fontSize", "48rpx"], ["fontWeight", "bold"], ["color", "#ef4444"]])]])], ["pay-button", _uM([[".bottom-bar ", _uM([["backgroundColor", "#2563eb"], ["paddingTop", "20rpx"], ["paddingRight", "40rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "40rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"]])]])], ["pay-button-text", _uM([[".bottom-bar .pay-button ", _uM([["color", "#ffffff"], ["fontSize", "30rpx"], ["fontWeight", 500]])]])]])]
+const GenPagesOrderDetailOrderDetailStyles = [_uM([["container", _pS(_uM([["backgroundColor", "#f4f7fb"], ["height", "100%"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["boxSizing", "border-box"]]))], ["package-card", _pS(_uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "32rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "32rpx"], ["paddingLeft", "32rpx"], ["marginBottom", "24rpx"]]))], ["package-header", _uM([[".package-card ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "16rpx"]])]])], ["package-name", _uM([[".package-card .package-header ", _uM([["fontSize", "36rpx"], ["fontWeight", 600], ["color", "#1f2937"]])]])], ["status-tag", _uM([[".package-card .package-header ", _uM([["fontSize", "24rpx"], ["paddingTop", "6rpx"], ["paddingRight", "16rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "16rpx"], ["borderTopLeftRadius", "20rpx"], ["borderTopRightRadius", "20rpx"], ["borderBottomRightRadius", "20rpx"], ["borderBottomLeftRadius", "20rpx"], ["fontWeight", 500]])], [".package-card .package-header .status-pending", _uM([["backgroundColor", "#fff3e0"], ["color", "#ed6c02"]])], [".package-card .package-header .status-completed", _uM([["backgroundColor", "#e8f5e9"], ["color", "#2e7d32"]])], [".package-card .package-header .status-refunded", _uM([["backgroundColor", "#fce4ec"], ["color", "#c62828"]])], [".package-card .package-header .status-cancelled", _uM([["backgroundColor", "#eeeeee"], ["color", "#757575"]])]])], ["card-number-row", _uM([[".package-card ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"]])]])], ["card-number-label", _uM([[".package-card .card-number-row ", _uM([["fontSize", "28rpx"], ["color", "#9ca3af"]])]])], ["card-number", _uM([[".package-card .card-number-row ", _uM([["fontSize", "28rpx"], ["color", "#374151"], ["fontWeight", 500]])]])], ["info-card", _pS(_uM([["backgroundColor", "#ffffff"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "32rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "32rpx"], ["paddingLeft", "32rpx"], ["marginBottom", "24rpx"]]))], ["section-header", _uM([[".info-card ", _uM([["marginBottom", "24rpx"], ["paddingBottom", "20rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f2f6"]])]])], ["section-title", _uM([[".info-card .section-header ", _uM([["fontSize", "32rpx"], ["fontWeight", 600], ["color", "#1f2937"]])]])], ["info-row", _uM([[".info-card ", _uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0]])]])], ["info-label", _uM([[".info-card .info-row ", _uM([["fontSize", "28rpx"], ["color", "#64748b"]])]])], ["info-value", _uM([[".info-card .info-row ", _uM([["fontSize", "28rpx"], ["color", "#374151"], ["textAlign", "right"]])], [".info-card .info-row .price", _uM([["fontSize", "36rpx"], ["fontWeight", "bold"], ["color", "#ef4444"]])], [".info-card .info-row .status-fail", _uM([["color", "#ef4444"]])]])], ["info-refunds", _uM([[".info-card ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "20rpx"], ["paddingRight", 0], ["paddingBottom", "20rpx"], ["paddingLeft", 0]])]])], ["times", _uM([[".info-card .info-refunds ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "10rpx"], ["marginLeft", 0], ["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["money", _uM([[".info-card .info-refunds ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginTop", "10rpx"], ["marginRight", 0], ["marginBottom", "10rpx"], ["marginLeft", 0], ["fontSize", "24rpx"], ["color", "#64748b"]])]])], ["bottom-placeholder", _pS(_uM([["height", "140rpx"]]))], ["bottom-bar", _pS(_uM([["position", "fixed"], ["bottom", 0], ["left", 0], ["right", 0], ["backgroundColor", "#ffffff"], ["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "24rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "32rpx"], ["boxShadow", "0 -4rpx 20rpx rgba(0, 0, 0, 0.05)"]]))], ["amount-section", _uM([[".bottom-bar ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "flex-start"]])]])], ["amount-label", _uM([[".bottom-bar .amount-section ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginRight", "16rpx"]])], [".bottom-bar .amount-section .amount-value ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginRight", "16rpx"]])], [".bottom-bar .amount-time ", _uM([["fontSize", "24rpx"], ["color", "#64748b"], ["marginRight", "16rpx"]])]])], ["amount-value", _uM([[".bottom-bar .amount-section ", _uM([["fontSize", "48rpx"], ["fontWeight", "bold"], ["color", "#ef4444"]])]])], ["amount-time", _uM([[".bottom-bar ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "flex-end"]])]])], ["pay-button", _uM([[".bottom-bar ", _uM([["backgroundColor", "#2563eb"], ["paddingTop", "20rpx"], ["paddingRight", "40rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "40rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"]])]])], ["pay-button-text", _uM([[".bottom-bar .pay-button ", _uM([["color", "#ffffff"], ["fontSize", "30rpx"], ["fontWeight", 500]])]])]])]

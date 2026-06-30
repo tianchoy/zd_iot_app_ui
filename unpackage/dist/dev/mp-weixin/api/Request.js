@@ -158,7 +158,7 @@ function navigateToLogin(loginPage) {
   setTimeout(() => {
     common_vendor.index.reLaunch({ url: loginPage });
     isRedirectingToLogin = false;
-  }, 1200);
+  }, 1e3);
 }
 function createRequestOptions(url, method, data = null, options = null) {
   const out = new RequestOptions({

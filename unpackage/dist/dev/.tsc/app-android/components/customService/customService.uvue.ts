@@ -30,7 +30,7 @@ const _component_rice_float_fab = resolveEasyComponent("rice-float-fab",_easycom
     height: "80rpx",
     "icon-size": "50rpx",
     "gap-bottom": "200rpx",
-    "gap-right": "50rpx",
+    "gap-right": "20rpx",
     onClick: handleClick
   }))
 }

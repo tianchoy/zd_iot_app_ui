@@ -3,6 +3,7 @@ export type AuthApiPaths = {
   tenantId: string
   clientId: string
   grantType: string
+  appID: string
 }
 
 // ApiPaths 只引用已定义的 interface
@@ -41,7 +42,7 @@ const ENV = 'dev' //  dev | prod
 
 const API_CONFIG: UTSJSONObject = {
   dev: {
-    baseUrl: 'http://192.168.0.4:8081',
+    baseUrl: 'http://192.168.1.45:8081',
     timeout: 30000
   },
   prod: {
@@ -64,6 +65,7 @@ export const config: ProjectConfig = {
       tenantId: '000000', // 租户ID
       clientId: '12353d4772a25656d6d2a67d53353cc3',
       grantType: 'xcx',
+      appID: 'wxef277996acc166c3'
     },
   },
   

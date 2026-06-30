@@ -11,10 +11,10 @@
 			个人用户登录
 			</button>
 		</view>
-		<rice-divider backgroundColor="#f1f5f9"></rice-divider>
+		<!-- <rice-divider backgroundColor="#f1f5f9"></rice-divider>
 		<view class="no-login">
 			<view class="no-login-text" @click="noNowLogin">暂不登录</view>
-		</view>
+		</view> -->
 	</view>
 </template>
 
@@ -34,7 +34,7 @@
 		if(res.code == 200){
 			console.log('登录成功:', res.data.access_token)
 			setToken(res.data.access_token, res.data.refreshToken)
-			setStorageSync('usePhone', true)
+			setStorageSync('usePhoneNumber', true)
 			uni.reLaunch({
 				url: '/pages/card/card'
 			})
@@ -44,7 +44,6 @@
 	//获取手机号
 	const handleGetPhoneNumber =  (res: UTSJSONObject) => {
 		const detail = res['detail'] as UTSJSONObject
-		console.log('点击登录按钮获取手机号:', detail)
 		getLogin(detail['code'] as string)
 	}
 

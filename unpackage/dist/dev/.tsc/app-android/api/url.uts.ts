@@ -2,7 +2,8 @@ export const ApiUrl = {
     getTenantPageConfigXcx: '/system/tenantPageConfig/getTenantPageConfigXcx', // 查询租户页面配置小程序
     getTenantPageConfigH: '/system/tenantPageConfig/getTenantPageConfigH',// 查询租户页面配置H5
     login: '/auth/login', // 登录
-    queryXcxCardList: '/card/pkgInfo/xcxList', // 查询卡列表
+    
+    //H5接口
     queryCardListSum: '/app/card/listSum', // 查询卡列表统计
     card_detail: '/app/card/info/', // 查询卡详情
     countries: '/app/card/getH5CountryList', // 查询国家列表
@@ -10,12 +11,23 @@ export const ApiUrl = {
     queryOrder: '/order/pkgOrder/', // 查询订单
     goPay: '/pay/order/goPayment', // 去支付
     queryBySuccessId: '/order/pkgOrder/success/', // 根据成功ID查询订单
-    queryPkgInfoList: '/card/pkgInfo/list', // 查询套餐信息列表
+    
     queryPkgInfoDetail: '/card/pkgInfo/info/', // 查询套餐信息详情
     queryOrderList: '/order/pkgOrder/list', // 查询订单列表
-    queryOrderPackInfo: '/order/pkgOrder/getOrderPackInfo/' // 查询订单套餐信息
+    queryOrderPackInfo: '/order/pkgOrder/getOrderPackInfo/', // 查询订单套餐信息
+    queryPkgInfoList: '/card/pkgInfo/list', // 查询套餐信息列表
 
+    //微信小程序接口
+    queryXcxCardList: '/card/pkgInfo/xcxList', // 查询卡套餐列表
     queryCardList: '/app/card/list',//小程序首页 查询卡列表
     queryCardDetailXcx: '/app/card/infoXcx/',//小程序首页 查询卡详情Xcx
-    userBindCard:'/system/appUserCard/bind' // 绑定卡
+    userBindCard:'/system/appUserCard/add', // 绑定卡
+    userUnBindCard:'/system/appUserCard/', // 解绑卡
+    queryOrderListXcx:'/order/pkgOrder/xcxList', // 查询订单列表Xcx
+
+    addOrderXcx:'/order/pkgOrder/xcx/add', // 添加订单Xcx
+    queryOrderDetailXcx:'/order/pkgOrder/getOrderPackInfo/xcx/', // 查询订单详情Xcx
+    queryOrderSuccess:'/order/pkgOrder/xcxSuccess/', // 查询订单成功Xcx
+    goPayXcx:'/pay/orderGn/xcx/goPayment/', // 订单详情里去支付Xcx
+    queryPkgInfoXcx:'/card/pkgInfo/xcxInfo/', // 查询套餐信息详情Xcx
 } 

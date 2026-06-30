@@ -4,6 +4,8 @@
 	// #ifdef APP-ANDROID || APP-HARMONY
 	let firstBackTime = 0
 	// #endif
+	let updateManager: any = null
+	let hasUpdate = false
 
 	onLaunch(() => {
 		// i18n.global.locale.value = getStorageSync('uVueI18nLocale')

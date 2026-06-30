@@ -1,4 +1,5 @@
 import '/Applications/HBuilderX-Alpha.app/Contents/HBuilderX/plugins/uniapp-cli-vite/node_modules/@dcloudio/uni-console/src/runtime/app/index.ts';import './utils/inject-m-unix'
+import i18n from './i18n';
 import App from './App.uvue'
 
 
@@ -8,6 +9,7 @@ import App from './App.uvue'
 import { createSSRApp } from 'vue'
 export function createApp() {
 	const app = createSSRApp(App)
+	app.use(i18n)
 	return {
 		app
 	}
@@ -24,7 +26,7 @@ export class UniAppConfig extends io.dcloud.uniapp.appframe.AppConfig {
     override appid: string = "__UNI__1E9055A"
     override versionName: string = "1.0.0"
     override versionCode: string = "100"
-    override uniCompilerVersion: string = "5.12"
+    override uniCompilerVersion: string = "5.14"
     
     constructor() { super() }
 }
@@ -44,6 +46,7 @@ import GenPagesMyPkgMyPkgClass from './pages/myPkg/myPkg.uvue'
 import GenPagesLoginLoginClass from './pages/login/login.uvue'
 import GenUniModulesRiceUiPagesActionSheetActionSheetClass from './uni_modules/rice-ui/pages/action-sheet/action-sheet.uvue'
 import GenUniModulesRiceUiPagesDialogDialogClass from './uni_modules/rice-ui/pages/dialog/dialog.uvue'
+import GenPagesPkgDetailPkgDetailClass from './pages/pkgDetail/pkgDetail.uvue'
 function definePageRoutes() {
 __uniRoutes.push({ path: "pages/card/card", component: GenPagesCardCardClass, meta: { isQuit: true } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 __uniRoutes.push({ path: "pages/recharge/recharge", component: GenPagesRechargeRechargeClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
@@ -60,6 +63,7 @@ __uniRoutes.push({ path: "pages/myPkg/myPkg", component: GenPagesMyPkgMyPkgClass
 __uniRoutes.push({ path: "pages/login/login", component: GenPagesLoginLoginClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 __uniRoutes.push({ path: "uni_modules/rice-ui/pages/action-sheet/action-sheet", component: GenUniModulesRiceUiPagesActionSheetActionSheetClass, meta: { isQuit: false } as UniPageMeta, style: _uM() } as UniPageRoute)
 __uniRoutes.push({ path: "uni_modules/rice-ui/pages/dialog/dialog", component: GenUniModulesRiceUiPagesDialogDialogClass, meta: { isQuit: false } as UniPageMeta, style: _uM() } as UniPageRoute)
+__uniRoutes.push({ path: "pages/pkgDetail/pkgDetail", component: GenPagesPkgDetailPkgDetailClass, meta: { isQuit: false } as UniPageMeta, style: _uM([["navigationBarTitleText",""]]) } as UniPageRoute)
 }
 const __uniTabBar: Map<string, any | null> | null = _uM([["color","#64748b"],["selectedColor","#2563eb"],["borderStyle","black"],["backgroundColor","#ffffff"],["list",[_uM([["pagePath","pages/card/card"],["iconPath","/static/tabBar/home.png"],["selectedIconPath","/static/tabBar/home1.png"],["text","首页"]]),_uM([["pagePath","pages/mine/mine"],["iconPath","/static/tabBar/mine.png"],["selectedIconPath","/static/tabBar/mine1.png"],["text","我的"]])]]])
 const __uniLaunchPage: Map<string, any | null> = _uM([["url","pages/card/card"],["style",_uM([["navigationBarTitleText",""]])]])

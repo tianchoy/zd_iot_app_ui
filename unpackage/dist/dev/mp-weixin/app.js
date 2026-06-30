@@ -25,23 +25,23 @@ if (!Math) {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App",
   setup(__props) {
+    let updateManager = null;
     common_vendor.onLaunch(() => {
-      common_vendor.index.__f__("log", "at App.uvue:22", "App Launch");
+      common_vendor.index.__f__("log", "at App.uvue:24", "App Launch");
       if (common_vendor.index.canIUse("getUpdateManager")) {
         updateManager = common_vendor.index.getUpdateManager();
         if (updateManager) {
           updateManager.onCheckForUpdate((res = null) => {
-            common_vendor.index.__f__("log", "at App.uvue:32", "检查更新结果:", res);
+            common_vendor.index.__f__("log", "at App.uvue:34", "检查更新结果:", res);
             if (res.hasUpdate) {
-              hasUpdate = true;
-              common_vendor.index.__f__("log", "at App.uvue:35", "发现新版本，正在后台下载...");
+              common_vendor.index.__f__("log", "at App.uvue:37", "发现新版本，正在后台下载...");
               common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
                 title: "下载新版本中"
               }));
             }
           });
           updateManager.onUpdateReady(() => {
-            common_vendor.index.__f__("log", "at App.uvue:44", "新版本下载完成");
+            common_vendor.index.__f__("log", "at App.uvue:46", "新版本下载完成");
             common_vendor.index.hideLoading();
             common_vendor.index.showModal(new common_vendor.UTSJSONObject({
               title: "更新提示",
@@ -56,7 +56,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }));
           });
           updateManager.onUpdateFailed(() => {
-            common_vendor.index.__f__("error", "at App.uvue:64", "新版本下载失败");
+            common_vendor.index.__f__("error", "at App.uvue:66", "新版本下载失败");
             common_vendor.index.hideLoading();
             common_vendor.index.showModal(new common_vendor.UTSJSONObject({
               title: "更新失败",
@@ -75,10 +75,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     });
     common_vendor.onAppShow(() => {
-      common_vendor.index.__f__("log", "at App.uvue:88", "App Show");
+      common_vendor.index.__f__("log", "at App.uvue:90", "App Show");
     });
     common_vendor.onAppHide(() => {
-      common_vendor.index.__f__("log", "at App.uvue:92", "App Hide");
+      common_vendor.index.__f__("log", "at App.uvue:94", "App Hide");
     });
     return () => {
     };

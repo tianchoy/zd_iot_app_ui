@@ -27,4 +27,3 @@ injectMUnixHostProjectConfig(mUnixConfig)
 
 // 验证配置是否注入成功
 const injectedConfig = getHostProjectConfig()
-__f__('log','at utils/inject-m-unix.uts:30','配置注入成功:', injectedConfig.baseUrl)

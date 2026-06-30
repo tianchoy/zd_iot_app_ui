@@ -1,7 +1,6 @@
 {
   "navigationBarTitleText": "",
   "usingComponents": {
-    "top-nav-bar": "../../components/topNavBar/topNavBar",
-    "rice-divider": "../../uni_modules/rice-ui/components/rice-divider/rice-divider"
+    "top-nav-bar": "../../components/topNavBar/topNavBar"
   }
 }

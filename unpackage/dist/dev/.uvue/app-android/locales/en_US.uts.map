@@ -1,0 +1,1 @@
+{"version":3,"file":"en_US.uts","sourceRoot":"","sources":["locales/en_US.uts"],"names":[],"mappings":"AAAA,MAAM,CAAC,MAAM,IAAI,GAAG;IAClB,UAAU,EAAE,UAAU;CACvB,iBAAA,CAAA;AAED,SAAS;AACT,eAAe,IAAI,CAAA","sourcesContent":["export const enUS = {\n  'recharge': 'Recharge',\n}\n\n// 添加默认导出\nexport default enUS"]}

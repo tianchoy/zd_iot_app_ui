@@ -50,25 +50,45 @@ export type CardItem = {
     usedTraffic: string;
     totalTraffic: string;
     currentCycle: string;
+    usedPeriod: string;
+    totalPeriod: string;
 };
 /** 查询卡列表返回数据 */
 export type QueryCardListData = {
     list: CardItem[];
 };
-export type CardDetail = {
-    currentPeriodEndTime: string;
-    currentPeriodStartTime: string;
-    effectiveTime: string;
-    expirationTime: string;
-    pkgFlow: string;
+// 卡片详情数据类型
+export type PkgXcxVo = {
+    pkgId: string;
     pkgName: string;
+    pkgCategory: string;
+    pkgType: string;
+    validityPeriod: string | null;
+    pkgFlow: string | null;
+    crossedOutPrice: string;
+    sellingPrice: string;
+};
+export type RechargeData = {
     rechargeNo: string;
+    pkgName: string;
     status: string;
-    totalPeriod: string;
-    unUsedFlow: string;
-    usedFlow: string;
-    usedPeriod: string;
+    statusStr: string;
+    effectiveTime: string;
+    expirationTime: string | null;
+    pkgFlow: string | null;
+    usedFlow: string | null;
+    unUsedFlow: string | null;
+    usedPeriod: string | null;
+    totalPeriod: string | null;
+    currentPeriodStartTime: string | null;
+    currentPeriodEndTime: string | null;
     isBind: boolean;
+    pkgXcxVos: PkgXcxVo[];
+};
+export type CardDetail = {
+    code: number;
+    msg: string;
+    data: RechargeData;
 };
 /** 绑定卡参数 */
 export type BindCard = {
@@ -76,6 +96,84 @@ export type BindCard = {
 };
 /** 查询套餐信息列表参数 */
 export type PkgInfoListParams = {
+    rechargeNo: string;
+    status: string;
+};
+export type PkgInfoItem = {
+    name: string;
+    status: 'active' | 'pending' | 'expired';
+    statusText: string;
+    tagType: string;
+    startTime: string;
+    totalFlow: string;
+    usedFlow: string;
+    leftFlow: string;
+};
+// 查询订单列表Xcx参数
+export type QueryOrderListXcxParams = {
+    rechargeNo: string;
+};
+// 查询订单列表Xcx返回数据
+export type QueryOrderListXcxData = {
+    code: number;
+    msg: string;
+    rows: OrderListXcxItem[];
+    total: number;
+};
+export type OrderListXcxItem = {
+    id: number;
+    orderNo: string;
+    pkgName: string;
+    createTime: string;
+    status: string;
+    payCurrencyAmount: string;
+};
+export type Refund = {
+    property1: string;
+    property2: string;
+};
+export type QueryOrderDetailXcxData = {
+    orderNo: string;
+    rechargeNo: string;
+    pkgName: string;
+    pkgCategory: string;
+    pkgType: string;
+    pkgFlow: number;
+    validityPeriod: string;
+    startDate: string;
+    endDate: string;
+    status: string;
+    pkgRefundStatus: string;
+    orderAmount: number;
+    payAmount: number;
+    orderCreateTime: string;
+    payTime: string;
+    refunds: Refund[];
+    cancelTime: string;
+    payFailTime: string;
+    payFailReason: string;
+    usageInstructions: string;
+    currentSeconds: number;
+};
+export type QueryOrderSuccessParams = {
+    orderNo: string;
+    validityPeriod: string;
+    availableRegions: string[];
+    pkgName: string;
+    pkgCategory: string;
+    pkgType: string;
+    msisdn: string;
+    iccid: string;
+    payTypeVos: any[];
+    currencyCode: string;
+    payAmount: string;
+    createTime: string;
+    payTime: string;
+    status: string;
+    payCurrencyAmount: string;
+    symbol: string;
+    signPosition: string;
+    payType: string;
     rechargeNo: string;
 };
 //# sourceMappingURL=types.uts.map

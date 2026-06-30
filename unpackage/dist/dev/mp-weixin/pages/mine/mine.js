@@ -172,8 +172,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           shape: "round",
           class: "data-v-284ae985"
         })
-      } : common_vendor.unref(common_config.getStorageSync)("usePhone") ? {
-        n: common_vendor.o(handleLogout, "b3"),
+      } : common_vendor.unref(common_config.getStorageSync)("usePhoneNumber") ? {
+        n: common_vendor.o(handleLogout, "18"),
         o: common_vendor.p({
           type: "error",
           width: "100%",
@@ -181,7 +181,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-284ae985"
         })
       } : {}, {
-        m: common_vendor.unref(common_config.getStorageSync)("usePhone")
+        m: common_vendor.unref(common_config.getStorageSync)("usePhoneNumber")
       }) : {}, {
         p: `${_ctx.u_s_b_h}px`,
         q: `${_ctx.u_s_a_i_b}px`

@@ -1,0 +1,1 @@
+{"version":3,"file":"zh-CN.uts","sourceRoot":"","sources":["locales/zh-CN.uts"],"names":[],"mappings":"AAAA,MAAM,CAAC,MAAM,IAAI,GAAG;IAClB,UAAU,EAAE,IAAI;CACjB,iBAAA,CAAA;AAED,SAAS;AACT,eAAe,IAAI,CAAA","sourcesContent":["export const zhCN = {\n  'recharge': '充值',\n}\n\n// 添加默认导出\nexport default zhCN"]}

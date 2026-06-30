@@ -25,7 +25,7 @@ const __sfc__ = defineComponent({
                 height: "80rpx",
                 "icon-size": "50rpx",
                 "gap-bottom": "200rpx",
-                "gap-right": "50rpx",
+                "gap-right": "20rpx",
                 onClick: handleClick
             }));
         };

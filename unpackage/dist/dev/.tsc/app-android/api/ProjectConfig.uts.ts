@@ -76,7 +76,7 @@ const BUILTIN_DEFAULT: MUnixHostProjectConfig = {
 		userInfo: 'userInfo',
 	},
 	loginRequiredPaths: [],
-	loginPagePath: '/pages_Me/login/login',
+	loginPagePath: '/pages/login/login',
 	api: {
 		login: {
 			tokenLogin: '',

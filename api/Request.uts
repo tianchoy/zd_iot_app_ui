@@ -149,7 +149,7 @@ function navigateToLogin(loginPage: string): void {
 	setTimeout(() => {
 		uni.reLaunch({ url: loginPage })
 		isRedirectingToLogin = false
-	}, 1200)
+	}, 1000)
 }
 
 function createRequestOptions(url: string, method: HttpMethod, data?: UTSJSONObject, options?: RequestOptions): RequestOptions {

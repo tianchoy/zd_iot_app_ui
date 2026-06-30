@@ -30,8 +30,6 @@ const riceOverlay_uvue_vue_type_style_index_0_lang = {};
 
 const ricePopup_uvue_vue_type_style_index_0_lang = {};
 
-const progress_uvue_vue_type_style_index_0_lang = {};
-
 const payment_uvue_vue_type_style_index_0_lang = {};
 
 const recharge_uvue_vue_type_style_index_0_lang = {};
@@ -45,6 +43,8 @@ const paySuccess_uvue_vue_type_style_index_0_lang = {};
 const payFailed_uvue_vue_type_style_index_0_lang = {};
 
 const myOrder_uvue_vue_type_style_index_0_lang = {};
+
+const riceCountDown_uvue_vue_type_style_index_0_lang = {};
 
 const orderDetail_uvue_vue_type_style_index_0_lang = {};
 
@@ -63,5 +63,7 @@ const login_uvue_vue_type_style_index_0_lang = {};
 const riceActionSheet_uvue_vue_type_style_index_0_lang = {};
 
 const riceDialog_uvue_vue_type_style_index_0_lang = {};
+
+const pkgDetail_uvue_vue_type_style_index_0_lang = {};
 
 const App_uvue_vue_type_style_index_0_lang = {};

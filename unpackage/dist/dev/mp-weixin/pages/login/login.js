@@ -5,13 +5,11 @@ const api_http = require("../../api/http.js");
 const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
-  const _easycom_rice_divider_1 = common_vendor.resolveComponent("rice-divider");
-  (_easycom_topNavBar_1 + _easycom_rice_divider_1)();
+  _easycom_topNavBar_1();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
-const _easycom_rice_divider = () => "../../uni_modules/rice-ui/components/rice-divider/rice-divider.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_rice_divider)();
+  _easycom_topNavBar();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "login",
@@ -28,7 +26,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (res.code == 200) {
           common_vendor.index.__f__("log", "at pages/login/login.uvue:35", "登录成功:", res.data.access_token);
           common_config.setToken(res.data.access_token, res.data.refreshToken);
-          common_config.setStorageSync("usePhone", true);
+          common_config.setStorageSync("usePhoneNumber", true);
           common_vendor.index.reLaunch({
             url: "/pages/card/card"
           });
@@ -37,16 +35,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleGetPhoneNumber = (res) => {
       const detail = res["detail"];
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:47", "点击登录按钮获取手机号:", detail);
       getLogin(detail["code"]);
     };
-    const noNowLogin = () => {
-      common_vendor.index.reLaunch({
-        url: "/pages/card/card"
-      });
-    };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:59", "登录参数:", options);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:58", "登录参数:", options);
       if (options["wxGetPhoneLogin"] != null) {
         wxGetPhoneLogin.value = options["wxGetPhoneLogin"];
         userId.value = options["userId"];
@@ -65,13 +57,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_assets._imports_0,
         c: common_vendor.o(handleGetPhoneNumber, "6d"),
-        d: common_vendor.p({
-          backgroundColor: "#f1f5f9",
-          class: "data-v-27a30816"
-        }),
-        e: common_vendor.o(noNowLogin, "82"),
-        f: `${_ctx.u_s_b_h}px`,
-        g: `${_ctx.u_s_a_i_b}px`
+        d: `${_ctx.u_s_b_h}px`,
+        e: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

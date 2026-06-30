@@ -41,8 +41,13 @@ const __sfc__ = defineComponent({
 		// 最大高度
 		maxHeight: {
 			type: String,
-			default: 'auto'
-		}
+			default: '50%'
+		},
+		// 最小高度
+		minHeight: {
+			type: String,
+			default: '50%'
+		},
 	},
   emits: ["update:modelValue", "change"],
   setup(__props, __setupCtx: SetupContext) {
@@ -206,7 +211,7 @@ return (): any | null => {
       "scroll-y": "",
       enhanced: true,
       "show-scrollbar": false,
-      style: _nS(_uM({ maxHeight: _ctx.maxHeight }))
+      style: _nS(_uM({ maxHeight: _ctx.maxHeight,minHeight: _ctx.minHeight}))
     }), [
       filteredOptions.value.length === 0
         ? _cE("view", _uM({

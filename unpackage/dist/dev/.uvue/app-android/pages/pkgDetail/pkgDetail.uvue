@@ -1,0 +1,231 @@
+import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue';
+import _easycom_rice_loading from '@/uni_modules/rice-ui/components/rice-loading/rice-loading.uvue';
+import _easycom_rice_overlay from '@/uni_modules/rice-ui/components/rice-overlay/rice-overlay.uvue';
+import _easycom_rice_tag from '@/uni_modules/rice-ui/components/rice-tag/rice-tag.uvue';
+import _easycom_rice_progress from '@/uni_modules/rice-ui/components/rice-progress/rice-progress.uvue';
+import { queryPkgInfoXcx } from '@/api/http';
+import { ref, computed } from 'vue';
+const __sfc__ = defineComponent({
+    __name: 'pkgDetail',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const showLoading = ref(false);
+        const pkgId = ref<string>('');
+        // 查询套餐信息详情
+        const pkgInfo = ref<any>({});
+        const flowPercentage = computed((): number => {
+            if (!isTruthy(pkgInfo.value))
+                return 0;
+            const usedFlow = Number(pkgInfo.value.usedFlow) || 0;
+            const pkgFlow = Number(pkgInfo.value.pkgFlow) || 0;
+            if (pkgFlow <= 0)
+                return 0;
+            return Math.min((usedFlow / pkgFlow) * 100, 100);
+        });
+        // 初始化查询套餐信息详情
+        const initPkgInfo = async (): Promise<void> => {
+            if (!(pkgId.value != ""))
+                return;
+            showLoading.value = true;
+            try {
+                const res = await queryPkgInfoXcx(pkgId.value);
+                if (res.code == 200) {
+                    pkgInfo.value = res.data;
+                    showLoading.value = false;
+                }
+                else {
+                    showLoading.value = false;
+                    uni.showToast({
+                        title: res.msg != "" ? res.msg : '查询套餐信息详情失败',
+                        icon: 'none'
+                    });
+                }
+            }
+            catch (error: any) {
+                showLoading.value = false;
+                uni.showToast({
+                    title: '查询套餐信息详情失败',
+                    icon: 'none'
+                });
+            }
+        };
+        // 返回事件
+        const handleBack = () => {
+            // 处理返回逻辑
+            uni.navigateBack();
+        };
+        onLoad((options) => {
+            console.log('pkgDetail onLoad', options, " at pages/pkgDetail/pkgDetail.uvue:136");
+            pkgId.value = options["pkgId"] ?? '';
+            initPkgInfo();
+        });
+        return (): any | null => {
+            const _component_topNavBar = resolveEasyComponent("topNavBar", _easycom_topNavBar);
+            const _component_rice_loading = resolveEasyComponent("rice-loading", _easycom_rice_loading);
+            const _component_rice_overlay = resolveEasyComponent("rice-overlay", _easycom_rice_overlay);
+            const _component_rice_tag = resolveEasyComponent("rice-tag", _easycom_rice_tag);
+            const _component_rice_progress = resolveEasyComponent("rice-progress", _easycom_rice_progress);
+            return _cE(Fragment, null, [
+                _cV(_component_topNavBar, _uM({
+                    title: "套餐详情",
+                    "show-back": true,
+                    onBack: handleBack,
+                    backgroundColor: "#f4f7fb",
+                    textColor: "#333",
+                    showCapsule: false
+                })),
+                _cV(_component_rice_overlay, _uM({
+                    show: showLoading.value,
+                    "onUpdate:show": ($event: boolean) => { (showLoading).value = $event; },
+                    mode: "snow",
+                    "bg-color": "rgba(255, 255, 255, 0.4)"
+                }), _uM({
+                    default: withSlotCtx((): any[] => [
+                        _cV(_component_rice_loading, _uM({ customStyle: { height: '100rpx', width: '100rpx', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' } }), null, 8 /* PROPS */, ["customStyle"])
+                    ]),
+                    _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["show", "onUpdate:show"]),
+                _cE("view", _uM({ class: "container" }), [
+                    _cE("view", _uM({ class: "card-box" }), [
+                        _cE("view", _uM({ class: "card-header" }), [
+                            isTrue(pkgInfo.value.pkgName)
+                                ? _cE("text", _uM({
+                                    key: 0,
+                                    class: "package-name"
+                                }), _tD(pkgInfo.value.pkgName), 1 /* TEXT */)
+                                : _cC("v-if", true),
+                            isTrue(pkgInfo.value.status)
+                                ? _cV(_component_rice_tag, _uM({
+                                    key: 1,
+                                    text: pkgInfo.value.status,
+                                    round: true,
+                                    "plain-fill": "",
+                                    size: "small",
+                                    type: "success"
+                                }), null, 8 /* PROPS */, ["text"])
+                                : _cC("v-if", true)
+                        ]),
+                        isTrue(pkgInfo.value.rechargeNo)
+                            ? _cE("view", _uM({
+                                key: 0,
+                                class: "card-number"
+                            }), [
+                                _cE("text", _uM({ class: "number-label" }), "当前卡号："),
+                                _cE("text", _uM({ class: "number-value" }), _tD(pkgInfo.value.rechargeNo), 1 /* TEXT */)
+                            ])
+                            : _cC("v-if", true),
+                        isTrue(isTruthy(pkgInfo.value.usedFlow) ? pkgInfo.value.unUsedFlow : pkgInfo.value.usedFlow)
+                            ? _cE("view", _uM({
+                                key: 1,
+                                class: "traffic-section"
+                            }), [
+                                _cE("view", _uM({ class: "traffic-text" }), [
+                                    _cE("view", _uM({ class: "traffic-header" }), [
+                                        _cE("text", _uM({ class: "traffic-title" }), "流量使用")
+                                    ]),
+                                    _cE("view", _uM({ class: "traffic-progress" }), [
+                                        _cE("text", _uM({ class: "used-text" }), "已用" + _tD(pkgInfo.value.usedFlow) + " GB", 1 /* TEXT */),
+                                        _cE("text", _uM({ class: "divider" }), "/"),
+                                        _cE("text", _uM({ class: "total-text" }), "剩余" + _tD(pkgInfo.value.unUsedFlow) + " GB", 1 /* TEXT */)
+                                    ])
+                                ]),
+                                _cE("view", _uM({ class: "progress-bar" }), [
+                                    _cV(_component_rice_progress, _uM({
+                                        percentage: flowPercentage.value,
+                                        "show-text": ""
+                                    }), null, 8 /* PROPS */, ["percentage"])
+                                ])
+                            ])
+                            : _cC("v-if", true),
+                        _cE("view", _uM({ class: "info-grid" }), [
+                            isTrue(pkgInfo.value.pkgFlow)
+                                ? _cE("view", _uM({
+                                    key: 0,
+                                    class: "info-item"
+                                }), [
+                                    _cE("text", _uM({ class: "info-label" }), "套餐流量"),
+                                    _cE("text", _uM({ class: "info-value" }), _tD(pkgInfo.value.pkgFlow) + " GB", 1 /* TEXT */)
+                                ])
+                                : _cC("v-if", true),
+                            isTrue(pkgInfo.value.startDate)
+                                ? _cE("view", _uM({
+                                    key: 1,
+                                    class: "info-item"
+                                }), [
+                                    _cE("text", _uM({ class: "info-label" }), "生效时间"),
+                                    _cE("text", _uM({ class: "info-value" }), _tD(pkgInfo.value.startDate), 1 /* TEXT */)
+                                ])
+                                : _cC("v-if", true),
+                            isTrue(pkgInfo.value.validityPeriod)
+                                ? _cE("view", _uM({
+                                    key: 2,
+                                    class: "info-item"
+                                }), [
+                                    _cE("text", _uM({ class: "info-label" }), "有效期"),
+                                    _cE("text", _uM({ class: "info-value" }), _tD(pkgInfo.value.validityPeriod) + _tD(pkgInfo.value?.pkgType == '1' ? '天' : '个月'), 1 /* TEXT */)
+                                ])
+                                : _cC("v-if", true),
+                            isTrue(pkgInfo.value.endDate)
+                                ? _cE("view", _uM({
+                                    key: 3,
+                                    class: "info-item"
+                                }), [
+                                    _cE("text", _uM({ class: "info-label" }), "到期时间"),
+                                    _cE("text", _uM({ class: "info-value" }), _tD(pkgInfo.value.endDate), 1 /* TEXT */)
+                                ])
+                                : _cC("v-if", true)
+                        ])
+                    ]),
+                    _cE("view", _uM({ class: "card-box order-card" }), [
+                        _cE("view", _uM({ class: "order-title" }), [
+                            _cE("text", _uM({ class: "order-title-text" }), "关联订单信息")
+                        ]),
+                        _cE("view", _uM({ class: "order-detail" }), [
+                            isTrue(pkgInfo.value.orderNo)
+                                ? _cE("view", _uM({
+                                    key: 0,
+                                    class: "order-row"
+                                }), [
+                                    _cE("text", _uM({ class: "order-label" }), "关联订单号"),
+                                    _cE("text", _uM({ class: "order-value" }), _tD(pkgInfo.value.orderNo), 1 /* TEXT */)
+                                ])
+                                : _cC("v-if", true),
+                            isTrue(pkgInfo.value.orderStatus)
+                                ? _cE("view", _uM({
+                                    key: 1,
+                                    class: "order-row"
+                                }), [
+                                    _cE("text", _uM({ class: "order-label" }), "订单状态"),
+                                    _cE("text", _uM({ class: "order-value status-completed" }), _tD(pkgInfo.value.orderStatus), 1 /* TEXT */)
+                                ])
+                                : _cC("v-if", true),
+                            isTrue(pkgInfo.value.payAmount)
+                                ? _cE("view", _uM({
+                                    key: 2,
+                                    class: "order-row"
+                                }), [
+                                    _cE("text", _uM({ class: "order-label" }), "支付金额"),
+                                    _cE("text", _uM({ class: "order-value price" }), "￥" + _tD(pkgInfo.value.payAmount), 1 /* TEXT */)
+                                ])
+                                : _cC("v-if", true),
+                            isTrue(pkgInfo.value.orderCreateTime)
+                                ? _cE("view", _uM({
+                                    key: 3,
+                                    class: "order-row"
+                                }), [
+                                    _cE("text", _uM({ class: "order-label" }), "下单时间"),
+                                    _cE("text", _uM({ class: "order-value" }), _tD(pkgInfo.value.orderCreateTime), 1 /* TEXT */)
+                                ])
+                                : _cC("v-if", true)
+                        ])
+                    ])
+                ])
+            ], 64 /* STABLE_FRAGMENT */);
+        };
+    }
+});
+export default __sfc__;
+const GenPagesPkgDetailPkgDetailStyles = [_uM([["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"], ["paddingBottom", "40rpx"]]))], ["card-box", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]]))], ["card-header", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["marginBottom", "16rpx"]]))], ["package-name", _pS(_uM([["fontSize", "36rpx"], ["fontWeight", "bold"], ["color", "#1a2332"]]))], ["status-badge", _pS(_uM([["backgroundColor", "#e8f5e9"], ["borderTopLeftRadius", "30rpx"], ["borderTopRightRadius", "30rpx"], ["borderBottomRightRadius", "30rpx"], ["borderBottomLeftRadius", "30rpx"], ["paddingTop", "6rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "6rpx"], ["paddingLeft", "20rpx"]]))], ["status-text", _pS(_uM([["fontSize", "24rpx"], ["color", "#2e7d32"], ["fontWeight", 500]]))], ["card-number", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "flex-start"], ["marginBottom", "24rpx"]]))], ["number-label", _pS(_uM([["fontSize", "26rpx"], ["color", "#8c9aa8"]]))], ["number-value", _pS(_uM([["fontSize", "26rpx"], ["color", "#1a2332"], ["fontWeight", 500]]))], ["traffic-section", _pS(_uM([["backgroundColor", "#f8fafc"], ["borderTopLeftRadius", "16rpx"], ["borderTopRightRadius", "16rpx"], ["borderBottomRightRadius", "16rpx"], ["borderBottomLeftRadius", "16rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginBottom", "24rpx"]]))], ["traffic-text", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]]))], ["traffic-header", _pS(_uM([["marginBottom", "12rpx"]]))], ["traffic-title", _pS(_uM([["fontSize", "28rpx"], ["color", "#1a2332"], ["fontWeight", 600]]))], ["traffic-progress", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["marginBottom", "12rpx"]]))], ["used-text", _pS(_uM([["fontSize", "24rpx"], ["color", "#8c9aa8"]]))], ["divider", _pS(_uM([["fontSize", "28rpx"], ["color", "#8c9aa8"], ["marginTop", 0], ["marginRight", "8rpx"], ["marginBottom", 0], ["marginLeft", "8rpx"]]))], ["total-text", _pS(_uM([["fontSize", "24rpx"], ["color", "#8c9aa8"]]))], ["info-grid", _pS(_uM([["gridTemplateColumns", "1fr 1fr"], ["gap", "20rpx 0"]]))], ["info-item", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))], ["info-label", _pS(_uM([["fontSize", "24rpx"], ["color", "#8c9aa8"], ["marginBottom", "6rpx"]]))], ["info-value", _pS(_uM([["fontSize", "28rpx"], ["color", "#1a2332"], ["fontWeight", 500]]))], ["order-card", _pS(_uM([["marginTop", 0]]))], ["order-title", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["marginBottom", "20rpx"]]))], ["order-title-text", _pS(_uM([["fontSize", "30rpx"], ["fontWeight", "bold"], ["color", "#1a2332"], ["marginBottom", "6rpx"]]))], ["order-desc", _pS(_uM([["fontSize", "24rpx"], ["color", "#8c9aa8"]]))], ["order-detail", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["gap", "16rpx"]]))], ["order-row", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "space-between"], ["alignItems", "center"], ["paddingTop", "10rpx"], ["paddingRight", 0], ["paddingBottom", "10rpx"], ["paddingLeft", 0], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#f0f2f5"], ["borderBottomWidth:last-child", "medium"], ["borderBottomStyle:last-child", "none"], ["borderBottomColor:last-child", "#000000"]]))], ["order-label", _pS(_uM([["fontSize", "26rpx"], ["color", "#8c9aa8"]]))], ["order-value", _pS(_uM([["fontSize", "26rpx"], ["color", "#1a2332"], ["fontWeight", 500]]))], ["price", _pS(_uM([["color", "#ef4444"], ["fontWeight", "bold"]]))], ["status-completed", _pS(_uM([["color", "#2e7d32"]]))]])];
+//# sourceMappingURL=pkgDetail.uvue.map

@@ -2,30 +2,20 @@ import { PkgInfoListParams } from "../../api/types";
 import _easycom_topNavBar from '@/components/topNavBar/topNavBar.uvue';
 import _easycom_rice_tabs from '@/uni_modules/rice-ui/components/rice-tabs/rice-tabs.uvue';
 import _easycom_rice_tag from '@/uni_modules/rice-ui/components/rice-tag/rice-tag.uvue';
+import _easycom_rice_divider from '@/uni_modules/rice-ui/components/rice-divider/rice-divider.uvue';
 import _easycom_rice_button from '@/uni_modules/rice-ui/components/rice-button/rice-button.uvue';
-import { queryCardDetail, userBindCard, queryPkgInfoList } from '@/api/http';
-import type { CardDetail, BindCard } from '@/api/types';
+import { queryCardDetail, userBindCard, queryPkgInfoList, queryOrderList, userUnBindCard } from '@/api/http';
+import type { CardDetail, BindCard, OrderListXcxItem, PkgInfoItem } from '@/api/types';
+import { isH5, isWechat } from '@/common/config.uts';
 type CardDetailTabItem = {
-    __$originalPosition?: UTSSourceMapPosition<"CardDetailTabItem", "pages/cardDetail/cardDetail.uvue", 96, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"CardDetailTabItem", "pages/cardDetail/cardDetail.uvue", 130, 7>;
     name: string;
 };
 type CardDetailTabEvent = {
-    __$originalPosition?: UTSSourceMapPosition<"CardDetailTabEvent", "pages/cardDetail/cardDetail.uvue", 100, 7>;
+    __$originalPosition?: UTSSourceMapPosition<"CardDetailTabEvent", "pages/cardDetail/cardDetail.uvue", 134, 7>;
     index: number;
     item: CardDetailTabItem;
     name: string;
-};
-type PackageStatus = 'active' | 'pending' | 'expired';
-type PackageItem = {
-    __$originalPosition?: UTSSourceMapPosition<"PackageItem", "pages/cardDetail/cardDetail.uvue", 131, 7>;
-    name: string;
-    status: PackageStatus;
-    statusText: string;
-    tagType: string;
-    startTime: string;
-    totalFlow: string;
-    usedFlow: string;
-    leftFlow: string;
 };
 const __sfc__ = defineComponent({
     __name: 'cardDetail',
@@ -40,6 +30,8 @@ const __sfc__ = defineComponent({
         const navBarHeight = ref(44);
         const fixedTabsHeight = 109;
         const cardDetail = ref<CardDetail>({} as CardDetail);
+        const orderList = ref<OrderListXcxItem[]>([]);
+        const pkgInfoList = ref<PkgInfoItem[]>([]);
         const fixedTabsStyle = computed((): Map<string, string> => {
             const css = new Map<string, string>();
             css.set('top', statusBarHeight.value + navBarHeight.value + 'px');
@@ -50,40 +42,102 @@ const __sfc__ = defineComponent({
             { name: '卡片套餐' },
             { name: '卡片订单' }
         ]);
-        const pkgTabs = ref([{ name: '全部' }, { name: '在用套餐' }, { name: '待生效' }, { name: '已失效' }]);
-        const orderDates = ref(['2026-03-25', '2026-02-25', '2026-01-25']);
-        const packageList = ref<PackageItem[]>([
-            { name: '车联网月包20G', status: 'active', statusText: '在用', tagType: 'success', startTime: '2026-04-01', totalFlow: '20GB', usedFlow: '11.34GB', leftFlow: '8.66GB' } as PackageItem,
-            { name: '车联网月包20G', status: 'pending', statusText: '待生效', tagType: 'warning', startTime: '2026-05-01', totalFlow: '20GB', usedFlow: '0GB', leftFlow: '20GB' } as PackageItem,
-            { name: '车联网月包20G', status: 'pending', statusText: '待生效', tagType: 'warning', startTime: '2026-06-01', totalFlow: '20GB', usedFlow: '0GB', leftFlow: '20GB' } as PackageItem,
-            { name: '车联网月包20G', status: 'expired', statusText: '已失效', tagType: 'danger', startTime: '2025-03-01', totalFlow: '20GB', usedFlow: '20GB', leftFlow: '0GB' } as PackageItem,
-            { name: '车联网月包20G', status: 'expired', statusText: '已失效', tagType: 'danger', startTime: '2025-02-01', totalFlow: '20GB', usedFlow: '20GB', leftFlow: '0GB' } as PackageItem
-        ]);
+        const pkgTabs = ref([{ name: '全部', value: '' }, { name: '在用套餐', value: '1' }, { name: '生效中', value: '0' }, { name: '已失效', value: '2' }]);
         const current = ref(0);
-        const filteredPackageList = computed<PackageItem[]>((): PackageItem[] => {
-            if (current.value == 1)
-                return packageList.value.filter((item): boolean => item.status == 'active');
-            if (current.value == 2)
-                return packageList.value.filter((item): boolean => item.status == 'pending');
-            if (current.value == 3)
-                return packageList.value.filter((item): boolean => item.status == 'expired');
-            return packageList.value;
-        });
+        // 获取套餐状态对应的文本
+        const getPackageStatusText = (status: string): string => {
+            const statusMap: Record<string, string> = {
+                '0': '未生效',
+                '1': '生效中',
+                '2': '已失效'
+            };
+            return statusMap[status] != "" ? statusMap[status] : status != "" ? status : '未知';
+        };
+        // 获取套餐状态对应的标签类型
+        const getPackageStatusType = (status: string): string => {
+            const typeMap: Record<string, string> = {
+                '0': 'success',
+                '1': 'primary',
+                '2': 'error'
+            };
+            return typeMap[status] != "" ? typeMap[status] : 'primary';
+        };
+        // 获取订单状态对应的文本
+        const getOrderStatusText = (status: string): string => {
+            const statusMap: Record<string, string> = {
+                '0': '待支付',
+                '1': '已完成',
+                '2': '已取消',
+                '3': '支付失败',
+                '4': '部分退款',
+                '5': '全部退款',
+            };
+            return statusMap[status] != "" ? statusMap[status] : status != "" ? status : '未知';
+        };
+        // 获取订单状态对应的标签类型
+        const getOrderStatusType = (status: string): string => {
+            const typeMap: Record<string, string> = {
+                '0': 'primary',
+                '1': 'success',
+                '2': 'error',
+                '3': 'danger',
+                '4': 'warning',
+                '5': 'warning',
+            };
+            return typeMap[status] != "" ? typeMap[status] : 'primary';
+        };
+        // 点击卡片信息tab
         const handleClick = (e: UTSJSONObject) => {
             if (e["index"] != null) {
                 current.value = e["index"] as number;
+                getPkgInfoList(e["value"].toString());
             }
         };
+        // 切换tab 基本信息-卡片套餐-卡片订单
         const changeTab = (e: CardDetailTabEvent) => {
             active.value = e.index;
             activeName.value = e.name;
+            const tabActions: Record<number, () => void> = {
+                0: () => getCardDetail(),
+                1: () => getPkgInfoList(),
+                2: () => getOrderList()
+            };
+            tabActions[e.index]?.();
+            current.value = 0;
         };
         const goBack = () => {
             uni.navigateBack({
                 delta: 1
             });
         };
+        // 处理套餐详情点击
+        const handleOrderDetail = (pkgId: string) => {
+            console.log(pkgId, " at pages/cardDetail/cardDetail.uvue:242");
+            uni.navigateTo({
+                url: `/pages/orderDetail/orderDetail?orderNo=${pkgId}`
+            });
+        };
         const getNavBarInfo = () => {
+            // 判断是否为微信环境（小程序）
+            if (isWechat()) {
+                try {
+                    const systemInfo = uni.getSystemInfoSync();
+                    statusBarHeight.value = systemInfo.statusBarHeight != 0 ? systemInfo.statusBarHeight : 20;
+                    const menuButtonInfo = uni.getMenuButtonBoundingClientRect();
+                    if (isTruthy(menuButtonInfo)) {
+                        const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height;
+                        navBarHeight.value = navHeight > 0 ? navHeight : 44;
+                    }
+                }
+                catch (e: any) {
+                    console.error('获取导航栏信息失败', e, " at pages/cardDetail/cardDetail.uvue:260");
+                }
+            }
+            if (isH5()) {
+                // H5 环境
+                statusBarHeight.value = 0;
+                navBarHeight.value = 44;
+            }
         };
         const handleRecharge = () => {
             uni.navigateTo({
@@ -91,22 +145,74 @@ const __sfc__ = defineComponent({
             });
         };
         const getCardDetail = async (): Promise<void> => {
-            const res = await queryCardDetail(card_number.value);
-            console.log(res, " at pages/cardDetail/cardDetail.uvue:205");
+            const res = await queryCardDetail(card_number.value, '', '1');
+            console.log(res, " at pages/cardDetail/cardDetail.uvue:278");
             if (res.code == 200) {
                 cardDetail.value = res.data;
             }
-            else {
-                cardDetail.value = {};
+        };
+        // 查询订单列表Xcx
+        const getOrderList = async (): Promise<void> => {
+            try {
+                const resp = await queryOrderList({
+                    rechargeNo: card_number.value,
+                });
+                if (resp.code == 200) {
+                    if (isTruthy(resp.rows) && Array.isArray(resp.rows)) {
+                        orderList.value = resp.rows!;
+                    }
+                    else if (resp.data != null && Array.isArray(resp.data)) {
+                        orderList.value = resp.data;
+                    }
+                    else {
+                        orderList.value = [];
+                    }
+                }
+                else {
+                    console.log('查询订单列表失败:', resp.msg, " at pages/cardDetail/cardDetail.uvue:299");
+                    orderList.value = [];
+                }
+            }
+            catch (error: any) {
+                console.error('查询订单列表异常:', error, " at pages/cardDetail/cardDetail.uvue:303");
+                orderList.value = [];
+            }
+        };
+        /** 查询套餐信息列表 */
+        const getPkgInfoList = async (state: string): Promise<void> => {
+            try {
+                const res = await queryPkgInfoList({
+                    rechargeNo: card_number.value,
+                    status: state,
+                } as PkgInfoListParams);
+                if (res.code == 200) {
+                    if (isTruthy(res.rows) && Array.isArray(res.rows)) {
+                        pkgInfoList.value = res.rows!;
+                    }
+                    else if (isTruthy(res.data) && Array.isArray(res.data)) {
+                        pkgInfoList.value = res.data as any[];
+                    }
+                    else {
+                        pkgInfoList.value = [];
+                    }
+                }
+                else {
+                    console.log('查询套餐列表失败:', res.msg, " at pages/cardDetail/cardDetail.uvue:324");
+                    pkgInfoList.value = [];
+                }
+            }
+            catch (error: any) {
+                console.error('查询套餐列表异常:', error, " at pages/cardDetail/cardDetail.uvue:328");
+                pkgInfoList.value = [];
             }
         };
         /** 绑定卡 */
         const isBinded = ref(false);
         const handleBindCard = async (): Promise<void> => {
             const res = await userBindCard({
-                rechargeNo: cardDetail.value?.rechargeNo ?? ''
+                rechargeNo: card_number.value
             } as BindCard);
-            console.log(res, " at pages/cardDetail/cardDetail.uvue:219");
+            console.log(res, " at pages/cardDetail/cardDetail.uvue:339");
             if (res.code == 200) {
                 uni.showToast({
                     title: '绑定成功',
@@ -121,16 +227,50 @@ const __sfc__ = defineComponent({
                 });
             }
         };
-        /** 查询套餐信息列表 */
-        const getPkgInfoList = async (): Promise<void> => {
-            const res = await queryPkgInfoList({
-                rechargeNo: card_number.value
-            } as PkgInfoListParams);
-            console.log(res, " at pages/cardDetail/cardDetail.uvue:239");
-            // if(res.code == 200){
-            // 	packageList.value = res.data?.packageList ?? []
-            // 	refillList.value = res.data?.refillList ?? []
-            // }
+        // 解绑卡片
+        const handleUnbind = async (): Promise<void> => {
+            uni.showModal({
+                title: '确认解绑',
+                content: '确定解绑该卡片吗？',
+                success: async (res) => {
+                    if (res.confirm) {
+                        try {
+                            const result = await userUnBindCard(card_number.value);
+                            console.log(result, " at pages/cardDetail/cardDetail.uvue:363");
+                            if (result.code == 200) {
+                                uni.showToast({
+                                    title: '解绑成功',
+                                    icon: 'success'
+                                });
+                                isBinded.value = false;
+                                uni.navigateBack({
+                                    delta: 1
+                                });
+                            }
+                            else {
+                                uni.showToast({
+                                    title: result.msg ?? '解绑失败',
+                                    icon: 'none'
+                                });
+                            }
+                        }
+                        catch (error: any) {
+                            console.error('解绑请求失败:', error, " at pages/cardDetail/cardDetail.uvue:381");
+                            uni.showToast({
+                                title: '网络异常，请重试',
+                                icon: 'none'
+                            });
+                        }
+                    }
+                }
+            });
+        };
+        // 处理套餐详情点击
+        const handlePkgDetail = (pkgId: string) => {
+            console.log(pkgId, " at pages/cardDetail/cardDetail.uvue:394");
+            uni.navigateTo({
+                url: `/pages/pkgDetail/pkgDetail?pkgId=${pkgId}`
+            });
         };
         onMounted(() => {
             getNavBarInfo();
@@ -139,14 +279,14 @@ const __sfc__ = defineComponent({
             const cardNumber = options["cardNumber"] ?? '';
             card_number.value = cardNumber;
             getCardDetail();
-            getPkgInfoList();
         });
         return (): any | null => {
             const _component_topNavBar = resolveEasyComponent("topNavBar", _easycom_topNavBar);
             const _component_rice_tabs = resolveEasyComponent("rice-tabs", _easycom_rice_tabs);
             const _component_rice_tag = resolveEasyComponent("rice-tag", _easycom_rice_tag);
+            const _component_rice_divider = resolveEasyComponent("rice-divider", _easycom_rice_divider);
             const _component_rice_button = resolveEasyComponent("rice-button", _easycom_rice_button);
-            return _cE("view", _uM({ class: "page-container" }), [
+            return _cE(Fragment, null, [
                 _cV(_component_topNavBar, _uM({
                     title: unref(card_number),
                     "show-back": true,
@@ -155,245 +295,329 @@ const __sfc__ = defineComponent({
                     textColor: "#333",
                     showCapsule: false
                 }), null, 8 /* PROPS */, ["title"]),
-                isTrue(unref(cardDetail))
-                    ? _cE("view", _uM({ key: 0 }), [
-                        _cE("view", _uM({
-                            class: "card-box fixed-tabs",
-                            style: _nS(unref(fixedTabsStyle))
-                        }), [
-                            _cV(_component_rice_tabs, _uM({
-                                modelValue: unref(active),
-                                "onUpdate:modelValue": ($event: number) => { trySetRefValue(active, $event); },
-                                "line-color": "#ffffff",
-                                list: unref(tabs),
-                                "line-width": 0,
-                                "title-active-color": '#2563eb',
-                                onChange: changeTab,
-                                customStyle: { height: '85rpx', padding: '10rpx', border: '1rpx solid #e5edf6' }
-                            }), null, 8 /* PROPS */, ["modelValue", "list"])
-                        ], 4 /* STYLE */),
-                        _cE("view", _uM({ class: "container" }), [
-                            _cE("view", _uM({ class: "card-box content-card" }), [
-                                _cE("view", _uM({ class: "card-content" }), [
-                                    _cE("view", _uM({ class: "section-title" }), _tD(unref(activeName)), 1 /* TEXT */),
-                                    unref(activeName) == '基本信息'
-                                        ? _cE("view", _uM({
-                                            key: 0,
-                                            class: "section-content"
-                                        }), [
-                                            _cE("view", _uM({ class: "base-info-box" }), [
-                                                _cE("view", _uM({ class: "base-info" }), [
-                                                    isTrue(unref(cardDetail).rechargeNo)
+                _cE("view", _uM({ class: "page-container" }), [
+                    isTrue(unref(cardDetail))
+                        ? _cE("view", _uM({ key: 0 }), [
+                            _cE("view", _uM({
+                                class: "card-box fixed-tabs",
+                                style: _nS(unref(fixedTabsStyle))
+                            }), [
+                                _cV(_component_rice_tabs, _uM({
+                                    modelValue: unref(active),
+                                    "onUpdate:modelValue": ($event: number) => { trySetRefValue(active, $event); },
+                                    "line-color": "#ffffff",
+                                    list: unref(tabs),
+                                    "line-width": 0,
+                                    "item-style": { overflow: 'hidden' },
+                                    "title-active-color": '#2563eb',
+                                    "title-inactive-color": '#334155',
+                                    "active-style": { backgroundColor: '#ffffff', border: '1rpx solid #e5edf6', borderRadius: '24rpx' },
+                                    "inactive-style": { backgroundColor: '#f3f7fb', border: '1rpx solid #e5edf6', borderRadius: '24rpx' },
+                                    onChange: changeTab,
+                                    customStyle: { height: '85rpx', padding: '10rpx', backgroundColor: '#ffffff', border: '1rpx solid #ffffff' }
+                                }), null, 8 /* PROPS */, ["modelValue", "list"])
+                            ], 4 /* STYLE */),
+                            _cE("view", _uM({ class: "container" }), [
+                                _cE("view", _uM({ class: "card-box content-card" }), [
+                                    _cE("view", _uM({ class: "card-content" }), [
+                                        _cE("view", _uM({ class: "section-title" }), _tD(unref(activeName)), 1 /* TEXT */),
+                                        unref(activeName) == '基本信息'
+                                            ? _cE("view", _uM({
+                                                key: 0,
+                                                class: "section-content"
+                                            }), [
+                                                _cE("view", _uM({ class: "base-info-box" }), [
+                                                    _cE("view", _uM({ class: "base-info" }), [
+                                                        isTrue(unref(cardDetail).rechargeNo)
+                                                            ? _cE("view", _uM({
+                                                                key: 0,
+                                                                class: "info-item"
+                                                            }), [
+                                                                _cE("text", _uM({ class: "info-label" }), "充值号"),
+                                                                _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).rechargeNo), 1 /* TEXT */)
+                                                            ])
+                                                            : _cC("v-if", true),
+                                                        isTrue(unref(cardDetail).statusStr)
+                                                            ? _cE("view", _uM({
+                                                                key: 1,
+                                                                class: "info-item"
+                                                            }), [
+                                                                _cE("text", _uM({ class: "info-label" }), "状态"),
+                                                                _cV(_component_rice_tag, _uM({
+                                                                    type: "success",
+                                                                    "plain-fill": "",
+                                                                    text: unref(cardDetail).statusStr,
+                                                                    size: "small"
+                                                                }), null, 8 /* PROPS */, ["text"])
+                                                            ])
+                                                            : _cC("v-if", true),
+                                                        isTrue(unref(cardDetail).pkgName)
+                                                            ? _cE("view", _uM({
+                                                                key: 2,
+                                                                class: "info-item"
+                                                            }), [
+                                                                _cE("text", _uM({ class: "info-label" }), "套餐名称"),
+                                                                _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).pkgName), 1 /* TEXT */)
+                                                            ])
+                                                            : _cC("v-if", true),
+                                                        isTrue(unref(cardDetail).effectiveTime)
+                                                            ? _cE("view", _uM({
+                                                                key: 3,
+                                                                class: "info-item"
+                                                            }), [
+                                                                _cE("text", _uM({ class: "info-label" }), "生效时间"),
+                                                                _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).effectiveTime), 1 /* TEXT */)
+                                                            ])
+                                                            : _cC("v-if", true),
+                                                        isTrue(unref(cardDetail).expirationTime)
+                                                            ? _cE("view", _uM({
+                                                                key: 4,
+                                                                class: "info-item"
+                                                            }), [
+                                                                _cE("text", _uM({ class: "info-label" }), "到期时间"),
+                                                                _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).expirationTime), 1 /* TEXT */)
+                                                            ])
+                                                            : _cC("v-if", true),
+                                                        isTrue(unref(cardDetail).usedPeriod && unref(cardDetail).totalPeriod)
+                                                            ? _cE("view", _uM({
+                                                                key: 5,
+                                                                class: "info-item"
+                                                            }), [
+                                                                _cE("text", _uM({ class: "info-label" }), "周期"),
+                                                                _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).usedPeriod) + " / " + _tD(unref(cardDetail).totalPeriod), 1 /* TEXT */)
+                                                            ])
+                                                            : _cC("v-if", true)
+                                                    ]),
+                                                    isTrue(unref(cardDetail).pkgFlow)
+                                                        ? _cV(_component_rice_divider, _uM({
+                                                            key: 0,
+                                                            dashed: ""
+                                                        }))
+                                                        : _cC("v-if", true)
+                                                ]),
+                                                isTrue(unref(cardDetail).pkgFlow)
+                                                    ? _cE("view", _uM({
+                                                        key: 0,
+                                                        class: "section-title"
+                                                    }), "流量使用")
+                                                    : _cC("v-if", true),
+                                                isTrue(unref(cardDetail).pkgFlow)
+                                                    ? _cE("view", _uM({
+                                                        key: 1,
+                                                        class: "data-total"
+                                                    }), [
+                                                        _cE("view", _uM({ class: "total-item" }), [
+                                                            _cE("text", _uM({ class: "total-label" }), "已用流量:"),
+                                                            _cE("text", _uM({ class: "total-value" }), _tD(unref(cardDetail).usedFlow != null && unref(cardDetail).usedFlow !== '' ? unref(cardDetail).usedFlow : '0'), 1 /* TEXT */)
+                                                        ]),
+                                                        _cE("view", _uM({ class: "total-item" }), [
+                                                            _cE("text", _uM({ class: "total-label" }), "剩余流量:"),
+                                                            _cE("text", _uM({ class: "total-value" }), _tD(unref(cardDetail).unUsedFlow != null && unref(cardDetail).unUsedFlow !== '' ? unref(cardDetail).unUsedFlow : '0'), 1 /* TEXT */)
+                                                        ]),
+                                                        _cE("view", _uM({ class: "total-item" }), [
+                                                            _cE("text", _uM({ class: "total-label" }), "总流量:"),
+                                                            _cE("text", _uM({ class: "total-value" }), _tD(unref(cardDetail).pkgFlow != null && unref(cardDetail).pkgFlow !== '' ? unref(cardDetail).pkgFlow : '0'), 1 /* TEXT */)
+                                                        ])
+                                                    ])
+                                                    : _cC("v-if", true)
+                                            ])
+                                            : _cC("v-if", true),
+                                        unref(activeName) == '卡片套餐'
+                                            ? _cE("view", _uM({
+                                                key: 1,
+                                                class: "section-content"
+                                            }), [
+                                                _cV(_component_rice_tabs, _uM({
+                                                    modelValue: unref(current),
+                                                    "onUpdate:modelValue": ($event: number) => { trySetRefValue(current, $event); },
+                                                    "line-color": "#ffffff",
+                                                    list: unref(pkgTabs),
+                                                    "line-width": 0,
+                                                    "title-active-color": '#2563eb',
+                                                    "title-inactive-color": '#334155',
+                                                    onChange: handleClick,
+                                                    customStyle: { height: '85rpx', padding: '5rpx 10rpx', border: '1rpx solid #e5edf6' }
+                                                }), null, 8 /* PROPS */, ["modelValue", "list"]),
+                                                _cE("view", _uM({ class: "card-pkg-box" }), [
+                                                    unref(pkgInfoList).length == 0
                                                         ? _cE("view", _uM({
                                                             key: 0,
-                                                            class: "info-item"
-                                                        }), [
-                                                            _cE("text", _uM({ class: "info-label" }), "充值号"),
-                                                            _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).rechargeNo), 1 /* TEXT */)
-                                                        ])
+                                                            class: "empty-order"
+                                                        }), "暂无套餐记录")
                                                         : _cC("v-if", true),
-                                                    isTrue(unref(cardDetail).pkgName)
-                                                        ? _cE("view", _uM({
-                                                            key: 1,
-                                                            class: "info-item"
+                                                    _cE(Fragment, null, RenderHelpers.renderList(unref(pkgInfoList), (item, index, __index, _cached): any => {
+                                                        return _cE("view", _uM({
+                                                            class: "item",
+                                                            key: index,
+                                                            onClick: () => { handlePkgDetail(item.id); }
                                                         }), [
-                                                            _cE("text", _uM({ class: "info-label" }), "套餐名称"),
-                                                            _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).pkgName), 1 /* TEXT */)
-                                                        ])
-                                                        : _cC("v-if", true),
-                                                    isTrue(unref(cardDetail).effectiveTime)
-                                                        ? _cE("view", _uM({
-                                                            key: 2,
-                                                            class: "info-item"
-                                                        }), [
-                                                            _cE("text", _uM({ class: "info-label" }), "生效时间"),
-                                                            _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).effectiveTime), 1 /* TEXT */)
-                                                        ])
-                                                        : _cC("v-if", true),
-                                                    isTrue(unref(cardDetail).expirationTime)
-                                                        ? _cE("view", _uM({
-                                                            key: 3,
-                                                            class: "info-item"
-                                                        }), [
-                                                            _cE("text", _uM({ class: "info-label" }), "到期时间"),
-                                                            _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).expirationTime), 1 /* TEXT */)
-                                                        ])
-                                                        : _cC("v-if", true),
-                                                    isTrue(unref(cardDetail).usedPeriod && unref(cardDetail).totalPeriod)
-                                                        ? _cE("view", _uM({
-                                                            key: 4,
-                                                            class: "info-item"
-                                                        }), [
-                                                            _cE("text", _uM({ class: "info-label" }), "周期"),
-                                                            _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).usedPeriod) + " / " + _tD(unref(cardDetail).totalPeriod), 1 /* TEXT */)
-                                                        ])
-                                                        : _cC("v-if", true),
-                                                    isTrue(unref(cardDetail).expirationTime)
-                                                        ? _cE("view", _uM({
-                                                            key: 5,
-                                                            class: "info-item"
-                                                        }), [
-                                                            _cE("text", _uM({ class: "info-label" }), "到期时间"),
-                                                            _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).expirationTime), 1 /* TEXT */)
-                                                        ])
-                                                        : _cC("v-if", true)
-                                                ])
-                                            ]),
-                                            _cE("view", _uM({ class: "section-title" }), "流量使用"),
-                                            _cE("view", _uM({ class: "data-total" }), [
-                                                _cE("view", _uM({ class: "total-item" }), [
-                                                    _cE("text", _uM({ class: "total-label" }), "已用流量:"),
-                                                    _cE("text", _uM({ class: "total-value" }), _tD(unref(cardDetail).usedFlow != null && unref(cardDetail).usedFlow !== '' ? unref(cardDetail).usedFlow : '0'), 1 /* TEXT */)
-                                                ]),
-                                                _cE("view", _uM({ class: "total-item" }), [
-                                                    _cE("text", _uM({ class: "total-label" }), "剩余流量:"),
-                                                    _cE("text", _uM({ class: "total-value" }), _tD(unref(cardDetail).unUsedFlow != null && unref(cardDetail).unUsedFlow !== '' ? unref(cardDetail).unUsedFlow : '0'), 1 /* TEXT */)
-                                                ]),
-                                                _cE("view", _uM({ class: "total-item" }), [
-                                                    _cE("text", _uM({ class: "total-label" }), "总流量:"),
-                                                    _cE("text", _uM({ class: "total-value" }), _tD(unref(cardDetail).pkgFlow != null && unref(cardDetail).pkgFlow !== '' ? unref(cardDetail).pkgFlow : '0'), 1 /* TEXT */)
+                                                            _cE("view", _uM({ class: "item-head" }), [
+                                                                isTrue(item.pkgName)
+                                                                    ? _cE("text", _uM({
+                                                                        key: 0,
+                                                                        class: "item-label"
+                                                                    }), _tD(item.pkgName), 1 /* TEXT */)
+                                                                    : _cC("v-if", true),
+                                                                isTrue(item.status)
+                                                                    ? _cV(_component_rice_tag, _uM({
+                                                                        key: 1,
+                                                                        text: getPackageStatusText(item.status),
+                                                                        round: true,
+                                                                        "plain-fill": "",
+                                                                        size: "small",
+                                                                        type: getPackageStatusType(item.status)
+                                                                    }), null, 8 /* PROPS */, ["text", "type"])
+                                                                    : _cC("v-if", true)
+                                                            ]),
+                                                            isTrue(item.effectiveTime)
+                                                                ? _cE("view", _uM({
+                                                                    key: 0,
+                                                                    class: "item-sub-title"
+                                                                }), "生效时间：" + _tD(item.effectiveTime), 1 /* TEXT */)
+                                                                : _cC("v-if", true),
+                                                            isTrue(item.expirationTime)
+                                                                ? _cE("view", _uM({
+                                                                    key: 1,
+                                                                    class: "item-sub-title"
+                                                                }), "到期时间：" + _tD(item.expirationTime), 1 /* TEXT */)
+                                                                : _cC("v-if", true),
+                                                            _cE("view", _uM({ class: "item-data" }), [
+                                                                isTrue(item.pkgFlow)
+                                                                    ? _cE("view", _uM({
+                                                                        key: 0,
+                                                                        class: "item-data-item"
+                                                                    }), [
+                                                                        _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
+                                                                        _cE("text", _uM({ class: "item-data-value" }), _tD(item.pkgFlow) + "GB", 1 /* TEXT */)
+                                                                    ])
+                                                                    : _cC("v-if", true),
+                                                                isTrue(item.usedFlow)
+                                                                    ? _cE("view", _uM({
+                                                                        key: 1,
+                                                                        class: "item-data-item"
+                                                                    }), [
+                                                                        _cE("text", _uM({ class: "item-data-label" }), "已用流量"),
+                                                                        _cE("text", _uM({ class: "item-data-value" }), _tD(item.usedFlow) + "GB", 1 /* TEXT */)
+                                                                    ])
+                                                                    : _cC("v-if", true),
+                                                                isTrue(item.unUsedFlow)
+                                                                    ? _cE("view", _uM({
+                                                                        key: 2,
+                                                                        class: "item-data-item"
+                                                                    }), [
+                                                                        _cE("text", _uM({ class: "item-data-label" }), "剩余流量"),
+                                                                        _cE("text", _uM({ class: "item-data-value" }), _tD(item.unUsedFlow) + "GB", 1 /* TEXT */)
+                                                                    ])
+                                                                    : _cC("v-if", true)
+                                                            ])
+                                                        ], 8 /* PROPS */, ["onClick"]);
+                                                    }), 128 /* KEYED_FRAGMENT */)
                                                 ])
                                             ])
-                                        ])
-                                        : _cC("v-if", true),
-                                    unref(activeName) == '卡片套餐'
-                                        ? _cE("view", _uM({
-                                            key: 1,
-                                            class: "section-content"
-                                        }), [
-                                            _cV(_component_rice_tabs, _uM({
-                                                modelValue: unref(current),
-                                                "onUpdate:modelValue": ($event: number) => { trySetRefValue(current, $event); },
-                                                "line-color": "#ffffff",
-                                                list: unref(pkgTabs),
-                                                "line-width": 0,
-                                                "title-active-color": '#2563eb',
-                                                onChange: handleClick,
-                                                customStyle: { height: '85rpx', padding: '5rpx 10rpx', border: '1rpx solid #e5edf6' }
-                                            }), null, 8 /* PROPS */, ["modelValue", "list"]),
-                                            _cE("view", _uM({ class: "card-pkg-box" }), [
-                                                _cE(Fragment, null, RenderHelpers.renderList(unref(filteredPackageList), (item, index, __index, _cached): any => {
+                                            : _cC("v-if", true),
+                                        unref(activeName) == '卡片订单'
+                                            ? _cE("view", _uM({
+                                                key: 2,
+                                                class: "section-content card-order"
+                                            }), [
+                                                unref(orderList).length == 0
+                                                    ? _cE("view", _uM({
+                                                        key: 0,
+                                                        class: "empty-order"
+                                                    }), [
+                                                        _cE("view", _uM({ class: "empty-text" }), "暂无订单记录")
+                                                    ])
+                                                    : _cC("v-if", true),
+                                                _cE(Fragment, null, RenderHelpers.renderList(unref(orderList), (order, index, __index, _cached): any => {
                                                     return _cE("view", _uM({
                                                         class: "item",
-                                                        key: index
+                                                        key: order.id != 0 ? order.id : index,
+                                                        onClick: () => { handleOrderDetail(order.id); }
                                                     }), [
                                                         _cE("view", _uM({ class: "item-head" }), [
-                                                            _cE("text", _uM({ class: "item-label" }), _tD(item.name), 1 /* TEXT */),
+                                                            _cE("text", _uM({ class: "item-label" }), _tD(order.pkgName != "" ? order.pkgName : '未知套餐'), 1 /* TEXT */),
                                                             _cV(_component_rice_tag, _uM({
-                                                                text: item.statusText,
+                                                                type: getOrderStatusType(order.status),
+                                                                text: getOrderStatusText(order.status),
                                                                 round: true,
-                                                                plain: true,
-                                                                size: "small",
-                                                                type: item.tagType
-                                                            }), null, 8 /* PROPS */, ["text", "type"])
+                                                                "plain-fill": "",
+                                                                size: "small"
+                                                            }), null, 8 /* PROPS */, ["type", "text"])
                                                         ]),
-                                                        _cE("view", _uM({ class: "item-sub-title" }), "生效时间：" + _tD(item.startTime), 1 /* TEXT */),
+                                                        _cE("view", _uM({ class: "item-sub-title" }), "订单号: " + _tD(order.orderNo != "" ? order.orderNo : '未知'), 1 /* TEXT */),
                                                         _cE("view", _uM({ class: "item-data" }), [
-                                                            _cE("view", _uM({ class: "item-data-item" }), [
-                                                                _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                                                                _cE("text", _uM({ class: "item-data-value" }), _tD(item.totalFlow), 1 /* TEXT */)
-                                                            ]),
-                                                            _cE("view", _uM({ class: "item-data-item" }), [
-                                                                _cE("text", _uM({ class: "item-data-label" }), "已用流量"),
-                                                                _cE("text", _uM({ class: "item-data-value" }), _tD(item.usedFlow), 1 /* TEXT */)
-                                                            ]),
-                                                            _cE("view", _uM({ class: "item-data-item" }), [
-                                                                _cE("text", _uM({ class: "item-data-label" }), "剩余流量"),
-                                                                _cE("text", _uM({ class: "item-data-value" }), _tD(item.leftFlow), 1 /* TEXT */)
-                                                            ])
+                                                            _cE("text", _uM({ class: "date-label" }), _tD(order.createTime), 1 /* TEXT */),
+                                                            _cE("text", _uM({ class: "total-value" }), "¥" + _tD(order.payCurrencyAmount), 1 /* TEXT */)
                                                         ])
-                                                    ]);
+                                                    ], 8 /* PROPS */, ["onClick"]);
                                                 }), 128 /* KEYED_FRAGMENT */)
                                             ])
-                                        ])
-                                        : _cC("v-if", true),
-                                    unref(activeName) == '卡片订单'
-                                        ? _cE("view", _uM({
-                                            key: 2,
-                                            class: "section-content card-order"
-                                        }), [
-                                            _cE(Fragment, null, RenderHelpers.renderList(unref(orderDates), (date, __key, __index, _cached): any => {
-                                                return _cE("view", _uM({
-                                                    class: "item",
-                                                    key: date
-                                                }), [
-                                                    _cE("view", _uM({ class: "item-head" }), [
-                                                        _cE("text", _uM({ class: "item-label" }), "车联网月包20G"),
-                                                        _cV(_component_rice_tag, _uM({
-                                                            text: "已完成",
-                                                            round: true,
-                                                            plain: true,
-                                                            size: "small",
-                                                            type: "success"
-                                                        }))
-                                                    ]),
-                                                    _cE("view", _uM({ class: "item-sub-title" }), "订单号: " + _tD(unref(card_number)), 1 /* TEXT */),
-                                                    _cE("view", _uM({ class: "item-data" }), [
-                                                        _cE("text", null, _tD(date), 1 /* TEXT */),
-                                                        _cE("text", _uM({ class: "total-value" }), "¥200")
-                                                    ])
-                                                ]);
-                                            }), 128 /* KEYED_FRAGMENT */)
-                                        ])
-                                        : _cC("v-if", true)
-                                ])
+                                            : _cC("v-if", true)
+                                    ])
+                                ]),
+                                isTrue(unref(cardDetail).isBind || unref(isBinded))
+                                    ? _cV(_component_rice_button, _uM({
+                                        key: 0,
+                                        class: "ml-24 mr-24 mt-24 mb-24",
+                                        type: "error",
+                                        "plain-fill": "",
+                                        text: "解绑卡片",
+                                        customStyle: { backgroundColor: '#ffffff' },
+                                        onClick: handleUnbind
+                                    }))
+                                    : _cC("v-if", true)
                             ]),
-                            _cV(_component_rice_button, _uM({
-                                class: "ml-24 mr-24 mt-24 mb-24",
-                                type: "error",
-                                plain: "",
-                                text: "解绑卡片",
-                                customStyle: { backgroundColor: '#ffffff' },
-                                onClick: _ctx.handleUnbind
-                            }), null, 8 /* PROPS */, ["onClick"])
-                        ]),
-                        _cE("view", _uM({ class: "fixed-bottom-buttons" }), [
-                            isTrue(unref(cardDetail).isBind || unref(isBinded))
-                                ? _cV(_component_rice_button, _uM({
-                                    key: 0,
+                            _cE("view", _uM({ class: "fixed-bottom-buttons" }), [
+                                isTrue(unref(cardDetail).isBind || unref(isBinded))
+                                    ? _cV(_component_rice_button, _uM({
+                                        key: 0,
+                                        height: "100rpx",
+                                        class: "btn",
+                                        bold: true,
+                                        disabled: true,
+                                        customStyle: { border: 'none' }
+                                    }), _uM({
+                                        default: withSlotCtx((): any[] => ["已绑定"]),
+                                        _: 1 /* STABLE */
+                                    }))
+                                    : _cV(_component_rice_button, _uM({
+                                        key: 1,
+                                        height: "100rpx",
+                                        class: "btn",
+                                        bold: true,
+                                        customStyle: { border: 'none' },
+                                        onClick: handleBindCard
+                                    }), _uM({
+                                        default: withSlotCtx((): any[] => ["去绑定"]),
+                                        _: 1 /* STABLE */
+                                    })),
+                                _cV(_component_rice_button, _uM({
+                                    height: "100rpx",
                                     class: "btn",
+                                    type: "primary",
+                                    color: "#1989fa",
+                                    textColor: "#ffffff",
                                     bold: true,
-                                    disabled: true,
-                                    customStyle: { border: 'none' }
+                                    shadow: true,
+                                    customStyle: { border: 'none' },
+                                    onClick: handleRecharge
                                 }), _uM({
-                                    default: withSlotCtx((): any[] => ["已绑定"]),
+                                    default: withSlotCtx((): any[] => ["去充值"]),
                                     _: 1 /* STABLE */
                                 }))
-                                : _cV(_component_rice_button, _uM({
-                                    key: 1,
-                                    class: "btn",
-                                    bold: true,
-                                    customStyle: { border: 'none' },
-                                    onClick: handleBindCard
-                                }), _uM({
-                                    default: withSlotCtx((): any[] => ["去绑定"]),
-                                    _: 1 /* STABLE */
-                                })),
-                            _cV(_component_rice_button, _uM({
-                                class: "btn",
-                                type: "primary",
-                                color: "#1989fa",
-                                textColor: "#ffffff",
-                                bold: true,
-                                shadow: true,
-                                customStyle: { border: 'none' },
-                                onClick: handleRecharge
-                            }), _uM({
-                                default: withSlotCtx((): any[] => ["去充值"]),
-                                _: 1 /* STABLE */
-                            }))
+                            ])
                         ])
-                    ])
-                    : _cE("view", _uM({
-                        key: 1,
-                        class: "empty-state"
-                    }), [
-                        _cE("text", _uM({ class: "empty-text" }), "暂无卡片详情")
-                    ])
-            ]);
+                        : _cE("view", _uM({
+                            key: 1,
+                            class: "empty-state"
+                        }), [
+                            _cE("view", _uM({ class: "empty-text" }), "暂无卡片详情")
+                        ])
+                ])
+            ], 64 /* STABLE_FRAGMENT */);
         };
     }
 });
 export default __sfc__;
-const GenPagesCardDetailCardDetailStyles = [_uM([["page-container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"]]))], ["fixed-tabs", _pS(_uM([["position", "fixed"], ["left", 0], ["right", 0], ["zIndex", 99], ["flexShrink", 0], ["backgroundColor", "#f4f7fb"], ["paddingTop", "12rpx"], ["paddingRight", "24rpx"], ["paddingBottom", 0], ["paddingLeft", "24rpx"]]))], ["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "150rpx"], ["paddingRight", 0], ["paddingBottom", "150rpx"], ["paddingLeft", 0]]))], ["card-box", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]]))], ["content-card", _pS(_uM([["marginTop", 0]]))], ["card-content", _pS(_uM([["marginTop", 0], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0]]))], ["section-title", _uM([[".card-content ", _uM([["fontSize", "28rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["marginBottom", "20rpx"]])]])], ["base-info-box", _uM([[".card-content ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["base-info", _uM([[".card-content .base-info-box ", _uM([["display", "flex"], ["flexDirection", "column"], ["paddingBottom", "24rpx"], ["borderBottomWidth", "1rpx"], ["borderBottomStyle", "solid"], ["borderBottomColor", "#eef2f7"], ["marginBottom", "24rpx"]])]])], ["info-item", _uM([[".card-content .base-info-box .base-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0]])]])], ["info-label", _uM([[".card-content .base-info-box .base-info .info-item ", _uM([["color", "#64748b"]])]])], ["info-value", _uM([[".card-content .base-info-box .base-info .info-item ", _uM([["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["pkg-content", _uM([[".card-content ", _uM([["display", "flex"], ["flexDirection", "column"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "20rpx"]])]])], ["pkg-item", _uM([[".card-content .pkg-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "22rpx"], ["marginBottom", "12rpx"]])]])], ["pkg-label", _uM([[".card-content .pkg-content .pkg-item ", _uM([["color", "#64748b"]])]])], ["pkg-value", _uM([[".card-content .pkg-content .pkg-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["pkg-icon", _uM([[".card-content .pkg-content .pkg-item .pkg-value ", _uM([["backgroundColor", "#ffffff"], ["width", "40rpx"], ["height", "40rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["marginLeft", "25rpx"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"]])]])], ["pkg-date", _uM([[".card-content .pkg-content ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eef2f7"], ["paddingTop", "20rpx"]])]])], ["date-list", _uM([[".card-content .pkg-content .pkg-date ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0], ["fontSize", "26rpx"], ["color", "#334155"]])]])], ["date-period", _uM([[".card-content .pkg-content .pkg-date .date-list ", _uM([["marginRight", "10rpx"]])]])], ["data-total", _uM([[".card-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["gap", "12rpx"]])]])], ["total-item", _uM([[".card-content .data-total ", _uM([["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"]])]])], ["total-label", _uM([[".card-content .data-total .total-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["lineHeight", 1.4], ["marginBottom", "10rpx"]])]])], ["total-value", _uM([[".card-content .data-total .total-item ", _uM([["fontSize", "25rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.4]])], [".card-content .card-order .item-data ", _uM([["fontSize", "30rpx"], ["fontWeight", 900], ["color", "#ef4444"]])]])], ["item", _uM([[".card-content .card-pkg-box ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"]])], [".card-content .card-order ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"]])]])], ["item-head", _uM([[".card-content .card-pkg-box .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginBottom", "12rpx"]])], [".card-content .card-order .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginBottom", "12rpx"]])]])], ["item-label", _uM([[".card-content .card-pkg-box .item .item-head ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])], [".card-content .card-order .item .item-head ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["item-sub-title", _uM([[".card-content .card-pkg-box .item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])], [".card-content .card-order .item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55]])]])], ["item-data", _uM([[".card-content .card-pkg-box .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["marginTop", "20rpx"], ["gap", "12rpx"]])], [".card-content .card-order .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["marginTop", "20rpx"], ["gap", "12rpx"]])], [".card-content .card-order ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["item-data-item", _uM([[".card-content .card-pkg-box .item .item-data ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "16rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "10rpx"]])], [".card-content .card-order .item .item-data ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "16rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "10rpx"]])]])], ["item-data-label", _uM([[".card-content .card-pkg-box .item .item-data .item-data-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["marginBottom", "8rpx"]])], [".card-content .card-order .item .item-data .item-data-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["marginBottom", "8rpx"]])]])], ["item-data-value", _uM([[".card-content .card-pkg-box .item .item-data .item-data-item ", _uM([["fontSize", "24rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])], [".card-content .card-order .item .item-data .item-data-item ", _uM([["fontSize", "24rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["fixed-bottom-buttons", _pS(_uM([["position", "fixed"], ["bottom", 0], ["left", 0], ["right", 0], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "20rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#e7edf5"], ["boxShadow", "0 -4rpx 12rpx rgba(0, 0, 0, 0.04)"], ["zIndex", 100]]))], ["btn", _uM([[".fixed-bottom-buttons ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])], ["empty-state", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "120rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "120rpx"], ["paddingLeft", "32rpx"], ["backgroundColor", "#ffffff"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"]]))], ["empty-text", _uM([[".empty-state ", _uM([["fontSize", "28rpx"], ["color", "#9ca3af"]])]])]])];
+const GenPagesCardDetailCardDetailStyles = [_uM([["page-container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["backgroundColor", "#f4f7fb"]]))], ["fixed-tabs", _pS(_uM([["position", "fixed"], ["left", 0], ["right", 0], ["zIndex", 99], ["flexShrink", 0], ["backgroundColor", "#ffffff"], ["!paddingTop", "12rpx"], ["!paddingRight", "12rpx"], ["!paddingBottom", "12rpx"], ["!paddingLeft", "12rpx"]]))], ["container", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["paddingTop", "130rpx"], ["paddingRight", 0], ["paddingBottom", "130rpx"], ["paddingLeft", 0]]))], ["card-box", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", "24rpx"], ["marginLeft", "24rpx"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"]]))], ["content-card", _pS(_uM([["marginTop", 0]]))], ["card-content", _pS(_uM([["marginTop", 0], ["marginRight", 0], ["marginBottom", 0], ["marginLeft", 0]]))], ["section-title", _uM([[".card-content ", _uM([["fontSize", "28rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["marginBottom", "20rpx"]])]])], ["base-info-box", _uM([[".card-content ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["base-info", _uM([[".card-content .base-info-box ", _uM([["display", "flex"], ["flexDirection", "column"]])]])], ["info-item", _uM([[".card-content .base-info-box .base-info ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "26rpx"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0]])]])], ["info-label", _uM([[".card-content .base-info-box .base-info .info-item ", _uM([["color", "#64748b"]])]])], ["info-value", _uM([[".card-content .base-info-box .base-info .info-item ", _uM([["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["pkg-content", _uM([[".card-content ", _uM([["display", "flex"], ["flexDirection", "column"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "24rpx"], ["paddingRight", "24rpx"], ["paddingBottom", "24rpx"], ["paddingLeft", "24rpx"], ["marginBottom", "20rpx"]])]])], ["pkg-item", _uM([[".card-content .pkg-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["fontSize", "22rpx"], ["marginBottom", "12rpx"]])]])], ["pkg-label", _uM([[".card-content .pkg-content .pkg-item ", _uM([["color", "#64748b"]])]])], ["pkg-value", _uM([[".card-content .pkg-content .pkg-item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["pkg-icon", _uM([[".card-content .pkg-content .pkg-item .pkg-value ", _uM([["backgroundColor", "#ffffff"], ["width", "40rpx"], ["height", "40rpx"], ["borderTopLeftRadius", "50%"], ["borderTopRightRadius", "50%"], ["borderBottomRightRadius", "50%"], ["borderBottomLeftRadius", "50%"], ["marginLeft", "25rpx"], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"]])]])], ["pkg-date", _uM([[".card-content .pkg-content ", _uM([["marginTop", "20rpx"], ["marginRight", 0], ["marginBottom", "20rpx"], ["marginLeft", 0], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#eef2f7"], ["paddingTop", "20rpx"]])]])], ["date-list", _uM([[".card-content .pkg-content .pkg-date ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["paddingTop", "14rpx"], ["paddingRight", 0], ["paddingBottom", "14rpx"], ["paddingLeft", 0], ["fontSize", "26rpx"], ["color", "#334155"]])]])], ["date-period", _uM([[".card-content .pkg-content .pkg-date .date-list ", _uM([["marginRight", "10rpx"]])]])], ["data-total", _uM([[".card-content ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["gap", "12rpx"]])]])], ["total-item", _uM([[".card-content .data-total ", _uM([["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "25rpx"], ["borderTopRightRadius", "25rpx"], ["borderBottomRightRadius", "25rpx"], ["borderBottomLeftRadius", "25rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "10rpx"], ["paddingLeft", "20rpx"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["textAlign", "center"]])]])], ["total-label", _uM([[".card-content .data-total .total-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["lineHeight", 1.4], ["marginBottom", "10rpx"]])]])], ["total-value", _uM([[".card-content .data-total .total-item ", _uM([["fontSize", "25rpx"], ["fontWeight", 800], ["color", "#0f172a"], ["lineHeight", 1.4]])], [".card-content .card-order .item-data ", _uM([["fontSize", "30rpx"], ["fontWeight", 900], ["color", "#ef4444"]])]])], ["item", _uM([[".card-content .card-pkg-box ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"]])], [".card-content .card-order ", _uM([["backgroundImage", "none"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e7edf5"], ["borderRightColor", "#e7edf5"], ["borderBottomColor", "#e7edf5"], ["borderLeftColor", "#e7edf5"], ["borderTopLeftRadius", "18rpx"], ["borderTopRightRadius", "18rpx"], ["borderBottomRightRadius", "18rpx"], ["borderBottomLeftRadius", "18rpx"], ["paddingTop", "20rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "20rpx"], ["paddingLeft", "20rpx"], ["marginTop", "20rpx"]])]])], ["item-head", _uM([[".card-content .card-pkg-box .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginBottom", "12rpx"]])], [".card-content .card-order .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["marginBottom", "12rpx"]])]])], ["item-label", _uM([[".card-content .card-pkg-box .item .item-head ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])], [".card-content .card-order .item .item-head ", _uM([["fontSize", "28rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["item-sub-title", _uM([[".card-content .card-pkg-box .item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55], ["marginBottom", "8rpx"]])], [".card-content .card-order .item ", _uM([["fontSize", "22rpx"], ["color", "#64748b"], ["lineHeight", 1.55], ["marginBottom", "8rpx"]])]])], ["item-data", _uM([[".card-content .card-pkg-box .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["marginTop", "20rpx"], ["gap", "12rpx"]])], [".card-content .card-order .item ", _uM([["display", "flex"], ["flexDirection", "row"], ["marginTop", "20rpx"], ["gap", "12rpx"]])], [".card-content .card-order ", _uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"]])]])], ["item-data-item", _uM([[".card-content .card-pkg-box .item .item-data ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "16rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "10rpx"], ["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"]])], [".card-content .card-order .item .item-data ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["backgroundImage", "none"], ["backgroundColor", "#f8fbff"], ["borderTopWidth", "1rpx"], ["borderRightWidth", "1rpx"], ["borderBottomWidth", "1rpx"], ["borderLeftWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e8eef7"], ["borderRightColor", "#e8eef7"], ["borderBottomColor", "#e8eef7"], ["borderLeftColor", "#e8eef7"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"], ["paddingTop", "16rpx"], ["paddingRight", "10rpx"], ["paddingBottom", "16rpx"], ["paddingLeft", "10rpx"], ["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"]])]])], ["item-data-label", _uM([[".card-content .card-pkg-box .item .item-data .item-data-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["marginBottom", "8rpx"]])], [".card-content .card-order .item .item-data .item-data-item ", _uM([["fontSize", "20rpx"], ["color", "#94a3b8"], ["marginBottom", "8rpx"]])]])], ["item-data-value", _uM([[".card-content .card-pkg-box .item .item-data .item-data-item ", _uM([["fontSize", "24rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])], [".card-content .card-order .item .item-data .item-data-item ", _uM([["fontSize", "24rpx"], ["fontWeight", "bold"], ["color", "#0f172a"]])]])], ["date-label", _uM([[".card-content .card-pkg-box .item .item-data ", _uM([["fontSize", "24rpx"]])], [".card-content .card-order .item .item-data ", _uM([["fontSize", "24rpx"]])]])], ["empty-order", _uM([[".card-content ", _uM([["textAlign", "center"], ["paddingTop", "60rpx"], ["paddingRight", "20rpx"], ["paddingBottom", "60rpx"], ["paddingLeft", "20rpx"], ["color", "#94a3b8"], ["fontSize", "28rpx"]])]])], ["empty-state", _uM([[".card-content .empty-order ", _uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", "120rpx"], ["paddingRight", "32rpx"], ["paddingBottom", "120rpx"], ["paddingLeft", "32rpx"], ["backgroundColor", "#ffffff"], ["marginTop", 0], ["marginRight", "24rpx"], ["marginBottom", 0], ["marginLeft", "24rpx"], ["borderTopLeftRadius", "24rpx"], ["borderTopRightRadius", "24rpx"], ["borderBottomRightRadius", "24rpx"], ["borderBottomLeftRadius", "24rpx"]])]])], ["empty-text", _uM([[".card-content .empty-order .empty-state ", _uM([["textAlign", "center"], ["fontSize", "28rpx"], ["color", "#9ca3af"]])]])], ["fixed-bottom-buttons", _pS(_uM([["position", "fixed"], ["bottom", 0], ["left", 0], ["right", 0], ["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "space-between"], ["backgroundColor", "#ffffff"], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["borderTopColor", "#e7edf5"], ["boxShadow", "0 -4rpx 12rpx rgba(0, 0, 0, 0.04)"], ["zIndex", 100]]))], ["btn", _uM([[".fixed-bottom-buttons ", _uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]])]])]])];
 //# sourceMappingURL=cardDetail.uvue.map

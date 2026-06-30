@@ -1,3 +1,7 @@
+import i18n from './i18n';
+	import {getStorageSync} from '@/common/config' //uVueI18nLocale
+
+	
 const __sfc__ = defineApp({
   __name: 'App',
   setup(__props) {
@@ -5,37 +9,101 @@ const __ins = getCurrentInstance()!;
 const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
 const _cache = __ins.renderCache;
 
-
 	let firstBackTime = 0
 
+	let updateManager: any = null
+	let hasUpdate = false
 
 	onLaunch(() => {
+		// i18n.global.locale.value = getStorageSync('uVueI18nLocale')
 
 		  uni.loadFontFace({
 		    family: 'iconfont',
 		    source: 'url("/static/iconfont/iconfont.ttf")',
 		    success: () => {
-		      console.log('图标字体加载成功', " at App.uvue:12")
+		      console.log('图标字体加载成功', " at App.uvue:17")
 		    },
 		    fail: (err) => {
-		      console.log('图标字体加载失败', err, " at App.uvue:15")
+		      console.log('图标字体加载失败', err, " at App.uvue:20")
 		    }
 		  })
 
-		console.log('App Launch', " at App.uvue:19")
+		console.log('App Launch', " at App.uvue:24")
+				// 仅在小程序平台生效
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	})
 
 	onAppShow(() => {
-		console.log('App Show', " at App.uvue:23")
+		console.log('App Show', " at App.uvue:90")
 	})
 
 	onAppHide(() => {
-		console.log('App Hide', " at App.uvue:27")
+		console.log('App Hide', " at App.uvue:94")
 	})
 
 
 	onLastPageBackPress(() => {
-		console.log('App LastPageBackPress', " at App.uvue:32")
+		console.log('App LastPageBackPress', " at App.uvue:99")
 		if (firstBackTime == 0) {
 			uni.showToast({
 				title: '再按一次退出应用',
@@ -52,7 +120,7 @@ const _cache = __ins.renderCache;
 	})
 
 	onExit(() => {
-		console.log('App Exit', " at App.uvue:49")
+		console.log('App Exit', " at App.uvue:116")
 	})
 
 return (): any | null => { return null } }

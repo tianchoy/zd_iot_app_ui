@@ -1,0 +1,6 @@
+export const enUS = {
+    'recharge': 'Recharge',
+} as UTSJSONObject;
+// 添加默认导出
+export default enUS;
+//# sourceMappingURL=en_US.uts.map

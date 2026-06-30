@@ -5,7 +5,7 @@
 import { getHostProjectConfig } from './ProjectConfig.uts'
 import { storage } from './Storage.uts'
 import { uploadFileRequest, type UploadApiResponse, type UploadFileOptions } from './Upload.uts'
-import { config, getToken,setToken, clearToken } from '@/common/config'
+import { config, getToken, setToken, clearToken, setStorageSync,isWechat } from '@/common/config'
 
 // ========== 类型定义 ==========
 
@@ -17,10 +17,14 @@ export type ApiResponse<T = any> = {
 	code: number
 	msg: string
 	data: T
+	rows?: any[]
+	total?: number
 }
 
 const systemInfo = uni.getSystemInfoSync()
 const DEFAULT_LANGUAGE = (systemInfo.language ?? 'zh_CN').replace('-', '_') as string
+setStorageSync('uVueI18nLocale', systemInfo.language.replace('_', '-'))
+
 
 /** 请求配置选项 */
 export type RequestOptions = {
@@ -36,7 +40,7 @@ export type RequestOptions = {
 	baseUrl?: string
 	/** 超时时间（毫秒），默认 30000 */
 	timeout?: number
-	/** 是否携带 Token，默认 true */
+	/** 是否携带 Token，默认 false */
 	withToken?: boolean
 	/** 是否显示错误提示，默认 true */
 	showError?: boolean
@@ -68,7 +72,7 @@ type QuickRequestParams = {
 const DEFAULT_TIMEOUT = 30000
 const DEFAULT_SUCCESS_CODES = [0, 200]
 const DEFAULT_UNAUTHORIZED_CODES = [401, 403]
-const DEFAULT_LOGIN_PAGE = '/pages/login/login'
+const DEFAULT_LOGIN_PAGE = '/pages/card/card'
 
 // ========== 工具函数 ==========
 
@@ -129,16 +133,23 @@ function showErrorToast(msg: string): void {
 	uni.showToast({ title: msg || '请求失败', icon: 'none' })
 }
 
+let isRedirectingToLogin = false
+
 /**
  * 跳转登录页
  */
 function navigateToLogin(loginPage: string): void {
-	storage.clearAuth()
-	uni.showToast({ title: '请先登录', icon: 'none' })
-	setTimeout(() => {
-		uni.navigateTo({ url: loginPage })
+	if (isRedirectingToLogin) {
 		return
-	}, 1200)
+	}
+	isRedirectingToLogin = true
+	clearToken()
+	storage.clearAuth()
+	uni.showToast({ title: '登录已过期，请重新登录', icon: 'none' })
+	setTimeout(() => {
+		uni.reLaunch({ url: loginPage })
+		isRedirectingToLogin = false
+	}, 1000)
 }
 
 function createRequestOptions(url: string, method: HttpMethod, data?: UTSJSONObject, options?: RequestOptions): RequestOptions {
@@ -232,19 +243,22 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 		fullUrl += buildQueryString(data)
 		requestData = {}
 	}
+	
 	// 构建请求头
 	const reqHeader: UTSJSONObject = {
 		'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Content-Language': DEFAULT_LANGUAGE,
+		'Accept': 'application/json',
+		'Content-Language': DEFAULT_LANGUAGE,
 		'clientId': config.api.auth.clientId,
 	}
 
-	// 添加 Token
+	// 如果 withToken 为 true，检查 token 是否存在
+	let hasToken = false
 	if (withToken) {
 		const token = getToken()
 		if (token != '') {
 			reqHeader['authorization'] = 'Bearer ' + token
+			hasToken = true
 		}
 	}
 
@@ -252,8 +266,7 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 	const finalSuccessCodes = successCodes ?? DEFAULT_SUCCESS_CODES
 	const finalUnauthorizedCodes = unauthorizedCodes ?? DEFAULT_UNAUTHORIZED_CODES
 	const hpLogin = getHostProjectConfig().loginPagePath
-	const finalLoginPage =
-		loginPage ?? (hpLogin.length > 0 ? hpLogin : DEFAULT_LOGIN_PAGE)
+	const finalLoginPage = loginPage ?? (hpLogin.length > 0 ? hpLogin : DEFAULT_LOGIN_PAGE)
 
 	return new Promise((resolve, reject) => {
 		uni.request({
@@ -281,7 +294,9 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 				const result = {
 					code,
 					msg: rawMsg == null ? '' : '' + rawMsg,
-					data: raw['data'] as T
+					data: raw['data'] as T,
+					rows: raw['rows'] as any[] | null,
+					total: raw['total'] as number | null
 				} as ApiResponse<T>
 				const msg = result.msg
 
@@ -298,24 +313,29 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 					return
 				}
 
-				let isUnauthorizedCode = false
-				for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
-					if (('' + finalUnauthorizedCodes[i]) == ('' + code)) {
-						isUnauthorizedCode = true
-						break
+				// 微信环境里，检查是否为未授权状态码
+				if(isWechat()){
+					let isUnauthorizedCode = false
+					for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
+						if (('' + finalUnauthorizedCodes[i]) == ('' + code)) {
+							isUnauthorizedCode = true
+							break
+						}
 					}
-				}
-
-				// 未授权处理
-				if (isUnauthorizedCode) {
-					if (redirectOnUnauthorized) {
+					if (isUnauthorizedCode && redirectOnUnauthorized) {
+						// 显示错误提示
+						if (showError) {
+							showErrorToast(msg || '登录已过期，请重新登录')
+						}
+						// 跳转登录页
 						navigateToLogin(finalLoginPage)
+						
+						reject(result)
+						return
 					}
-					reject(result)
-					return
 				}
 
-					// 自定义错误码处理
+				// 自定义错误码处理
 				if (onErrorCode != null) {
 					onErrorCode(result as ApiResponse<any>)
 				}
