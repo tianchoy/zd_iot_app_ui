@@ -24,18 +24,23 @@
 				<text class="item-value">{{ props.validityPeriod }}{{ props?.pkgType == '1' ? '天' : '个月' }}</text>
 			</view>
 
+			<view class="info-item">
+				<text class="item-label">应付金额</text>
+				<text class="item-value amount">{{ formattedAmount }}</text>
+			</view>
+
 			<!-- 支付方式区域：根据平台条件渲染 -->
 			<view class="payment-methods">
 				<!-- #ifndef MP-WEIXIN -->
 				<view class="method-section">
 					<text class="section-title">选择支付方式</text>
 					<view class="method-option" 
-							v-for="method in props.payMethod" 
+							v-for="method in sortedPayMethods" 
 							:key="method.merchantConfigId"
 							:class="{ 'method-selected': selectedMethodId === method.merchantConfigId }"
 							@click="selectPaymentMethod(method.merchantConfigId)">
 						<view class="method-left">
-							<text class="method-label">{{ method.payType }}</text>
+							<text class="method-label">{{ method.payType == 'wechat_pay' ? '微信支付' : method.payType == 'ali_pay' ? '支付宝支付' : '未知' }}</text>
 							<text v-if="method.desc" class="method-desc">{{ method.desc }}</text>
 						</view>
 						<view class="method-right">
@@ -45,16 +50,6 @@
 				</view>
 				<!-- #endif -->
 			</view>
-
-			<view class="info-item">
-				<text class="item-label">应付金额</text>
-				<text class="item-value amount">{{ formattedAmount }}</text>
-			</view>
-		</view>
-
-		<!-- 提示信息 -->
-		<view class="tips">
-			<text class="tips-text">续费后套餐将在30分钟内生效，如续费后设备始终无法上线，请您联系客服处理！</text>
 		</view>
 
 		<!-- 按钮区域 -->
@@ -100,8 +95,21 @@ type PaymentMethod = {
 	desc?: string
 }
 
+const sortedPayMethods = computed(() => {
+	const methods = props.payMethod || [];
+	const priority: Record<string, number> = {
+		'wechat_pay': 0,
+		'ali_pay': 1
+	};
+	return [...methods].sort((a, b) => {
+		const priorityA = priority[a.payType] ?? 99;
+		const priorityB = priority[b.payType] ?? 99;
+		return priorityA - priorityB;
+	});
+});
+
 // 当前选中的支付方式ID
-const selectedMethodId = ref<string>(props.payMethod?.[0]?.merchantConfigId); // 默认选中微信H5支付
+const selectedMethodId = ref<string>(sortedPayMethods.value[0]?.merchantConfigId);
 
 // 选择支付方式
 const selectPaymentMethod = (methodId: string) => {
@@ -153,12 +161,12 @@ const handleConfirm = () => {
 	flex-direction: row;
 	justify-content: space-between;
 	
-    padding: 10rpx 0;
+    padding: 20rpx 0;
 }
 
 .item-label {
     font-size: 28rpx;
-	color: #666;
+	color: #64748b;
 }
 
 .item-value {
@@ -207,7 +215,7 @@ const handleConfirm = () => {
 
 .section-title {
 	font-size: 24rpx;
-	color: #666;
+	color: #64748b;
 	margin-bottom: 24rpx;
 	
 }
@@ -218,7 +226,7 @@ const handleConfirm = () => {
 	justify-content: space-between;
 	align-items: center;
 	padding: 24rpx;
-	margin-bottom: 16rpx;
+	margin-bottom: 24rpx;
 	border: 2rpx solid #e5e5e5;
 	border-radius: 16rpx;
 	background-color: #fff;

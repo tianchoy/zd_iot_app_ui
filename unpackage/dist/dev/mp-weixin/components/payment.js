@@ -44,14 +44,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   },
   emits: ["cancel", "confirm"],
   setup(__props, _a) {
-    var _b, _c;
+    var _b;
     var __emit = _a.emit;
     const props = __props;
     const emit = __emit;
     const formattedAmount = common_vendor.computed(() => {
       return `￥${props.amount}`;
     });
-    common_vendor.ref((_c = (_b = props.payMethod) === null || _b === void 0 ? null : _b[0]) === null || _c === void 0 ? null : _c.merchantConfigId);
+    const sortedPayMethods = common_vendor.computed(() => {
+      const methods = props.payMethod || [];
+      const priority = {
+        "wechat_pay": 0,
+        "ali_pay": 1
+      };
+      return [...methods].sort((a = null, b = null) => {
+        var _a2, _b2;
+        const priorityA = (_a2 = priority[a.payType]) !== null && _a2 !== void 0 ? _a2 : 99;
+        const priorityB = (_b2 = priority[b.payType]) !== null && _b2 !== void 0 ? _b2 : 99;
+        return priorityA - priorityB;
+      });
+    });
+    common_vendor.ref((_b = sortedPayMethods.value[0]) === null || _b === void 0 ? null : _b.merchantConfigId);
     const handleCancel = () => {
       emit("cancel");
     };
@@ -79,11 +92,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         i: common_vendor.t((props == null ? void 0 : props.pkgType) == "1" ? "天" : "个月")
       } : {}, {
         j: common_vendor.t(common_vendor.unref(formattedAmount)),
-        k: common_vendor.o(handleCancel, "10"),
+        k: common_vendor.o(handleCancel, "23"),
         l: common_vendor.p({
           class: "btn cancel-btn mr-24 data-v-0c94e3a5"
         }),
-        m: common_vendor.o(handleConfirm, "26"),
+        m: common_vendor.o(handleConfirm, "ff"),
         n: common_vendor.p({
           textColor: "#fff",
           class: "btn confirm-btn ml-24 data-v-0c94e3a5"

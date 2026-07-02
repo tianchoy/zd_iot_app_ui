@@ -11,18 +11,29 @@
 			个人用户登录
 			</button>
 		</view>
-		<!-- <rice-divider backgroundColor="#f1f5f9"></rice-divider>
-		<view class="no-login">
-			<view class="no-login-text" @click="noNowLogin">暂不登录</view>
-		</view> -->
+		<view class="documents">
+			<rice-checkbox :checked="docState" @change="isDocState"></rice-checkbox>
+			<view class="doc-info-box">
+				已阅读并同意<text class="doc-link" @click="gotoAgreement">《用户协议》</text>和<text class="doc-link" @click="gotoPrivacy">《隐私政策》</text>
+			</view>
+		</view>
+		<rice-dialog v-model:show="showTitle" width="80%" :message="message" :show-cancel-button="false" @confirm="agree" />
 	</view>
 </template>
 
 <script setup lang="uts">
 	import {login} from '@/api/http.uts'
 	import {setToken,setStorageSync} from '@/common/config.uts'
+	import {userAgreement,privacyPolicy} from '@/utils/doc.uts'
 	const wxGetPhoneLogin = ref<string>('')
 	const userId = ref<string>('')
+	const docState = ref(false)
+	const showTitle = ref(false)
+	const message = ref('')
+
+	const isDocState = () => {
+		docState.value = !docState.value
+	}
 
 	//登录
 	const getLogin = async (code: string) => {
@@ -43,6 +54,13 @@
 
 	//获取手机号
 	const handleGetPhoneNumber =  (res: UTSJSONObject) => {
+		if (!docState.value) {
+			uni.showToast({
+				title: '请先阅读并同意用户协议',
+				icon: 'error'
+			})
+			return
+		}
 		const detail = res['detail'] as UTSJSONObject
 		getLogin(detail['code'] as string)
 	}
@@ -54,13 +72,27 @@
 		})
 	}
 
+	const gotoAgreement = () => {
+		showTitle.value = true
+		message.value = userAgreement
+	}
+
+	const gotoPrivacy = () => {
+		showTitle.value = true
+		message.value = privacyPolicy
+	}
+
+	const agree = () => {
+		showTitle.value = false
+	}
+
 	onLoad((options: OnLoadOptions) => {
-		console.log('登录参数:', options)
 		if(options['wxGetPhoneLogin'] != null){
 			wxGetPhoneLogin.value = options['wxGetPhoneLogin'] as string
 			userId.value = options['userId'] as string
 		}
 	})
+	
 </script>
 
 <style lang="scss" scoped>
@@ -95,6 +127,23 @@
 				color: #64748b;
 				line-height: 1.45;
 				text-align: center;
+			}
+		}
+		.documents {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			font-size: 25rpx;
+			margin-top: 40rpx;
+			.doc-info-box{
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				.doc-link{
+					color: #007AFF;
+				}
 			}
 		}
 	}

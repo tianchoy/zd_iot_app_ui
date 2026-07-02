@@ -140,7 +140,7 @@
 			<rice-button type="primary" width="300rpx" height="110rpx" @click="choosePayment" class="btn">去支付</rice-button>
 		</view>
 	</view>
-
+	<view ref="formContainer"></view>
 	<customService @connect_service="handleConnectService"></customService>
 	<rice-popup v-model:show="showCustomService" position="bottom">
 		<view class="popup-center">
@@ -246,6 +246,9 @@
 	// 选中的套餐包
 	const selectedPackage = ref<PkgXcxVo | null>(null);
 	
+	// 从URL参数中获取的默认pkgId
+	const defaultPkgId = ref<string>('');
+	
 	// 当前选中的套餐/加油包
 	const currentPackage = computed<PkgXcxVo | null>((): PkgXcxVo | null => {
 		if (active.value === 0) {
@@ -282,10 +285,47 @@
 		packageList.value = packagesList;
 		refillList.value = refillsList;
 		
-		// 重置选中索引
-		selectedPackageIndex.value = 0;
-		selectedRefillIndex.value = 0;
+		// 根据URL参数中的pkgId设置默认选中
+		setDefaultSelection();
+	};
+	
+	// 设置默认选中的套餐/加油包
+	const setDefaultSelection = () => {
+		const packagesList = packageList.value;
+		const refillsList = refillList.value;
+		const defaultId = defaultPkgId.value;
 		
+		// 如果有默认pkgId，尝试匹配
+		if (defaultId) {
+			// 先在套餐包中查找
+			const pkgIndex = packagesList.findIndex(item => item.pkgId === defaultId);
+			if (pkgIndex !== -1) {
+				selectedPackageIndex.value = pkgIndex;
+				active.value = 0;
+				return;
+			}
+			
+			// 再在加油包中查找
+			const refillIndex = refillsList.findIndex(item => item.pkgId === defaultId);
+			if (refillIndex !== -1) {
+				selectedRefillIndex.value = refillIndex;
+				active.value = 1;
+				return;
+			}
+		}
+		
+		// 如果没有默认pkgId或未匹配到，使用原有逻辑：优先选中第一个套餐，没有套餐则选中第一个加油包
+		if (packagesList.length > 0) {
+			selectedPackageIndex.value = 0;
+			active.value = 0;
+		} else if (refillsList.length > 0) {
+			selectedRefillIndex.value = 0;
+			active.value = 1;
+		} else {
+			// 如果都没有，重置索引
+			selectedPackageIndex.value = 0;
+			selectedRefillIndex.value = 0;
+		}
 	};
 
 	const getOrderStatusType = (status: string): string => {
@@ -443,6 +483,17 @@
 			}
 		}
 	}
+	const formContainer = ref<HTMLDivElement | null>(null);
+	const handleAlipayForm = (formHtml: string) => {
+		if (!formContainer.value) return;
+		formContainer.value.innerHTML = formHtml;
+		const form = formContainer.value.querySelector('form');
+		if (form) {
+			form.submit();
+		} else {
+			console.error('未找到支付表单');
+		}
+	};
 	
 	// 确认支付
 	const handleConfirmPayment =  async (e: any) => {
@@ -483,11 +534,18 @@
 			const res = await addOrder(params)
 			if(res.code == 200){
 				console.log('添加订单成功:', res)
+				
 				if(isWechat()){
 					toPay(res.data)
 				}
 				if(isH5()){
 					console.log('H5支付:', res.data)
+
+					if(res.data.payWxType == 'wechat_pay' || res.data.payWxType == 'allin_pay'){
+						window.location.href = res.data.url
+					}else{
+						handleAlipayForm(res.data.formHtml)
+					}
 				}
 			} else {
 				uni.hideLoading()
@@ -580,6 +638,12 @@
 		const cardNumberValue = opt.cardNumber
 		const countryValue = opt.country
 		const from = opt.from
+		const pkgId = opt.pkgId
+		
+		// 保存默认的pkgId
+		if (pkgId) {
+			defaultPkgId.value = pkgId
+		}
 		
 		handleBack()
 		if (cardNumberValue) {

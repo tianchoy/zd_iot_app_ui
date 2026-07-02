@@ -61,6 +61,14 @@ const isThemeColor = (type = null) => {
     return false;
   return ["primary", "success", "warning", "error"].includes(type);
 };
+const isSameValue = (value1 = null, value2 = null) => {
+  if (value1 == null || value2 == null)
+    return false;
+  if (typeof value1 == "object" && typeof value2 == "object") {
+    return common_vendor.UTS.JSON.stringify(value1) == common_vendor.UTS.JSON.stringify(value2);
+  }
+  return value1 === value2;
+};
 function padZero(number, len = 2) {
   const num = typeof number == "number" ? number.toString() : number;
   return num.padStart(len, "0");
@@ -165,6 +173,7 @@ exports.getPxNum = getPxNum;
 exports.getRandomStr = getRandomStr;
 exports.hasStrValue = hasStrValue;
 exports.isGradientColor = isGradientColor;
+exports.isSameValue = isSameValue;
 exports.isThemeColor = isThemeColor;
 exports.padZero = padZero;
 exports.toNum = toNum;

@@ -3,19 +3,30 @@ const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const api_http = require("../../api/http.js");
 const common_config = require("../../common/config.js");
+const utils_doc = require("../../utils/doc.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
-  _easycom_topNavBar_1();
+  const _easycom_rice_checkbox_1 = common_vendor.resolveComponent("rice-checkbox");
+  const _easycom_rice_dialog_1 = common_vendor.resolveComponent("rice-dialog");
+  (_easycom_topNavBar_1 + _easycom_rice_checkbox_1 + _easycom_rice_dialog_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
+const _easycom_rice_checkbox = () => "../../uni_modules/rice-ui/components/rice-checkbox/rice-checkbox.js";
+const _easycom_rice_dialog = () => "../../uni_modules/rice-ui/components/rice-dialog/rice-dialog.js";
 if (!Math) {
-  _easycom_topNavBar();
+  (_easycom_topNavBar + _easycom_rice_checkbox + _easycom_rice_dialog)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "login",
   setup(__props) {
     const wxGetPhoneLogin = common_vendor.ref("");
     const userId = common_vendor.ref("");
+    const docState = common_vendor.ref(false);
+    const showTitle = common_vendor.ref(false);
+    const message = common_vendor.ref("");
+    const isDocState = () => {
+      docState.value = !docState.value;
+    };
     const getLogin = (code) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.login(new common_vendor.UTSJSONObject({
@@ -24,7 +35,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isLogin: wxGetPhoneLogin.value
         }));
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:35", "登录成功:", res.data.access_token);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:46", "登录成功:", res.data.access_token);
           common_config.setToken(res.data.access_token, res.data.refreshToken);
           common_config.setStorageSync("usePhoneNumber", true);
           common_vendor.index.reLaunch({
@@ -34,11 +45,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleGetPhoneNumber = (res) => {
+      if (!docState.value) {
+        common_vendor.index.showToast({
+          title: "请先阅读并同意用户协议",
+          icon: "error"
+        });
+        return null;
+      }
       const detail = res["detail"];
       getLogin(detail["code"]);
     };
+    const gotoAgreement = () => {
+      showTitle.value = true;
+      message.value = utils_doc.userAgreement;
+    };
+    const gotoPrivacy = () => {
+      showTitle.value = true;
+      message.value = utils_doc.privacyPolicy;
+    };
+    const agree = () => {
+      showTitle.value = false;
+    };
     common_vendor.onLoad((options) => {
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:58", "登录参数:", options);
       if (options["wxGetPhoneLogin"] != null) {
         wxGetPhoneLogin.value = options["wxGetPhoneLogin"];
         userId.value = options["userId"];
@@ -57,8 +85,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: common_assets._imports_0,
         c: common_vendor.o(handleGetPhoneNumber, "6d"),
-        d: `${_ctx.u_s_b_h}px`,
-        e: `${_ctx.u_s_a_i_b}px`
+        d: common_vendor.o(isDocState, "a6"),
+        e: common_vendor.p({
+          checked: common_vendor.unref(docState),
+          class: "data-v-27a30816"
+        }),
+        f: common_vendor.o(gotoAgreement, "01"),
+        g: common_vendor.o(gotoPrivacy, "e7"),
+        h: common_vendor.o(agree, "15"),
+        i: common_vendor.o(($event) => {
+          return common_vendor.isRef(showTitle) ? showTitle.value = $event : null;
+        }, "01"),
+        j: common_vendor.p({
+          width: "80%",
+          message: common_vendor.unref(message),
+          ["show-cancel-button"]: false,
+          show: common_vendor.unref(showTitle),
+          class: "data-v-27a30816"
+        }),
+        k: `${_ctx.u_s_b_h}px`,
+        l: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

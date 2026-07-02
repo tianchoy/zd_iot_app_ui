@@ -28,7 +28,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           width: "80rpx",
           height: "80rpx",
           ["icon-size"]: "50rpx",
-          ["gap-bottom"]: "300rpx",
+          ["gap-bottom"]: "500rpx",
           ["gap-right"]: "20rpx",
           id: common_vendor.gei(_ctx, "")
         }),
