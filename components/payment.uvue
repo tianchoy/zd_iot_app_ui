@@ -30,16 +30,16 @@
 				<view class="method-section">
 					<text class="section-title">选择支付方式</text>
 					<view class="method-option" 
-							v-for="method in paymentMethods" 
-							:key="method.id"
-							:class="{ 'method-selected': selectedMethodId === method.id }"
-							@click="selectPaymentMethod(method.id)">
+							v-for="method in props.payMethod" 
+							:key="method.merchantConfigId"
+							:class="{ 'method-selected': selectedMethodId === method.merchantConfigId }"
+							@click="selectPaymentMethod(method.merchantConfigId)">
 						<view class="method-left">
-							<text class="method-label">{{ method.label }}</text>
+							<text class="method-label">{{ method.payType }}</text>
 							<text v-if="method.desc" class="method-desc">{{ method.desc }}</text>
 						</view>
 						<view class="method-right">
-							<view :class="['radio', { 'radio-selected': selectedMethodId === method.id }]"></view>
+							<view :class="['radio', { 'radio-selected': selectedMethodId === method.merchantConfigId }]"></view>
 						</view>
 					</view>
 				</view>
@@ -79,6 +79,7 @@ const props = defineProps<{
 	// 应付金额
 	amount: string | number;
 	pkgType?: string;
+	payMethod?: PaymentMethod[];
 }>();
 
 
@@ -94,19 +95,13 @@ const formattedAmount = computed(() => {
 });
 
 type PaymentMethod = {
-	id: string
-	label: string
+	merchantConfigId: string
+	payType: string
 	desc?: string
 }
 
-const paymentMethods = ref<PaymentMethod[]>([
-	{ id: 'wechat_h5', label: '微信H5支付', desc: '推荐使用微信完成支付' },
-	{ id: 'alipay', label: '支付宝支付', desc: '通过支付宝完成支付' },
-	{ id: 'bank_card', label: '银行卡支付', desc: '支持常见银行卡支付' }
-]);
-
 // 当前选中的支付方式ID
-const selectedMethodId = ref<string>('wechat_h5'); // 默认选中微信H5支付
+const selectedMethodId = ref<string>(props.payMethod?.[0]?.merchantConfigId); // 默认选中微信H5支付
 
 // 选择支付方式
 const selectPaymentMethod = (methodId: string) => {

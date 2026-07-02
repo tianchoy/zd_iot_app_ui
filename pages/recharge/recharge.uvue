@@ -121,6 +121,7 @@
 			:traffic="currentPackage?.pkgFlow"
 			:validityPeriod="currentPackage?.validityPeriod"
 			:pkgType="currentPackage?.pkgType"
+			:payMethod="cardDetail?.objectMap.payInfo"
 		/>
 	</rice-popup>
 	<view class="bottom-box" v-if="packageList.length > 0 || refillList.length > 0">
@@ -182,12 +183,6 @@
 
 	const closeTips = () => {
 		showTips.value = false;
-	}
-
-	const handleConnectService = () => {
-		setTimeout(() => {
-			showCustomService.value = true;
-		}, 100);
 	}
 	
 	const showPopup = ref<boolean>(false);
@@ -451,6 +446,8 @@
 	
 	// 确认支付
 	const handleConfirmPayment =  async (e: any) => {
+		console.log('确认支付:', e)
+		const merchantConfigId = e
 		uni.showLoading({
 			title: '支付中...'
 		})
@@ -461,14 +458,37 @@
 			? packageList.value[selectedPackageIndex.value]
 			: refillList.value[selectedRefillIndex.value];
 
-		// 处理确认逻辑
-		try {
-			const res = await addOrder({
+		console.log('currentItem:', currentItem,currentItem.pkgId)
+
+		let params = {}
+		if(isWechat()){
+			params = {
 				pkgId: currentItem.pkgId,
 				rechargeNo: cardNumber.value,
-			})
+			}
+		}
+		
+		if(isH5()){
+			params = {
+				pkgId: currentItem.pkgId,
+				rechargeNo: cardNumber.value,
+				merchantConfigId
+			}
+		}
+
+		console.log('params:', params)
+		
+		// 处理确认逻辑
+		try {
+			const res = await addOrder(params)
 			if(res.code == 200){
-				toPay(res.data)
+				console.log('添加订单成功:', res)
+				if(isWechat()){
+					toPay(res.data)
+				}
+				if(isH5()){
+					console.log('H5支付:', res.data)
+				}
 			} else {
 				uni.hideLoading()
 				uni.showToast({
@@ -477,10 +497,9 @@
 				})
 			}
 		} catch (error) {
-			console.error('添加订单失败:', error)
 			uni.hideLoading()
 			uni.showToast({
-				title: '添加订单失败',
+				title: error.msg,
 				icon: 'none'
 			})
 		}
@@ -513,7 +532,6 @@
 	const getCardDetail = async (cardNumber: string,country: string) => {
 		try {
 			const res = await queryCardDetail(cardNumber, country,'0')
-			console.log('获取卡片详情1111:', res)
 			if(res.code == 200){
 				cardDetail.value = res.data as any
 				if (res.data?.pkgXcxVos && res.data.pkgXcxVos.length > 0) {
@@ -543,7 +561,17 @@
 		return phoneStr ? phoneStr.split(',').map(item => item.trim()) : []
 	})
 	
-	
+	const handleConnectService = () => {
+		if(cardDetail.value?.objectMap.serviceJumpUrl){
+			window.open(cardDetail.value?.objectMap.serviceJumpUrl,'_blank')
+		}else{
+			setTimeout(() => {
+				showCustomService.value = true;
+			}, 100);
+		}
+		
+	}
+
 	const cardNumber = ref<string>('')
 	const country = ref<string>('')
 	onLoad((options: UTSJSONObject) => {
@@ -886,7 +914,7 @@
 	.popup-center{
 		display: flex;
 		flex-direction: column;
-		padding: 48rpx 24rpx;
+		padding: 75rpx 24rpx;
 		.cs-list {
 			display: flex;
 			flex-direction: row;

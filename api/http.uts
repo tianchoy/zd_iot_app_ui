@@ -223,7 +223,7 @@ export function addOrder(data: UTSJSONObject, withToken: boolean = true): Promis
   // #endif
 
   // #ifdef H5
-  const url = (ApiUrl.addOrder as string)
+  const url = (ApiUrl.addOrderGnH5 as string)
   const token = false
   // #endif
 

@@ -272,7 +272,7 @@
 .popup-center[class].data-v-722cdacb {
   display: flex;
   flex-direction: column;
-  padding: 48rpx 24rpx;
+  padding: 75rpx 24rpx;
 }
 .popup-center .cs-list[class].data-v-722cdacb {
   display: flex;

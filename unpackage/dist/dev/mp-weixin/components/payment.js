@@ -14,8 +14,8 @@ class PaymentMethod extends common_vendor.UTS.UTSType {
       kind: 2,
       get fields() {
         return {
-          id: { type: String, optional: false },
-          label: { type: String, optional: false },
+          merchantConfigId: { type: String, optional: false },
+          payType: { type: String, optional: false },
           desc: { type: String, optional: true }
         };
       },
@@ -25,8 +25,8 @@ class PaymentMethod extends common_vendor.UTS.UTSType {
   constructor(options, metadata = PaymentMethod.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.id = this.__props__.id;
-    this.label = this.__props__.label;
+    this.merchantConfigId = this.__props__.merchantConfigId;
+    this.payType = this.__props__.payType;
     this.desc = this.__props__.desc;
     delete this.__props__;
   }
@@ -39,22 +39,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     traffic: {},
     validityPeriod: {},
     amount: {},
-    pkgType: {}
+    pkgType: {},
+    payMethod: {}
   },
   emits: ["cancel", "confirm"],
   setup(__props, _a) {
+    var _b, _c;
     var __emit = _a.emit;
     const props = __props;
     const emit = __emit;
     const formattedAmount = common_vendor.computed(() => {
       return `￥${props.amount}`;
     });
-    common_vendor.ref([
-      new PaymentMethod({ id: "wechat_h5", label: "微信H5支付", desc: "推荐使用微信完成支付" }),
-      new PaymentMethod({ id: "alipay", label: "支付宝支付", desc: "通过支付宝完成支付" }),
-      new PaymentMethod({ id: "bank_card", label: "银行卡支付", desc: "支持常见银行卡支付" })
-    ]);
-    common_vendor.ref("wechat_h5");
+    common_vendor.ref((_c = (_b = props.payMethod) === null || _b === void 0 ? null : _b[0]) === null || _c === void 0 ? null : _c.merchantConfigId);
     const handleCancel = () => {
       emit("cancel");
     };
