@@ -80,7 +80,7 @@
 	import { getCountryList } from '@/api/http.uts'
 	import type { CountryData } from '@/api/types.uts'
 	
-	const cardNumber = ref<string>('gn20260603164757')
+	const cardNumber = ref<string>('gn1000000000026')
 	
 	// 国家/地区相关
 	const showCountryPopup = ref<boolean>(false)

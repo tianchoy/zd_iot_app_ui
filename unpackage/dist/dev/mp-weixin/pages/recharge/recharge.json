@@ -7,6 +7,8 @@
     "rice-button": "../../uni_modules/rice-ui/components/rice-button/rice-button",
     "rice-tabs": "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs",
     "rice-popup": "../../uni_modules/rice-ui/components/rice-popup/rice-popup",
+    "rice-icon": "../../uni_modules/rice-ui/components/rice-icon/rice-icon",
+    "custom-service": "../../components/customService/customService",
     "payment": "../../components/payment"
   }
 }

@@ -40,7 +40,7 @@
 						</view>
 						<text class="status-tag" :class="getStatusClass(card.statusStr)" v-if="card.statusStr">{{ card.statusStr || '未知' }}</text>
 					</view>
-					<view class="item-package" v-if="card.usedFlow || card.totalFlow">
+					<view class="item-package" v-if="card.usedFlow || card.pkgFlow">
 						<text class="package-label">流量：</text>
 						<text class="package-value">{{ getFlowText(card) }}</text>
 					</view>
@@ -70,7 +70,6 @@
 		<view v-if="cardList.length === 0" class="empty-state">
 			<text class="empty-text">暂无卡片数据</text>
 		</view>
-		<customService></customService>
 	</view>
 </template>
 
@@ -80,13 +79,13 @@ import { queryCardList, login, getTenantInfo } from '@/api/http.uts'
 import { getToken, getTenantId, isWechat, setToken } from '@/common/config.uts'
 import type { RechargeData } from '@/api/types.uts'
 
-const card_number = ref('gn20260603164757')
+const card_number = ref('gn1000000000002')
 const queryKeyword = ref('')
 const current = ref(0)
 const scrollViewHeight = ref(0)
 
 const cardList = ref<RechargeData[]>([])
-const cardCounts = ref<[number, number, number]>([0, 0, 0])
+const cardCounts = ref<number[]>([0, 0, 0])
 
 type TabItem = {
 	name: string
@@ -127,18 +126,12 @@ const getCycleText = (card: RechargeData): string => {
 	return `${used} / ${total}`
 }
 
-const handleClick = (e: UTSJSONObject) => {
-	if (isWechat()) {
-		if (!checkToken()) return;
-	}
-
-	if (e.index != null) {
-		current.value = e.index as number
-		getCardList(current.value.toString()).then((list) => {
-			cardList.value = list
-		})
-	}
+const checkToken = (): boolean => {
+	const token = getToken()
+	return !!token
 }
+
+
 
 const scanCode = () => {
 	uni.navigateTo({
@@ -179,22 +172,23 @@ const onScanResult = async (data: UTSJSONObject) => {
 	}
 }
 
-const getCardList = async (state: string) => {
+
+const getCardList = async (state: string): Promise<RechargeData[]> => {
 	try {
 		const res = await queryCardList({
 			status: state,
 			isSort: true
 		})
 		if (res.code == 200) {
-			return Array.isArray(res.data) ? res.data : []
+			return Array.isArray(res.data) ? res.data : [] as RechargeData[]
 		}
-		return []
+		return [] as RechargeData[]
 	} catch (error) {
 		uni.showToast({
 			title: '查询失败，请稍后重试',
 			icon: 'none'
 		})
-		return []
+		return [] as RechargeData[]
 	}
 }
 
@@ -205,32 +199,36 @@ const handleRecharge = (rechargeNo: string) => {
 		})
 }
 
-const checkToken = (): boolean => {
-	const token = getToken()
-	return !!token
-}
+
 
 // 获取 code
 const code = ref<string>('')
 const getCode = async (): Promise<boolean> => {
-	try {
-		const res = await uni.login({ provider: 'weixin' })
-		code.value = res.code
-		
-		const loginRes = await login({
-			isLogin: "1",
-			xcxCode: code.value,
+	return new Promise((resolve) => {
+		uni.login({
+			provider: 'weixin',
+			success: (res) => {
+				code.value = res.code
+				login({
+					isLogin: "1",
+					xcxCode: code.value,
+				}).then((loginRes) => {
+					if (loginRes.code == 200) {
+						setToken(loginRes.data.access_token, loginRes.data.refreshToken)
+						resolve(true)
+					} else {
+						resolve(false)
+					}
+				}).catch(() => {
+					resolve(false)
+				})
+			},
+			fail: (err) => {
+				console.error('登录失败:', err)
+				resolve(false)
+			}
 		})
-		
-		if (loginRes.code == 200) {
-			setToken(loginRes.data.access_token, loginRes.data.refreshToken)
-			return true
-		}
-		return false
-	} catch (err) {
-		console.error('登录失败:', err)
-		return false
-	}
+	})
 }
 
 // 获取租户页面配置
@@ -285,6 +283,19 @@ const platform = async () => {
 
 	// 2. 登录完成后（或已有token），再请求数据
 	await loadCardData()
+}
+
+const handleClick = (e: UTSJSONObject) => {
+	if (isWechat()) {
+		if (!checkToken()) return;
+	}
+
+	if (e.index != null) {
+		current.value = e.index as number
+		getCardList(current.value.toString()).then((list) => {
+			cardList.value = list
+		})
+	}
 }
 
 onLoad(() => {

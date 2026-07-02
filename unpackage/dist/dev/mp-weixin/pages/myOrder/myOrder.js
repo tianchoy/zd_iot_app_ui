@@ -72,25 +72,96 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const getTabIndexByStatus = (status) => {
       var _a;
-      if (status === "" || status === null || status === void 0) {
+      if (status === "" || status === null) {
         return 0;
       }
-      const tabMap = {
-        "0": 1,
-        "1": 2,
-        "5": 3,
-        "2": 4
-        // 已取消
-      };
-      return (_a = tabMap[status]) !== null && _a !== void 0 ? _a : 0;
+      const tabMap = /* @__PURE__ */ new Map();
+      tabMap.set("0", 1);
+      tabMap.set("1", 2);
+      tabMap.set("5", 3);
+      tabMap.set("2", 4);
+      return (_a = common_vendor.UTS.mapGet(tabMap, status)) !== null && _a !== void 0 ? _a : 0;
+    };
+    const getOrderList = (status, isSearch) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const params = new common_vendor.UTSJSONObject({});
+          if (status !== "") {
+            params["status"] = status;
+          }
+          if (isSearch && card_number.value.trim()) {
+            params["rechargeNoAndOrderNo"] = card_number.value.trim();
+          }
+          const resp = yield api_http.queryOrderList(params);
+          if (resp.code == 200) {
+            const rows = resp.rows;
+            let data = [];
+            if (rows != null && Array.isArray(rows)) {
+              data = rows;
+            } else {
+              data = [];
+            }
+            if (isSearch) {
+              if (data.length === 0) {
+                orderList.value = [];
+                common_vendor.index.showToast({
+                  title: "未找到匹配的订单",
+                  icon: "none"
+                });
+                return Promise.resolve(null);
+              }
+              const statusCount = /* @__PURE__ */ new Map();
+              let firstStatus = "";
+              data.forEach((order) => {
+                var _a;
+                const statusKey = order.status || "";
+                const count = (_a = common_vendor.UTS.mapGet(statusCount, statusKey)) !== null && _a !== void 0 ? _a : 0;
+                statusCount.set(statusKey, count + 1);
+                if (firstStatus === "") {
+                  firstStatus = statusKey;
+                }
+              });
+              orderList.value = data;
+              if (statusCount.size === 1) {
+                if (firstStatus !== "") {
+                  const targetIndex = getTabIndexByStatus(firstStatus);
+                  current.value = targetIndex;
+                } else {
+                  current.value = 0;
+                }
+              } else {
+                current.value = 0;
+              }
+            } else {
+              orderList.value = data;
+            }
+          } else {
+            orderList.value = [];
+            common_vendor.index.showToast({
+              title: resp.msg || "获取订单列表失败",
+              icon: "none"
+            });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:209", "获取订单列表失败:", error);
+          orderList.value = [];
+          common_vendor.index.showToast({
+            title: "网络错误，请稍后重试",
+            icon: "none"
+          });
+        }
+      });
     };
     const handleTabClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:141", e);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:220", e);
       const index = e.index;
       current.value = index;
       isSearching.value = false;
       card_number.value = "";
-      getOrderList(e.value, false);
+      const status = e.value;
+      if (status != null) {
+        getOrderList(status, false);
+      }
     };
     const getStatusClass = (status) => {
       switch (status) {
@@ -111,7 +182,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleOrderClick = (order) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:172", order);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:254", order);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
       });
@@ -142,7 +213,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:209", result);
+        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:291", result);
         if (result.length > 0) {
           card_number.value = result;
           common_vendor.index.showToast({
@@ -163,73 +234,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
         });
       }
-    };
-    const getOrderList = (status, isSearch) => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        try {
-          const params = new common_vendor.UTSJSONObject({});
-          if (status !== "") {
-            params.status = status;
-          }
-          if (isSearch && card_number.value.trim()) {
-            params.rechargeNoAndOrderNo = card_number.value.trim();
-          }
-          const resp = yield api_http.queryOrderList(params);
-          if (resp.code == 200) {
-            let data = [];
-            if (resp.rows && Array.isArray(resp.rows)) {
-              data = resp.rows;
-            } else if (resp.data && Array.isArray(resp.data)) {
-              data = resp.data;
-            } else {
-              data = [];
-            }
-            if (isSearch) {
-              if (data.length === 0) {
-                orderList.value = [];
-                common_vendor.index.showToast({
-                  title: "未找到匹配的订单",
-                  icon: "none"
-                });
-                return Promise.resolve(null);
-              }
-              const statusCount = {};
-              data.forEach((order) => {
-                const statusKey = order.status || "";
-                statusCount[statusKey] = (statusCount[statusKey] || 0) + 1;
-              });
-              const statusKeys = Object.keys(statusCount);
-              orderList.value = data;
-              if (statusKeys.length === 1) {
-                const targetStatus = statusKeys[0];
-                if (targetStatus !== "") {
-                  const targetIndex = getTabIndexByStatus(targetStatus);
-                  current.value = targetIndex;
-                } else {
-                  current.value = 0;
-                }
-              } else {
-                current.value = 0;
-              }
-            } else {
-              orderList.value = data;
-            }
-          } else {
-            orderList.value = [];
-            common_vendor.index.showToast({
-              title: resp.msg || "获取订单列表失败",
-              icon: "none"
-            });
-          }
-        } catch (error) {
-          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:312", "获取订单列表失败:", error);
-          orderList.value = [];
-          common_vendor.index.showToast({
-            title: "网络错误，请稍后重试",
-            icon: "none"
-          });
-        }
-      });
     };
     common_vendor.onShow(() => {
       isSearching.value = false;

@@ -112,11 +112,13 @@ export type PkgInfoListParams = {
 }
 
 export type PkgInfoItem = {
+		id: string
 		name: string
-		status: 'active' | 'pending' | 'expired'
+		status: string
 		statusText: string
 		tagType: string
 		startTime: string
+		endTime: string
 		totalFlow: string
 		usedFlow: string
 		leftFlow: string
@@ -137,6 +139,8 @@ export type QueryOrderListXcxData = {
 export type OrderListXcxItem = {
   id: number;
   orderNo: string;
+  cardNo: string;
+  iccid?: string;
   pkgName: string;
   createTime: string;
   status: string;

@@ -1,7 +1,7 @@
 <template>
 	<!-- #ifndef MP-WEIXIN -->
 	<view :class="fabClass" :style="[floatFabStyle,customStyle]" ref="fabRef" @touchstart="onTouchstart"
-		@touchmove="onTouchmove" @touchend="onTouchend" @touchcancel="onTouchend">
+		@touchmove="onTouchmove" @touchend="onTouchend" @touchcancel="onTouchend" @click="handleClick">
 		<slot>
 			<rice-icon v-if="hasStrValue(icon)" :name="icon" :color="iconColor" :size="iconSize" />
 		</slot>

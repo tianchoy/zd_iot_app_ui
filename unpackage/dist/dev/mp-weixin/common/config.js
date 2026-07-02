@@ -198,15 +198,11 @@ function getStorageSync(key) {
 function isWechat() {
   return true;
 }
-function isH5() {
-  return false;
-}
 exports.clearToken = clearToken;
 exports.config = config;
 exports.getStorageSync = getStorageSync;
 exports.getTenantId = getTenantId;
 exports.getToken = getToken;
-exports.isH5 = isH5;
 exports.isWechat = isWechat;
 exports.setStorageSync = setStorageSync;
 exports.setToken = setToken;

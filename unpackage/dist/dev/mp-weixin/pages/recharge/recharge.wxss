@@ -211,23 +211,88 @@
   left: 0;
   right: 0;
   display: flex;
+  flex-direction: column;
+}
+.bottom-box .tips[class].data-v-722cdacb {
+  font-size: 24rpx;
+  background: #ffffff;
+  color: #64748b;
+  border: 1rpx solid #e2e8f0;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin: 24rpx;
+  position: relative;
+  overflow: visible;
+}
+.bottom-box .tips .tips-text[class].data-v-722cdacb {
+  display: block;
+  line-height: 1.6;
+}
+.bottom-box .tips .tips-close[class].data-v-722cdacb {
+  position: absolute;
+  right: -5rpx;
+  top: -15rpx;
+  background-color: #fff;
+  border-radius: 50%;
+}
+.bottom-box .tips .tips-arrow[class].data-v-722cdacb {
+  position: absolute;
+  bottom: -15rpx;
+  right: 5%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 16rpx solid transparent;
+  border-right: 16rpx solid transparent;
+  border-top: 16rpx solid #ffffff;
+  filter: drop-shadow(0 2rpx 2rpx rgba(0, 0, 0, 0.1));
+}
+.bottom-box .pay-content[class].data-v-722cdacb {
+  display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   background: #ffffff;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
 }
-.bottom-box .price-box[class].data-v-722cdacb {
+.bottom-box .pay-content .price-box[class].data-v-722cdacb {
   display: flex;
   flex-direction: column;
   margin-left: 50rpx;
 }
-.bottom-box .price-box .price-label[class].data-v-722cdacb {
+.bottom-box .pay-content .price-box .price-label[class].data-v-722cdacb {
   font-size: 24rpx;
   color: #64748b;
 }
-.bottom-box .price-box .price-value[class].data-v-722cdacb {
+.bottom-box .pay-content .price-box .price-value[class].data-v-722cdacb {
   font-weight: bold;
   color: #ef4444;
   font-size: 40rpx;
+}
+.popup-center[class].data-v-722cdacb {
+  display: flex;
+  flex-direction: column;
+  padding: 48rpx 24rpx;
+}
+.popup-center .cs-list[class].data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1rpx solid #E5E5E5;
+  padding: 20rpx 0;
+}
+.popup-center .cs-list .label[class].data-v-722cdacb {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+.popup-center .cs-list .label .cs-label-desc[class].data-v-722cdacb {
+  font-size: 24rpx;
+  color: #64748b;
+}
+.popup-center .qrcode[class].data-v-722cdacb {
+  width: 150rpx;
+  height: 150rpx;
 }

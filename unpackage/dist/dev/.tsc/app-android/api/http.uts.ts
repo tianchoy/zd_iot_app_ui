@@ -7,16 +7,14 @@ import type {
   CountryData,
   TenantInfoData,
   QueryCardListParams,
-  QueryCardListData,
   CardListSumData,
-  CardItem,
   BindCard,
   PkgInfoListParams,
-  CardDetail,
   QueryOrderListXcxParams,
   QueryOrderListXcxData,
   QueryOrderDetailXcxData,
-  QueryOrderSuccessParams
+  QueryOrderSuccessParams,
+  RechargeData
 } from './types'
 
 // 查询国家列表
@@ -75,13 +73,13 @@ export function getTenantInfo(tenantId: string, withToken: boolean = true): Prom
 }
 
 // 查询卡列表
-export function queryCardList(params: QueryCardListParams, withToken: boolean = true): Promise<ApiResponse<QueryCardListData>> {
+export function queryCardList(params: QueryCardListParams, withToken: boolean = true): Promise<ApiResponse<RechargeData[]>> {
   const data: UTSJSONObject = {
     rechargeNo: params.rechargeNo,
     status: params.status,
     isSort: params.isSort
   }
-  return request<QueryCardListData>({
+  return request<RechargeData[]>({
     url: ApiUrl.queryCardList as string,
     method: 'GET',
     data: data,
@@ -99,7 +97,7 @@ export function queryCardListSum(withToken: boolean = true): Promise<ApiResponse
 }
 
 // 查询卡详情Xcx
-export function queryCardDetail(id: string,countryCode?: string, isFind?:string, withToken: boolean = true): Promise<ApiResponse<CardDetail>> {
+export function queryCardDetail(id: string,countryCode?: string, isFind?:string, withToken: boolean = true): Promise<ApiResponse<RechargeData>> {
 
 
 
@@ -120,7 +118,15 @@ export function queryCardDetail(id: string,countryCode?: string, isFind?:string,
 
 
 
-	return request<CardDetail>({
+
+
+	// 其他平台默认使用H5配置
+	const url = (ApiUrl.card_detail as string) + id
+  const token = true
+
+
+
+	return request<RechargeData>({
 		url: url,
 		method: 'GET',
 		withToken: token

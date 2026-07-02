@@ -29,32 +29,32 @@
 			>
 				<!-- 套餐头部 -->
 				<view class="package-header">
-					<text class="package-name" v-if="item.pkgName">{{ item.pkgName }}</text>
+					<text class="package-name" v-if="item.name">{{ item.name }}</text>
 					<rice-tag v-if="item.status" :text="getPackageStatusText(item.status)" :round="true" plain-fill size="small" :type="getPackageStatusType(item.status)"></rice-tag>
 				</view>
-				
+
 				<!-- 生效时间 -->
-				<view class="effective-time" style="margin-bottom: 0;" v-if="item.effectiveTime">
+				<view class="effective-time" style="margin-bottom: 0;" v-if="item.startTime">
 					<text class="time-label">生效时间：</text>
-					<text class="time-value">{{ item.effectiveTime }}</text>
+					<text class="time-value">{{ item.startTime }}</text>
 				</view>
-				<view class="effective-time" v-if="item.expirationTime">
+				<view class="effective-time" v-if="item.endTime">
 					<text class="time-label">到期时间：</text>
-					<text class="time-value">{{ item.expirationTime }}</text>
+					<text class="time-value">{{ item.endTime }}</text>
 				</view>
 				<!-- 套餐数据指标 -->
 				<view class="package-metrics">
-					<view class="metric-item" v-if="item.unUsedFlow">
+					<view class="metric-item" v-if="item.leftFlow">
 						<text class="metric-label">剩余</text>
-						<text class="metric-value">{{ item.unUsedFlow }}GB</text>
+						<text class="metric-value">{{ item.leftFlow }}GB</text>
 					</view>
 					<view class="metric-item" v-if="item.usedFlow">
 						<text class="metric-label">已用</text>
 						<text class="metric-value">{{ item.usedFlow }}GB</text>
 					</view>
-					<view class="metric-item" v-if="item.pkgFlow">
+					<view class="metric-item" v-if="item.totalFlow">
 						<text class="metric-label">流量</text>
-						<text class="metric-value">{{ item.pkgFlow }}GB</text>
+						<text class="metric-value">{{ item.totalFlow }}GB</text>
 					</view>
 				</view>
 			</view>
@@ -70,43 +70,25 @@
 	
 	// 套餐状态类型
 	type PackageStatus = '全部' | '在用套餐' | '待生效' | '已失效'
-	interface PackageTab {
+	type PackageTab = {
 		name: PackageStatus
+		value: string
 	}
-	type PackageItemStatus = '在用套餐' | '待生效' | '已失效'
 
 	const card_number = ref<string>('')
 
-	// 套餐数据结构
-	interface PackageItem {
-		name: string
-		status: PackageItemStatus
-		effectiveTime: string
-		totalTraffic: string
-		remainingTraffic: string
-		expireDate: string
-	}
-	
 	// Tab 列表
 	const pkgTabs = ref<PackageTab[]>([{name:'全部', value:''}, {name:'在用套餐', value:'1'}, {name:'待生效', value:'0'}, {name:'已失效', value:'2'}])
 	const current = ref<number>(0)
 	
 	// 套餐数据
-	const pkgInfoList = ref<XcxCardListItem[]>([])
+	const pkgInfoList = ref<PkgInfoItem[]>([])
 	
 	const getPackageText = (item: any, key: string): string => {
 		const value = (item as UTSJSONObject)[key]
 		return value == null ? '' : '' + value
 	}
 	
-	// Tab 切换处理
-	const handleClick = (e: UTSJSONObject) => {
-		if (e.index != null) {
-			current.value = e.index as number
-			getPkgInfoList(e.value.toString())
-		}
-	}
-
 	/** 查询套餐信息列表 */
 	const getPkgInfoList = async (state: string) => {
 		try {
@@ -115,10 +97,9 @@
 				status: state,
 			})
 			if (res.code == 200) {
-				if (res.rows && Array.isArray(res.rows)) {
-					pkgInfoList.value = res.rows
-				} else if (res.data && Array.isArray(res.data)) {
-					pkgInfoList.value = res.data
+				const rows = res.rows as PkgInfoItem[]
+				if (rows != null && Array.isArray(rows)) {
+					pkgInfoList.value = rows
 				} else {
 					pkgInfoList.value = []
 				}
@@ -132,33 +113,38 @@
 		}
 	}
 
+	// Tab 切换处理
+	const handleClick = (e: UTSJSONObject) => {
+		if (e.index != null) {
+			current.value = e.index as number
+			getPkgInfoList(e.value.toString())
+		}
+	}
+
 	// 套餐详情点击处理
-	const handlePkgDetail = (item: any) => {
+	const handlePkgDetail = (item: PkgInfoItem) => {
 		console.log(item)
 		uni.navigateTo({
 			url: '/pages/pkgDetail/pkgDetail?pkgId=' + item.id
 		})
 	}
 	
-	// 获取订单状态对应的文本
 	// 获取套餐状态对应的文本
 	const getPackageStatusText = (status: string): string => {
-		const statusMap: Record<string, string> = {
-			'0': '未生效',
-			'1': '生效中',
-			'2': '已失效'
-		}
-		return statusMap[status] || status || '未知'
+		const statusMap = new Map<string, string>()
+		statusMap.set('0', '未生效')
+		statusMap.set('1', '生效中')
+		statusMap.set('2', '已失效')
+		return statusMap.get(status) ?? status ?? '未知'
 	}
 
 	// 获取套餐状态对应的标签类型
 	const getPackageStatusType = (status: string): string => {
-		const typeMap: Record<string, string> = {
-			'0': 'success',
-			'1': 'primary',
-			'2': 'error'
-		}
-		return typeMap[status] || 'primary'
+		const typeMap = new Map<string, string>()
+		typeMap.set('0', 'success')
+		typeMap.set('1', 'primary')
+		typeMap.set('2', 'error')
+		return typeMap.get(status) ?? 'primary'
 	}
 
 	// 返回上一页

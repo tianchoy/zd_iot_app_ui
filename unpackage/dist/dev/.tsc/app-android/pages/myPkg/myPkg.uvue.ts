@@ -7,21 +7,11 @@ import { ref, computed } from 'vue'
 	
 	// 套餐状态类型
 	type PackageStatus = '全部' | '在用套餐' | '待生效' | '已失效'
-	interface PackageTab {
+	type PackageTab = { __$originalPosition?: UTSSourceMapPosition<"PackageTab", "pages/myPkg/myPkg.uvue", 73, 7>;
 		name: PackageStatus
+		value: string
 	}
-	type PackageItemStatus = '在用套餐' | '待生效' | '已失效'
 
-	interface PackageItem {
-		name: string
-		status: PackageItemStatus
-		effectiveTime: string
-		totalTraffic: string
-		remainingTraffic: string
-		expireDate: string
-	}
-	
-	// Tab 列表
 	
 const __sfc__ = defineComponent({
   __name: 'myPkg',
@@ -32,26 +22,18 @@ const _cache = __ins.renderCache;
 
 	const card_number = ref<string>('')
 
-	// 套餐数据结构
+	// Tab 列表
 	const pkgTabs = ref<PackageTab[]>([{name:'全部', value:''}, {name:'在用套餐', value:'1'}, {name:'待生效', value:'0'}, {name:'已失效', value:'2'}])
 	const current = ref<number>(0)
 	
 	// 套餐数据
-	const pkgInfoList = ref<XcxCardListItem[]>([])
+	const pkgInfoList = ref<PkgInfoItem[]>([])
 	
 	const getPackageText = (item: any, key: string): string => {
 		const value = (item as UTSJSONObject)[key]
 		return value == null ? '' : '' + value
 	}
 	
-	// Tab 切换处理
-	const handleClick = (e: UTSJSONObject) => {
-		if (e.index != null) {
-			current.value = e.index as number
-			getPkgInfoList(e.value.toString())
-		}
-	}
-
 	/** 查询套餐信息列表 */
 	const getPkgInfoList = async (state: string) => {
 		try {
@@ -60,50 +42,54 @@ const _cache = __ins.renderCache;
 				status: state,
 			})
 			if (res.code == 200) {
-				if (res.rows && Array.isArray(res.rows)) {
-					pkgInfoList.value = res.rows
-				} else if (res.data && Array.isArray(res.data)) {
-					pkgInfoList.value = res.data
+				const rows = res.rows as PkgInfoItem[]
+				if (rows != null && Array.isArray(rows)) {
+					pkgInfoList.value = rows
 				} else {
 					pkgInfoList.value = []
 				}
 			} else {
-				console.log('查询套餐列表失败:', res.msg, " at pages/myPkg/myPkg.uvue:126")
+				console.log('查询套餐列表失败:', res.msg, " at pages/myPkg/myPkg.uvue:107")
 				pkgInfoList.value = []
 			}
 		} catch (error) {
-			console.error('查询套餐列表异常:', error, " at pages/myPkg/myPkg.uvue:130")
+			console.error('查询套餐列表异常:', error, " at pages/myPkg/myPkg.uvue:111")
 			pkgInfoList.value = []
 		}
 	}
 
+	// Tab 切换处理
+	const handleClick = (e: UTSJSONObject) => {
+		if (e.index != null) {
+			current.value = e.index as number
+			getPkgInfoList(e.value.toString())
+		}
+	}
+
 	// 套餐详情点击处理
-	const handlePkgDetail = (item: any) => {
-		console.log(item, " at pages/myPkg/myPkg.uvue:137")
+	const handlePkgDetail = (item: PkgInfoItem) => {
+		console.log(item, " at pages/myPkg/myPkg.uvue:126")
 		uni.navigateTo({
 			url: '/pages/pkgDetail/pkgDetail?pkgId=' + item.id
 		})
 	}
 	
-	// 获取订单状态对应的文本
 	// 获取套餐状态对应的文本
 	const getPackageStatusText = (status: string): string => {
-		const statusMap: Record<string, string> = {
-			'0': '未生效',
-			'1': '生效中',
-			'2': '已失效'
-		}
-		return statusMap[status] || status || '未知'
+		const statusMap = new Map<string, string>()
+		statusMap.set('0', '未生效')
+		statusMap.set('1', '生效中')
+		statusMap.set('2', '已失效')
+		return statusMap.get(status) ?? status ?? '未知'
 	}
 
 	// 获取套餐状态对应的标签类型
 	const getPackageStatusType = (status: string): string => {
-		const typeMap: Record<string, string> = {
-			'0': 'success',
-			'1': 'primary',
-			'2': 'error'
-		}
-		return typeMap[status] || 'primary'
+		const typeMap = new Map<string, string>()
+		typeMap.set('0', 'success')
+		typeMap.set('1', 'primary')
+		typeMap.set('2', 'error')
+		return typeMap.get(status) ?? 'primary'
 	}
 
 	// 返回上一页
@@ -171,11 +157,11 @@ const _component_rice_tag = resolveEasyComponent("rice-tag",_easycom_rice_tag)
               onClick: () => {handlePkgDetail(item)}
             }), [
               _cE("view", _uM({ class: "package-header" }), [
-                isTrue(item.pkgName)
+                isTrue(item.name)
                   ? _cE("text", _uM({
                       key: 0,
                       class: "package-name"
-                    }), _tD(item.pkgName), 1 /* TEXT */)
+                    }), _tD(item.name), 1 /* TEXT */)
                   : _cC("v-if", true),
                 isTrue(item.status)
                   ? _cV(_component_rice_tag, _uM({
@@ -188,33 +174,33 @@ const _component_rice_tag = resolveEasyComponent("rice-tag",_easycom_rice_tag)
                     }), null, 8 /* PROPS */, ["text", "type"])
                   : _cC("v-if", true)
               ]),
-              isTrue(item.effectiveTime)
+              isTrue(item.startTime)
                 ? _cE("view", _uM({
                     key: 0,
                     class: "effective-time",
                     style: _nS(_uM({"margin-bottom":"0"}))
                   }), [
                     _cE("text", _uM({ class: "time-label" }), "生效时间："),
-                    _cE("text", _uM({ class: "time-value" }), _tD(item.effectiveTime), 1 /* TEXT */)
+                    _cE("text", _uM({ class: "time-value" }), _tD(item.startTime), 1 /* TEXT */)
                   ], 4 /* STYLE */)
                 : _cC("v-if", true),
-              isTrue(item.expirationTime)
+              isTrue(item.endTime)
                 ? _cE("view", _uM({
                     key: 1,
                     class: "effective-time"
                   }), [
                     _cE("text", _uM({ class: "time-label" }), "到期时间："),
-                    _cE("text", _uM({ class: "time-value" }), _tD(item.expirationTime), 1 /* TEXT */)
+                    _cE("text", _uM({ class: "time-value" }), _tD(item.endTime), 1 /* TEXT */)
                   ])
                 : _cC("v-if", true),
               _cE("view", _uM({ class: "package-metrics" }), [
-                isTrue(item.unUsedFlow)
+                isTrue(item.leftFlow)
                   ? _cE("view", _uM({
                       key: 0,
                       class: "metric-item"
                     }), [
                       _cE("text", _uM({ class: "metric-label" }), "剩余"),
-                      _cE("text", _uM({ class: "metric-value" }), _tD(item.unUsedFlow) + "GB", 1 /* TEXT */)
+                      _cE("text", _uM({ class: "metric-value" }), _tD(item.leftFlow) + "GB", 1 /* TEXT */)
                     ])
                   : _cC("v-if", true),
                 isTrue(item.usedFlow)
@@ -226,13 +212,13 @@ const _component_rice_tag = resolveEasyComponent("rice-tag",_easycom_rice_tag)
                       _cE("text", _uM({ class: "metric-value" }), _tD(item.usedFlow) + "GB", 1 /* TEXT */)
                     ])
                   : _cC("v-if", true),
-                isTrue(item.pkgFlow)
+                isTrue(item.totalFlow)
                   ? _cE("view", _uM({
                       key: 2,
                       class: "metric-item"
                     }), [
                       _cE("text", _uM({ class: "metric-label" }), "流量"),
-                      _cE("text", _uM({ class: "metric-value" }), _tD(item.pkgFlow) + "GB", 1 /* TEXT */)
+                      _cE("text", _uM({ class: "metric-value" }), _tD(item.totalFlow) + "GB", 1 /* TEXT */)
                     ])
                   : _cC("v-if", true)
               ])

@@ -1,15 +1,11 @@
 <template>
-	  <rice-float-fab default-position="bottom-right" icon="chat-fill" width="80rpx" height="80rpx" icon-size="50rpx" gap-bottom="200rpx" gap-right="20rpx" @click="handleClick" />
+	  <rice-float-fab default-position="bottom-right" icon="chat-fill" width="80rpx" height="80rpx" icon-size="50rpx" gap-bottom="300rpx" gap-right="20rpx" @click="handleClick" />
 </template>
 
 <script setup lang="uts">
 	const emit = defineEmits(['connect_service']);
 	const handleClick = (e: any) => {
-		// emit('connect_service');
-		uni.showToast({
-			title: '连接客服',
-			icon: 'none'
-		})
+		emit('connect_service');
 	}
 </script>
 

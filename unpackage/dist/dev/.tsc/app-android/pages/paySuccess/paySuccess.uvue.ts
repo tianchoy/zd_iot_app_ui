@@ -13,7 +13,19 @@ const _cache = __ins.renderCache;
 	const orderId = ref<string>('')
 	const payChannelId = ref<string>('')
 	const orderDetail = ref<any>({})
-	
+
+	/** 模板中安全访问 orderDetail 属性 */
+	function d(key: string): any {
+		const val = (orderDetail.value as UTSJSONObject)[key]
+		return val as any
+	}
+
+	/** 获取 string 类型的属性值 */
+	function ds(key: string): string {
+		const val = (orderDetail.value as UTSJSONObject)[key]
+		return val != null ? (val as string) : ''
+	}
+
 	// 查看订单点击处理
 	const handleViewOrder = () => {
 		uni.redirectTo({
@@ -24,23 +36,26 @@ const _cache = __ins.renderCache;
 	
 	// 返回卡片详情点击处理
 	const handleBackCard = () => {
+		const detail = orderDetail.value as UTSJSONObject
 		uni.reLaunch({
-			url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
+			url: `/pages/cardDetail/cardDetail?cardNumber=${detail['rechargeNo'] as string}`
 		})
 	}
 
 	const getOrderDetail = async () => {
 		const res = await queryOrderSuccess(orderId.value,payChannelId.value)
 		if(res.code == 200){
-			console.log('订单详情:',res, " at pages/paySuccess/paySuccess.uvue:96")
+			console.log('订单详情:',res, " at pages/paySuccess/paySuccess.uvue:109")
 			orderDetail.value = res.data
 		}
 	}
 
-	onLoad((options)=>{
-		console.log('orderId:',options, " at pages/paySuccess/paySuccess.uvue:102")	
-		orderId.value = options.orderId ?? ''
-		payChannelId.value = options.payChannelId ?? ''
+	onLoad((options: UTSJSONObject) => {
+		console.log('orderId:',options, " at pages/paySuccess/paySuccess.uvue:115")	
+		const oid = options['orderId'] as string
+		orderId.value = oid != null ? oid : ''
+		const pid = options['payChannelId'] as string
+		payChannelId.value = pid != null ? pid : ''
 		getOrderDetail()
 	})
 
@@ -64,76 +79,76 @@ const _component_topNavBar = resolveEasyComponent("topNavBar",_easycom_topNavBar
         _cE("text", _uM({ class: "status-text" }), "支付成功")
       ]),
       _cE("view", _uM({ class: "card-container" }), [
-        isTrue(unref(orderDetail).rechargeNo)
+        isTrue(d('rechargeNo'))
           ? _cE("view", _uM({
               key: 0,
               class: "info-row"
             }), [
               _cE("text", _uM({ class: "label" }), "卡号"),
-              _cE("text", _uM({ class: "value" }), _tD(unref(orderDetail).rechargeNo), 1 /* TEXT */)
+              _cE("text", _uM({ class: "value" }), _tD(d('rechargeNo')), 1 /* TEXT */)
             ])
           : _cC("v-if", true),
-        isTrue(unref(orderDetail).iccid)
+        isTrue(d('iccid'))
           ? _cE("view", _uM({
               key: 1,
               class: "info-row"
             }), [
               _cE("text", _uM({ class: "label" }), "ICCID"),
-              _cE("text", _uM({ class: "value" }), _tD(unref(orderDetail).iccid), 1 /* TEXT */)
+              _cE("text", _uM({ class: "value" }), _tD(d('iccid')), 1 /* TEXT */)
             ])
           : _cC("v-if", true),
-        isTrue(unref(orderDetail).orderNo)
+        isTrue(d('orderNo'))
           ? _cE("view", _uM({
               key: 2,
               class: "info-row"
             }), [
               _cE("text", _uM({ class: "label" }), "订单编号"),
-              _cE("text", _uM({ class: "value" }), _tD(unref(orderDetail).orderNo), 1 /* TEXT */)
+              _cE("text", _uM({ class: "value" }), _tD(d('orderNo')), 1 /* TEXT */)
             ])
           : _cC("v-if", true),
-        isTrue(unref(orderDetail).pkgName)
+        isTrue(d('pkgName'))
           ? _cE("view", _uM({
               key: 3,
               class: "info-row"
             }), [
               _cE("text", _uM({ class: "label" }), "套餐名称"),
-              _cE("text", _uM({ class: "value" }), _tD(unref(orderDetail).pkgName), 1 /* TEXT */)
+              _cE("text", _uM({ class: "value" }), _tD(d('pkgName')), 1 /* TEXT */)
             ])
           : _cC("v-if", true),
-        isTrue(unref(orderDetail).pkgType)
+        isTrue(d('pkgType'))
           ? _cE("view", _uM({
               key: 4,
               class: "info-row"
             }), [
               _cE("text", _uM({ class: "label" }), "套餐类型"),
-              _cE("text", _uM({ class: "value" }), _tD(unref(orderDetail).pkgType), 1 /* TEXT */)
+              _cE("text", _uM({ class: "value" }), _tD(d('pkgType')), 1 /* TEXT */)
             ])
           : _cC("v-if", true),
-        isTrue(unref(isWechat)() && unref(orderDetail).payType)
+        ds('payType') != ''
           ? _cE("view", _uM({
               key: 5,
               class: "info-row"
             }), [
               _cE("text", _uM({ class: "label" }), "支付方式"),
-              _cE("text", _uM({ class: "value" }), _tD(unref(orderDetail).payType), 1 /* TEXT */)
+              _cE("text", _uM({ class: "value" }), _tD(d('payType')), 1 /* TEXT */)
             ])
           : _cC("v-if", true),
-        isTrue(unref(orderDetail).payAmount)
+        isTrue(d('payAmount'))
           ? _cE("view", _uM({
               key: 6,
               class: "info-row"
             }), [
               _cE("text", _uM({ class: "label" }), "支付金额"),
-              _cE("text", _uM({ class: "value amount" }), "￥" + _tD(unref(orderDetail).payAmount), 1 /* TEXT */)
+              _cE("text", _uM({ class: "value amount" }), "￥" + _tD(d('payAmount')), 1 /* TEXT */)
             ])
           : _cC("v-if", true),
-        isTrue(unref(orderDetail).payTime)
+        isTrue(d('payTime'))
           ? _cE("view", _uM({
               key: 7,
               class: "info-row"
             }), [
               _cE("text", _uM({ class: "label" }), "支付时间"),
-              _cE("text", _uM({ class: "value" }), _tD(unref(orderDetail).payTime), 1 /* TEXT */)
+              _cE("text", _uM({ class: "value" }), _tD(d('payTime')), 1 /* TEXT */)
             ])
           : _cC("v-if", true)
       ]),

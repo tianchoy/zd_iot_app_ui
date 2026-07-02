@@ -20,6 +20,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     common_vendor.ref("用户");
     const wxGetPhoneLogin = common_vendor.ref("");
+    const isWechatEnv = common_vendor.computed(() => {
+      return common_config.isWechat();
+    });
+    const checkToken = () => {
+      const token = common_config.getToken();
+      return !!token;
+    };
+    const isLoginState = common_vendor.computed(() => {
+      return !checkToken();
+    });
+    const isLogin = () => {
+      if (!checkToken()) {
+        common_vendor.index.showToast({
+          title: "请先登录",
+          icon: "none"
+        });
+        return false;
+      }
+      return true;
+    };
     const toOrder = () => {
       if (!isLogin())
         return null;
@@ -47,25 +67,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         common_vendor.index.login(new common_vendor.UTSJSONObject({
           success: (res) => {
-            return common_vendor.__awaiter(this, void 0, void 0, function* () {
-              code.value = res.code;
-              if (wxGetPhoneLogin.value == "1") {
-                const params = new common_vendor.UTSJSONObject({
-                  isLogin: "1",
-                  xcxCode: code.value
-                });
-                const res_1 = yield api_http.login(params);
-                if (res_1.code == 200) {
-                  common_vendor.index.__f__("log", "at pages/mine/mine.uvue:88", "登录成功:", res_1.data.access_token);
-                  common_config.setToken(res_1.data.access_token, res_1.data.refreshToken);
+            code.value = res.code;
+            if (wxGetPhoneLogin.value == "1") {
+              const params = new common_vendor.UTSJSONObject({
+                isLogin: "1",
+                xcxCode: code.value
+              });
+              api_http.login(params).then((res2) => {
+                if (res2.code == 200) {
+                  common_vendor.index.__f__("log", "at pages/mine/mine.uvue:109", "登录成功:", res2.data.access_token);
+                  common_config.setToken(res2.data.access_token, res2.data.refreshToken);
                   common_vendor.index.reLaunch({
                     url: "/pages/card/card"
                   });
                 }
-              } else {
-                userLoginByOpenid(res.code);
-              }
-            });
+              });
+            } else {
+              userLoginByOpenid(res.code);
+            }
           }
         }));
       });
@@ -106,23 +125,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             cardListSum.value = res.data;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:140", "查询卡列表统计异常:", error);
+          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:162", "查询卡列表统计异常:", error);
         }
       });
-    };
-    const checkToken = () => {
-      const token = common_config.getToken();
-      return !!token;
-    };
-    const isLogin = () => {
-      if (!checkToken()) {
-        common_vendor.index.showToast({
-          title: "请先登录",
-          icon: "none"
-        });
-        return false;
-      }
-      return true;
     };
     common_vendor.onLoad(() => {
       if (common_config.isWechat()) {
@@ -142,9 +147,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-284ae985"
         }),
-        b: common_vendor.t(common_vendor.unref(cardListSum).all != null ? common_vendor.unref(cardListSum).all : 0),
-        c: common_vendor.t(common_vendor.unref(cardListSum).inUse != null ? common_vendor.unref(cardListSum).inUse : 0),
-        d: common_vendor.t(common_vendor.unref(cardListSum).inNotUse != null ? common_vendor.unref(cardListSum).inNotUse : 0),
+        b: common_vendor.t(cardListSum.value.all != null ? cardListSum.value.all : 0),
+        c: common_vendor.t(cardListSum.value.inUse != null ? cardListSum.value.inUse : 0),
+        d: common_vendor.t(cardListSum.value.inNotUse != null ? cardListSum.value.inNotUse : 0),
         e: common_vendor.p({
           name: "arrow-right",
           size: "20rpx",
@@ -161,11 +166,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        i: common_vendor.unref(common_config.isWechat)()
-      }, common_vendor.unref(common_config.isWechat)() ? common_vendor.e({
-        j: !isLogin()
-      }, !isLogin() ? {
-        k: common_vendor.o(handleLogin, "53"),
+        i: isWechatEnv.value
+      }, isWechatEnv.value ? common_vendor.e({
+        j: isLoginState.value
+      }, isLoginState.value ? {
+        k: common_vendor.o(handleLogin, "70"),
         l: common_vendor.p({
           type: "primary",
           width: "100%",
@@ -173,7 +178,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-284ae985"
         })
       } : common_vendor.unref(common_config.getStorageSync)("usePhoneNumber") ? {
-        n: common_vendor.o(handleLogout, "18"),
+        n: common_vendor.o(handleLogout, "61"),
         o: common_vendor.p({
           type: "error",
           width: "100%",

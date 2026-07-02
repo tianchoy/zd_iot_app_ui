@@ -23,11 +23,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const showLoading = common_vendor.ref(false);
     const pkgId = common_vendor.ref("");
     const pkgInfo = common_vendor.ref(new common_vendor.UTSJSONObject({}));
+    function d(key) {
+      const val = pkgInfo.value[key];
+      return val;
+    }
     const flowPercentage = common_vendor.computed(() => {
       if (!pkgInfo.value)
         return 0;
-      const usedFlow = Number(pkgInfo.value.usedFlow) || 0;
-      const pkgFlow = Number(pkgInfo.value.pkgFlow) || 0;
+      const info = pkgInfo.value;
+      const usedFlowStr = info["usedFlow"];
+      const pkgFlowStr = info["pkgFlow"];
+      const usedFlow = usedFlowStr != null && usedFlowStr != "" ? Number.parseInt(usedFlowStr) : 0;
+      const pkgFlow = pkgFlowStr != null && pkgFlowStr != "" ? Number.parseInt(pkgFlowStr) : 0;
       if (pkgFlow <= 0)
         return 0;
       return Math.min(usedFlow / pkgFlow * 100, 100);
@@ -62,14 +69,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.navigateBack();
     };
     common_vendor.onLoad((options) => {
-      var _a;
-      common_vendor.index.__f__("log", "at pages/pkgDetail/pkgDetail.uvue:136", "pkgDetail onLoad", options);
-      pkgId.value = (_a = options.pkgId) !== null && _a !== void 0 ? _a : "";
+      common_vendor.index.__f__("log", "at pages/pkgDetail/pkgDetail.uvue:145", "pkgDetail onLoad", options);
+      const pid = options["pkgId"];
+      pkgId.value = pid != null ? pid : "";
       initPkgInfo();
     });
     return (_ctx, _cache) => {
       "raw js";
-      var _a;
       const __returned__ = common_vendor.e({
         a: common_vendor.o(handleBack, "56"),
         b: common_vendor.p({
@@ -100,14 +106,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           show: showLoading.value,
           class: "data-v-36efee10"
         }),
-        f: pkgInfo.value.pkgName
-      }, pkgInfo.value.pkgName ? {
-        g: common_vendor.t(pkgInfo.value.pkgName)
+        f: d("pkgName")
+      }, d("pkgName") ? {
+        g: common_vendor.t(d("pkgName"))
       } : {}, {
-        h: pkgInfo.value.status
-      }, pkgInfo.value.status ? {
+        h: d("status")
+      }, d("status") ? {
         i: common_vendor.p({
-          text: pkgInfo.value.status,
+          text: d("status"),
           round: true,
           ["plain-fill"]: true,
           size: "small",
@@ -115,52 +121,52 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-36efee10"
         })
       } : {}, {
-        j: pkgInfo.value.rechargeNo
-      }, pkgInfo.value.rechargeNo ? {
-        k: common_vendor.t(pkgInfo.value.rechargeNo)
+        j: d("rechargeNo")
+      }, d("rechargeNo") ? {
+        k: common_vendor.t(d("rechargeNo"))
       } : {}, {
-        l: pkgInfo.value.usedFlow && pkgInfo.value.unUsedFlow
-      }, pkgInfo.value.usedFlow && pkgInfo.value.unUsedFlow ? {
-        m: common_vendor.t(pkgInfo.value.usedFlow),
-        n: common_vendor.t(pkgInfo.value.unUsedFlow),
+        l: d("usedFlow") != null && d("unUsedFlow") != null
+      }, d("usedFlow") != null && d("unUsedFlow") != null ? {
+        m: common_vendor.t(d("usedFlow")),
+        n: common_vendor.t(d("unUsedFlow")),
         o: common_vendor.p({
           percentage: flowPercentage.value,
           ["show-text"]: true,
           class: "data-v-36efee10"
         })
       } : {}, {
-        p: pkgInfo.value.pkgFlow
-      }, pkgInfo.value.pkgFlow ? {
-        q: common_vendor.t(pkgInfo.value.pkgFlow)
+        p: d("pkgFlow")
+      }, d("pkgFlow") ? {
+        q: common_vendor.t(d("pkgFlow"))
       } : {}, {
-        r: pkgInfo.value.startDate
-      }, pkgInfo.value.startDate ? {
-        s: common_vendor.t(pkgInfo.value.startDate)
+        r: d("startDate")
+      }, d("startDate") ? {
+        s: common_vendor.t(d("startDate"))
       } : {}, {
-        t: pkgInfo.value.validityPeriod
-      }, pkgInfo.value.validityPeriod ? {
-        v: common_vendor.t(pkgInfo.value.validityPeriod),
-        w: common_vendor.t(((_a = pkgInfo.value) == null ? void 0 : _a.pkgType) == "1" ? "天" : "个月")
+        t: d("validityPeriod")
+      }, d("validityPeriod") ? {
+        v: common_vendor.t(d("validityPeriod")),
+        w: common_vendor.t(d("pkgType") == "1" ? "天" : "个月")
       } : {}, {
-        x: pkgInfo.value.endDate
-      }, pkgInfo.value.endDate ? {
-        y: common_vendor.t(pkgInfo.value.endDate)
+        x: d("endDate")
+      }, d("endDate") ? {
+        y: common_vendor.t(d("endDate"))
       } : {}, {
-        z: pkgInfo.value.orderNo
-      }, pkgInfo.value.orderNo ? {
-        A: common_vendor.t(pkgInfo.value.orderNo)
+        z: d("orderNo")
+      }, d("orderNo") ? {
+        A: common_vendor.t(d("orderNo"))
       } : {}, {
-        B: pkgInfo.value.orderStatus
-      }, pkgInfo.value.orderStatus ? {
-        C: common_vendor.t(pkgInfo.value.orderStatus)
+        B: d("orderStatus")
+      }, d("orderStatus") ? {
+        C: common_vendor.t(d("orderStatus"))
       } : {}, {
-        D: pkgInfo.value.payAmount
-      }, pkgInfo.value.payAmount ? {
-        E: common_vendor.t(pkgInfo.value.payAmount)
+        D: d("payAmount")
+      }, d("payAmount") ? {
+        E: common_vendor.t(d("payAmount"))
       } : {}, {
-        F: pkgInfo.value.orderCreateTime
-      }, pkgInfo.value.orderCreateTime ? {
-        G: common_vendor.t(pkgInfo.value.orderCreateTime)
+        F: d("orderCreateTime")
+      }, d("orderCreateTime") ? {
+        G: common_vendor.t(d("orderCreateTime"))
       } : {}, {
         H: `${_ctx.u_s_b_h}px`,
         I: `${_ctx.u_s_a_i_b}px`

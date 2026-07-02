@@ -9,17 +9,15 @@ if (!Array) {
   const _easycom_rice_button_1 = common_vendor.resolveComponent("rice-button");
   const _easycom_rice_tabs_1 = common_vendor.resolveComponent("rice-tabs");
   const _easycom_rice_divider_1 = common_vendor.resolveComponent("rice-divider");
-  const _easycom_customService_1 = common_vendor.resolveComponent("customService");
-  (_easycom_topNavBar_1 + _easycom_rice_input_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1 + _easycom_rice_divider_1 + _easycom_customService_1)();
+  (_easycom_topNavBar_1 + _easycom_rice_input_1 + _easycom_rice_button_1 + _easycom_rice_tabs_1 + _easycom_rice_divider_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
 const _easycom_rice_input = () => "../../uni_modules/rice-ui/components/rice-input/rice-input.js";
 const _easycom_rice_button = () => "../../uni_modules/rice-ui/components/rice-button/rice-button.js";
 const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
 const _easycom_rice_divider = () => "../../uni_modules/rice-ui/components/rice-divider/rice-divider.js";
-const _easycom_customService = () => "../../components/customService/customService.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_rice_input + _easycom_rice_button + _easycom_rice_tabs + _easycom_rice_divider + _easycom_customService)();
+  (_easycom_topNavBar + _easycom_rice_input + _easycom_rice_button + _easycom_rice_tabs + _easycom_rice_divider)();
 }
 class TabItem extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
@@ -43,7 +41,7 @@ class TabItem extends common_vendor.UTS.UTSType {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "card",
   setup(__props) {
-    const card_number = common_vendor.ref("gn20260603164757");
+    const card_number = common_vendor.ref("gn1000000000002");
     const queryKeyword = common_vendor.ref("");
     const current = common_vendor.ref(0);
     common_vendor.ref(0);
@@ -83,17 +81,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const total = (_b = card.totalPeriod) !== null && _b !== void 0 ? _b : "-";
       return `${used} / ${total}`;
     };
-    const handleClick = (e) => {
-      if (common_config.isWechat()) {
-        if (!checkToken())
-          return null;
-      }
-      if (e.index != null) {
-        current.value = e.index;
-        getCardList(current.value.toString()).then((list) => {
-          cardList.value = list;
-        });
-      }
+    const checkToken = () => {
+      const token = common_config.getToken();
+      return !!token;
     };
     const scanCode = () => {
       common_vendor.index.navigateTo({
@@ -159,29 +149,34 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         url: "/pages/recharge/recharge?cardNumber=" + rechargeNo
       });
     };
-    const checkToken = () => {
-      const token = common_config.getToken();
-      return !!token;
-    };
     const code = common_vendor.ref("");
     const getCode = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        try {
-          const res = yield common_vendor.index.login(new common_vendor.UTSJSONObject({ provider: "weixin" }));
-          code.value = res.code;
-          const loginRes = yield api_http.login(new common_vendor.UTSJSONObject({
-            isLogin: "1",
-            xcxCode: code.value
+        return new Promise((resolve) => {
+          common_vendor.index.login(new common_vendor.UTSJSONObject({
+            provider: "weixin",
+            success: (res) => {
+              code.value = res.code;
+              api_http.login(new common_vendor.UTSJSONObject({
+                isLogin: "1",
+                xcxCode: code.value
+              })).then((loginRes) => {
+                if (loginRes.code == 200) {
+                  common_config.setToken(loginRes.data.access_token, loginRes.data.refreshToken);
+                  resolve(true);
+                } else {
+                  resolve(false);
+                }
+              }).catch(() => {
+                resolve(false);
+              });
+            },
+            fail: (err) => {
+              common_vendor.index.__f__("error", "at pages/card/card.uvue:227", "登录失败:", err);
+              resolve(false);
+            }
           }));
-          if (loginRes.code == 200) {
-            common_config.setToken(loginRes.data.access_token, loginRes.data.refreshToken);
-            return true;
-          }
-          return false;
-        } catch (err) {
-          common_vendor.index.__f__("error", "at pages/card/card.uvue:231", "登录失败:", err);
-          return false;
-        }
+        });
       });
     };
     const wxGetPhoneLogin = common_vendor.ref("");
@@ -217,7 +212,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
             const loginSuccess = yield getCode();
             if (!loginSuccess) {
-              common_vendor.index.__f__("log", "at pages/card/card.uvue:276", "登录失败，跳过数据加载");
+              common_vendor.index.__f__("log", "at pages/card/card.uvue:274", "登录失败，跳过数据加载");
               common_vendor.index.showToast({
                 title: "登录失败，请重试",
                 icon: "none"
@@ -228,6 +223,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
         yield loadCardData();
       });
+    };
+    const handleClick = (e) => {
+      if (common_config.isWechat()) {
+        if (!checkToken())
+          return null;
+      }
+      if (e.index != null) {
+        current.value = e.index;
+        getCardList(current.value.toString()).then((list) => {
+          cardList.value = list;
+        });
+      }
     };
     common_vendor.onLoad(() => {
       common_vendor.index.$on("scanResult", onScanResult);
@@ -305,8 +312,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: common_vendor.t(card.statusStr || "未知"),
             g: common_vendor.n(getStatusClass(card.statusStr))
           } : {}, {
-            h: card.usedFlow || card.totalFlow
-          }, card.usedFlow || card.totalFlow ? {
+            h: card.usedFlow || card.pkgFlow
+          }, card.usedFlow || card.pkgFlow ? {
             i: common_vendor.t(getFlowText(card))
           } : {}, {
             j: "a89086b7-5-" + i0,
@@ -340,11 +347,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         o: cardList.value.length === 0
       }, cardList.value.length === 0 ? {} : {}, {
-        p: common_vendor.p({
-          class: "data-v-a89086b7"
-        }),
-        q: `${_ctx.u_s_b_h}px`,
-        r: `${_ctx.u_s_a_i_b}px`
+        p: `${_ctx.u_s_b_h}px`,
+        q: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

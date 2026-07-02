@@ -68,8 +68,43 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return "未知状态";
       }
     };
+    const getOrderList = (status) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const params = new common_vendor.UTSJSONObject({
+            rechargeNo: rechargeNo.value
+          });
+          if (status !== "") {
+            params["status"] = status;
+          }
+          const resp = yield api_http.queryOrderList(params);
+          if (resp.code == 200) {
+            if (resp.rows && Array.isArray(resp.rows)) {
+              orderList.value = resp.rows;
+            } else if (resp.data && Array.isArray(resp.data)) {
+              orderList.value = resp.data;
+            } else {
+              orderList.value = [];
+            }
+          } else {
+            orderList.value = [];
+            common_vendor.index.showToast({
+              title: resp.msg || "获取订单列表失败",
+              icon: "none"
+            });
+          }
+        } catch (error) {
+          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:139", "获取订单列表失败:", error);
+          orderList.value = [];
+          common_vendor.index.showToast({
+            title: "网络错误，请稍后重试",
+            icon: "none"
+          });
+        }
+      });
+    };
     const handleTabClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:115", e);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:150", e);
       const index = e.index;
       current.value = index;
       getOrderList(e.value);
@@ -92,9 +127,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return "";
       }
     };
-    const handleOrderClick = (order) => {
+    const handleOrderClick = (order = null) => {
       common_vendor.index.navigateTo({
-        url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+        url: `/pages/orderDetail/orderDetail?orderNo=${order["id"]}`
       });
     };
     const handleBack = () => {
@@ -102,55 +137,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         delta: 1
       }));
     };
-    const handlePay = (order) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:157", "去支付:", order);
+    const handlePay = (order = null) => {
+      const o = order;
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:193", "去支付:", order);
       if (common_config.isWechat()) {
         common_vendor.index.showToast({
-          title: `支付订单 ${order.id}`,
+          title: `支付订单 ${o["id"]}`,
           icon: "none"
         });
         common_vendor.index.navigateTo({
-          url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+          url: `/pages/orderDetail/orderDetail?orderNo=${o["id"]}`
         });
       }
     };
-    const getOrderList = (status) => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        try {
-          const params = new common_vendor.UTSJSONObject({
-            rechargeNo: rechargeNo.value
-          });
-          if (status !== "") {
-            params.status = status;
-          }
-          const resp = yield api_http.queryOrderList(params);
-          if (resp.code == 200) {
-            if (resp.rows && Array.isArray(resp.rows)) {
-              orderList.value = resp.rows;
-            } else if (resp.data && Array.isArray(resp.data)) {
-              orderList.value = resp.data;
-            } else {
-              orderList.value = [];
-            }
-          } else {
-            orderList.value = [];
-            common_vendor.index.showToast({
-              title: resp.msg || "获取订单列表失败",
-              icon: "none"
-            });
-          }
-        } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:200", "获取订单列表失败:", error);
-          orderList.value = [];
-          common_vendor.index.showToast({
-            title: "网络错误，请稍后重试",
-            icon: "none"
-          });
-        }
-      });
-    };
     common_vendor.onLoad((options) => {
-      rechargeNo.value = options.rechargeNo;
+      rechargeNo.value = options["rechargeNo"];
       getOrderList("");
     });
     return (_ctx, _cache) => {
@@ -165,7 +166,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-a151b594"
         }),
-        c: common_vendor.o(handleTabClick, "f1"),
+        c: common_vendor.o(handleTabClick, "9e"),
         d: common_vendor.o(($event) => {
           return current.value = $event;
         }, "fd"),
@@ -189,7 +190,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return common_vendor.e({
             a: order.pkgName
           }, order.pkgName ? {
-            b: common_vendor.t(order.pkgName || "套餐名称")
+            b: common_vendor.t(order.pkgName)
           } : {}, {
             c: order.status
           }, order.status ? {
@@ -205,21 +206,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           } : {}, {
             f: order.orderNo
           }, order.orderNo ? {
-            g: common_vendor.t(order.orderNo || "-")
+            g: common_vendor.t(order.orderNo)
           } : {}, {
             h: order.cardNo
           }, order.cardNo ? {
-            i: common_vendor.t(order.cardNo || "-")
+            i: common_vendor.t(order.cardNo)
           } : {}, {
             j: order.iccid
           }, order.iccid ? {
-            k: common_vendor.t(order.iccid || "-")
+            k: common_vendor.t(order.iccid)
           } : {}, {
             l: order.createTime
           }, order.createTime ? {
-            m: common_vendor.t(order.createTime || "-")
+            m: common_vendor.t(order.createTime)
           } : {}, {
-            n: common_vendor.t(order.payCurrencyAmount || "0.00"),
+            n: common_vendor.t(order.payCurrencyAmount),
             o: order.status === "0"
           }, order.status === "0" ? {
             p: common_vendor.o(($event) => {

@@ -12,50 +12,50 @@
 		<!-- 卡片详情区域 -->
 		<view class="card-container">
 			<!-- 卡号 -->
-			<view class="info-row" v-if="orderDetail.rechargeNo">
+			<view class="info-row" v-if="d('rechargeNo')">
 				<text class="label">卡号</text>
-				<text class="value">{{orderDetail.rechargeNo}}</text>
+				<text class="value">{{ d('rechargeNo') }}</text>
 			</view>
 			
 			<!-- ICCID -->
-			<view class="info-row" v-if="orderDetail.iccid">
+			<view class="info-row" v-if="d('iccid')">
 				<text class="label">ICCID</text>
-				<text class="value">{{orderDetail.iccid}}</text>
+				<text class="value">{{ d('iccid') }}</text>
 			</view>
 			
 			<!-- 订单编号 -->
-			<view class="info-row" v-if="orderDetail.orderNo">
+			<view class="info-row" v-if="d('orderNo')">
 				<text class="label">订单编号</text>
-				<text class="value">{{orderDetail.orderNo}}</text>
+				<text class="value">{{ d('orderNo') }}</text>
 			</view>
 			
 			<!-- 套餐名称 -->
-			<view class="info-row" v-if="orderDetail.pkgName">
+			<view class="info-row" v-if="d('pkgName')">
 				<text class="label">套餐名称</text>
-				<text class="value">{{orderDetail.pkgName}}</text>
+				<text class="value">{{ d('pkgName') }}</text>
 			</view>
 			
 			<!-- 套餐类型 -->
-			<view class="info-row" v-if="orderDetail.pkgType">
+			<view class="info-row" v-if="d('pkgType')">
 				<text class="label">套餐类型</text>
-				<text class="value">{{orderDetail.pkgType}}</text>
+				<text class="value">{{ d('pkgType') }}</text>
 			</view>
 			
 			<!-- 支付方式 -->
-			<view class="info-row" v-if="isWechat() && orderDetail.payType">
+			<view class="info-row" v-if="ds('payType') != ''">
 				<text class="label">支付方式</text>
-				<text class="value">{{orderDetail.payType}}</text>
+				<text class="value">{{ d('payType') }}</text>
 			</view>
 			
 			<!-- 支付金额 (突出显示) -->
-			<view class="info-row" v-if="orderDetail.payAmount">
+			<view class="info-row" v-if="d('payAmount')">
 				<text class="label">支付金额</text>
-				<text class="value amount">￥{{orderDetail.payAmount}}</text>
+				<text class="value amount">￥{{ d('payAmount') }}</text>
 			</view>
 
-			<view class="info-row" v-if="orderDetail.payTime">
+			<view class="info-row" v-if="d('payTime')">
 				<text class="label">支付时间</text>
-				<text class="value">{{orderDetail.payTime}}</text>
+				<text class="value">{{ d('payTime') }}</text>
 			</view>
 		</view>
 		
@@ -74,7 +74,19 @@
 	const orderId = ref<string>('')
 	const payChannelId = ref<string>('')
 	const orderDetail = ref<any>({})
-	
+
+	/** 模板中安全访问 orderDetail 属性 */
+	function d(key: string): any {
+		const val = (orderDetail.value as UTSJSONObject)[key]
+		return val as any
+	}
+
+	/** 获取 string 类型的属性值 */
+	function ds(key: string): string {
+		const val = (orderDetail.value as UTSJSONObject)[key]
+		return val != null ? (val as string) : ''
+	}
+
 	// 查看订单点击处理
 	const handleViewOrder = () => {
 		uni.redirectTo({
@@ -85,8 +97,9 @@
 	
 	// 返回卡片详情点击处理
 	const handleBackCard = () => {
+		const detail = orderDetail.value as UTSJSONObject
 		uni.reLaunch({
-			url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
+			url: `/pages/cardDetail/cardDetail?cardNumber=${detail['rechargeNo'] as string}`
 		})
 	}
 
@@ -98,10 +111,12 @@
 		}
 	}
 
-	onLoad((options)=>{
+	onLoad((options: UTSJSONObject) => {
 		console.log('orderId:',options)	
-		orderId.value = options.orderId ?? ''
-		payChannelId.value = options.payChannelId ?? ''
+		const oid = options['orderId'] as string
+		orderId.value = oid != null ? oid : ''
+		const pid = options['payChannelId'] as string
+		payChannelId.value = pid != null ? pid : ''
 		getOrderDetail()
 	})
 </script>

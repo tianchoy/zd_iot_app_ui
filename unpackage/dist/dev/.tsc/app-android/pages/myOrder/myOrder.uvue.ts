@@ -61,27 +61,109 @@ const _cache = __ins.renderCache;
 	
 	// 获取状态对应的tab索引
 	const getTabIndexByStatus = (status: string): number => {
-		if (status === '' || status === null || status === undefined) {
+		if (status === '' || status === null) {
 			return 0 // 全部
 		}
-		const tabMap: Record<string, number> = {
-			'0': 1, // 待支付
-			'1': 2, // 已完成
-			'5': 3, // 已退款
-			'2': 4  // 已取消
-		}
-		return tabMap[status] ?? 0
+		const tabMap = new Map<string, number>()
+		tabMap.set('0', 1) // 待支付
+		tabMap.set('1', 2) // 已完成
+		tabMap.set('5', 3) // 已退款
+		tabMap.set('2', 4) // 已取消
+		return tabMap.get(status) ?? 0
 	}
-	
+
+	// 获取订单列表
+	const getOrderList = async (status: string, isSearch: boolean) => {
+		try {
+			const params: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("params", "pages/myOrder/myOrder.uvue", 141, 10),}
+			if (status !== '') {
+				params['status'] = status
+			}
+			// 只有查询操作才传递查询参数
+			if (isSearch && card_number.value.trim()) {
+				params['rechargeNoAndOrderNo'] = card_number.value.trim()
+			}
+			const resp = await queryOrderList(params)
+			if (resp.code == 200) {
+				const rows = resp.rows as OrderListXcxItem[]
+				let data: OrderListXcxItem[] = []
+				if (rows != null && Array.isArray(rows)) {
+					data = rows
+				} else {
+					data = []
+				}
+
+				// 如果是查询操作
+				if (isSearch) {
+					if (data.length === 0) {
+						orderList.value = []
+						uni.showToast({
+							title: '未找到匹配的订单',
+							icon: 'none'
+						})
+						return
+					}
+
+					// 统计各状态的订单数量
+					const statusCount = new Map<string, number>()
+					let firstStatus = ''
+					data.forEach(order => {
+						const statusKey = order.status || ''
+						const count = statusCount.get(statusKey) ?? 0
+						statusCount.set(statusKey, count + 1)
+						if (firstStatus === '') {
+							firstStatus = statusKey
+						}
+					})
+
+					// 直接显示查询结果
+					orderList.value = data
+
+					// 如果只有一种状态，切换到对应的tab
+					if (statusCount.size === 1) {
+						if (firstStatus !== '') {
+							const targetIndex = getTabIndexByStatus(firstStatus)
+							current.value = targetIndex
+						} else {
+							current.value = 0
+						}
+					} else {
+						// 多种状态，显示在"全部"
+						current.value = 0
+					}
+				} else {
+					// 非查询操作，直接显示数据
+					orderList.value = data
+				}
+			} else {
+				orderList.value = []
+				uni.showToast({
+					title: resp.msg || '获取订单列表失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('获取订单列表失败:', error, " at pages/myOrder/myOrder.uvue:209")
+			orderList.value = []
+			uni.showToast({
+				title: '网络错误，请稍后重试',
+				icon: 'none'
+			})
+		}
+	}
+
 	// 处理Tab切换
 	const handleTabClick = (e: UTSJSONObject) => {
-		console.log(e, " at pages/myOrder/myOrder.uvue:141")
+		console.log(e, " at pages/myOrder/myOrder.uvue:220")
 		const index = e.index as number
 		current.value = index
 		// 切换标签时重置查询状态和搜索框
 		isSearching.value = false
 		card_number.value = ''
-		getOrderList(e.value, false)
+		const status = e.value as string
+		if (status != null) {
+			getOrderList(status, false)
+		}
 	}
 	
 	// 获取状态样式类
@@ -106,7 +188,7 @@ const _cache = __ins.renderCache;
 	
 	// 处理订单点击
 	const handleOrderClick = (order: OrderListXcxItem) => {
-		console.log(order, " at pages/myOrder/myOrder.uvue:172")
+		console.log(order, " at pages/myOrder/myOrder.uvue:254")
 		uni.navigateTo({
 			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
 		})
@@ -143,7 +225,7 @@ const _cache = __ins.renderCache;
 	// 接收扫码结果
 	const onScanResult = async (data: UTSJSONObject) => {
 		const result = data.getString('result') ?? ''
-		console.log(result, " at pages/myOrder/myOrder.uvue:209")
+		console.log(result, " at pages/myOrder/myOrder.uvue:291")
 		if (result.length > 0) {
 			card_number.value = result
 			uni.showToast({
@@ -170,86 +252,6 @@ const _cache = __ins.renderCache;
 		if(isH5()){
 			uni.showToast({
 				title: `支付订单 ${order.orderNo}`,
-				icon: 'none'
-			})
-		}
-	}
-	
-	// 获取订单列表
-	const getOrderList = async (status: string, isSearch: boolean) => {
-		try {
-			const params: any = {}
-			if (status !== '') {
-				params.status = status
-			}
-			// 只有查询操作才传递查询参数
-			if (isSearch && card_number.value.trim()) {
-				params.rechargeNoAndOrderNo = card_number.value.trim()
-			}
-			const resp = await queryOrderList(params)
-			if (resp.code == 200) {
-				let data: OrderListXcxItem[] = []
-				if (resp.rows && Array.isArray(resp.rows)) {
-					data = resp.rows
-				} else if (resp.data && Array.isArray(resp.data)) {
-					data = resp.data
-				} else {
-					data = []
-				}
-				
-				// 如果是查询操作
-				if (isSearch) {
-					if (data.length === 0) {
-						orderList.value = []
-						uni.showToast({
-							title: '未找到匹配的订单',
-							icon: 'none'
-						})
-						return
-					}
-					
-					// 统计各状态的订单数量
-					const statusCount: Record<string, number> = {}
-					data.forEach(order => {
-						const statusKey = order.status || ''
-						statusCount[statusKey] = (statusCount[statusKey] || 0) + 1
-					})
-					
-					// 获取不同的状态种类数
-					const statusKeys = Object.keys(statusCount)
-					
-					// 直接显示查询结果
-					orderList.value = data
-					
-					// 如果只有一种状态，切换到对应的tab
-					if (statusKeys.length === 1) {
-						const targetStatus = statusKeys[0]
-						if (targetStatus !== '') {
-							const targetIndex = getTabIndexByStatus(targetStatus)
-							current.value = targetIndex
-						} else {
-							current.value = 0
-						}
-					} else {
-						// 多种状态，显示在"全部"
-						current.value = 0
-					}
-				} else {
-					// 非查询操作，直接显示数据
-					orderList.value = data
-				}
-			} else {
-				orderList.value = []
-				uni.showToast({
-					title: resp.msg || '获取订单列表失败',
-					icon: 'none'
-				})
-			}
-		} catch (error) {
-			console.error('获取订单列表失败:', error, " at pages/myOrder/myOrder.uvue:312")
-			orderList.value = []
-			uni.showToast({
-				title: '网络错误，请稍后重试',
 				icon: 'none'
 			})
 		}

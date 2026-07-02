@@ -14,19 +14,34 @@ const _easycom_rice_tag = () => "../../uni_modules/rice-ui/components/rice-tag/r
 if (!Math) {
   (_easycom_topNavBar + _easycom_rice_tabs + _easycom_rice_tag)();
 }
+class PackageTab extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          name: { type: "Unknown", optional: false },
+          value: { type: String, optional: false }
+        };
+      },
+      name: "PackageTab"
+    };
+  }
+  constructor(options, metadata = PackageTab.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.name = this.__props__.name;
+    this.value = this.__props__.value;
+    delete this.__props__;
+  }
+}
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "myPkg",
   setup(__props) {
     const card_number = common_vendor.ref("");
-    const pkgTabs = common_vendor.ref([{ name: "全部", value: "" }, { name: "在用套餐", value: "1" }, { name: "待生效", value: "0" }, { name: "已失效", value: "2" }]);
+    const pkgTabs = common_vendor.ref([new PackageTab({ name: "全部", value: "" }), new PackageTab({ name: "在用套餐", value: "1" }), new PackageTab({ name: "待生效", value: "0" }), new PackageTab({ name: "已失效", value: "2" })]);
     const current = common_vendor.ref(0);
     const pkgInfoList = common_vendor.ref([]);
-    const handleClick = (e) => {
-      if (e.index != null) {
-        current.value = e.index;
-        getPkgInfoList(e.value.toString());
-      }
-    };
     const getPkgInfoList = (state) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         try {
@@ -35,44 +50,49 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             status: state
           }));
           if (res.code == 200) {
-            if (res.rows && Array.isArray(res.rows)) {
-              pkgInfoList.value = res.rows;
-            } else if (res.data && Array.isArray(res.data)) {
-              pkgInfoList.value = res.data;
+            const rows = res.rows;
+            if (rows != null && Array.isArray(rows)) {
+              pkgInfoList.value = rows;
             } else {
               pkgInfoList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:126", "查询套餐列表失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:107", "查询套餐列表失败:", res.msg);
             pkgInfoList.value = [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/myPkg/myPkg.uvue:130", "查询套餐列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/myPkg/myPkg.uvue:111", "查询套餐列表异常:", error);
           pkgInfoList.value = [];
         }
       });
     };
-    const handlePkgDetail = (item = null) => {
-      common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:137", item);
+    const handleClick = (e) => {
+      if (e.index != null) {
+        current.value = e.index;
+        getPkgInfoList(e.value.toString());
+      }
+    };
+    const handlePkgDetail = (item) => {
+      common_vendor.index.__f__("log", "at pages/myPkg/myPkg.uvue:126", item);
       common_vendor.index.navigateTo({
         url: "/pages/pkgDetail/pkgDetail?pkgId=" + item.id
       });
     };
     const getPackageStatusText = (status) => {
-      const statusMap = {
-        "0": "未生效",
-        "1": "生效中",
-        "2": "已失效"
-      };
-      return statusMap[status] || status || "未知";
+      var _a, _b;
+      const statusMap = /* @__PURE__ */ new Map();
+      statusMap.set("0", "未生效");
+      statusMap.set("1", "生效中");
+      statusMap.set("2", "已失效");
+      return (_b = (_a = common_vendor.UTS.mapGet(statusMap, status)) !== null && _a !== void 0 ? _a : status) !== null && _b !== void 0 ? _b : "未知";
     };
     const getPackageStatusType = (status) => {
-      const typeMap = {
-        "0": "success",
-        "1": "primary",
-        "2": "error"
-      };
-      return typeMap[status] || "primary";
+      var _a;
+      const typeMap = /* @__PURE__ */ new Map();
+      typeMap.set("0", "success");
+      typeMap.set("1", "primary");
+      typeMap.set("2", "error");
+      return (_a = common_vendor.UTS.mapGet(typeMap, status)) !== null && _a !== void 0 ? _a : "primary";
     };
     const goBack = () => {
       common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -119,9 +139,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, pkgInfoList.value.length == 0 ? {} : {}, {
         h: common_vendor.f(pkgInfoList.value, (item, index, i0) => {
           return common_vendor.e({
-            a: item.pkgName
-          }, item.pkgName ? {
-            b: common_vendor.t(item.pkgName)
+            a: item.name
+          }, item.name ? {
+            b: common_vendor.t(item.name)
           } : {}, {
             c: item.status
           }, item.status ? {
@@ -135,25 +155,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               class: "data-v-8137f92d"
             })
           } : {}, {
-            f: item.effectiveTime
-          }, item.effectiveTime ? {
-            g: common_vendor.t(item.effectiveTime)
+            f: item.startTime
+          }, item.startTime ? {
+            g: common_vendor.t(item.startTime)
           } : {}, {
-            h: item.expirationTime
-          }, item.expirationTime ? {
-            i: common_vendor.t(item.expirationTime)
+            h: item.endTime
+          }, item.endTime ? {
+            i: common_vendor.t(item.endTime)
           } : {}, {
-            j: item.unUsedFlow
-          }, item.unUsedFlow ? {
-            k: common_vendor.t(item.unUsedFlow)
+            j: item.leftFlow
+          }, item.leftFlow ? {
+            k: common_vendor.t(item.leftFlow)
           } : {}, {
             l: item.usedFlow
           }, item.usedFlow ? {
             m: common_vendor.t(item.usedFlow)
           } : {}, {
-            n: item.pkgFlow
-          }, item.pkgFlow ? {
-            o: common_vendor.t(item.pkgFlow)
+            n: item.totalFlow
+          }, item.totalFlow ? {
+            o: common_vendor.t(item.totalFlow)
           } : {}, {
             p: index,
             q: common_vendor.o(($event) => {

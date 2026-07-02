@@ -7,26 +7,26 @@
 		<view class="card-box">
 			<!-- 头部：套餐名称和状态 -->
 			<view class="card-header">
-				<text class="package-name" v-if="pkgInfo.pkgName">{{ pkgInfo.pkgName }}</text>
-				<rice-tag v-if="pkgInfo.status" :text="pkgInfo.status" :round="true" plain-fill size="small" type="success"></rice-tag>
+				<text class="package-name" v-if="d('pkgName')">{{ d('pkgName') }}</text>
+				<rice-tag v-if="d('status')" :text="d('status')" :round="true" plain-fill size="small" type="success"></rice-tag>
 			</view>
 
 			<!-- 卡号 -->
-			<view class="card-number" v-if="pkgInfo.rechargeNo">
+			<view class="card-number" v-if="d('rechargeNo')">
 				<text class="number-label">当前卡号：</text>
-				<text class="number-value">{{ pkgInfo.rechargeNo }}</text>
+				<text class="number-value">{{ d('rechargeNo') }}</text>
 			</view>
 
 			<!-- 流量使用进度 -->
-			<view class="traffic-section" v-if="pkgInfo.usedFlow && pkgInfo.unUsedFlow">
+			<view class="traffic-section" v-if="d('usedFlow') != null && d('unUsedFlow') != null">
 				<view class="traffic-text">
 					<view class="traffic-header">
 						<text class="traffic-title">流量使用</text>
 					</view>
 					<view class="traffic-progress">
-						<text class="used-text">已用{{ pkgInfo.usedFlow }} GB</text>
+						<text class="used-text">已用{{ d('usedFlow') }} GB</text>
 						<text class="divider">/</text>
-						<text class="total-text">剩余{{ pkgInfo.unUsedFlow }} GB</text>
+						<text class="total-text">剩余{{ d('unUsedFlow') }} GB</text>
 					</view>
 				</view>
 
@@ -37,21 +37,21 @@
 
 			<!-- 套餐信息 -->
 			<view class="info-grid">
-				<view class="info-item" v-if="pkgInfo.pkgFlow">
+				<view class="info-item" v-if="d('pkgFlow')">
 					<text class="info-label">套餐流量</text>
-					<text class="info-value">{{ pkgInfo.pkgFlow }} GB</text>
+					<text class="info-value">{{ d('pkgFlow') }} GB</text>
 				</view>
-				<view class="info-item" v-if="pkgInfo.startDate">
+				<view class="info-item" v-if="d('startDate')">
 					<text class="info-label">生效时间</text>
-					<text class="info-value">{{ pkgInfo.startDate }}</text>
+					<text class="info-value">{{ d('startDate') }}</text>
 				</view>
-				<view class="info-item" v-if="pkgInfo.validityPeriod">
+				<view class="info-item" v-if="d('validityPeriod')">
 					<text class="info-label">有效期</text>
-					<text class="info-value">{{ pkgInfo.validityPeriod }}{{ pkgInfo?.pkgType == '1' ? '天' : '个月' }}</text>
+					<text class="info-value">{{ d('validityPeriod') }}{{ d('pkgType') == '1' ? '天' : '个月' }}</text>
 				</view>
-				<view class="info-item" v-if="pkgInfo.endDate">
+				<view class="info-item" v-if="d('endDate')">
 					<text class="info-label">到期时间</text>
-					<text class="info-value">{{ pkgInfo.endDate }}</text>
+					<text class="info-value">{{ d('endDate') }}</text>
 				</view>
 			</view>
 		</view>
@@ -62,21 +62,21 @@
 				<text class="order-title-text">关联订单信息</text>
 			</view>
 			<view class="order-detail">
-				<view class="order-row" v-if="pkgInfo.orderNo">
+				<view class="order-row" v-if="d('orderNo')">
 					<text class="order-label">关联订单号</text>
-					<text class="order-value">{{ pkgInfo.orderNo }}</text>
+					<text class="order-value">{{ d('orderNo') }}</text>
 				</view>
-				<view class="order-row" v-if="pkgInfo.orderStatus">
+				<view class="order-row" v-if="d('orderStatus')">
 					<text class="order-label">订单状态</text>
-					<text class="order-value status-completed">{{ pkgInfo.orderStatus }}</text>
+					<text class="order-value status-completed">{{ d('orderStatus') }}</text>
 				</view>
-				<view class="order-row" v-if="pkgInfo.payAmount">
+				<view class="order-row" v-if="d('payAmount')">
 					<text class="order-label">支付金额</text>
-					<text class="order-value price">￥{{ pkgInfo.payAmount }}</text>
+					<text class="order-value price">￥{{ d('payAmount') }}</text>
 				</view>
-				<view class="order-row" v-if="pkgInfo.orderCreateTime">
+				<view class="order-row" v-if="d('orderCreateTime')">
 					<text class="order-label">下单时间</text>
-					<text class="order-value">{{ pkgInfo.orderCreateTime }}</text>
+					<text class="order-value">{{ d('orderCreateTime') }}</text>
 				</view>
 			</view>
 		</view>
@@ -92,11 +92,20 @@
 	// 查询套餐信息详情
 	const pkgInfo = ref<any>({});
 
+	/** 模板中安全访问 pkgInfo 属性 */
+	function d(key: string): any {
+		const val = (pkgInfo.value as UTSJSONObject)[key]
+		return val as any
+	}
+
 	const flowPercentage = computed(() => {
 		if (!pkgInfo.value) return 0
 		
-		const usedFlow = Number(pkgInfo.value.usedFlow) || 0
-		const pkgFlow = Number(pkgInfo.value.pkgFlow) || 0
+		const info = pkgInfo.value as UTSJSONObject
+		const usedFlowStr = info['usedFlow'] as string
+		const pkgFlowStr = info['pkgFlow'] as string
+		const usedFlow = usedFlowStr != null && usedFlowStr != '' ? Number.parseInt(usedFlowStr) : 0
+		const pkgFlow = pkgFlowStr != null && pkgFlowStr != '' ? Number.parseInt(pkgFlowStr) : 0
 		
 		if (pkgFlow <= 0) return 0
 		
@@ -132,9 +141,10 @@
 		uni.navigateBack()
 	}
 
-	onLoad((options)=>{
+	onLoad((options: UTSJSONObject) => {
 		console.log('pkgDetail onLoad',options)
-		pkgId.value = options.pkgId ?? ''
+		const pid = options['pkgId'] as string
+		pkgId.value = pid != null ? pid : ''
 		initPkgInfo()
 	})
 </script>

@@ -12,12 +12,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "customService",
   emits: ["connect_service"],
   setup(__props, _a) {
-    _a.emit;
+    var __emit = _a.emit;
+    const emit = __emit;
     const handleClick = (e = null) => {
-      common_vendor.index.showToast({
-        title: "连接客服",
-        icon: "none"
-      });
+      emit("connect_service");
     };
     return (_ctx, _cache) => {
       "raw js";
@@ -30,7 +28,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           width: "80rpx",
           height: "80rpx",
           ["icon-size"]: "50rpx",
-          ["gap-bottom"]: "200rpx",
+          ["gap-bottom"]: "300rpx",
           ["gap-right"]: "20rpx",
           id: common_vendor.gei(_ctx, "")
         }),

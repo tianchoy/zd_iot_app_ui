@@ -12,8 +12,12 @@
 					<text class="label">当前套餐</text>
 					<text class="value">{{ cardDetail?.pkgName || '未知' }}</text>
 				</view>
+				<view class="info-item">
+					<text class="label">有效期</text>
+					<text class="value">{{ cardDetail?.effectiveTime }}~{{ cardDetail?.expirationTime}}</text>
+				</view>
 			</view>
-			<view class="flow-box">
+			<view class="flow-box" v-if="cardDetail?.pkgFlow">
 				<view class="flow-label">
 					<text class="label">流量信息</text>
 					<text class="value">已用 {{ cardDetail?.usedFlow || 0 }}GB / 剩余 {{ cardDetail?.unUsedFlow || 0 }}GB / 总流量 {{ cardDetail?.pkgFlow || 0 }}GB</text>
@@ -120,12 +124,48 @@
 		/>
 	</rice-popup>
 	<view class="bottom-box" v-if="packageList.length > 0 || refillList.length > 0">
-		<view class="price-box">
-			<text class="price-label">当前套餐金额</text>
-			<text class="price-value">¥{{ currentPrice }}</text>
+		<view class="tips" v-if="showTips && cardDetail?.objectMap?.rechargeTip">
+			<text class="tips-text">{{ cardDetail?.objectMap.rechargeTip }}</text>
+			<view class="tips-close" @click="closeTips">
+				<rice-icon name="clear" :color="'#cbd5e1'" size="35rpx" />
+			</view>
+			<view class="tips-arrow"></view>
 		</view>
-		<rice-button type="primary" width="300rpx" height="110rpx" @click="choosePayment" class="btn">去支付</rice-button>
+		<view class="pay-content">
+			<view class="price-box">
+				<text class="price-label">当前套餐金额</text>
+				<text class="price-value">¥{{ currentPrice }}</text>
+			</view>
+			<rice-button type="primary" width="300rpx" height="110rpx" @click="choosePayment" class="btn">去支付</rice-button>
+		</view>
 	</view>
+
+	<customService @connect_service="handleConnectService"></customService>
+	<rice-popup v-model:show="showCustomService" position="bottom">
+		<view class="popup-center">
+			<view class="cs-list" v-if="cardDetail?.objectMap?.serviceQrcode">
+				<view class="label">
+					<text class="cs-label-desc">微信：</text>
+					<text class="cs-label-desc">请添加客服为您服务</text>
+				</view>
+				<view class="value">
+					<image :src="cardDetail?.objectMap?.serviceQrcode" show-menu-by-longpress mode="aspectFill" class="qrcode">
+					</image>
+				</view>
+			</view>
+			<view v-if="phoneList">
+				<view class="cs-list" v-for="(phone, index) in phoneList" :key="index">
+					<view class="label">
+						<text class="cs-label-desc">客服电话：</text>
+						<text>{{ phone }}</text>
+					</view>
+					<view class="value">
+						<rice-button type="primary" icon="phone-call" text="拨打电话" shape="round" size="small" @click="callPhone(phone)"></rice-button>
+					</view>
+				</view>
+			</view>
+		</view>
+	</rice-popup>
 </template>
 
 <script setup lang="uts">
@@ -134,6 +174,21 @@
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
 	import { config , isWechat,isH5} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
+	defineOptions({
+		inheritAttrs: false
+	})
+	const showTips = ref<boolean>(true);
+	const showCustomService = ref<boolean>(false);
+
+	const closeTips = () => {
+		showTips.value = false;
+	}
+
+	const handleConnectService = () => {
+		setTimeout(() => {
+			showCustomService.value = true;
+		}, 100);
+	}
 	
 	const showPopup = ref<boolean>(false);
 	// 添加标记：是否正在支付流程中
@@ -141,18 +196,24 @@
 	// 是否显示返回按钮
 	const showBack = ref<boolean>(true);
 	
+	/** 卡详情 */
+	const cardDetail = ref<RechargeData | null>(null)
+
 	// 计算流量使用百分比
 	const percentage = computed<number>((): number => {
-		const usedFlow = cardDetail.value?.usedPeriod;
-		const totalFlow = cardDetail.value?.pkgFlow;
+		const detail = cardDetail.value
+		if (detail == null) return 0
+		
+		const usedFlow = detail.usedPeriod
+		const totalFlow = detail.pkgFlow
 		
 		// 如果没有数据，返回0
-		if (!usedFlow || !totalFlow) {
+		if (usedFlow == null || totalFlow == null) {
 			return 0;
 		}
 		
-		const used = parseFloat(usedFlow);
-		const total = parseFloat(totalFlow);
+		const used = Number.parseFloat(usedFlow);
+		const total = Number.parseFloat(totalFlow);
 		
 		// 避免除以0
 		if (total === 0) {
@@ -169,12 +230,12 @@
 	});
 	
 	const active = ref<number>(0);
-	const tabs = ref<Array<{name: string}>>([
+	const tabs = ref<any[]>([
 		{
 			name: '套餐包'
 		},
 		{
-			name: '加油包',
+			name: '加油包'
 		}
 	]);
 	
@@ -233,14 +294,17 @@
 	};
 
 	const getOrderStatusType = (status: string): string => {
-		const typeMap: Record<string, string> = {
-			'在用': 'success',
-			'停机': 'error',
-		}
-		return typeMap[status] || 'warning'
+		const typeMap = new Map<string, string>()
+		typeMap.set('在用', 'success')
+		typeMap.set('停机', 'error')
+		return typeMap.get(status) ?? 'warning'
 	}
 	
-	const changeTab = (e: {index: number}) => {
+	interface TabEvent {
+		index: number
+	}
+
+	const changeTab = (e: TabEvent) => {
 		active.value = e.index;
 	}
 	
@@ -445,13 +509,11 @@
 			url: '/pages/orderRecord/orderRecord?rechargeNo=' + cardNumber.value
 		})
 	}
-	
-	/** 卡详情 */
-	const cardDetail = ref<RechargeData | null>(null)
-	
+
 	const getCardDetail = async (cardNumber: string,country: string) => {
 		try {
 			const res = await queryCardDetail(cardNumber, country,'0')
+			console.log('获取卡片详情1111:', res)
 			if(res.code == 200){
 				cardDetail.value = res.data as any
 				if (res.data?.pkgXcxVos && res.data.pkgXcxVos.length > 0) {
@@ -466,6 +528,21 @@
 			})
 		}
 	}
+
+	const handleBack = () => {
+		const pages = getCurrentPages();
+		if (pages.length > 1) {
+			showBack.value = true
+		}else{
+			showBack.value = false
+		}
+	}
+
+	const phoneList = computed(() => {
+		const phoneStr = cardDetail.value?.objectMap?.servicePhone || ''
+		return phoneStr ? phoneStr.split(',').map(item => item.trim()) : []
+	})
+	
 	
 	const cardNumber = ref<string>('')
 	const country = ref<string>('')
@@ -476,8 +553,7 @@
 		const countryValue = opt.country
 		const from = opt.from
 		
-		showBack.value = isH5() && from == 'h5Search'
-		
+		handleBack()
 		if (cardNumberValue) {
 			cardNumber.value = cardNumberValue
 			country.value = countryValue ?? ''
@@ -747,24 +823,93 @@
 		left: 0;
 		right: 0;
 		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
-		background: #ffffff;
-		box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
-		.price-box{
+		flex-direction: column;
+		.tips{
+			font-size: 24rpx;
+			background: #ffffff;
+			color: #64748b;
+			border: 1rpx solid #e2e8f0;
+			border-radius: 24rpx;
+			padding: 24rpx;
+			margin: 24rpx;
+			position: relative;
+			overflow: visible;
+			
+			.tips-text {
+				display: block;
+				line-height: 1.6;
+			}
+			
+			.tips-close {
+				position: absolute;
+				right: -5rpx;
+				top: -15rpx;
+				background-color: #fff;
+				border-radius: 50%;
+			}
+			.tips-arrow {
+				position: absolute;
+				bottom: -15rpx;
+				right: 5%;
+				transform: translateX(-50%);
+				width: 0;
+				height: 0;
+				border-left: 16rpx solid transparent;
+				border-right: 16rpx solid transparent;
+				border-top: 16rpx solid #ffffff;
+				filter: drop-shadow(0 2rpx 2rpx rgba(0, 0, 0, 0.1));
+			}
+		}
+		.pay-content{
 			display: flex;
-			flex-direction: column;
-			margin-left: 50rpx;
-			.price-label{
-				font-size: 24rpx;
-				color: #64748b;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			background: #ffffff;
+			box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+			.price-box{
+				display: flex;
+				flex-direction: column;
+				margin-left: 50rpx;
+				.price-label{
+					font-size: 24rpx;
+					color: #64748b;
+				}
+				.price-value{
+					font-weight: bold;
+					color: #ef4444;
+					font-size: 40rpx;
+				}
 			}
-			.price-value{
-				font-weight: bold;
-				color: #ef4444;
-				font-size: 40rpx;
+		}
+	}
+	.popup-center{
+		display: flex;
+		flex-direction: column;
+		padding: 48rpx 24rpx;
+		.cs-list {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+			border-bottom: 1rpx solid #E5E5E5;
+			padding: 20rpx 0;
+
+			.label {
+				display: flex;
+				flex-direction: row;
+				justify-content: flex-start;
+				align-items: center;
+				.cs-label-desc{
+					font-size: 24rpx;
+					color: #64748b;
+				}
 			}
+		}
+
+		.qrcode {
+			width: 150rpx;
+			height: 150rpx;
 		}
 	}
 </style>

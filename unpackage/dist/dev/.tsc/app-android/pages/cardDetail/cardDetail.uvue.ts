@@ -3,15 +3,16 @@ import _easycom_rice_tabs from '@/uni_modules/rice-ui/components/rice-tabs/rice-
 import _easycom_rice_tag from '@/uni_modules/rice-ui/components/rice-tag/rice-tag.uvue'
 import _easycom_rice_divider from '@/uni_modules/rice-ui/components/rice-divider/rice-divider.uvue'
 import _easycom_rice_button from '@/uni_modules/rice-ui/components/rice-button/rice-button.uvue'
-import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderList,userUnBindCard} from '@/api/http'
-	import type {CardDetail,BindCard,OrderListXcxItem,PkgInfoItem} from '@/api/types'
+import { ref, computed } from 'vue'
+	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderList,userUnBindCard} from '@/api/http'
+	import type {BindCard,OrderListXcxItem,PkgInfoItem,RechargeData} from '@/api/types'
 	import {isH5,isWechat} from '@/common/config.uts'
 
-	type CardDetailTabItem = { __$originalPosition?: UTSSourceMapPosition<"CardDetailTabItem", "pages/cardDetail/cardDetail.uvue", 130, 7>;
+	type CardDetailTabItem = { __$originalPosition?: UTSSourceMapPosition<"CardDetailTabItem", "pages/cardDetail/cardDetail.uvue", 131, 7>;
 		name: string
 	}
 
-	type CardDetailTabEvent = { __$originalPosition?: UTSSourceMapPosition<"CardDetailTabEvent", "pages/cardDetail/cardDetail.uvue", 134, 7>;
+	type CardDetailTabEvent = { __$originalPosition?: UTSSourceMapPosition<"CardDetailTabEvent", "pages/cardDetail/cardDetail.uvue", 135, 7>;
 		index: number
 		item: CardDetailTabItem
 		name: string
@@ -31,7 +32,7 @@ const _cache = __ins.renderCache;
 	const statusBarHeight = ref(20)
 	const navBarHeight = ref(44)
 	const fixedTabsHeight = 109
-	const cardDetail = ref<CardDetail>({} as CardDetail)
+	const cardDetail = ref<RechargeData | null>(null)
 	const orderList = ref<OrderListXcxItem[]>([])
 	const pkgInfoList = ref<PkgInfoItem[]>([])
 
@@ -51,57 +52,113 @@ const _cache = __ins.renderCache;
 
 	const current = ref(0)
 
+	// 查询卡详情
+	const getCardDetail = async () => {
+		const res = await queryCardDetail(card_number.value,'','1')
+		console.log(res, " at pages/cardDetail/cardDetail.uvue:170")
+		if(res.code == 200){
+			cardDetail.value = res.data
+		}
+	}
+
+	// 查询订单列表Xcx
+	const getOrderList = async () => {
+		try {
+			const resp = await queryOrderList({
+				rechargeNo: card_number.value,
+			})
+			if (resp.code == 200) {
+				const rows = resp.rows as OrderListXcxItem[]
+				if (rows != null && Array.isArray(rows)) {
+					orderList.value = rows
+				} else {
+					orderList.value = []
+				}
+			} else {
+				console.log('查询订单列表失败:', resp.msg, " at pages/cardDetail/cardDetail.uvue:190")
+				orderList.value = []
+			}
+		} catch (error) {
+			console.error('查询订单列表异常:', error, " at pages/cardDetail/cardDetail.uvue:194")
+			orderList.value = []
+		}
+	}
+
+	/** 查询套餐信息列表 */
+	const getPkgInfoList = async (state: string) => {
+		try {
+			const res = await queryPkgInfoList({
+				rechargeNo: card_number.value,
+				status: state,
+			})
+			if (res.code == 200) {
+				const rows = res.rows as PkgInfoItem[]
+				if (rows != null && Array.isArray(rows)) {
+					pkgInfoList.value = rows
+				} else {
+					pkgInfoList.value = []
+				}
+			} else {
+				console.log('查询套餐列表失败:', res.msg, " at pages/cardDetail/cardDetail.uvue:214")
+				pkgInfoList.value = []
+			}
+		} catch (error) {
+			console.error('查询套餐列表异常:', error, " at pages/cardDetail/cardDetail.uvue:218")
+			pkgInfoList.value = []
+		}
+	}
+
+	// 移到定义之后
+
 	// 获取套餐状态对应的文本
 	const getPackageStatusText = (status: string): string => {
-		const statusMap: Record<string, string> = {
-			'0': '未生效',
-			'1': '生效中',
-			'2': '已失效'
-		}
-		return statusMap[status] || status || '未知'
+		const statusMap = new Map<string, string>()
+		statusMap.set('0', '未生效')
+		statusMap.set('1', '生效中')
+		statusMap.set('2', '已失效')
+		return statusMap.get(status) ?? status ?? '未知'
 	}
 
 	// 获取套餐状态对应的标签类型
 	const getPackageStatusType = (status: string): string => {
-		const typeMap: Record<string, string> = {
-			'0': 'success',
-			'1': 'primary',
-			'2': 'error'
-		}
-		return typeMap[status] || 'primary'
+		const typeMap = new Map<string, string>()
+		typeMap.set('0', 'success')
+		typeMap.set('1', 'primary')
+		typeMap.set('2', 'error')
+		return typeMap.get(status) ?? 'primary'
 	}
 
 	// 获取订单状态对应的文本
 	const getOrderStatusText = (status: string): string => {
-		const statusMap: Record<string, string> = {
-			'0': '待支付',
-			'1': '已完成',
-			'2': '已取消',
-			'3': '支付失败',
-			'4': '部分退款',
-			'5': '全部退款',
-		}
-		return statusMap[status] || status || '未知'
+		const statusMap = new Map<string, string>()
+		statusMap.set('0', '待支付')
+		statusMap.set('1', '已完成')
+		statusMap.set('2', '已取消')
+		statusMap.set('3', '支付失败')
+		statusMap.set('4', '部分退款')
+		statusMap.set('5', '全部退款')
+		return statusMap.get(status) ?? status ?? '未知'
 	}
 
 	// 获取订单状态对应的标签类型
 	const getOrderStatusType = (status: string): string => {
-		const typeMap: Record<string, string> = {
-			'0': 'primary',
-			'1': 'success',
-			'2': 'error',
-			'3': 'danger',
-			'4': 'warning',
-			'5': 'warning',
-		}
-		return typeMap[status] || 'primary'
+		const typeMap = new Map<string, string>()
+		typeMap.set('0', 'primary')
+		typeMap.set('1', 'success')
+		typeMap.set('2', 'error')
+		typeMap.set('3', 'danger')
+		typeMap.set('4', 'warning')
+		typeMap.set('5', 'warning')
+		return typeMap.get(status) ?? 'primary'
 	}
 
 	// 点击卡片信息tab
 	const handleClick = (e: UTSJSONObject) => {
 		if (e.index != null) {
 			current.value = e.index as number
-			getPkgInfoList(e.value.toString())
+			if (e.index == 1) {
+				getPkgInfoList(e.value.toString())
+			}
 		}
 	}
 
@@ -110,12 +167,13 @@ const _cache = __ins.renderCache;
 		active.value = e.index
 		activeName.value = e.name
 
-		const tabActions: Record<number, () => void> = {
-			0: () => getCardDetail(),
-			1: () => getPkgInfoList(),
-			2: () => getOrderList()
+		if (e.index == 0) {
+			getCardDetail()
+		} else if (e.index == 1) {
+			getPkgInfoList('')
+		} else if (e.index == 2) {
+			getOrderList()
 		}
-		tabActions[e.index]?.()
 		current.value = 0
 	}
 
@@ -127,7 +185,7 @@ const _cache = __ins.renderCache;
 
 	// 处理套餐详情点击
 	const handleOrderDetail = (pkgId: string) => {
-		console.log(pkgId, " at pages/cardDetail/cardDetail.uvue:242")
+		console.log(pkgId, " at pages/cardDetail/cardDetail.uvue:300")
 		uni.navigateTo({
 			url: `/pages/orderDetail/orderDetail?orderNo=${pkgId}`
 		})
@@ -139,15 +197,17 @@ const _cache = __ins.renderCache;
 			try {
 				const systemInfo = uni.getSystemInfoSync()
 				statusBarHeight.value = systemInfo.statusBarHeight || 20
-				const menuButtonInfo = uni.getMenuButtonBoundingClientRect()
-				if (menuButtonInfo) {
-					const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height
-					navBarHeight.value = navHeight > 0 ? navHeight : 44
-				}
+
+
+
+
+
+
+
 			} catch (e) {
-				console.error('获取导航栏信息失败', e, " at pages/cardDetail/cardDetail.uvue:260")
+				console.error('获取导航栏信息失败', e, " at pages/cardDetail/cardDetail.uvue:320")
 			}
-		} 
+		}
 		if (isH5()) {
 			// H5 环境
 			statusBarHeight.value = 0
@@ -161,70 +221,13 @@ const _cache = __ins.renderCache;
 		})
 	}
 
-	const getCardDetail = async () => {
-		const res = await queryCardDetail(card_number.value,'','1')
-		console.log(res, " at pages/cardDetail/cardDetail.uvue:278")
-		if(res.code == 200){
-			cardDetail.value = res.data
-		}
-	}
-
-	// 查询订单列表Xcx
-	const getOrderList = async () => {
-		try {
-			const resp = await queryOrderList({
-				rechargeNo: card_number.value,
-			})
-			if (resp.code == 200) {
-				if (resp.rows && Array.isArray(resp.rows)) {
-					orderList.value = resp.rows
-				} else if (resp.data && Array.isArray(resp.data)) {
-					orderList.value = resp.data
-				} else {
-					orderList.value = []
-				}
-			} else {
-				console.log('查询订单列表失败:', resp.msg, " at pages/cardDetail/cardDetail.uvue:299")
-				orderList.value = []
-			}
-		} catch (error) {
-			console.error('查询订单列表异常:', error, " at pages/cardDetail/cardDetail.uvue:303")
-			orderList.value = []
-		}
-	}
-
-	/** 查询套餐信息列表 */
-	const getPkgInfoList = async (state: string) => {
-		try {
-			const res = await queryPkgInfoList({
-				rechargeNo: card_number.value,
-				status: state,
-			})
-			if (res.code == 200) {
-				if (res.rows && Array.isArray(res.rows)) {
-					pkgInfoList.value = res.rows
-				} else if (res.data && Array.isArray(res.data)) {
-					pkgInfoList.value = res.data
-				} else {
-					pkgInfoList.value = []
-				}
-			} else {
-				console.log('查询套餐列表失败:', res.msg, " at pages/cardDetail/cardDetail.uvue:324")
-				pkgInfoList.value = []
-			}
-		} catch (error) {
-			console.error('查询套餐列表异常:', error, " at pages/cardDetail/cardDetail.uvue:328")
-			pkgInfoList.value = []
-		}
-	}
-
 	/** 绑定卡 */
 	const isBinded = ref(false)
 	const handleBindCard = async () => {
 		const res = await userBindCard({
 			rechargeNo: card_number.value
 		})
-		console.log(res, " at pages/cardDetail/cardDetail.uvue:339")
+		console.log(res, " at pages/cardDetail/cardDetail.uvue:342")
 		if(res.code == 200){
 			uni.showToast({
 				title: '绑定成功',
@@ -244,12 +247,10 @@ const _cache = __ins.renderCache;
 		uni.showModal({
 			title: '确认解绑',
 			content: '确定解绑该卡片吗？',
-			success: async (res) => {
+			success: (res) => {
 				if (res.confirm) {
-					try {
-						const result = await userUnBindCard(card_number.value)
-						console.log(result, " at pages/cardDetail/cardDetail.uvue:363")
-						
+					userUnBindCard(card_number.value).then((result) => {
+						console.log(result, " at pages/cardDetail/cardDetail.uvue:365")
 						if (result.code == 200) {
 							uni.showToast({
 								title: '解绑成功',
@@ -265,13 +266,13 @@ const _cache = __ins.renderCache;
 								icon: 'none'
 							})
 						}
-					} catch (error) {
-						console.error('解绑请求失败:', error, " at pages/cardDetail/cardDetail.uvue:381")
+					}).catch((error) => {
+						console.error('解绑请求失败:', error, " at pages/cardDetail/cardDetail.uvue:382")
 						uni.showToast({
 							title: '网络异常，请重试',
 							icon: 'none'
 						})
-					}
+					})
 				}
 			}
 		})
@@ -279,7 +280,7 @@ const _cache = __ins.renderCache;
 
 	// 处理套餐详情点击
 	const handlePkgDetail = (pkgId: string) => {
-		console.log(pkgId, " at pages/cardDetail/cardDetail.uvue:394")
+		console.log(pkgId, " at pages/cardDetail/cardDetail.uvue:395")
 		uni.navigateTo({
 			url: `/pages/pkgDetail/pkgDetail?pkgId=${pkgId}`
 		})
@@ -305,7 +306,7 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
 
   return _cE(Fragment, null, [
     _cV(_component_topNavBar, _uM({
-      title: unref(card_number),
+      title: card_number.value,
       "show-back": true,
       onBack: goBack,
       backgroundColor: "#f4f7fb",
@@ -313,17 +314,17 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
       showCapsule: false
     }), null, 8 /* PROPS */, ["title"]),
     _cE("view", _uM({ class: "page-container" }), [
-      isTrue(unref(cardDetail))
+      isTrue(cardDetail.value)
         ? _cE("view", _uM({ key: 0 }), [
             _cE("view", _uM({
               class: "card-box fixed-tabs",
-              style: _nS(unref(fixedTabsStyle))
+              style: _nS(fixedTabsStyle.value)
             }), [
               _cV(_component_rice_tabs, _uM({
-                modelValue: unref(active),
-                "onUpdate:modelValue": $event => {trySetRefValue(active, $event)},
+                modelValue: active.value,
+                "onUpdate:modelValue": $event => {(active).value = $event},
                 "line-color": "#ffffff",
-                list: unref(tabs),
+                list: tabs.value,
                 "line-width": 0,
                 "item-style": { overflow: 'hidden' },
                 "title-active-color": '#2563eb',
@@ -332,29 +333,29 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
                 "inactive-style": { backgroundColor: '#f3f7fb',border:'1rpx solid #e5edf6',borderRadius:'24rpx' },
                 onChange: changeTab,
                 customStyle: {height:'85rpx',padding:'10rpx',backgroundColor:'#ffffff',border:'1rpx solid #ffffff'}
-              }), null, 8 /* PROPS */, ["modelValue", "list"])
+              }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "list"])
             ], 4 /* STYLE */),
             _cE("view", _uM({ class: "container" }), [
               _cE("view", _uM({ class: "card-box content-card" }), [
                 _cE("view", _uM({ class: "card-content" }), [
-                  _cE("view", _uM({ class: "section-title" }), _tD(unref(activeName)), 1 /* TEXT */),
-                  unref(activeName) == '基本信息'
+                  _cE("view", _uM({ class: "section-title" }), _tD(activeName.value), 1 /* TEXT */),
+                  activeName.value == '基本信息'
                     ? _cE("view", _uM({
                         key: 0,
                         class: "section-content"
                       }), [
                         _cE("view", _uM({ class: "base-info-box" }), [
                           _cE("view", _uM({ class: "base-info" }), [
-                            isTrue(unref(cardDetail).rechargeNo)
+                            isTrue(cardDetail.value?.rechargeNo)
                               ? _cE("view", _uM({
                                   key: 0,
                                   class: "info-item"
                                 }), [
                                   _cE("text", _uM({ class: "info-label" }), "充值号"),
-                                  _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).rechargeNo), 1 /* TEXT */)
+                                  _cE("text", _uM({ class: "info-value" }), _tD(cardDetail.value?.rechargeNo), 1 /* TEXT */)
                                 ])
                               : _cC("v-if", true),
-                            isTrue(unref(cardDetail).statusStr)
+                            isTrue(cardDetail.value?.statusStr)
                               ? _cE("view", _uM({
                                   key: 1,
                                   class: "info-item"
@@ -363,117 +364,117 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
                                   _cV(_component_rice_tag, _uM({
                                     type: "success",
                                     "plain-fill": "",
-                                    text: unref(cardDetail).statusStr,
+                                    text: cardDetail.value?.statusStr,
                                     size: "small"
                                   }), null, 8 /* PROPS */, ["text"])
                                 ])
                               : _cC("v-if", true),
-                            isTrue(unref(cardDetail).pkgName)
+                            isTrue(cardDetail.value?.pkgName)
                               ? _cE("view", _uM({
                                   key: 2,
                                   class: "info-item"
                                 }), [
                                   _cE("text", _uM({ class: "info-label" }), "套餐名称"),
-                                  _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).pkgName), 1 /* TEXT */)
+                                  _cE("text", _uM({ class: "info-value" }), _tD(cardDetail.value?.pkgName), 1 /* TEXT */)
                                 ])
                               : _cC("v-if", true),
-                            isTrue(unref(cardDetail).effectiveTime)
+                            isTrue(cardDetail.value?.effectiveTime)
                               ? _cE("view", _uM({
                                   key: 3,
                                   class: "info-item"
                                 }), [
                                   _cE("text", _uM({ class: "info-label" }), "生效时间"),
-                                  _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).effectiveTime), 1 /* TEXT */)
+                                  _cE("text", _uM({ class: "info-value" }), _tD(cardDetail.value?.effectiveTime), 1 /* TEXT */)
                                 ])
                               : _cC("v-if", true),
-                            isTrue(unref(cardDetail).expirationTime)
+                            isTrue(cardDetail.value?.expirationTime)
                               ? _cE("view", _uM({
                                   key: 4,
                                   class: "info-item"
                                 }), [
                                   _cE("text", _uM({ class: "info-label" }), "到期时间"),
-                                  _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).expirationTime), 1 /* TEXT */)
+                                  _cE("text", _uM({ class: "info-value" }), _tD(cardDetail.value?.expirationTime), 1 /* TEXT */)
                                 ])
                               : _cC("v-if", true),
-                            isTrue(unref(cardDetail).usedPeriod && unref(cardDetail).totalPeriod)
+                            isTrue(cardDetail.value?.usedPeriod && cardDetail.value?.totalPeriod)
                               ? _cE("view", _uM({
                                   key: 5,
                                   class: "info-item"
                                 }), [
                                   _cE("text", _uM({ class: "info-label" }), "周期"),
-                                  _cE("text", _uM({ class: "info-value" }), _tD(unref(cardDetail).usedPeriod) + " / " + _tD(unref(cardDetail).totalPeriod), 1 /* TEXT */)
+                                  _cE("text", _uM({ class: "info-value" }), _tD(cardDetail.value?.usedPeriod) + " / " + _tD(cardDetail.value?.totalPeriod), 1 /* TEXT */)
                                 ])
                               : _cC("v-if", true)
                           ]),
-                          isTrue(unref(cardDetail).pkgFlow)
+                          isTrue(cardDetail.value?.pkgFlow)
                             ? _cV(_component_rice_divider, _uM({
                                 key: 0,
                                 dashed: ""
                               }))
                             : _cC("v-if", true)
                         ]),
-                        isTrue(unref(cardDetail).pkgFlow)
+                        isTrue(cardDetail.value?.pkgFlow)
                           ? _cE("view", _uM({
                               key: 0,
                               class: "section-title"
                             }), "流量使用")
                           : _cC("v-if", true),
-                        isTrue(unref(cardDetail).pkgFlow)
+                        isTrue(cardDetail.value?.pkgFlow)
                           ? _cE("view", _uM({
                               key: 1,
                               class: "data-total"
                             }), [
                               _cE("view", _uM({ class: "total-item" }), [
                                 _cE("text", _uM({ class: "total-label" }), "已用流量:"),
-                                _cE("text", _uM({ class: "total-value" }), _tD(unref(cardDetail).usedFlow != null && unref(cardDetail).usedFlow !== '' ? unref(cardDetail).usedFlow : '0'), 1 /* TEXT */)
+                                _cE("text", _uM({ class: "total-value" }), _tD(cardDetail.value?.usedFlow != null && cardDetail.value?.usedFlow !== '' ? cardDetail.value?.usedFlow : '0'), 1 /* TEXT */)
                               ]),
                               _cE("view", _uM({ class: "total-item" }), [
                                 _cE("text", _uM({ class: "total-label" }), "剩余流量:"),
-                                _cE("text", _uM({ class: "total-value" }), _tD(unref(cardDetail).unUsedFlow != null && unref(cardDetail).unUsedFlow !== '' ? unref(cardDetail).unUsedFlow : '0'), 1 /* TEXT */)
+                                _cE("text", _uM({ class: "total-value" }), _tD(cardDetail.value?.unUsedFlow != null && cardDetail.value?.unUsedFlow !== '' ? cardDetail.value?.unUsedFlow : '0'), 1 /* TEXT */)
                               ]),
                               _cE("view", _uM({ class: "total-item" }), [
                                 _cE("text", _uM({ class: "total-label" }), "总流量:"),
-                                _cE("text", _uM({ class: "total-value" }), _tD(unref(cardDetail).pkgFlow != null && unref(cardDetail).pkgFlow !== '' ? unref(cardDetail).pkgFlow : '0'), 1 /* TEXT */)
+                                _cE("text", _uM({ class: "total-value" }), _tD(cardDetail.value?.pkgFlow != null && cardDetail.value?.pkgFlow !== '' ? cardDetail.value?.pkgFlow : '0'), 1 /* TEXT */)
                               ])
                             ])
                           : _cC("v-if", true)
                       ])
                     : _cC("v-if", true),
-                  unref(activeName) == '卡片套餐'
+                  activeName.value == '卡片套餐'
                     ? _cE("view", _uM({
                         key: 1,
                         class: "section-content"
                       }), [
                         _cV(_component_rice_tabs, _uM({
-                          modelValue: unref(current),
-                          "onUpdate:modelValue": $event => {trySetRefValue(current, $event)},
+                          modelValue: current.value,
+                          "onUpdate:modelValue": $event => {(current).value = $event},
                           "line-color": "#ffffff",
-                          list: unref(pkgTabs),
+                          list: pkgTabs.value,
                           "line-width": 0,
                           "title-active-color": '#2563eb',
                           "title-inactive-color": '#334155',
                           onChange: handleClick,
                           customStyle: {height:'85rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}
-                        }), null, 8 /* PROPS */, ["modelValue", "list"]),
+                        }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue", "list"]),
                         _cE("view", _uM({ class: "card-pkg-box" }), [
-                          unref(pkgInfoList).length == 0
+                          pkgInfoList.value.length == 0
                             ? _cE("view", _uM({
                                 key: 0,
                                 class: "empty-order"
                               }), "暂无套餐记录")
                             : _cC("v-if", true),
-                          _cE(Fragment, null, RenderHelpers.renderList(unref(pkgInfoList), (item, index, __index, _cached): any => {
+                          _cE(Fragment, null, RenderHelpers.renderList(pkgInfoList.value, (item, index, __index, _cached): any => {
                             return _cE("view", _uM({
                               class: "item",
                               key: index,
                               onClick: () => {handlePkgDetail(item.id)}
                             }), [
                               _cE("view", _uM({ class: "item-head" }), [
-                                isTrue(item.pkgName)
+                                isTrue(item.name)
                                   ? _cE("text", _uM({
                                       key: 0,
                                       class: "item-label"
-                                    }), _tD(item.pkgName), 1 /* TEXT */)
+                                    }), _tD(item.name), 1 /* TEXT */)
                                   : _cC("v-if", true),
                                 isTrue(item.status)
                                   ? _cV(_component_rice_tag, _uM({
@@ -486,26 +487,26 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
                                     }), null, 8 /* PROPS */, ["text", "type"])
                                   : _cC("v-if", true)
                               ]),
-                              isTrue(item.effectiveTime)
+                              isTrue(item.startTime)
                                 ? _cE("view", _uM({
                                     key: 0,
                                     class: "item-sub-title"
-                                  }), "生效时间：" + _tD(item.effectiveTime), 1 /* TEXT */)
+                                  }), "生效时间：" + _tD(item.startTime), 1 /* TEXT */)
                                 : _cC("v-if", true),
-                              isTrue(item.expirationTime)
+                              isTrue(item.endTime)
                                 ? _cE("view", _uM({
                                     key: 1,
                                     class: "item-sub-title"
-                                  }), "到期时间：" + _tD(item.expirationTime), 1 /* TEXT */)
+                                  }), "到期时间：" + _tD(item.endTime), 1 /* TEXT */)
                                 : _cC("v-if", true),
                               _cE("view", _uM({ class: "item-data" }), [
-                                isTrue(item.pkgFlow)
+                                isTrue(item.totalFlow)
                                   ? _cE("view", _uM({
                                       key: 0,
                                       class: "item-data-item"
                                     }), [
                                       _cE("text", _uM({ class: "item-data-label" }), "套餐流量"),
-                                      _cE("text", _uM({ class: "item-data-value" }), _tD(item.pkgFlow) + "GB", 1 /* TEXT */)
+                                      _cE("text", _uM({ class: "item-data-value" }), _tD(item.totalFlow) + "GB", 1 /* TEXT */)
                                     ])
                                   : _cC("v-if", true),
                                 isTrue(item.usedFlow)
@@ -517,13 +518,13 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
                                       _cE("text", _uM({ class: "item-data-value" }), _tD(item.usedFlow) + "GB", 1 /* TEXT */)
                                     ])
                                   : _cC("v-if", true),
-                                isTrue(item.unUsedFlow)
+                                isTrue(item.leftFlow)
                                   ? _cE("view", _uM({
                                       key: 2,
                                       class: "item-data-item"
                                     }), [
                                       _cE("text", _uM({ class: "item-data-label" }), "剩余流量"),
-                                      _cE("text", _uM({ class: "item-data-value" }), _tD(item.unUsedFlow) + "GB", 1 /* TEXT */)
+                                      _cE("text", _uM({ class: "item-data-value" }), _tD(item.leftFlow) + "GB", 1 /* TEXT */)
                                     ])
                                   : _cC("v-if", true)
                               ])
@@ -532,12 +533,12 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
                         ])
                       ])
                     : _cC("v-if", true),
-                  unref(activeName) == '卡片订单'
+                  activeName.value == '卡片订单'
                     ? _cE("view", _uM({
                         key: 2,
                         class: "section-content card-order"
                       }), [
-                        unref(orderList).length == 0
+                        orderList.value.length == 0
                           ? _cE("view", _uM({
                               key: 0,
                               class: "empty-order"
@@ -545,11 +546,11 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
                               _cE("view", _uM({ class: "empty-text" }), "暂无订单记录")
                             ])
                           : _cC("v-if", true),
-                        _cE(Fragment, null, RenderHelpers.renderList(unref(orderList), (order, index, __index, _cached): any => {
+                        _cE(Fragment, null, RenderHelpers.renderList(orderList.value, (order, index, __index, _cached): any => {
                           return _cE("view", _uM({
                             class: "item",
-                            key: order.id || index,
-                            onClick: () => {handleOrderDetail(order.id)}
+                            key: index,
+                            onClick: () => {handleOrderDetail(order.id.toString())}
                           }), [
                             _cE("view", _uM({ class: "item-head" }), [
                               _cE("text", _uM({ class: "item-label" }), _tD(order.pkgName || '未知套餐'), 1 /* TEXT */),
@@ -572,7 +573,7 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
                     : _cC("v-if", true)
                 ])
               ]),
-              isTrue(unref(cardDetail).isBind || unref(isBinded))
+              isTrue(cardDetail.value?.isBind || isBinded.value)
                 ? _cV(_component_rice_button, _uM({
                     key: 0,
                     class: "ml-24 mr-24 mt-24 mb-24",
@@ -585,7 +586,7 @@ const _component_rice_button = resolveEasyComponent("rice-button",_easycom_rice_
                 : _cC("v-if", true)
             ]),
             _cE("view", _uM({ class: "fixed-bottom-buttons" }), [
-              isTrue(unref(cardDetail).isBind || unref(isBinded))
+              isTrue(cardDetail.value?.isBind || isBinded.value)
                 ? _cV(_component_rice_button, _uM({
                     key: 0,
                     height: "100rpx",

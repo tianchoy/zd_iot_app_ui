@@ -27,7 +27,7 @@ const current = ref(0)
 const scrollViewHeight = ref(0)
 
 const cardList = ref<RechargeData[]>([])
-const cardCounts = ref<[number, number, number]>([0, 0, 0])
+const cardCounts = ref<number[]>([0, 0, 0])
 
 const tabs = computed<TabItem[]>(() => ([
 	{name: `全部 ${cardCounts.value[0]}`},
@@ -64,18 +64,12 @@ const getCycleText = (card: RechargeData): string => {
 	return `${used} / ${total}`
 }
 
-const handleClick = (e: UTSJSONObject) => {
-	if (isWechat()) {
-		if (!checkToken()) return;
-	}
-
-	if (e.index != null) {
-		current.value = e.index as number
-		getCardList(current.value.toString()).then((list) => {
-			cardList.value = list
-		})
-	}
+const checkToken = (): boolean => {
+	const token = getToken()
+	return !!token
 }
+
+
 
 const scanCode = () => {
 	uni.navigateTo({
@@ -116,22 +110,23 @@ const onScanResult = async (data: UTSJSONObject) => {
 	}
 }
 
-const getCardList = async (state: string) => {
+
+const getCardList = async (state: string): Promise<RechargeData[]> => {
 	try {
 		const res = await queryCardList({
 			status: state,
 			isSort: true
 		})
 		if (res.code == 200) {
-			return Array.isArray(res.data) ? res.data : []
+			return Array.isArray(res.data) ? res.data : [] as RechargeData[]
 		}
-		return []
+		return [] as RechargeData[]
 	} catch (error) {
 		uni.showToast({
 			title: '查询失败，请稍后重试',
 			icon: 'none'
 		})
-		return []
+		return [] as RechargeData[]
 	}
 }
 
@@ -142,32 +137,36 @@ const handleRecharge = (rechargeNo: string) => {
 		})
 }
 
-const checkToken = (): boolean => {
-	const token = getToken()
-	return !!token
-}
+
 
 // 获取 code
 const code = ref<string>('')
 const getCode = async (): Promise<boolean> => {
-	try {
-		const res = await uni.login({ provider: 'weixin' })
-		code.value = res.code
-		
-		const loginRes = await login({
-			isLogin: "1",
-			xcxCode: code.value,
+	return new Promise((resolve) => {
+		uni.login({
+			provider: 'weixin',
+			success: (res) => {
+				code.value = res.code
+				login({
+					isLogin: "1",
+					xcxCode: code.value,
+				}).then((loginRes) => {
+					if (loginRes.code == 200) {
+						setToken(loginRes.data.access_token, loginRes.data.refreshToken)
+						resolve(true)
+					} else {
+						resolve(false)
+					}
+				}).catch(() => {
+					resolve(false)
+				})
+			},
+			fail: (err) => {
+				console.error('登录失败:', err, " at pages/card/card.uvue:228")
+				resolve(false)
+			}
 		})
-		
-		if (loginRes.code == 200) {
-			setToken(loginRes.data.access_token, loginRes.data.refreshToken)
-			return true
-		}
-		return false
-	} catch (err) {
-		console.error('登录失败:', err, " at pages/card/card.uvue:231")
-		return false
-	}
+	})
 }
 
 // 获取租户页面配置
@@ -210,7 +209,7 @@ const platform = async () => {
 			
 			// 登录失败时，不加载数据
 			if (!loginSuccess) {
-				console.log('登录失败，跳过数据加载', " at pages/card/card.uvue:276")
+				console.log('登录失败，跳过数据加载', " at pages/card/card.uvue:275")
 				uni.showToast({
 					title: '登录失败，请重试',
 					icon: 'none'
@@ -222,6 +221,19 @@ const platform = async () => {
 
 	// 2. 登录完成后（或已有token），再请求数据
 	await loadCardData()
+}
+
+const handleClick = (e: UTSJSONObject) => {
+	if (isWechat()) {
+		if (!checkToken()) return;
+	}
+
+	if (e.index != null) {
+		current.value = e.index as number
+		getCardList(current.value.toString()).then((list) => {
+			cardList.value = list
+		})
+	}
 }
 
 onLoad(() => {
@@ -325,7 +337,7 @@ const _component_customService = resolveEasyComponent("customService",_easycom_c
                     }), _tD(card.statusStr || '未知'), 3 /* TEXT, CLASS */)
                   : _cC("v-if", true)
               ]),
-              isTrue(card.usedFlow || card.totalFlow)
+              isTrue(card.usedFlow || card.pkgFlow)
                 ? _cE("view", _uM({
                     key: 0,
                     class: "item-package"

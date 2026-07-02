@@ -10,6 +10,10 @@ import { ref, computed } from 'vue';
 	import { config , isWechat,isH5} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	
+	interface TabEvent {
+		index: number
+	}
+
 	
 const __sfc__ = defineComponent({
   __name: 'recharge',
@@ -24,18 +28,24 @@ const _cache = __ins.renderCache;
 	// 是否显示返回按钮
 	const showBack = ref<boolean>(true);
 	
+	/** 卡详情 */
+	const cardDetail = ref<RechargeData | null>(null)
+
 	// 计算流量使用百分比
 	const percentage = computed<number>((): number => {
-		const usedFlow = cardDetail.value?.usedPeriod;
-		const totalFlow = cardDetail.value?.pkgFlow;
+		const detail = cardDetail.value
+		if (detail == null) return 0
+		
+		const usedFlow = detail.usedPeriod
+		const totalFlow = detail.pkgFlow
 		
 		// 如果没有数据，返回0
-		if (!usedFlow || !totalFlow) {
+		if (usedFlow == null || totalFlow == null) {
 			return 0;
 		}
 		
-		const used = parseFloat(usedFlow);
-		const total = parseFloat(totalFlow);
+		const used = Number.parseFloat(usedFlow);
+		const total = Number.parseFloat(totalFlow);
 		
 		// 避免除以0
 		if (total === 0) {
@@ -52,12 +62,12 @@ const _cache = __ins.renderCache;
 	});
 	
 	const active = ref<number>(0);
-	const tabs = ref<Array<{name: string}>>([
+	const tabs = ref<any[]>([
 		{
 			name: '套餐包'
 		},
 		{
-			name: '加油包',
+			name: '加油包'
 		}
 	]);
 	
@@ -116,14 +126,13 @@ const _cache = __ins.renderCache;
 	};
 
 	const getOrderStatusType = (status: string): string => {
-		const typeMap: Record<string, string> = {
-			'在用': 'success',
-			'停机': 'error',
-		}
-		return typeMap[status] || 'warning'
+		const typeMap = new Map<string, string>()
+		typeMap.set('在用', 'success')
+		typeMap.set('停机', 'error')
+		return typeMap.get(status) ?? 'warning'
 	}
 	
-	const changeTab = (e: {index: number}) => {
+	const changeTab = (e: TabEvent) => {
 		active.value = e.index;
 	}
 	
@@ -180,7 +189,7 @@ const _cache = __ins.renderCache;
 				signType: res.signType,
 
 				success: (res) => {
-					console.log('微信支付成功',res, " at pages/recharge/recharge.uvue:300")
+					console.log('微信支付成功',res, " at pages/recharge/recharge.uvue:309")
 					uni.hideLoading()
 					uni.redirectTo({
 						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
@@ -212,7 +221,7 @@ const _cache = __ins.renderCache;
 					paySign: res.paySign,
 					signType: res.signType,
 					success: function (res) {
-						console.log('通联支付成功',res, " at pages/recharge/recharge.uvue:332")
+						console.log('通联支付成功',res, " at pages/recharge/recharge.uvue:341")
 						uni.hideLoading()
 						uni.redirectTo({
 							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
@@ -235,7 +244,7 @@ const _cache = __ins.renderCache;
 					},
 				});
 			}else{
-				let param = {__$originalPosition: new UTSSourceMapPosition("param", "pages/recharge/recharge.uvue", 355, 9),
+				let param = {__$originalPosition: new UTSSourceMapPosition("param", "pages/recharge/recharge.uvue", 364, 9),
 					cusid: res.cusid,
 					appid: res.appid,
 					orgid: res.orgid,
@@ -255,10 +264,10 @@ const _cache = __ins.renderCache;
 					appId: config.api.auth.appID,
 					extraData: param,
 					success(res) { 
-						console.log('支付成功:', res, " at pages/recharge/recharge.uvue:375");
+						console.log('支付成功:', res, " at pages/recharge/recharge.uvue:384");
 					},
 					fail(res) {
-						console.log('支付失败:', res, " at pages/recharge/recharge.uvue:378");
+						console.log('支付失败:', res, " at pages/recharge/recharge.uvue:387");
 						uni.hideLoading()
 						// 支付失败，重置标记
 						isInPaymentProcess.value = false
@@ -296,7 +305,7 @@ const _cache = __ins.renderCache;
 				})
 			}
 		} catch (error) {
-			console.error('添加订单失败:', error, " at pages/recharge/recharge.uvue:416")
+			console.error('添加订单失败:', error, " at pages/recharge/recharge.uvue:425")
 			uni.hideLoading()
 			uni.showToast({
 				title: '添加订单失败',
@@ -306,7 +315,7 @@ const _cache = __ins.renderCache;
 	}
 	
 	const onPopupClose = () => {
-		console.log('弹窗关闭', " at pages/recharge/recharge.uvue:426");
+		console.log('弹窗关闭', " at pages/recharge/recharge.uvue:435");
 	}
 	
 	const goBack = () => {
@@ -328,10 +337,7 @@ const _cache = __ins.renderCache;
 			url: '/pages/orderRecord/orderRecord?rechargeNo=' + cardNumber.value
 		})
 	}
-	
-	/** 卡详情 */
-	const cardDetail = ref<RechargeData | null>(null)
-	
+
 	const getCardDetail = async (cardNumber: string,country: string) => {
 		try {
 			const res = await queryCardDetail(cardNumber, country,'0')
@@ -342,7 +348,7 @@ const _cache = __ins.renderCache;
 				}
 			}
 		} catch (error) {
-			console.error('获取卡片详情失败:', error, " at pages/recharge/recharge.uvue:462")
+			console.error('获取卡片详情失败:', error, " at pages/recharge/recharge.uvue:468")
 			uni.showToast({
 				title: '获取卡片信息失败',
 				icon: 'none'
@@ -353,7 +359,7 @@ const _cache = __ins.renderCache;
 	const cardNumber = ref<string>('')
 	const country = ref<string>('')
 	onLoad((options: UTSJSONObject) => {
-		console.log('options:', options, " at pages/recharge/recharge.uvue:473")
+		console.log('options:', options, " at pages/recharge/recharge.uvue:479")
 		const opt = options as any
 		const cardNumberValue = opt.cardNumber
 		const countryValue = opt.country
@@ -366,7 +372,7 @@ const _cache = __ins.renderCache;
 			country.value = countryValue ?? ''
 			getCardDetail(cardNumber.value, country.value)
 		} else {
-			console.error('未获取到卡片号码', " at pages/recharge/recharge.uvue:486")
+			console.error('未获取到卡片号码', " at pages/recharge/recharge.uvue:492")
 			uni.showToast({
 				title: '卡片号码不存在',
 				icon: 'none'

@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_http = require("../../api/http.js");
-const common_config = require("../../common/config.js");
+require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   _easycom_topNavBar_1();
@@ -16,30 +16,40 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const orderId = common_vendor.ref("");
     const payChannelId = common_vendor.ref("");
     const orderDetail = common_vendor.ref(new common_vendor.UTSJSONObject({}));
+    function d(key) {
+      const val = orderDetail.value[key];
+      return val;
+    }
+    function ds(key) {
+      const val = orderDetail.value[key];
+      return val != null ? val : "";
+    }
     const handleViewOrder = () => {
       common_vendor.index.redirectTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}&from=paySuccess`
       });
     };
     const handleBackCard = () => {
+      const detail = orderDetail.value;
       common_vendor.index.reLaunch({
-        url: `/pages/cardDetail/cardDetail?cardNumber=${orderDetail.value.rechargeNo}`
+        url: `/pages/cardDetail/cardDetail?cardNumber=${detail["rechargeNo"]}`
       });
     };
     const getOrderDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.queryOrderSuccess(orderId.value, payChannelId.value);
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:96", "订单详情:", res);
+          common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:109", "订单详情:", res);
           orderDetail.value = res.data;
         }
       });
     };
     common_vendor.onLoad((options) => {
-      var _a, _b;
-      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:102", "orderId:", options);
-      orderId.value = (_a = options.orderId) !== null && _a !== void 0 ? _a : "";
-      payChannelId.value = (_b = options.payChannelId) !== null && _b !== void 0 ? _b : "";
+      common_vendor.index.__f__("log", "at pages/paySuccess/paySuccess.uvue:115", "orderId:", options);
+      const oid = options["orderId"];
+      orderId.value = oid != null ? oid : "";
+      const pid = options["payChannelId"];
+      payChannelId.value = pid != null ? pid : "";
       getOrderDetail();
     });
     return (_ctx, _cache) => {
@@ -53,40 +63,40 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-4b5f1e90"
         }),
-        b: common_vendor.unref(orderDetail).rechargeNo
-      }, common_vendor.unref(orderDetail).rechargeNo ? {
-        c: common_vendor.t(common_vendor.unref(orderDetail).rechargeNo)
+        b: d("rechargeNo")
+      }, d("rechargeNo") ? {
+        c: common_vendor.t(d("rechargeNo"))
       } : {}, {
-        d: common_vendor.unref(orderDetail).iccid
-      }, common_vendor.unref(orderDetail).iccid ? {
-        e: common_vendor.t(common_vendor.unref(orderDetail).iccid)
+        d: d("iccid")
+      }, d("iccid") ? {
+        e: common_vendor.t(d("iccid"))
       } : {}, {
-        f: common_vendor.unref(orderDetail).orderNo
-      }, common_vendor.unref(orderDetail).orderNo ? {
-        g: common_vendor.t(common_vendor.unref(orderDetail).orderNo)
+        f: d("orderNo")
+      }, d("orderNo") ? {
+        g: common_vendor.t(d("orderNo"))
       } : {}, {
-        h: common_vendor.unref(orderDetail).pkgName
-      }, common_vendor.unref(orderDetail).pkgName ? {
-        i: common_vendor.t(common_vendor.unref(orderDetail).pkgName)
+        h: d("pkgName")
+      }, d("pkgName") ? {
+        i: common_vendor.t(d("pkgName"))
       } : {}, {
-        j: common_vendor.unref(orderDetail).pkgType
-      }, common_vendor.unref(orderDetail).pkgType ? {
-        k: common_vendor.t(common_vendor.unref(orderDetail).pkgType)
+        j: d("pkgType")
+      }, d("pkgType") ? {
+        k: common_vendor.t(d("pkgType"))
       } : {}, {
-        l: common_vendor.unref(common_config.isWechat)() && common_vendor.unref(orderDetail).payType
-      }, common_vendor.unref(common_config.isWechat)() && common_vendor.unref(orderDetail).payType ? {
-        m: common_vendor.t(common_vendor.unref(orderDetail).payType)
+        l: ds("payType") != ""
+      }, ds("payType") != "" ? {
+        m: common_vendor.t(d("payType"))
       } : {}, {
-        n: common_vendor.unref(orderDetail).payAmount
-      }, common_vendor.unref(orderDetail).payAmount ? {
-        o: common_vendor.t(common_vendor.unref(orderDetail).payAmount)
+        n: d("payAmount")
+      }, d("payAmount") ? {
+        o: common_vendor.t(d("payAmount"))
       } : {}, {
-        p: common_vendor.unref(orderDetail).payTime
-      }, common_vendor.unref(orderDetail).payTime ? {
-        q: common_vendor.t(common_vendor.unref(orderDetail).payTime)
+        p: d("payTime")
+      }, d("payTime") ? {
+        q: common_vendor.t(d("payTime"))
       } : {}, {
-        r: common_vendor.o(handleViewOrder, "bd"),
-        s: common_vendor.o(handleBackCard, "5b"),
+        r: common_vendor.o(handleViewOrder, "7b"),
+        s: common_vendor.o(handleBackCard, "f8"),
         t: `${_ctx.u_s_b_h}px`,
         v: `${_ctx.u_s_a_i_b}px`
       });

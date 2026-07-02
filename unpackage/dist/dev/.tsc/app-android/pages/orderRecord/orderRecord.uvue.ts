@@ -56,82 +56,21 @@ const _cache = __ins.renderCache;
 		}
 	}
 	
-	// 处理Tab切换
-	const handleTabClick = (e: UTSJSONObject) => {
-		console.log(e, " at pages/orderRecord/orderRecord.uvue:115")
-		const index = e.index as number
-		current.value = index
-		getOrderList(e.value)
-	}
-	
-	// 获取状态样式类
-	const getStatusClass = (status: string): string => {
-		switch (status) {
-			case '0':
-				return 'success'
-			case '1':
-				return 'primary'
-			case '2':
-				return 'warning'
-			case '3':
-				return 'error'
-			case '4':
-				return 'error'
-			case '5':
-				return 'error'
-			default:
-				return ''
-		}
-	}
-	
-	// 处理订单点击
-	const handleOrderClick = (order: OrderListXcxItem) => {
-		uni.navigateTo({
-			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
-		})
-	}
-	
-	// 处理返回
-	const handleBack = () => {
-		uni.navigateBack({
-			delta: 1
-		})
-	}
-	
-	// 去支付
-	const handlePay = (order: OrderListXcxItem) => {
-		console.log('去支付:', order, " at pages/orderRecord/orderRecord.uvue:157")
-		if(isWechat()){
-			uni.showToast({
-				title: `支付订单 ${order.id}`,
-				icon: 'none'
-			})
-			uni.navigateTo({
-				url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
-			})
-		}
-		if(isH5()){
-			uni.navigateTo({
-				url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
-			})
-		}
-	}
-	
 	// 获取订单列表
 	const getOrderList = async (status: string) => {
 		try {
-			const params: any = {
+			const params: UTSJSONObject = {__$originalPosition: new UTSSourceMapPosition("params", "pages/orderRecord/orderRecord.uvue", 116, 10),
 				rechargeNo: rechargeNo.value
 			}
 			if (status !== '') {
-				params.status = status
+				params['status'] = status
 			}
 			const resp = await queryOrderList(params)
 			if (resp.code == 200) {
 				if (resp.rows && Array.isArray(resp.rows)) {
-					orderList.value = resp.rows
+					orderList.value = resp.rows as OrderListXcxItem[]
 				} else if (resp.data && Array.isArray(resp.data)) {
-					orderList.value = resp.data
+					orderList.value = resp.data as OrderListXcxItem[]
 				} else {
 					orderList.value = []
 				}
@@ -143,7 +82,7 @@ const _cache = __ins.renderCache;
 				})
 			}
 		} catch (error) {
-			console.error('获取订单列表失败:', error, " at pages/orderRecord/orderRecord.uvue:200")
+			console.error('获取订单列表失败:', error, " at pages/orderRecord/orderRecord.uvue:139")
 			orderList.value = []
 			uni.showToast({
 				title: '网络错误，请稍后重试',
@@ -151,9 +90,71 @@ const _cache = __ins.renderCache;
 			})
 		}
 	}
-	
+
+	// 处理Tab切换
+	const handleTabClick = (e: UTSJSONObject) => {
+	 console.log(e, " at pages/orderRecord/orderRecord.uvue:150")
+	 const index = e.index as number
+	 current.value = index
+	 getOrderList(e.value as string)
+	}
+
+	// 获取状态样式类
+	const getStatusClass = (status: string): string => {
+	 switch (status) {
+	  case '0':
+	   return 'success'
+	  case '1':
+	   return 'primary'
+	  case '2':
+	   return 'warning'
+	  case '3':
+	   return 'error'
+	  case '4':
+	   return 'error'
+	  case '5':
+	   return 'error'
+	  default:
+	   return ''
+	 }
+	}
+
+	// 处理订单点击
+	const handleOrderClick = (order: any) => {
+	 uni.navigateTo({
+	  url: `/pages/orderDetail/orderDetail?orderNo=${(order as UTSJSONObject)['id']}`
+	 })
+	}
+
+	// 处理返回
+	const handleBack = () => {
+	 uni.navigateBack({
+	  delta: 1
+	 })
+	}
+
+	// 去支付
+	const handlePay = (order: any) => {
+	 const o = order as UTSJSONObject
+	 console.log('去支付:', order, " at pages/orderRecord/orderRecord.uvue:193")
+	 if(isWechat()){
+	  uni.showToast({
+	   title: `支付订单 ${o['id']}`,
+	   icon: 'none'
+	  })
+	  uni.navigateTo({
+	   url: `/pages/orderDetail/orderDetail?orderNo=${o['id']}`
+	  })
+	 }
+	 if(isH5()){
+	  uni.navigateTo({
+	   url: `/pages/orderDetail/orderDetail?orderNo=${o['id']}`
+	  })
+	 }
+	}
+
 	onLoad((options: UTSJSONObject) => {
-		rechargeNo.value = options.rechargeNo
+		rechargeNo.value = options['rechargeNo'] as string
 		getOrderList('')
 	})
 
@@ -215,12 +216,12 @@ const _component_rice_tag = resolveEasyComponent("rice-tag",_easycom_rice_tag)
                       ? _cE("text", _uM({
                           key: 0,
                           class: "package-name"
-                        }), _tD(order.pkgName || '套餐名称'), 1 /* TEXT */)
+                        }), _tD(order.pkgName), 1 /* TEXT */)
                       : _cC("v-if", true),
                     isTrue(order.status)
                       ? _cV(_component_rice_tag, _uM({
                           key: 1,
-                          text: getStatusText(order.status) ,
+                          text: getStatusText(order.status),
                           round: true,
                           "plain-fill": "",
                           size: "small",
@@ -235,7 +236,7 @@ const _component_rice_tag = resolveEasyComponent("rice-tag",_easycom_rice_tag)
                           class: "detail-row"
                         }), [
                           _cE("text", _uM({ class: "detail-label" }), "订单号"),
-                          _cE("text", _uM({ class: "detail-value" }), _tD(order.orderNo || '-'), 1 /* TEXT */)
+                          _cE("text", _uM({ class: "detail-value" }), _tD(order.orderNo), 1 /* TEXT */)
                         ])
                       : _cC("v-if", true),
                     isTrue(order.cardNo)
@@ -244,7 +245,7 @@ const _component_rice_tag = resolveEasyComponent("rice-tag",_easycom_rice_tag)
                           class: "detail-row"
                         }), [
                           _cE("text", _uM({ class: "detail-label" }), "卡号"),
-                          _cE("text", _uM({ class: "detail-value" }), _tD(order.cardNo || '-'), 1 /* TEXT */)
+                          _cE("text", _uM({ class: "detail-value" }), _tD(order.cardNo), 1 /* TEXT */)
                         ])
                       : _cC("v-if", true),
                     isTrue(order.iccid)
@@ -253,7 +254,7 @@ const _component_rice_tag = resolveEasyComponent("rice-tag",_easycom_rice_tag)
                           class: "detail-row"
                         }), [
                           _cE("text", _uM({ class: "detail-label" }), "ICCID"),
-                          _cE("text", _uM({ class: "detail-value" }), _tD(order.iccid || '-'), 1 /* TEXT */)
+                          _cE("text", _uM({ class: "detail-value" }), _tD(order.iccid), 1 /* TEXT */)
                         ])
                       : _cC("v-if", true),
                     _cE("view", _uM({ class: "detail-row last" }), [
@@ -261,10 +262,10 @@ const _component_rice_tag = resolveEasyComponent("rice-tag",_easycom_rice_tag)
                         ? _cE("text", _uM({
                             key: 0,
                             class: "detail-value"
-                          }), _tD(order.createTime || '-'), 1 /* TEXT */)
+                          }), _tD(order.createTime), 1 /* TEXT */)
                         : _cC("v-if", true),
                       _cE("view", _uM({ class: "order-footer" }), [
-                        _cE("text", _uM({ class: "price" }), "¥" + _tD(order.payCurrencyAmount || '0.00'), 1 /* TEXT */),
+                        _cE("text", _uM({ class: "price" }), "¥" + _tD(order.payCurrencyAmount), 1 /* TEXT */),
                         order.status === '0'
                           ? _cE("text", _uM({
                               key: 0,

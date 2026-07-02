@@ -208,7 +208,8 @@ class PkgXcxVo extends common_vendor.UTS.UTSType {
           validityPeriod: { type: String, optional: true },
           pkgFlow: { type: String, optional: true },
           crossedOutPrice: { type: String, optional: false },
-          sellingPrice: { type: String, optional: false }
+          sellingPrice: { type: String, optional: false },
+          objectMap: { type: objectMapType, optional: false }
         };
       },
       name: "PkgXcxVo"
@@ -225,6 +226,30 @@ class PkgXcxVo extends common_vendor.UTS.UTSType {
     this.pkgFlow = this.__props__.pkgFlow;
     this.crossedOutPrice = this.__props__.crossedOutPrice;
     this.sellingPrice = this.__props__.sellingPrice;
+    this.objectMap = this.__props__.objectMap;
+    delete this.__props__;
+  }
+}
+class objectMapType extends common_vendor.UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          rechargeTip: { type: String, optional: false },
+          servicePhone: { type: String, optional: false },
+          serviceQrcode: { type: String, optional: false }
+        };
+      },
+      name: "objectMapType"
+    };
+  }
+  constructor(options, metadata = objectMapType.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.rechargeTip = this.__props__.rechargeTip;
+    this.servicePhone = this.__props__.servicePhone;
+    this.serviceQrcode = this.__props__.serviceQrcode;
     delete this.__props__;
   }
 }
@@ -344,11 +369,13 @@ class PkgInfoItem extends common_vendor.UTS.UTSType {
       kind: 2,
       get fields() {
         return {
+          id: { type: String, optional: false },
           name: { type: String, optional: false },
-          status: { type: "Unknown", optional: false },
+          status: { type: String, optional: false },
           statusText: { type: String, optional: false },
           tagType: { type: String, optional: false },
           startTime: { type: String, optional: false },
+          endTime: { type: String, optional: false },
           totalFlow: { type: String, optional: false },
           usedFlow: { type: String, optional: false },
           leftFlow: { type: String, optional: false }
@@ -360,11 +387,13 @@ class PkgInfoItem extends common_vendor.UTS.UTSType {
   constructor(options, metadata = PkgInfoItem.get$UTSMetadata$(), isJSONParse = false) {
     super();
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.id = this.__props__.id;
     this.name = this.__props__.name;
     this.status = this.__props__.status;
     this.statusText = this.__props__.statusText;
     this.tagType = this.__props__.tagType;
     this.startTime = this.__props__.startTime;
+    this.endTime = this.__props__.endTime;
     this.totalFlow = this.__props__.totalFlow;
     this.usedFlow = this.__props__.usedFlow;
     this.leftFlow = this.__props__.leftFlow;
@@ -423,6 +452,8 @@ class OrderListXcxItem extends common_vendor.UTS.UTSType {
         return {
           id: { type: Number, optional: false },
           orderNo: { type: String, optional: false },
+          cardNo: { type: String, optional: false },
+          iccid: { type: String, optional: true },
           pkgName: { type: String, optional: false },
           createTime: { type: String, optional: false },
           status: { type: String, optional: false },
@@ -437,6 +468,8 @@ class OrderListXcxItem extends common_vendor.UTS.UTSType {
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.id = this.__props__.id;
     this.orderNo = this.__props__.orderNo;
+    this.cardNo = this.__props__.cardNo;
+    this.iccid = this.__props__.iccid;
     this.pkgName = this.__props__.pkgName;
     this.createTime = this.__props__.createTime;
     this.status = this.__props__.status;
@@ -580,7 +613,6 @@ class QueryOrderSuccessParams extends common_vendor.UTS.UTSType {
   }
 }
 exports.BindCard = BindCard;
-exports.CardDetail = CardDetail;
 exports.CardListSumData = CardListSumData;
 exports.PkgInfoListParams = PkgInfoListParams;
 exports.QueryCardListParams = QueryCardListParams;

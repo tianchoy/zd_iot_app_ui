@@ -16,6 +16,7 @@ const ApiUrl = new common_vendor.UTSJSONObject({
   queryOrderList: "/order/pkgOrder/list",
   queryOrderPackInfo: "/order/pkgOrder/getOrderPackInfo/",
   queryPkgInfoList: "/card/pkgInfo/list",
+  addOrderGnH5: "/order/pkgOrder/gnH5/add",
   //微信小程序接口
   queryXcxCardList: "/card/pkgInfo/xcxList",
   queryCardList: "/app/card/list",

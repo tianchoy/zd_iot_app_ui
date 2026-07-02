@@ -26,20 +26,20 @@
 						<view class="section-content" v-if="activeName == '基本信息'">
 							<view class="base-info-box">
 								<view class="base-info">
-									<view class="info-item" v-if="cardDetail.rechargeNo"><text class="info-label">充值号</text><text class="info-value">{{cardDetail.rechargeNo}}</text></view>
-									<view class="info-item" v-if="cardDetail.statusStr"><text class="info-label">状态</text><rice-tag type="success" plain-fill :text="cardDetail.statusStr" size="small"/></view>
-									<view class="info-item" v-if="cardDetail.pkgName"><text class="info-label">套餐名称</text><text class="info-value">{{cardDetail.pkgName}}</text></view>
-									<view class="info-item" v-if="cardDetail.effectiveTime"><text class="info-label">生效时间</text><text class="info-value">{{cardDetail.effectiveTime}}</text></view>
-									<view class="info-item" v-if="cardDetail.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail.expirationTime}}</text></view>
-									<view class="info-item" v-if="cardDetail.usedPeriod && cardDetail.totalPeriod"><text class="info-label">周期</text><text class="info-value">{{cardDetail.usedPeriod}} / {{cardDetail.totalPeriod}}</text></view>
+									<view class="info-item" v-if="cardDetail?.rechargeNo"><text class="info-label">充值号</text><text class="info-value">{{cardDetail?.rechargeNo}}</text></view>
+									<view class="info-item" v-if="cardDetail?.statusStr"><text class="info-label">状态</text><rice-tag type="success" plain-fill :text="cardDetail?.statusStr" size="small"/></view>
+									<view class="info-item" v-if="cardDetail?.pkgName"><text class="info-label">套餐名称</text><text class="info-value">{{cardDetail?.pkgName}}</text></view>
+									<view class="info-item" v-if="cardDetail?.effectiveTime"><text class="info-label">生效时间</text><text class="info-value">{{cardDetail?.effectiveTime}}</text></view>
+									<view class="info-item" v-if="cardDetail?.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail?.expirationTime}}</text></view>
+									<view class="info-item" v-if="cardDetail?.usedPeriod && cardDetail?.totalPeriod"><text class="info-label">周期</text><text class="info-value">{{cardDetail?.usedPeriod}} / {{cardDetail?.totalPeriod}}</text></view>
 								</view>
-								<rice-divider v-if="cardDetail.pkgFlow" dashed />
+								<rice-divider v-if="cardDetail?.pkgFlow" dashed />
 							</view>
-							<view class="section-title" v-if="cardDetail.pkgFlow">流量使用</view>
-							<view class="data-total" v-if="cardDetail.pkgFlow">
-								<view class="total-item"><text class="total-label">已用流量:</text><text class="total-value">{{cardDetail.usedFlow != null && cardDetail.usedFlow !== '' ? cardDetail.usedFlow : '0'}}</text></view>
-								<view class="total-item"><text class="total-label">剩余流量:</text><text class="total-value">{{cardDetail.unUsedFlow != null && cardDetail.unUsedFlow !== '' ? cardDetail.unUsedFlow : '0'}}</text></view>
-								<view class="total-item"><text class="total-label">总流量:</text><text class="total-value">{{cardDetail.pkgFlow != null && cardDetail.pkgFlow !== '' ? cardDetail.pkgFlow : '0'}}</text></view>
+							<view class="section-title" v-if="cardDetail?.pkgFlow">流量使用</view>
+							<view class="data-total" v-if="cardDetail?.pkgFlow">
+								<view class="total-item"><text class="total-label">已用流量:</text><text class="total-value">{{cardDetail?.usedFlow != null && cardDetail?.usedFlow !== '' ? cardDetail?.usedFlow : '0'}}</text></view>
+								<view class="total-item"><text class="total-label">剩余流量:</text><text class="total-value">{{cardDetail?.unUsedFlow != null && cardDetail?.unUsedFlow !== '' ? cardDetail?.unUsedFlow : '0'}}</text></view>
+								<view class="total-item"><text class="total-label">总流量:</text><text class="total-value">{{cardDetail?.pkgFlow != null && cardDetail?.pkgFlow !== '' ? cardDetail?.pkgFlow : '0'}}</text></view>
 							</view>
 						</view>
 
@@ -59,23 +59,23 @@
 								<view v-if="pkgInfoList.length == 0" class="empty-order">暂无套餐记录</view>
 								<view class="item" v-for="(item, index) in pkgInfoList" :key="index" @click="handlePkgDetail(item.id)">
 									<view class="item-head">
-										<text class="item-label" v-if="item.pkgName">{{ item.pkgName }}</text>
+										<text class="item-label" v-if="item.name">{{ item.name }}</text>
 										<rice-tag v-if="item.status" :text="getPackageStatusText(item.status)" :round="true" plain-fill size="small" :type="getPackageStatusType(item.status)"></rice-tag>
 									</view>
-									<view class="item-sub-title" v-if="item.effectiveTime">生效时间：{{ item.effectiveTime}}</view>
-									<view class="item-sub-title" v-if="item.expirationTime">到期时间：{{ item.expirationTime}}</view>
+									<view class="item-sub-title" v-if="item.startTime">生效时间：{{ item.startTime}}</view>
+									<view class="item-sub-title" v-if="item.endTime">到期时间：{{ item.endTime}}</view>
 									<view class="item-data">
-										<view class="item-data-item" v-if="item.pkgFlow">
+										<view class="item-data-item" v-if="item.totalFlow">
 											<text class="item-data-label">套餐流量</text>
-											<text class="item-data-value">{{ item.pkgFlow }}GB</text>
+											<text class="item-data-value">{{ item.totalFlow }}GB</text>
 										</view>
 										<view class="item-data-item" v-if="item.usedFlow">
 											<text class="item-data-label">已用流量</text>
 											<text class="item-data-value">{{ item.usedFlow }}GB</text>
 										</view>
-										<view class="item-data-item" v-if="item.unUsedFlow">
+										<view class="item-data-item" v-if="item.leftFlow">
 											<text class="item-data-label">剩余流量</text>
-											<text class="item-data-value">{{ item.unUsedFlow }}GB</text>
+											<text class="item-data-value">{{ item.leftFlow }}GB</text>
 										</view>
 									</view>
 								</view>
@@ -86,7 +86,7 @@
 							<view v-if="orderList.length == 0" class="empty-order">
 								<view class="empty-text">暂无订单记录</view>
 							</view>
-							<view class="item" v-for="(order, index) in orderList" :key="order.id || index"  @click="handleOrderDetail(order.id)">
+							<view class="item" v-for="(order, index) in orderList" :key="index"  @click="handleOrderDetail(order.id.toString())">
 								<view class="item-head">
 									<text class="item-label">{{ order.pkgName || '未知套餐' }}</text>
 									<rice-tag 
@@ -106,12 +106,12 @@
 						</view>
 					</view>
 				</view>
-				<rice-button v-if="cardDetail.isBind || isBinded" class="ml-24 mr-24 mt-24 mb-24" type="error" plain-fill text="解绑卡片" :customStyle="{backgroundColor:'#ffffff'}" @click="handleUnbind"></rice-button>
+				<rice-button v-if="cardDetail?.isBind || isBinded" class="ml-24 mr-24 mt-24 mb-24" type="error" plain-fill text="解绑卡片" :customStyle="{backgroundColor:'#ffffff'}" @click="handleUnbind"></rice-button>
 			</view>
 
 			<view class="fixed-bottom-buttons">
 				<!-- <rice-button class="btn" :bold="true" :customStyle="{border:'none'}">诊断</rice-button> -->
-				<rice-button v-if="cardDetail.isBind || isBinded" height="100rpx" class="btn" :bold="true" :disabled="true" :customStyle="{border:'none'}">已绑定</rice-button>
+				<rice-button v-if="cardDetail?.isBind || isBinded" height="100rpx" class="btn" :bold="true" :disabled="true" :customStyle="{border:'none'}">已绑定</rice-button>
 				<rice-button v-else height="100rpx" class="btn" :bold="true" :customStyle="{border:'none'}" @click="handleBindCard">去绑定</rice-button>
 				<rice-button height="100rpx" class="btn" type="primary" color="#1989fa" textColor="#ffffff" :bold="true" :shadow="true" :customStyle="{border:'none'}" @click="handleRecharge">去充值</rice-button>
 			</view>
@@ -123,8 +123,9 @@
 </template>
 
 <script setup lang="uts">
+	import { ref, computed } from 'vue'
 	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderList,userUnBindCard} from '@/api/http'
-	import type {CardDetail,BindCard,OrderListXcxItem,PkgInfoItem} from '@/api/types'
+	import type {BindCard,OrderListXcxItem,PkgInfoItem,RechargeData} from '@/api/types'
 	import {isH5,isWechat} from '@/common/config.uts'
 
 	type CardDetailTabItem = {
@@ -143,7 +144,7 @@
 	const statusBarHeight = ref(20)
 	const navBarHeight = ref(44)
 	const fixedTabsHeight = 109
-	const cardDetail = ref<CardDetail>({} as CardDetail)
+	const cardDetail = ref<RechargeData | null>(null)
 	const orderList = ref<OrderListXcxItem[]>([])
 	const pkgInfoList = ref<PkgInfoItem[]>([])
 
@@ -163,57 +164,113 @@
 
 	const current = ref(0)
 
+	// 查询卡详情
+	const getCardDetail = async () => {
+		const res = await queryCardDetail(card_number.value,'','1')
+		console.log(res)
+		if(res.code == 200){
+			cardDetail.value = res.data
+		}
+	}
+
+	// 查询订单列表Xcx
+	const getOrderList = async () => {
+		try {
+			const resp = await queryOrderList({
+				rechargeNo: card_number.value,
+			})
+			if (resp.code == 200) {
+				const rows = resp.rows as OrderListXcxItem[]
+				if (rows != null && Array.isArray(rows)) {
+					orderList.value = rows
+				} else {
+					orderList.value = []
+				}
+			} else {
+				console.log('查询订单列表失败:', resp.msg)
+				orderList.value = []
+			}
+		} catch (error) {
+			console.error('查询订单列表异常:', error)
+			orderList.value = []
+		}
+	}
+
+	/** 查询套餐信息列表 */
+	const getPkgInfoList = async (state: string) => {
+		try {
+			const res = await queryPkgInfoList({
+				rechargeNo: card_number.value,
+				status: state,
+			})
+			if (res.code == 200) {
+				const rows = res.rows as PkgInfoItem[]
+				if (rows != null && Array.isArray(rows)) {
+					pkgInfoList.value = rows
+				} else {
+					pkgInfoList.value = []
+				}
+			} else {
+				console.log('查询套餐列表失败:', res.msg)
+				pkgInfoList.value = []
+			}
+		} catch (error) {
+			console.error('查询套餐列表异常:', error)
+			pkgInfoList.value = []
+		}
+	}
+
+	// 移到定义之后
+
 	// 获取套餐状态对应的文本
 	const getPackageStatusText = (status: string): string => {
-		const statusMap: Record<string, string> = {
-			'0': '未生效',
-			'1': '生效中',
-			'2': '已失效'
-		}
-		return statusMap[status] || status || '未知'
+		const statusMap = new Map<string, string>()
+		statusMap.set('0', '未生效')
+		statusMap.set('1', '生效中')
+		statusMap.set('2', '已失效')
+		return statusMap.get(status) ?? status ?? '未知'
 	}
 
 	// 获取套餐状态对应的标签类型
 	const getPackageStatusType = (status: string): string => {
-		const typeMap: Record<string, string> = {
-			'0': 'success',
-			'1': 'primary',
-			'2': 'error'
-		}
-		return typeMap[status] || 'primary'
+		const typeMap = new Map<string, string>()
+		typeMap.set('0', 'success')
+		typeMap.set('1', 'primary')
+		typeMap.set('2', 'error')
+		return typeMap.get(status) ?? 'primary'
 	}
 
 	// 获取订单状态对应的文本
 	const getOrderStatusText = (status: string): string => {
-		const statusMap: Record<string, string> = {
-			'0': '待支付',
-			'1': '已完成',
-			'2': '已取消',
-			'3': '支付失败',
-			'4': '部分退款',
-			'5': '全部退款',
-		}
-		return statusMap[status] || status || '未知'
+		const statusMap = new Map<string, string>()
+		statusMap.set('0', '待支付')
+		statusMap.set('1', '已完成')
+		statusMap.set('2', '已取消')
+		statusMap.set('3', '支付失败')
+		statusMap.set('4', '部分退款')
+		statusMap.set('5', '全部退款')
+		return statusMap.get(status) ?? status ?? '未知'
 	}
 
 	// 获取订单状态对应的标签类型
 	const getOrderStatusType = (status: string): string => {
-		const typeMap: Record<string, string> = {
-			'0': 'primary',
-			'1': 'success',
-			'2': 'error',
-			'3': 'danger',
-			'4': 'warning',
-			'5': 'warning',
-		}
-		return typeMap[status] || 'primary'
+		const typeMap = new Map<string, string>()
+		typeMap.set('0', 'primary')
+		typeMap.set('1', 'success')
+		typeMap.set('2', 'error')
+		typeMap.set('3', 'danger')
+		typeMap.set('4', 'warning')
+		typeMap.set('5', 'warning')
+		return typeMap.get(status) ?? 'primary'
 	}
 
 	// 点击卡片信息tab
 	const handleClick = (e: UTSJSONObject) => {
 		if (e.index != null) {
 			current.value = e.index as number
-			getPkgInfoList(e.value.toString())
+			if (e.index == 1) {
+				getPkgInfoList(e.value.toString())
+			}
 		}
 	}
 
@@ -222,12 +279,13 @@
 		active.value = e.index
 		activeName.value = e.name
 
-		const tabActions: Record<number, () => void> = {
-			0: () => getCardDetail(),
-			1: () => getPkgInfoList(),
-			2: () => getOrderList()
+		if (e.index == 0) {
+			getCardDetail()
+		} else if (e.index == 1) {
+			getPkgInfoList('')
+		} else if (e.index == 2) {
+			getOrderList()
 		}
-		tabActions[e.index]?.()
 		current.value = 0
 	}
 
@@ -251,15 +309,17 @@
 			try {
 				const systemInfo = uni.getSystemInfoSync()
 				statusBarHeight.value = systemInfo.statusBarHeight || 20
+				// #ifdef MP-WEIXIN
 				const menuButtonInfo = uni.getMenuButtonBoundingClientRect()
 				if (menuButtonInfo) {
 					const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height
 					navBarHeight.value = navHeight > 0 ? navHeight : 44
 				}
+				// #endif
 			} catch (e) {
 				console.error('获取导航栏信息失败', e)
 			}
-		} 
+		}
 		if (isH5()) {
 			// H5 环境
 			statusBarHeight.value = 0
@@ -271,63 +331,6 @@
 		uni.navigateTo({
 			url: '/pages/recharge/recharge?cardNumber=' + card_number.value
 		})
-	}
-
-	const getCardDetail = async () => {
-		const res = await queryCardDetail(card_number.value,'','1')
-		console.log(res)
-		if(res.code == 200){
-			cardDetail.value = res.data
-		}
-	}
-
-	// 查询订单列表Xcx
-	const getOrderList = async () => {
-		try {
-			const resp = await queryOrderList({
-				rechargeNo: card_number.value,
-			})
-			if (resp.code == 200) {
-				if (resp.rows && Array.isArray(resp.rows)) {
-					orderList.value = resp.rows
-				} else if (resp.data && Array.isArray(resp.data)) {
-					orderList.value = resp.data
-				} else {
-					orderList.value = []
-				}
-			} else {
-				console.log('查询订单列表失败:', resp.msg)
-				orderList.value = []
-			}
-		} catch (error) {
-			console.error('查询订单列表异常:', error)
-			orderList.value = []
-		}
-	}
-
-	/** 查询套餐信息列表 */
-	const getPkgInfoList = async (state: string) => {
-		try {
-			const res = await queryPkgInfoList({
-				rechargeNo: card_number.value,
-				status: state,
-			})
-			if (res.code == 200) {
-				if (res.rows && Array.isArray(res.rows)) {
-					pkgInfoList.value = res.rows
-				} else if (res.data && Array.isArray(res.data)) {
-					pkgInfoList.value = res.data
-				} else {
-					pkgInfoList.value = []
-				}
-			} else {
-				console.log('查询套餐列表失败:', res.msg)
-				pkgInfoList.value = []
-			}
-		} catch (error) {
-			console.error('查询套餐列表异常:', error)
-			pkgInfoList.value = []
-		}
 	}
 
 	/** 绑定卡 */
@@ -356,12 +359,10 @@
 		uni.showModal({
 			title: '确认解绑',
 			content: '确定解绑该卡片吗？',
-			success: async (res) => {
+			success: (res) => {
 				if (res.confirm) {
-					try {
-						const result = await userUnBindCard(card_number.value)
+					userUnBindCard(card_number.value).then((result) => {
 						console.log(result)
-						
 						if (result.code == 200) {
 							uni.showToast({
 								title: '解绑成功',
@@ -377,13 +378,13 @@
 								icon: 'none'
 							})
 						}
-					} catch (error) {
+					}).catch((error) => {
 						console.error('解绑请求失败:', error)
 						uni.showToast({
 							title: '网络异常，请重试',
 							icon: 'none'
 						})
-					}
+					})
 				}
 			}
 		})

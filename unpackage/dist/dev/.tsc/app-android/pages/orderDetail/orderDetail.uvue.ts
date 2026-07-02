@@ -39,7 +39,7 @@ const _cache = __ins.renderCache;
 		payAmount: 0,
 		orderCreateTime: '',
 		payTime: '',
-		refunds: [],
+		refunds: [] as any[],
 		cancelTime: '',
 		payFailTime: '',
 		payFailReason: '',
@@ -47,35 +47,74 @@ const _cache = __ins.renderCache;
 		currentSeconds: 0
 	});
 
+	/** 模板中通过此函数安全访问 orderDetail 的属性 */
+	function d(key: string): any {
+		const val = (orderDetail.value as UTSJSONObject)[key]
+		return val as any
+	}
+
+	/** 获取 string 类型的属性值（给模板中需要 String 参数的地方用） */
+	function ds(key: string): string {
+		const val = (orderDetail.value as UTSJSONObject)[key]
+		return val != null ? (val as string) : ''
+	}
+
+	/** 获取显示金额（优先 payAmount，其次 orderAmount） */
+	function getDisplayAmount(): number {
+		const detail = orderDetail.value as UTSJSONObject
+		const pay = detail['payAmount'] as number
+		const order = detail['orderAmount'] as number
+		return pay != null ? pay : (order != null ? order : 0)
+	}
+
+	/** 获取退款记录数组 */
+	function getRefunds(): any[] {
+		const detail = orderDetail.value as UTSJSONObject
+		const list = detail['refunds'] as any[]
+		return list != null ? list : []
+	}
+
+	/** 获取退款记录中的值 */
+	function getRefundValue(item: any, key: string): string {
+		const val = (item as UTSJSONObject)[key]
+		return val != null ? (val as string) : ''
+	}
+
+	/** 获取当前倒计时秒数 */
+	function getCurrentSeconds(): number {
+		const detail = orderDetail.value as UTSJSONObject
+		const sec = detail['currentSeconds'] as number
+		return sec != null ? sec : 0
+	}
+
 	// 获取订单状态对应的文本
 	const getOrderStatusText = (status: string): string => {
-		const statusMap: Record<string, string> = {
-			'0': '待支付',
-			'1': '已完成',
-			'2': '已取消',
-			'3': '支付失败',
-			'4': '部分退款',
-			'5': '全部退款',
-		}
-		return statusMap[status] || status || '未知'
+		const statusMap = new Map<string, string>()
+		statusMap.set('0', '待支付')
+		statusMap.set('1', '已完成')
+		statusMap.set('2', '已取消')
+		statusMap.set('3', '支付失败')
+		statusMap.set('4', '部分退款')
+		statusMap.set('5', '全部退款')
+		return statusMap.get(status) ?? status ?? '未知'
 	}
 
 	// 获取订单状态对应的标签类型
 	const getOrderStatusType = (status: string): string => {
-		const typeMap: Record<string, string> = {
-			'0': 'success',
-			'1': 'primary',
-			'2': 'warning',
-			'3': 'error',
-			'4': 'error',
-			'5': 'error',
-		}
-		return typeMap[status] || 'primary'
+		const typeMap = new Map<string, string>()
+		typeMap.set('0', 'success')
+		typeMap.set('1', 'primary')
+		typeMap.set('2', 'warning')
+		typeMap.set('3', 'error')
+		typeMap.set('4', 'error')
+		typeMap.set('5', 'error')
+		return typeMap.get(status) ?? 'primary'
 	}
-	
+
 	// 获取套餐类型文本
 	const getPkgCategoryText = (): string => {
-		const category = orderDetail.value.pkgCategory;
+		const detail = orderDetail.value as UTSJSONObject
+		const category = detail['pkgCategory'] as string;
 		switch (category) {
 			case '1':
 				return '日包'
@@ -84,13 +123,12 @@ const _cache = __ins.renderCache;
 			case '3':
 				return '自然月包'
 			default:
-				return orderDetail.value.pkgCategory || '-'
+				return category || '-'
 		}
 	}
 	
 	// 获取支付方式
 	const getPaymentMethod = (): string => {
-
 		if(isWechat()){
 			return '微信小程序支付'
 		}
@@ -99,11 +137,13 @@ const _cache = __ins.renderCache;
 			return 'H5支付'
 		}
 
+		return ''
 	}
 	
 	// 获取说明文本
 	const getNoticeText = (): string => {
-		const status = orderDetail.value.status;
+		const detail = orderDetail.value as UTSJSONObject
+		const status = detail['status'] as string;
 		switch (status) {
 			case '0':
 				return '订单尚未支付，支付完成后套餐才会生效。'
@@ -120,159 +160,13 @@ const _cache = __ins.renderCache;
 	
 	// 选择支付方式
 	const choosePayment = () => {
-		currentPrice.value = orderDetail.value.payAmount || orderDetail.value.orderAmount || 0
+		const detail = orderDetail.value as UTSJSONObject
+		const payAmount = detail['payAmount'] as number
+		const orderAmount = detail['orderAmount'] as number
+		currentPrice.value = payAmount != null ? payAmount : (orderAmount != null ? orderAmount : 0)
 		showPopup.value = true
 	}
 
-	// 倒计时结束
-	const handleCountDownFinish = () => {
-		uni.showToast({
-			title: "支付已过期，请重新下单",
-			icon: 'none',
-			duration: 1000
-		});
-		getOrderDetail()
-	}
-	
-	// 取消支付
-	const handleCancelPayment = () => {
-		showPopup.value = false
-	}
-
-	const toPay = (data:any) => {
-		if(!data) return
-		const res = data as any
-		orderId.value = res.orderId
-		payChannelId.value = res.payChannelId
-		// 设置正在支付流程中 - 所有支付方式统一处理
-		isInPaymentProcess.value = true
-		
-		if(res.payWxType == 'wechat_pay'){
-			uni.requestPayment({
-				provider: 'wxpay',
-				timeStamp: res.timeStamp,
-				nonceStr: res.nonceStr,
-				package: res.package,
-				paySign: res.paySign,
-				signType: res.signType,
-
-				success: (res) => {
-					uni.hideLoading()
-					uni.redirectTo({
-						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
-					})
-				},
-				fail: (res) => {
-					uni.hideLoading()
-					uni.showToast({
-						title: "支付失败，请您重新支付",
-						icon: 'none',
-						duration: 1000
-					});
-					// 支付失败，重置标记
-					isInPaymentProcess.value = false
-				},
-			})
-		}
-		else if(res.payWxType == 'allin_pay'){
-			if(res.payWxClass == '0'){
-				uni.requestPayment({
-					timeStamp: res.timeStamp,
-					nonceStr: res.nonceStr,
-					package: res.package,
-					paySign: res.paySign,
-					signType: res.signType,
-					success: function (res) {
-						uni.hideLoading()
-						uni.redirectTo({
-							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
-						})
-						// 注意：支付成功时不要立即重置标记，等待 onShow 回调
-					},
-					fail: function (err) {
-						uni.hideLoading()
-						uni.showToast({
-							title: "支付失败，请您重新支付",
-							icon: 'none',
-							duration: 1000
-						});
-						// 支付失败，重置标记
-						isInPaymentProcess.value = false
-					},
-				});
-			}else{
-				let param = {__$originalPosition: new UTSSourceMapPosition("param", "pages/orderDetail/orderDetail.uvue", 323, 9),
-					cusid: res.cusid,
-					appid: res.appid,
-					orgid: res.orgid,
-					version: res.version,
-					trxamt: res.trxamt,
-					reqsn: res.reqsn,
-					notify_url: res.notify_url,
-					body: res.body,
-					remark: res.remark,
-					randomstr: res.randomstr,
-					paytype: res.paytype,
-					signtype: res.signtype,
-					sign: res.sign,
-				}
-
-				uni.navigateToMiniProgram({
-					appId: config.api.auth.appID,
-					extraData: param,
-					success(res) { 
-						console.log('打开支付小程序成功:', res, " at pages/orderDetail/orderDetail.uvue:343")
-					},
-					fail(res) {
-						console.log('打开支付小程序失败:', res, " at pages/orderDetail/orderDetail.uvue:346");
-						uni.hideLoading()
-						// 支付失败，重置标记
-						isInPaymentProcess.value = false
-					},
-				})
-			}
-		}
-	}
-	
-	// 确认支付
-	const handleConfirmPayment = async (e: any) => {
-		showPopup.value = false
-		try {
-			const res = await goPayXcx(orderId.value)
-			if (res.code == 200) {
-				toPay(res.data)
-			} else {
-				uni.showToast({
-					title: res.msg || '支付失败',
-					icon: 'none'
-				})
-			}
-		} catch (error) {
-			console.error('支付失败:', error, " at pages/orderDetail/orderDetail.uvue:370")
-			uni.showToast({
-				title: '支付失败，请稍后重试',
-				icon: 'none'
-			})
-		}
-	}
-	
-	// 支付弹窗关闭
-	const onPopupClose = () => {
-		showPopup.value = false
-	}
-	
-	// 返回上一页或首页
-	const handleBack = () => {
-		const pages = getCurrentPages();
-		if (pages.length > 1) {
-			uni.navigateBack()
-		} else {
-			uni.reLaunch({
-				url: '/pages/card/card'
-			})
-		}
-	}
-	
 	// 查询订单详情
 	const getOrderDetail = async () => {
 		if (!orderId.value) return
@@ -287,10 +181,159 @@ const _cache = __ins.renderCache;
 				})
 			}
 		} catch (error) {
-			console.error('查询订单详情失败:', error, " at pages/orderDetail/orderDetail.uvue:409")
+			console.error('查询订单详情失败:', error, " at pages/orderDetail/orderDetail.uvue:303")
 			uni.showToast({
 				title: '网络错误，请稍后重试',
 				icon: 'none'
+			})
+		}
+	}
+
+	// 倒计时结束
+	const handleCountDownFinish = () => {
+		uni.showToast({
+			title: "支付已过期，请重新下单",
+			icon: 'none',
+			duration: 1000
+		});
+		getOrderDetail()
+	}
+
+	// 取消支付
+	const handleCancelPayment = () => {
+		showPopup.value = false
+	}
+
+	const toPay = (data: UTSJSONObject) => {
+		if(!data) return
+		orderId.value = data['orderId'] as string
+		payChannelId.value = data['payChannelId'] as string
+		// 设置正在支付流程中 - 所有支付方式统一处理
+		isInPaymentProcess.value = true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	}
+
+	// 确认支付
+	const handleConfirmPayment = async (e: UTSJSONObject) => {
+		showPopup.value = false
+		try {
+			const res = await goPayXcx(orderId.value)
+			if (res.code == 200) {
+				toPay(res.data as UTSJSONObject)
+			} else {
+				uni.showToast({
+					title: res.msg || '支付失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			console.error('支付失败:', error, " at pages/orderDetail/orderDetail.uvue:435")
+			uni.showToast({
+				title: '支付失败，请稍后重试',
+				icon: 'none'
+			})
+		}
+	}
+
+	// 支付弹窗关闭
+	const onPopupClose = () => {
+		showPopup.value = false
+	}
+	
+	// 返回上一页或首页
+	const handleBack = () => {
+		const pages = getCurrentPages();
+		if (pages.length > 1) {
+			uni.navigateBack()
+		} else {
+			uni.reLaunch({
+				url: '/pages/card/card'
 			})
 		}
 	}
@@ -321,61 +364,60 @@ const _cache = __ins.renderCache;
 		}
 		
 		let options = uni.getEnterOptionsSync();
-		if (options.scene == '1038' &&
-			options.referrerInfo.appId == config.api.auth.appID) {
-			// 代表从收银台小程序返回
-			let extraData = options.referrerInfo.extraData;
-			if (!extraData) {
-				// "当前通过物理按键返回，未接收到返参，建议自行查询交易结果";
-				uni.hideLoading()
-				uni.showToast({
-					title: "支付取消，请您重新支付",
-					icon: 'none',
-					duration: 1000
-				});
-				// 重置支付流程标记
-				isInPaymentProcess.value = false
-				return
-			} else {
-				if (extraData.code == 'success') {
-					uni.hideLoading()
-					uni.showToast({
-						title: "支付成功",
-						icon: 'success',
-						duration: 1000,
-						success() {
-							// 重置支付流程标记
-							isInPaymentProcess.value = false
-							// 使用 redirectTo 替换当前页面，避免页面栈累积
-							uni.redirectTo({
-								url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
-							})
-						}
-					});
-					// "支付成功";
-				} else if (extraData.code == 'cancel') {
-					uni.hideLoading()
-					uni.showToast({
-						title: "支付取消，请您重新支付",
-						icon: 'none',
-						duration: 1000
-					});
-					// 重置支付流程标记
-					isInPaymentProcess.value = false
-					return
-				} else {
-					uni.hideLoading()
-					uni.showToast({
-						title: "支付失败，请您重新支付",
-						icon: 'none',
-						duration: 1000
-					});
-					// 重置支付流程标记
-					isInPaymentProcess.value = false
-					return
-				}
-			}
-		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	})
 
 return (): any | null => {
@@ -404,69 +446,69 @@ const _component_rice_popup = resolveEasyComponent("rice-popup",_easycom_rice_po
         enhanced: true
       }), [
         _cE("view", _uM({ class: "package-card" }), [
-          isTrue(unref(orderDetail).pkgName)
+          isTrue(d('pkgName'))
             ? _cE("view", _uM({
                 key: 0,
                 class: "package-header"
               }), [
-                _cE("text", _uM({ class: "package-name" }), _tD(unref(orderDetail).pkgName), 1 /* TEXT */),
+                _cE("text", _uM({ class: "package-name" }), _tD(d('pkgName')), 1 /* TEXT */),
                 _cV(_component_rice_tag, _uM({
-                  type: getOrderStatusType(unref(orderDetail).status),
-                  text: getOrderStatusText(unref(orderDetail).status),
+                  type: getOrderStatusType(ds('status')),
+                  text: getOrderStatusText(ds('status')),
                   round: true,
                   "plain-fill": "",
                   size: "small"
                 }), null, 8 /* PROPS */, ["type", "text"])
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).rechargeNo)
+          isTrue(d('rechargeNo'))
             ? _cE("view", _uM({
                 key: 1,
                 class: "card-number-row"
               }), [
                 _cE("text", _uM({ class: "card-number-label" }), "充值号："),
-                _cE("text", _uM({ class: "card-number" }), _tD(unref(orderDetail).rechargeNo), 1 /* TEXT */)
+                _cE("text", _uM({ class: "card-number" }), _tD(d('rechargeNo')), 1 /* TEXT */)
               ])
             : _cC("v-if", true)
         ]),
         _cE("view", _uM({ class: "info-card" }), [
-          isTrue(unref(orderDetail).orderNo)
+          isTrue(d('orderNo'))
             ? _cE("view", _uM({
                 key: 0,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "订单编号"),
-                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).orderNo), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('orderNo')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).iccid)
+          isTrue(d('iccid'))
             ? _cE("view", _uM({
                 key: 1,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "ICCID"),
-                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).iccid), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('iccid')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).orderAmount)
+          isTrue(d('orderAmount'))
             ? _cE("view", _uM({
                 key: 2,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "支付金额"),
-                _cE("text", _uM({ class: "info-value price" }), "¥" + _tD(unref(orderDetail).payAmount || unref(orderDetail).orderAmount || 0), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value price" }), "¥" + _tD(getDisplayAmount()), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).orderStatus)
+          isTrue(d('orderStatus'))
             ? _cE("view", _uM({
                 key: 3,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "订单状态"),
-                _cE("text", _uM({ class: "info-value status" }), _tD(getOrderStatusText(unref(orderDetail).status)), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value status" }), _tD(getOrderStatusText(ds('status'))), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).payMethod)
+          isTrue(d('payMethod'))
             ? _cE("view", _uM({
                 key: 4,
                 class: "info-row"
@@ -475,44 +517,44 @@ const _component_rice_popup = resolveEasyComponent("rice-popup",_easycom_rice_po
                 _cE("text", _uM({ class: "info-value" }), _tD(getPaymentMethod()), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).orderCreateTime)
+          isTrue(d('orderCreateTime'))
             ? _cE("view", _uM({
                 key: 5,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "下单时间"),
-                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).orderCreateTime), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('orderCreateTime')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).payTime)
+          isTrue(d('payTime'))
             ? _cE("view", _uM({
                 key: 6,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "支付时间"),
-                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).payTime), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('payTime')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).payFailReason)
+          isTrue(d('payFailReason'))
             ? _cE("view", _uM({
                 key: 7,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "支付失败原因"),
-                _cE("text", _uM({ class: "info-value status-fail" }), _tD(unref(orderDetail).payFailReason), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value status-fail" }), _tD(d('payFailReason')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).cancelTime)
+          isTrue(d('cancelTime'))
             ? _cE("view", _uM({
                 key: 8,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "取消时间"),
-                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).cancelTime), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('cancelTime')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
           _cV(_component_rice_divider),
-          isTrue(unref(orderDetail).pkgCategory)
+          isTrue(d('pkgCategory'))
             ? _cE("view", _uM({
                 key: 9,
                 class: "info-row"
@@ -521,62 +563,62 @@ const _component_rice_popup = resolveEasyComponent("rice-popup",_easycom_rice_po
                 _cE("text", _uM({ class: "info-value" }), _tD(getPkgCategoryText()), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).pkgFlow)
+          isTrue(d('pkgFlow'))
             ? _cE("view", _uM({
                 key: 10,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "套餐流量"),
-                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).pkgFlow) + " GB", 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('pkgFlow')) + " GB", 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).validityPeriod)
+          isTrue(d('validityPeriod'))
             ? _cE("view", _uM({
                 key: 11,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "有效期"),
-                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).validityPeriod) + _tD(unref(orderDetail)?.pkgType == '1' ? '天' : '个月'), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('validityPeriod')) + _tD(d('pkgType') == '1' ? '天' : '个月'), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).startDate)
+          isTrue(d('startDate'))
             ? _cE("view", _uM({
                 key: 12,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "生效时间"),
-                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).startDate), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('startDate')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).endDate)
+          isTrue(d('endDate'))
             ? _cE("view", _uM({
                 key: 13,
                 class: "info-row"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "失效时间"),
-                _cE("text", _uM({ class: "info-value" }), _tD(unref(orderDetail).endDate), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('endDate')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).refunds && unref(orderDetail).refunds.length > 0)
+          getRefunds().length > 0
             ? _cV(_component_rice_divider, _uM({
                 key: 14,
                 dashed: "",
                 customStyle: {margin: '0'}
               }))
             : _cC("v-if", true),
-          isTrue(unref(orderDetail).refunds && unref(orderDetail).refunds.length > 0)
-            ? _cE(Fragment, _uM({ key: 15 }), RenderHelpers.renderList(unref(orderDetail).refunds, (item, index, __index, _cached): any => {
+          getRefunds().length > 0
+            ? _cE(Fragment, _uM({ key: 15 }), RenderHelpers.renderList(getRefunds(), (item, index, __index, _cached): any => {
                 return _cE("view", _uM({
                   class: "info-refunds",
                   key: index
                 }), [
                   _cE("view", _uM({ class: "times" }), [
                     _cE("text", _uM({ class: "info-label" }), "退款时间"),
-                    _cE("text", _uM({ class: "info-value" }), _tD(item.refundTime), 1 /* TEXT */)
+                    _cE("text", _uM({ class: "info-value" }), _tD(getRefundValue(item, 'refundTime')), 1 /* TEXT */)
                   ]),
                   _cE("view", _uM({ class: "money" }), [
                     _cE("text", _uM({ class: "info-label" }), "退款金额"),
-                    _cE("text", _uM({ class: "info-value" }), "¥" + _tD(item.refundAmount || 0), 1 /* TEXT */)
+                    _cE("text", _uM({ class: "info-value" }), "¥" + _tD(getRefundValue(item, 'refundAmount')), 1 /* TEXT */)
                   ])
                 ])
               }), 128 /* KEYED_FRAGMENT */)
@@ -584,19 +626,19 @@ const _component_rice_popup = resolveEasyComponent("rice-popup",_easycom_rice_po
         ]),
         _cE("view", _uM({ class: "bottom-placeholder" }))
       ]),
-      unref(orderDetail).status === '0'
+      d('status') === '0'
         ? _cE("view", _uM({
             key: 0,
             class: "bottom-bar"
           }), [
             _cE("view", _uM({ class: "amount-section" }), [
               _cE("text", _uM({ class: "amount-label" }), "待支付金额"),
-              _cE("text", _uM({ class: "amount-value" }), "¥" + _tD(unref(orderDetail).payAmount || unref(orderDetail).orderAmount || 0), 1 /* TEXT */)
+              _cE("text", _uM({ class: "amount-value" }), "¥" + _tD(getDisplayAmount()), 1 /* TEXT */)
             ]),
             _cE("view", _uM({ class: "amount-time" }), [
               _cE("text", _uM({ class: "amount-label" }), "支付剩余时间"),
               _cV(_component_rice_count_down, _uM({
-                time: unref(orderDetail).currentSeconds * 1000 || 0,
+                time: getCurrentSeconds() * 1000,
                 "font-size": "28rpx",
                 color: "#f56c6c",
                 onFinish: handleCountDownFinish
@@ -622,12 +664,12 @@ const _component_rice_popup = resolveEasyComponent("rice-popup",_easycom_rice_po
           amount: unref(currentPrice),
           onCancel: handleCancelPayment,
           onConfirm: handleConfirmPayment,
-          cardNumber: unref(orderDetail).rechargeNo,
+          cardNumber: d('rechargeNo'),
           ",": "",
-          productName: unref(orderDetail).pkgName,
-          traffic: unref(orderDetail).pkgFlow,
-          validityPeriod: unref(orderDetail).validityPeriod,
-          pkgType: unref(orderDetail).pkgType
+          productName: d('pkgName'),
+          traffic: d('pkgFlow'),
+          validityPeriod: d('validityPeriod'),
+          pkgType: d('pkgType')
         }), null, 8 /* PROPS */, ["amount", "cardNumber", "productName", "traffic", "validityPeriod", "pkgType"])
       ]),
       _: 1 /* STABLE */

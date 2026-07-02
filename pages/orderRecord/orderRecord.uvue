@@ -1,65 +1,65 @@
 <template>
-	<topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
-	<view class="container">
-		<view class="card-box">
-			<rice-tabs
-				v-model="current"
-				line-color="#ffffff" 
-				:list="tabs" 
-				:line-width="0" 
-				:title-active-color="'#2563eb'" 
-				:title-inactive-color="'#334155'"
-				@change="handleTabClick" 
-				:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
-				>
-			</rice-tabs>
-		</view>
-		
-		<!-- 订单列表 -->
-		<scroll-view class="order-list" scroll-y :enhanced="true" :show-scrollbar="false">
-			<view v-if="orderList.length === 0" class="empty-state">
-				<text class="empty-text">暂无订单</text>
-			</view>
-			<view v-else class="orders-container">
-				<view 
-					v-for="(order, index) in orderList" 
-					:key="index"
-					class="order-card"
-					@click="handleOrderClick(order)"
-				>
-					<!-- 订单头部：套餐名称和状态 -->
-					<view class="order-header">
-						<text class="package-name" v-if="order.pkgName">{{ order.pkgName || '套餐名称' }}</text>
-						<rice-tag v-if="order.status" :text="getStatusText(order.status) " :round="true" plain-fill size="small" :type="getStatusClass(order.status)"></rice-tag>
-					</view>
-					
-					<!-- 订单详情 -->
-					<view class="order-details">
-						<view class="detail-row" v-if="order.orderNo">
-							<text class="detail-label">订单号</text>
-							<text class="detail-value">{{ order.orderNo || '-' }}</text>
-						</view>
-						<view class="detail-row" v-if="order.cardNo">
-							<text class="detail-label">卡号</text>
-							<text class="detail-value">{{ order.cardNo || '-' }}</text>
-						</view>
-						<view class="detail-row" v-if="order.iccid">
-							<text class="detail-label">ICCID</text>
-							<text class="detail-value">{{ order.iccid || '-' }}</text>
-						</view>
-						<view class="detail-row last">
-							<text class="detail-value" v-if="order.createTime">{{ order.createTime || '-' }}</text>
-							<view class="order-footer">
-								<text class="price">¥{{ order.payCurrencyAmount || '0.00' }}</text>
-								<text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
-							</view>
-						</view>
-					</view>
-					
-				</view>
-			</view>
-		</scroll-view>
-	</view>
+ <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+ <view class="container">
+  <view class="card-box">
+   <rice-tabs
+    v-model="current"
+    line-color="#ffffff"
+    :list="tabs"
+    :line-width="0"
+    :title-active-color="'#2563eb'"
+    :title-inactive-color="'#334155'"
+    @change="handleTabClick"
+    :customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
+    >
+   </rice-tabs>
+  </view>
+
+  <!-- 订单列表 -->
+  <scroll-view class="order-list" scroll-y :enhanced="true" :show-scrollbar="false">
+   <view v-if="orderList.length === 0" class="empty-state">
+    <text class="empty-text">暂无订单</text>
+   </view>
+   <view v-else class="orders-container">
+    <view
+     v-for="(order, index) in orderList"
+     :key="index"
+     class="order-card"
+     @click="handleOrderClick(order)"
+    >
+     <!-- 订单头部：套餐名称和状态 -->
+     <view class="order-header">
+      <text class="package-name" v-if="order.pkgName">{{ order.pkgName }}</text>
+      <rice-tag v-if="order.status" :text="getStatusText(order.status)" :round="true" plain-fill size="small" :type="getStatusClass(order.status)"></rice-tag>
+     </view>
+
+     <!-- 订单详情 -->
+     <view class="order-details">
+      <view class="detail-row" v-if="order.orderNo">
+       <text class="detail-label">订单号</text>
+       <text class="detail-value">{{ order.orderNo }}</text>
+      </view>
+      <view class="detail-row" v-if="order.cardNo">
+       <text class="detail-label">卡号</text>
+       <text class="detail-value">{{ order.cardNo }}</text>
+      </view>
+      <view class="detail-row" v-if="order.iccid">
+       <text class="detail-label">ICCID</text>
+       <text class="detail-value">{{ order.iccid }}</text>
+      </view>
+      <view class="detail-row last">
+       <text class="detail-value" v-if="order.createTime">{{ order.createTime }}</text>
+       <view class="order-footer">
+        <text class="price">¥{{ order.payCurrencyAmount }}</text>
+        <text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
+       </view>
+      </view>
+     </view>
+
+    </view>
+   </view>
+  </scroll-view>
+ </view>
 </template>
 
 <script setup lang="uts">
@@ -110,82 +110,21 @@
 		}
 	}
 	
-	// 处理Tab切换
-	const handleTabClick = (e: UTSJSONObject) => {
-		console.log(e)
-		const index = e.index as number
-		current.value = index
-		getOrderList(e.value)
-	}
-	
-	// 获取状态样式类
-	const getStatusClass = (status: string): string => {
-		switch (status) {
-			case '0':
-				return 'success'
-			case '1':
-				return 'primary'
-			case '2':
-				return 'warning'
-			case '3':
-				return 'error'
-			case '4':
-				return 'error'
-			case '5':
-				return 'error'
-			default:
-				return ''
-		}
-	}
-	
-	// 处理订单点击
-	const handleOrderClick = (order: OrderListXcxItem) => {
-		uni.navigateTo({
-			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
-		})
-	}
-	
-	// 处理返回
-	const handleBack = () => {
-		uni.navigateBack({
-			delta: 1
-		})
-	}
-	
-	// 去支付
-	const handlePay = (order: OrderListXcxItem) => {
-		console.log('去支付:', order)
-		if(isWechat()){
-			uni.showToast({
-				title: `支付订单 ${order.id}`,
-				icon: 'none'
-			})
-			uni.navigateTo({
-				url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
-			})
-		}
-		if(isH5()){
-			uni.navigateTo({
-				url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
-			})
-		}
-	}
-	
 	// 获取订单列表
 	const getOrderList = async (status: string) => {
 		try {
-			const params: any = {
+			const params: UTSJSONObject = {
 				rechargeNo: rechargeNo.value
 			}
 			if (status !== '') {
-				params.status = status
+				params['status'] = status
 			}
 			const resp = await queryOrderList(params)
 			if (resp.code == 200) {
 				if (resp.rows && Array.isArray(resp.rows)) {
-					orderList.value = resp.rows
+					orderList.value = resp.rows as OrderListXcxItem[]
 				} else if (resp.data && Array.isArray(resp.data)) {
-					orderList.value = resp.data
+					orderList.value = resp.data as OrderListXcxItem[]
 				} else {
 					orderList.value = []
 				}
@@ -205,9 +144,71 @@
 			})
 		}
 	}
-	
+
+	// 处理Tab切换
+	const handleTabClick = (e: UTSJSONObject) => {
+	 console.log(e)
+	 const index = e.index as number
+	 current.value = index
+	 getOrderList(e.value as string)
+	}
+
+	// 获取状态样式类
+	const getStatusClass = (status: string): string => {
+	 switch (status) {
+	  case '0':
+	   return 'success'
+	  case '1':
+	   return 'primary'
+	  case '2':
+	   return 'warning'
+	  case '3':
+	   return 'error'
+	  case '4':
+	   return 'error'
+	  case '5':
+	   return 'error'
+	  default:
+	   return ''
+	 }
+	}
+
+	// 处理订单点击
+	const handleOrderClick = (order: any) => {
+	 uni.navigateTo({
+	  url: `/pages/orderDetail/orderDetail?orderNo=${(order as UTSJSONObject)['id']}`
+	 })
+	}
+
+	// 处理返回
+	const handleBack = () => {
+	 uni.navigateBack({
+	  delta: 1
+	 })
+	}
+
+	// 去支付
+	const handlePay = (order: any) => {
+	 const o = order as UTSJSONObject
+	 console.log('去支付:', order)
+	 if(isWechat()){
+	  uni.showToast({
+	   title: `支付订单 ${o['id']}`,
+	   icon: 'none'
+	  })
+	  uni.navigateTo({
+	   url: `/pages/orderDetail/orderDetail?orderNo=${o['id']}`
+	  })
+	 }
+	 if(isH5()){
+	  uni.navigateTo({
+	   url: `/pages/orderDetail/orderDetail?orderNo=${o['id']}`
+	  })
+	 }
+	}
+
 	onLoad((options: UTSJSONObject) => {
-		rechargeNo.value = options.rechargeNo
+		rechargeNo.value = options['rechargeNo'] as string
 		getOrderList('')
 	})
 

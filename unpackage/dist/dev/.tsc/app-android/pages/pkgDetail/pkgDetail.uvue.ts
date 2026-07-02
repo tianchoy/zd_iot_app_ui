@@ -19,11 +19,20 @@ const _cache = __ins.renderCache;
 	// 查询套餐信息详情
 	const pkgInfo = ref<any>({});
 
+	/** 模板中安全访问 pkgInfo 属性 */
+	function d(key: string): any {
+		const val = (pkgInfo.value as UTSJSONObject)[key]
+		return val as any
+	}
+
 	const flowPercentage = computed(() => {
 		if (!pkgInfo.value) return 0
 		
-		const usedFlow = Number(pkgInfo.value.usedFlow) || 0
-		const pkgFlow = Number(pkgInfo.value.pkgFlow) || 0
+		const info = pkgInfo.value as UTSJSONObject
+		const usedFlowStr = info['usedFlow'] as string
+		const pkgFlowStr = info['pkgFlow'] as string
+		const usedFlow = usedFlowStr != null && usedFlowStr != '' ? Number.parseInt(usedFlowStr) : 0
+		const pkgFlow = pkgFlowStr != null && pkgFlowStr != '' ? Number.parseInt(pkgFlowStr) : 0
 		
 		if (pkgFlow <= 0) return 0
 		
@@ -59,9 +68,10 @@ const _cache = __ins.renderCache;
 		uni.navigateBack()
 	}
 
-	onLoad((options)=>{
-		console.log('pkgDetail onLoad',options, " at pages/pkgDetail/pkgDetail.uvue:136")
-		pkgId.value = options.pkgId ?? ''
+	onLoad((options: UTSJSONObject) => {
+		console.log('pkgDetail onLoad',options, " at pages/pkgDetail/pkgDetail.uvue:145")
+		const pid = options['pkgId'] as string
+		pkgId.value = pid != null ? pid : ''
 		initPkgInfo()
 	})
 
@@ -96,16 +106,16 @@ const _component_rice_progress = resolveEasyComponent("rice-progress",_easycom_r
     _cE("view", _uM({ class: "container" }), [
       _cE("view", _uM({ class: "card-box" }), [
         _cE("view", _uM({ class: "card-header" }), [
-          isTrue(pkgInfo.value.pkgName)
+          isTrue(d('pkgName'))
             ? _cE("text", _uM({
                 key: 0,
                 class: "package-name"
-              }), _tD(pkgInfo.value.pkgName), 1 /* TEXT */)
+              }), _tD(d('pkgName')), 1 /* TEXT */)
             : _cC("v-if", true),
-          isTrue(pkgInfo.value.status)
+          isTrue(d('status'))
             ? _cV(_component_rice_tag, _uM({
                 key: 1,
-                text: pkgInfo.value.status,
+                text: d('status'),
                 round: true,
                 "plain-fill": "",
                 size: "small",
@@ -113,16 +123,16 @@ const _component_rice_progress = resolveEasyComponent("rice-progress",_easycom_r
               }), null, 8 /* PROPS */, ["text"])
             : _cC("v-if", true)
         ]),
-        isTrue(pkgInfo.value.rechargeNo)
+        isTrue(d('rechargeNo'))
           ? _cE("view", _uM({
               key: 0,
               class: "card-number"
             }), [
               _cE("text", _uM({ class: "number-label" }), "当前卡号："),
-              _cE("text", _uM({ class: "number-value" }), _tD(pkgInfo.value.rechargeNo), 1 /* TEXT */)
+              _cE("text", _uM({ class: "number-value" }), _tD(d('rechargeNo')), 1 /* TEXT */)
             ])
           : _cC("v-if", true),
-        isTrue(pkgInfo.value.usedFlow && pkgInfo.value.unUsedFlow)
+        isTrue(d('usedFlow') != null && d('unUsedFlow') != null)
           ? _cE("view", _uM({
               key: 1,
               class: "traffic-section"
@@ -132,9 +142,9 @@ const _component_rice_progress = resolveEasyComponent("rice-progress",_easycom_r
                   _cE("text", _uM({ class: "traffic-title" }), "流量使用")
                 ]),
                 _cE("view", _uM({ class: "traffic-progress" }), [
-                  _cE("text", _uM({ class: "used-text" }), "已用" + _tD(pkgInfo.value.usedFlow) + " GB", 1 /* TEXT */),
+                  _cE("text", _uM({ class: "used-text" }), "已用" + _tD(d('usedFlow')) + " GB", 1 /* TEXT */),
                   _cE("text", _uM({ class: "divider" }), "/"),
-                  _cE("text", _uM({ class: "total-text" }), "剩余" + _tD(pkgInfo.value.unUsedFlow) + " GB", 1 /* TEXT */)
+                  _cE("text", _uM({ class: "total-text" }), "剩余" + _tD(d('unUsedFlow')) + " GB", 1 /* TEXT */)
                 ])
               ]),
               _cE("view", _uM({ class: "progress-bar" }), [
@@ -146,40 +156,40 @@ const _component_rice_progress = resolveEasyComponent("rice-progress",_easycom_r
             ])
           : _cC("v-if", true),
         _cE("view", _uM({ class: "info-grid" }), [
-          isTrue(pkgInfo.value.pkgFlow)
+          isTrue(d('pkgFlow'))
             ? _cE("view", _uM({
                 key: 0,
                 class: "info-item"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "套餐流量"),
-                _cE("text", _uM({ class: "info-value" }), _tD(pkgInfo.value.pkgFlow) + " GB", 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('pkgFlow')) + " GB", 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(pkgInfo.value.startDate)
+          isTrue(d('startDate'))
             ? _cE("view", _uM({
                 key: 1,
                 class: "info-item"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "生效时间"),
-                _cE("text", _uM({ class: "info-value" }), _tD(pkgInfo.value.startDate), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('startDate')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(pkgInfo.value.validityPeriod)
+          isTrue(d('validityPeriod'))
             ? _cE("view", _uM({
                 key: 2,
                 class: "info-item"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "有效期"),
-                _cE("text", _uM({ class: "info-value" }), _tD(pkgInfo.value.validityPeriod) + _tD(pkgInfo.value?.pkgType == '1' ? '天' : '个月'), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('validityPeriod')) + _tD(d('pkgType') == '1' ? '天' : '个月'), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(pkgInfo.value.endDate)
+          isTrue(d('endDate'))
             ? _cE("view", _uM({
                 key: 3,
                 class: "info-item"
               }), [
                 _cE("text", _uM({ class: "info-label" }), "到期时间"),
-                _cE("text", _uM({ class: "info-value" }), _tD(pkgInfo.value.endDate), 1 /* TEXT */)
+                _cE("text", _uM({ class: "info-value" }), _tD(d('endDate')), 1 /* TEXT */)
               ])
             : _cC("v-if", true)
         ])
@@ -189,40 +199,40 @@ const _component_rice_progress = resolveEasyComponent("rice-progress",_easycom_r
           _cE("text", _uM({ class: "order-title-text" }), "关联订单信息")
         ]),
         _cE("view", _uM({ class: "order-detail" }), [
-          isTrue(pkgInfo.value.orderNo)
+          isTrue(d('orderNo'))
             ? _cE("view", _uM({
                 key: 0,
                 class: "order-row"
               }), [
                 _cE("text", _uM({ class: "order-label" }), "关联订单号"),
-                _cE("text", _uM({ class: "order-value" }), _tD(pkgInfo.value.orderNo), 1 /* TEXT */)
+                _cE("text", _uM({ class: "order-value" }), _tD(d('orderNo')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(pkgInfo.value.orderStatus)
+          isTrue(d('orderStatus'))
             ? _cE("view", _uM({
                 key: 1,
                 class: "order-row"
               }), [
                 _cE("text", _uM({ class: "order-label" }), "订单状态"),
-                _cE("text", _uM({ class: "order-value status-completed" }), _tD(pkgInfo.value.orderStatus), 1 /* TEXT */)
+                _cE("text", _uM({ class: "order-value status-completed" }), _tD(d('orderStatus')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(pkgInfo.value.payAmount)
+          isTrue(d('payAmount'))
             ? _cE("view", _uM({
                 key: 2,
                 class: "order-row"
               }), [
                 _cE("text", _uM({ class: "order-label" }), "支付金额"),
-                _cE("text", _uM({ class: "order-value price" }), "￥" + _tD(pkgInfo.value.payAmount), 1 /* TEXT */)
+                _cE("text", _uM({ class: "order-value price" }), "￥" + _tD(d('payAmount')), 1 /* TEXT */)
               ])
             : _cC("v-if", true),
-          isTrue(pkgInfo.value.orderCreateTime)
+          isTrue(d('orderCreateTime'))
             ? _cE("view", _uM({
                 key: 3,
                 class: "order-row"
               }), [
                 _cE("text", _uM({ class: "order-label" }), "下单时间"),
-                _cE("text", _uM({ class: "order-value" }), _tD(pkgInfo.value.orderCreateTime), 1 /* TEXT */)
+                _cE("text", _uM({ class: "order-value" }), _tD(d('orderCreateTime')), 1 /* TEXT */)
               ])
             : _cC("v-if", true)
         ])
