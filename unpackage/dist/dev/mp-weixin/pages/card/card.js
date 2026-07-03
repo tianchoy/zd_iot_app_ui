@@ -17,8 +17,9 @@ const _easycom_rice_button = () => "../../uni_modules/rice-ui/components/rice-bu
 const _easycom_rice_tabs = () => "../../uni_modules/rice-ui/components/rice-tabs/rice-tabs.js";
 const _easycom_rice_divider = () => "../../uni_modules/rice-ui/components/rice-divider/rice-divider.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_rice_input + _easycom_rice_button + _easycom_rice_tabs + _easycom_rice_divider)();
+  (_easycom_topNavBar + _easycom_rice_input + _easycom_rice_button + _easycom_rice_tabs + _easycom_rice_divider + common_vendor.unref(tousu))();
 }
+const tousu = () => "../../components/tousu.js";
 class TabItem extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
@@ -172,7 +173,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             },
             fail: (err) => {
-              common_vendor.index.__f__("error", "at pages/card/card.uvue:227", "登录失败:", err);
+              common_vendor.index.__f__("error", "at pages/card/card.uvue:229", "登录失败:", err);
               resolve(false);
             }
           }));
@@ -212,7 +213,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }
             const loginSuccess = yield getCode();
             if (!loginSuccess) {
-              common_vendor.index.__f__("log", "at pages/card/card.uvue:274", "登录失败，跳过数据加载");
+              common_vendor.index.__f__("log", "at pages/card/card.uvue:276", "登录失败，跳过数据加载");
               common_vendor.index.showToast({
                 title: "登录失败，请重试",
                 icon: "none"
@@ -347,8 +348,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         o: cardList.value.length === 0
       }, cardList.value.length === 0 ? {} : {}, {
-        p: `${_ctx.u_s_b_h}px`,
-        q: `${_ctx.u_s_a_i_b}px`
+        p: common_vendor.o(_ctx.handleConnectTousu, "69"),
+        q: common_vendor.p({
+          class: "data-v-a89086b7"
+        }),
+        r: `${_ctx.u_s_b_h}px`,
+        s: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

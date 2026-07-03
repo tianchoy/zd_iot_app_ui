@@ -59,23 +59,23 @@
 								<view v-if="pkgInfoList.length == 0" class="empty-order">暂无套餐记录</view>
 								<view class="item" v-for="(item, index) in pkgInfoList" :key="index" @click="handlePkgDetail(item.id)">
 									<view class="item-head">
-										<text class="item-label" v-if="item.name">{{ item.name }}</text>
+										<text class="item-label" v-if="item.pkgName">{{ item.pkgName }}</text>
 										<rice-tag v-if="item.status" :text="getPackageStatusText(item.status)" :round="true" plain-fill size="small" :type="getPackageStatusType(item.status)"></rice-tag>
 									</view>
-									<view class="item-sub-title" v-if="item.startTime">生效时间：{{ item.startTime}}</view>
-									<view class="item-sub-title" v-if="item.endTime">到期时间：{{ item.endTime}}</view>
+									<view class="item-sub-title" v-if="item.effectiveTime">生效时间：{{ item.effectiveTime}}</view>
+									<view class="item-sub-title" v-if="item.expirationTime">到期时间：{{ item.expirationTime}}</view>
 									<view class="item-data">
-										<view class="item-data-item" v-if="item.totalFlow">
+										<view class="item-data-item" v-if="item.pkgFlow">
 											<text class="item-data-label">套餐流量</text>
-											<text class="item-data-value">{{ item.totalFlow }}GB</text>
+											<text class="item-data-value">{{ item.pkgFlow }}GB</text>
 										</view>
 										<view class="item-data-item" v-if="item.usedFlow">
 											<text class="item-data-label">已用流量</text>
 											<text class="item-data-value">{{ item.usedFlow }}GB</text>
 										</view>
-										<view class="item-data-item" v-if="item.leftFlow">
+										<view class="item-data-item" v-if="item.unUsedFlow">
 											<text class="item-data-label">剩余流量</text>
-											<text class="item-data-value">{{ item.leftFlow }}GB</text>
+											<text class="item-data-value">{{ item.unUsedFlow }}GB</text>
 										</view>
 									</view>
 								</view>
@@ -329,7 +329,7 @@
 
 	const handleRecharge = () => {
 		uni.navigateTo({
-			url: '/pages/recharge/recharge?cardNumber=' + card_number.value
+			url: '/pages/recharge/recharge?rechargeNo=' + card_number.value
 		})
 	}
 

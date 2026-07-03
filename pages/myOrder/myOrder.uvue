@@ -253,7 +253,7 @@
 	const handleOrderClick = (order: OrderListXcxItem) => {
 		console.log(order)
 		uni.navigateTo({
-			url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+			url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
 		})
 	}
 	
@@ -308,7 +308,7 @@
 				icon: 'none'
 			})
 			uni.navigateTo({
-				url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+				url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
 			})
 		}
 

@@ -72,6 +72,11 @@
   font-size: 32rpx;
   font-weight: 600;
   color: #1f2937;
+  margin-bottom: 10rpx;
+}
+.card-box .search-tips[class].data-v-9fa4edd6 {
+  font-size: 20rpx;
+  color: #64748b;
   margin-bottom: 24rpx;
 }
 .card-box .search-value[class].data-v-9fa4edd6 {

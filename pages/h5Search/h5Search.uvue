@@ -13,10 +13,11 @@
 			<!-- 卡号查询卡片 -->
 			<view class="card-box">
 				<view class="card-label">卡号查询</view>
+				<view class="search-tips">请输入ICCID/MSISDN,或点击输入框右侧扫描图标识别卡号</view>
 				<view class="search-value">
 					<input
 						v-model="cardNumber"
-						placeholder="请输入ICCID/MSISDN，或点击输入框右侧扫描图标识别卡号"
+						placeholder="请输入ICCID/MSISDN,或扫描图标识别卡号"
 						class="search-input"
 					/>
 					<view class="scan-btn" @click="handleScan">
@@ -151,7 +152,7 @@
 		})
 		// 跳转到充值页面
 		uni.navigateTo({
-			url: `/pages/recharge/recharge?cardNumber=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
+			url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
 		})
 	}
 	
@@ -247,6 +248,12 @@
 			font-size: 32rpx;
 			font-weight: 600;
 			color: #1f2937;
+			margin-bottom: 10rpx;
+		}
+
+		.search-tips{
+			font-size: 20rpx;
+			color: #64748b;
 			margin-bottom: 24rpx;
 		}
 		

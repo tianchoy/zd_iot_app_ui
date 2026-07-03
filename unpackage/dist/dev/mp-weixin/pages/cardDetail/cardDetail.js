@@ -226,7 +226,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleRecharge = () => {
       common_vendor.index.navigateTo({
-        url: "/pages/recharge/recharge?cardNumber=" + card_number.value
+        url: "/pages/recharge/recharge?rechargeNo=" + card_number.value
       });
     };
     const isBinded = common_vendor.ref(false);
@@ -424,9 +424,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, pkgInfoList.value.length == 0 ? {} : {}, {
         J: common_vendor.f(pkgInfoList.value, (item, index, i0) => {
           return common_vendor.e({
-            a: item.name
-          }, item.name ? {
-            b: common_vendor.t(item.name)
+            a: item.pkgName
+          }, item.pkgName ? {
+            b: common_vendor.t(item.pkgName)
           } : {}, {
             c: item.status
           }, item.status ? {
@@ -440,25 +440,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               class: "data-v-2bc48812"
             })
           } : {}, {
-            f: item.startTime
-          }, item.startTime ? {
-            g: common_vendor.t(item.startTime)
+            f: item.effectiveTime
+          }, item.effectiveTime ? {
+            g: common_vendor.t(item.effectiveTime)
           } : {}, {
-            h: item.endTime
-          }, item.endTime ? {
-            i: common_vendor.t(item.endTime)
+            h: item.expirationTime
+          }, item.expirationTime ? {
+            i: common_vendor.t(item.expirationTime)
           } : {}, {
-            j: item.totalFlow
-          }, item.totalFlow ? {
-            k: common_vendor.t(item.totalFlow)
+            j: item.pkgFlow
+          }, item.pkgFlow ? {
+            k: common_vendor.t(item.pkgFlow)
           } : {}, {
             l: item.usedFlow
           }, item.usedFlow ? {
             m: common_vendor.t(item.usedFlow)
           } : {}, {
-            n: item.leftFlow
-          }, item.leftFlow ? {
-            o: common_vendor.t(item.leftFlow)
+            n: item.unUsedFlow
+          }, item.unUsedFlow ? {
+            o: common_vendor.t(item.unUsedFlow)
           } : {}, {
             p: index,
             q: common_vendor.o(($event) => {
@@ -495,7 +495,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }) : {}, {
         N: ((_K = cardDetail.value) == null ? void 0 : _K.isBind) || isBinded.value
       }, ((_L = cardDetail.value) == null ? void 0 : _L.isBind) || isBinded.value ? {
-        O: common_vendor.o(handleUnbind, "e5"),
+        O: common_vendor.o(handleUnbind, "59"),
         P: common_vendor.p({
           type: "error",
           ["plain-fill"]: true,
@@ -518,7 +518,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        S: common_vendor.o(handleBindCard, "55"),
+        S: common_vendor.o(handleBindCard, "38"),
         T: common_vendor.p({
           height: "100rpx",
           bold: true,
@@ -528,7 +528,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        U: common_vendor.o(handleRecharge, "90"),
+        U: common_vendor.o(handleRecharge, "95"),
         V: common_vendor.p({
           height: "100rpx",
           type: "primary",

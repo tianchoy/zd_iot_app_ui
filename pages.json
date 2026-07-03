@@ -1,5 +1,33 @@
 {
 	"pages": [
+		// // #ifdef MP-WEIXIN
+		// {
+		// 	"path": "pages/card/card",
+		// 	"style": {
+		// 		"navigationBarTitleText": ""
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/recharge/recharge",
+		// 	"style": {
+		// 		"navigationBarTitleText": ""
+		// 	}
+		// },
+		// // #endif
+		// // #ifdef H5
+		// {
+		// 	"path": "pages/recharge/recharge",
+		// 	"style": {
+		// 		"navigationBarTitleText": ""
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/card/card",
+		// 	"style": {
+		// 		"navigationBarTitleText": ""
+		// 	}
+		// },
+		// // #endif
 		{
 			"path": "pages/card/card",
 			"style": {

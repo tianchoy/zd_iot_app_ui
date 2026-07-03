@@ -1,1 +1,1 @@
-{"version":3,"file":"assets.js","sources":["static/defaultAvator.png"],"sourcesContent":["export default \"__VITE_ASSET__3f44fca8__\""],"names":[],"mappings":";AAAA,MAAe,aAAA;;"}
+{"version":3,"file":"assets.js","sources":["static/defaultAvator.png","static/tousu.png"],"sourcesContent":["export default \"__VITE_ASSET__3f44fca8__\"","export default \"__VITE_ASSET__e87070dd__\""],"names":[],"mappings":";AAAA,MAAe,eAAA;ACAf,MAAe,aAAA;;;"}

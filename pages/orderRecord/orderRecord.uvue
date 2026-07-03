@@ -176,7 +176,7 @@
 	// 处理订单点击
 	const handleOrderClick = (order: any) => {
 	 uni.navigateTo({
-	  url: `/pages/orderDetail/orderDetail?orderNo=${(order as UTSJSONObject)['id']}`
+	  url: `/pages/orderDetail/orderDetail?orderNo=${(order as UTSJSONObject)['orderNo']}`
 	 })
 	}
 
@@ -197,12 +197,12 @@
 	   icon: 'none'
 	  })
 	  uni.navigateTo({
-	   url: `/pages/orderDetail/orderDetail?orderNo=${o['id']}`
+	   url: `/pages/orderDetail/orderDetail?orderNo=${o['orderNo']}`
 	  })
 	 }
 	 if(isH5()){
 	  uni.navigateTo({
-	   url: `/pages/orderDetail/orderDetail?orderNo=${o['id']}`
+	   url: `/pages/orderDetail/orderDetail?orderNo=${o['orderNo']}`
 	  })
 	 }
 	}

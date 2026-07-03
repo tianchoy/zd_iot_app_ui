@@ -184,7 +184,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const handleOrderClick = (order) => {
       common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:254", order);
       common_vendor.index.navigateTo({
-        url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+        url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
       });
     };
     const handleBack = () => {
@@ -231,7 +231,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           icon: "none"
         });
         common_vendor.index.navigateTo({
-          url: `/pages/orderDetail/orderDetail?orderNo=${order.id}`
+          url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
         });
       }
     };

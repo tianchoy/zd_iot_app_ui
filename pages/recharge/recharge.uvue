@@ -57,7 +57,7 @@
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ item.pkgFlow }}</text>
+								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ item.pkgFlow }}GB</text>
 								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod }}{{ item?.pkgType == '1' ? '天' : '个月' }}</text>
 							</view>
 						</view>
@@ -88,7 +88,7 @@
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ item.pkgFlow }}</text>
+								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ item.pkgFlow }}GB</text>
 								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod }}{{ item?.pkgType == '1' ? '天' : '个月' }}</text>
 							</view>
 						</view>
@@ -140,8 +140,9 @@
 			<rice-button type="primary" width="300rpx" height="110rpx" @click="choosePayment" class="btn">去支付</rice-button>
 		</view>
 	</view>
-	<view ref="formContainer"></view>
+	<view ref="formContainer" class="form-container"></view>
 	<customService @connect_service="handleConnectService"></customService>
+	<tousu @connect_tousu="handleConnectTousu"></tousu>
 	<rice-popup v-model:show="showCustomService" position="bottom">
 		<view class="popup-center">
 			<view class="cs-list" v-if="cardDetail?.objectMap?.serviceQrcode">
@@ -175,6 +176,7 @@
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
 	import { config , isWechat,isH5} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
+	import tousu from '@/components/tousu.uvue';
 	defineOptions({
 		inheritAttrs: false
 	})
@@ -268,7 +270,7 @@
 		}
 	});
 	
-	// 根据 pkgCategory 分类套餐和加油包
+	// 根据 pkgCategory 分类套餐和加油包，并按 pkgSort 排序
 	const classifyPackages = (packages: Array<PkgXcxVo>) => {
 		const packagesList: Array<PkgXcxVo> = [];
 		const refillsList: Array<PkgXcxVo> = [];
@@ -282,8 +284,16 @@
 			}
 		});
 		
-		packageList.value = packagesList;
-		refillList.value = refillsList;
+		// 按 pkgSort 排序（升序，数值越小越靠前）
+		// pkgSort 为 null 或 undefined 的排到最后
+		const sortByPkgSort = (a: PkgXcxVo, b: PkgXcxVo) => {
+			const sortA = a.pkgSort ?? Number.MAX_SAFE_INTEGER;
+			const sortB = b.pkgSort ?? Number.MAX_SAFE_INTEGER;
+			return sortA - sortB;
+		};
+		
+		packageList.value = packagesList.sort(sortByPkgSort);
+		refillList.value = refillsList.sort(sortByPkgSort);
 		
 		// 根据URL参数中的pkgId设置默认选中
 		setDefaultSelection();
@@ -544,7 +554,7 @@
 					if(res.data.payWxType == 'wechat_pay' || res.data.payWxType == 'allin_pay'){
 						window.location.href = res.data.url
 					}else{
-						handleAlipayForm(res.data.formHtml)
+						handleAlipayForm(res.data.url)
 					}
 				}
 			} else {
@@ -635,7 +645,7 @@
 	onLoad((options: UTSJSONObject) => {
 		console.log('options:', options)
 		const opt = options as any
-		const cardNumberValue = opt.cardNumber
+		const cardNumberValue = opt.rechargeNo
 		const countryValue = opt.country
 		const from = opt.from
 		const pkgId = opt.pkgId
@@ -725,6 +735,23 @@
 			}
 		}
 	})
+
+	const callPhone = (phone: string) => {
+		uni.makePhoneCall({
+			phoneNumber: phone,
+			success: () => {
+				console.log('拨号界面弹出成功');
+			},
+			fail: (err) => {
+				console.log('拨号失败:', err);
+				// 可以在这里给用户一个提示
+				uni.showToast({
+				title: '拨号失败，请重试',
+				icon: 'none'
+				});
+			}
+		});
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -812,7 +839,7 @@
 			border: 1rpx solid #e7edf5;
 			border-radius: 20rpx;
 			padding: 24rpx;
-			margin: 24rpx 24rpx 120rpx 24rpx;
+			margin: 24rpx 24rpx 300rpx 24rpx;
 		}
 		.pkg-content {
 			margin: 24rpx 0 0 0;

@@ -42,7 +42,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const onCountryChange = (value = null, item = null) => {
       showCountryPopup.value = false;
       resCountry.value = value;
-      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:117", "选中国家/地区:", resCountry.value);
+      common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:118", "选中国家/地区:", resCountry.value);
     };
     const onPopupClose = () => {
       showCountryPopup.value = false;
@@ -72,7 +72,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         icon: "loading"
       });
       common_vendor.index.navigateTo({
-        url: `/pages/recharge/recharge?cardNumber=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
+        url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
       });
     };
     const onScanResult = (data) => {
@@ -89,7 +89,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const initCountryList = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.getCountryList(false);
-        common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:173", "查询国家列表:", res);
+        common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:174", "查询国家列表:", res);
         if (res.code == 200) {
           countryOptions.value = res.data.map((item) => {
             return new common_vendor.UTSJSONObject({
@@ -120,27 +120,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: cardNumber.value,
         c: common_vendor.o(($event) => {
           return cardNumber.value = $event.detail.value;
-        }, "0d"),
+        }, "d8"),
         d: common_vendor.p({
           name: "scan",
           size: "40rpx",
           color: "#666",
           class: "data-v-9fa4edd6"
         }),
-        e: common_vendor.o(handleScan, "e9"),
+        e: common_vendor.o(handleScan, "22"),
         f: common_vendor.t(selectedCountryLabel.value || "请选择国家/地区"),
         g: !selectedCountry.value ? 1 : "",
-        h: common_vendor.o(openSelectCountry, "47"),
-        i: common_vendor.o(handleQuery, "f5"),
+        h: common_vendor.o(openSelectCountry, "0b"),
+        i: common_vendor.o(handleQuery, "e0"),
         j: `${_ctx.u_s_b_h}px`,
         k: `${_ctx.u_s_a_i_b}px`,
         l: common_vendor.sr(searchSelectRef, "9fa4edd6-3,9fa4edd6-2", {
           "k": "searchSelectRef"
         }),
-        m: common_vendor.o(onCountryChange, "b5"),
+        m: common_vendor.o(onCountryChange, "f0"),
         n: common_vendor.o(($event) => {
           return selectedCountry.value = $event;
-        }, "3d"),
+        }, "85"),
         o: common_vendor.p({
           options: countryOptions.value,
           maxHeight: "800rpx",
@@ -149,10 +149,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: selectedCountry.value,
           class: "r data-v-9fa4edd6"
         }),
-        p: common_vendor.o(onPopupClose, "4e"),
+        p: common_vendor.o(onPopupClose, "8e"),
         q: common_vendor.o(($event) => {
           return showCountryPopup.value = $event;
-        }, "05"),
+        }, "e5"),
         r: common_vendor.p({
           position: "bottom",
           show: showCountryPopup.value,

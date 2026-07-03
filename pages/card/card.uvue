@@ -70,11 +70,13 @@
 		<view v-if="cardList.length === 0" class="empty-state">
 			<text class="empty-text">暂无卡片数据</text>
 		</view>
+		<tousu @connect_tousu="handleConnectTousu"></tousu>
 	</view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import tousu from '@/components/tousu.uvue'
 import { queryCardList, login, getTenantInfo } from '@/api/http.uts'
 import { getToken, getTenantId, isWechat, setToken } from '@/common/config.uts'
 import type { RechargeData } from '@/api/types.uts'
