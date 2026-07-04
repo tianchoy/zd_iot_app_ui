@@ -42,7 +42,7 @@ class TabItem extends common_vendor.UTS.UTSType {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "card",
   setup(__props) {
-    const card_number = common_vendor.ref("gn1000000000002");
+    const card_number = common_vendor.ref("");
     const queryKeyword = common_vendor.ref("");
     const current = common_vendor.ref(0);
     common_vendor.ref(0);
@@ -146,8 +146,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleRecharge = (rechargeNo) => {
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:199", "去充值", rechargeNo);
       common_vendor.index.navigateTo({
-        url: "/pages/recharge/recharge?cardNumber=" + rechargeNo
+        url: "/pages/recharge/recharge?rechargeNo=" + rechargeNo
       });
     };
     const code = common_vendor.ref("");
@@ -173,7 +174,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             },
             fail: (err) => {
-              common_vendor.index.__f__("error", "at pages/card/card.uvue:229", "登录失败:", err);
+              common_vendor.index.__f__("error", "at pages/card/card.uvue:230", "登录失败:", err);
               resolve(false);
             }
           }));
@@ -204,22 +205,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const platform = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (common_config.isWechat()) {
-          if (!checkToken()) {
-            yield getTenantInfos();
-            if (wxGetPhoneLogin.value != "1") {
-              cardList.value = [];
-              cardCounts.value = [0, 0, 0];
-              return Promise.resolve(null);
-            }
-            const loginSuccess = yield getCode();
-            if (!loginSuccess) {
-              common_vendor.index.__f__("log", "at pages/card/card.uvue:276", "登录失败，跳过数据加载");
-              common_vendor.index.showToast({
-                title: "登录失败，请重试",
-                icon: "none"
-              });
-              return Promise.resolve(null);
-            }
+          yield getTenantInfos();
+          if (wxGetPhoneLogin.value != "1") {
+            cardList.value = [];
+            cardCounts.value = [0, 0, 0];
+            return Promise.resolve(null);
+          }
+          const loginSuccess = yield getCode();
+          if (!loginSuccess) {
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:299", "登录失败，跳过数据加载");
+            common_vendor.index.showToast({
+              title: "登录失败，请重试",
+              icon: "none"
+            });
+            return Promise.resolve(null);
           }
         }
         yield loadCardData();

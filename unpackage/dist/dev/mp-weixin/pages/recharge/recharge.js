@@ -178,13 +178,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const handleCancelPayment = () => {
     showPopup.value = false;
   };
-  const orderId = common_vendor.ref("");
+  const orderNo = common_vendor.ref("");
   const payChannelId = common_vendor.ref("");
   const toPay = (data = null) => {
     if (!data)
       return null;
     const res = data;
-    orderId.value = res.orderId;
+    orderNo.value = res.orderNo;
     payChannelId.value = res.payChannelId;
     isInPaymentProcess.value = true;
     if (res.payWxType == "wechat_pay") {
@@ -199,7 +199,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:409", "微信支付成功", res2);
           common_vendor.index.hideLoading();
           common_vendor.index.redirectTo({
-            url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
+            url: "/pages/paySuccess/paySuccess?orderId=" + orderNo.value + "&payChannelId=" + payChannelId.value
           });
         },
         fail: (res2) => {
@@ -211,7 +211,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           });
           setTimeout(() => {
             common_vendor.index.reLaunch({
-              url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
+              url: "/pages/orderDetail/orderDetail?orderNo=" + orderNo.value
             });
           }, 1e3);
           isInPaymentProcess.value = false;
@@ -229,7 +229,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
             common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:441", "通联支付成功", res2);
             common_vendor.index.hideLoading();
             common_vendor.index.redirectTo({
-              url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
+              url: "/pages/paySuccess/paySuccess?orderId=" + orderNo.value + "&payChannelId=" + payChannelId.value
             });
           },
           fail: function(err) {
@@ -241,7 +241,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
             });
             setTimeout(() => {
               common_vendor.index.reLaunch({
-                url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
+                url: "/pages/orderDetail/orderDetail?orderNo=" + orderNo.value
               });
             }, 1e3);
             isInPaymentProcess.value = false;
@@ -420,11 +420,78 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       });
     }
   });
+  const wxGetPhoneLogin = common_vendor.ref("");
+  const code = common_vendor.ref("");
+  const userId = common_vendor.ref("");
+  const userLoginByOpenid = (codes) => {
+    return common_vendor.__awaiter(this, void 0, void 0, function* () {
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:677", "userLoginByOpenid:", codes);
+      const res = yield api_http.login(new common_vendor.UTSJSONObject({
+        xcxCode: codes,
+        isLogin: "1"
+      }));
+      if (res.code == 200) {
+        userId.value = "" + res.data.id;
+        common_vendor.index.navigateTo({
+          url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value + "&from=other&rechargeNo=" + cardNumber.value
+        });
+      }
+    });
+  };
+  const getCode = () => {
+    return common_vendor.__awaiter(this, void 0, void 0, function* () {
+      common_vendor.index.login(new common_vendor.UTSJSONObject({
+        success: (res) => {
+          code.value = res.code;
+          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:694", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
+          if (wxGetPhoneLogin.value == "1") {
+            const params = new common_vendor.UTSJSONObject({
+              isLogin: "1",
+              xcxCode: code.value
+            });
+            api_http.login(params).then((res2) => {
+              if (res2.code == 200) {
+                common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:702", "登录成功:", res2.data.access_token);
+                common_config.setToken(res2.data.access_token, res2.data.refreshToken);
+                common_vendor.index.reLaunch({
+                  url: "/pages/recharge/recharge?rechargeNo=" + cardNumber.value
+                });
+              }
+            });
+          } else {
+            userLoginByOpenid(res.code);
+          }
+        }
+      }));
+    });
+  };
+  const getTenantInfos = () => {
+    return common_vendor.__awaiter(this, void 0, void 0, function* () {
+      const res = yield api_http.getTenantInfo(common_config.getTenantId(), false);
+      if (res.code == 200) {
+        const tenantInfo = res.data;
+        wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
+      }
+    });
+  };
+  const platform = () => {
+    return common_vendor.__awaiter(this, void 0, void 0, function* () {
+      if (common_config.isWechat()) {
+        yield getTenantInfos();
+        yield getCode();
+      }
+    });
+  };
   common_vendor.onShow(() => {
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:732", "onShow111111111", isInPaymentProcess.value);
+    let options = common_vendor.index.getEnterOptionsSync();
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:736", "options.scene:", options.scene);
+    if (options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037 || options.scene == 1038) {
+      platform();
+    }
     if (!isInPaymentProcess.value) {
       return null;
     }
-    let options = common_vendor.index.getEnterOptionsSync();
     if (options.scene == "1038" && options.referrerInfo.appId == common_config.config.api.auth.appID) {
       let extraData = options.referrerInfo.extraData;
       if (!extraData) {
@@ -446,7 +513,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
             success() {
               isInPaymentProcess.value = false;
               common_vendor.index.redirectTo({
-                url: "/pages/paySuccess/paySuccess?orderId=" + orderId.value + "&payChannelId=" + payChannelId.value
+                url: "/pages/paySuccess/paySuccess?orderId=" + orderNo.value + "&payChannelId=" + payChannelId.value
               });
             }
           });
@@ -459,7 +526,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           });
           setTimeout(() => {
             common_vendor.index.reLaunch({
-              url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
+              url: "/pages/orderDetail/orderDetail?orderNo=" + orderNo.value
             });
           }, 1e3);
           isInPaymentProcess.value = false;
@@ -481,10 +548,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     common_vendor.index.makePhoneCall({
       phoneNumber: phone,
       success: () => {
-        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:743", "拨号界面弹出成功");
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:809", "拨号界面弹出成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:746", "拨号失败:", err);
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:812", "拨号失败:", err);
         common_vendor.index.showToast({
           title: "拨号失败，请重试",
           icon: "none"

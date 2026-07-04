@@ -111,6 +111,7 @@
 			</view>
 		</view>
 	</view>
+	<view ref="formContainer" class="form-container"></view>
 	<rice-popup
 		v-model:show="showPopup"
 		position="bottom"
@@ -323,14 +324,14 @@
 		showPopup.value = false
 	}
 
+	const orderNos = ref<string>('')
+
 	const toPay = (data: UTSJSONObject) => {
 		if(!data) return
-		orderId.value = data['orderId'] as string
+		orderNos.value = data['orderNo'] as string
 		payChannelId.value = data['payChannelId'] as string
 		// 设置正在支付流程中 - 所有支付方式统一处理
 		isInPaymentProcess.value = true
-
-		// #ifdef MP-WEIXIN
 		const payWxType = data['payWxType'] as string
 		if(payWxType == 'wechat_pay'){
 			uni.requestPayment({
@@ -344,7 +345,7 @@
 				success: (res) => {
 					uni.hideLoading()
 					uni.redirectTo({
-						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+						url: '/pages/paySuccess/paySuccess?orderId=' + orderNos.value + '&payChannelId=' + payChannelId.value
 					})
 				},
 				fail: (res) => {
@@ -371,7 +372,7 @@
 					success: function (res) {
 						uni.hideLoading()
 						uni.redirectTo({
-							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+							url: '/pages/paySuccess/paySuccess?orderId=' + orderNos.value + '&payChannelId=' + payChannelId.value
 						})
 					},
 					fail: function (err) {
@@ -415,8 +416,19 @@
 				})
 			}
 		}
-		// #endif
 	}
+
+	const formContainer = ref<HTMLDivElement | null>(null);
+	const handleAlipayForm = (formHtml: string) => {
+		if (!formContainer.value) return;
+		formContainer.value.innerHTML = formHtml;
+		const form = formContainer.value.querySelector('form');
+		if (form) {
+			form.submit();
+		} else {
+			console.error('未找到支付表单');
+		}
+	};
 
 	// 确认支付
 	const handleConfirmPayment = async (e: UTSJSONObject) => {
@@ -424,7 +436,19 @@
 		try {
 			const res = await goPayXcx(orderId.value)
 			if (res.code == 200) {
-				toPay(res.data as UTSJSONObject)
+				console.log('支付成功:', res.data)
+				if(isWechat()){
+					toPay(res.data as UTSJSONObject)
+				}
+				if(isH5()){
+					console.log('H5支付:', res.data)
+
+					if(res.data.payWxType == 'wechat_pay' || res.data.payWxType == 'allin_pay'){
+						window.location.href = res.data.url
+					}else{
+						handleAlipayForm(res.data.url)
+					}
+				}
 			} else {
 				uni.showToast({
 					title: res.msg || '支付失败',
@@ -434,7 +458,7 @@
 		} catch (error) {
 			console.error('支付失败:', error)
 			uni.showToast({
-				title: '支付失败，请稍后重试',
+				title: err.msg,
 				icon: 'none'
 			})
 		}
@@ -483,7 +507,6 @@
 		}
 		
 		let options = uni.getEnterOptionsSync();
-		// #ifdef MP-WEIXIN
 		if (options.scene == '1038' &&
 			options.referrerInfo.appId == config.api.auth.appID) {
 			// 代表从收银台小程序返回
@@ -511,7 +534,7 @@
 							isInPaymentProcess.value = false
 							// 使用 redirectTo 替换当前页面，避免页面栈累积
 							uni.redirectTo({
-								url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+								url: '/pages/paySuccess/paySuccess?orderId=' + orderNos.value + '&payChannelId=' + payChannelId.value
 							})
 						}
 					});
@@ -536,7 +559,6 @@
 				}
 			}
 		}
-		// #endif
 	})
 </script>
 

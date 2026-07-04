@@ -86,7 +86,7 @@
 							<view v-if="orderList.length == 0" class="empty-order">
 								<view class="empty-text">暂无订单记录</view>
 							</view>
-							<view class="item" v-for="(order, index) in orderList" :key="index"  @click="handleOrderDetail(order.id.toString())">
+							<view class="item" v-for="(order, index) in orderList" :key="index"  @click="handleOrderDetail(order.orderNo.toString())">
 								<view class="item-head">
 									<text class="item-label">{{ order.pkgName || '未知套餐' }}</text>
 									<rice-tag 

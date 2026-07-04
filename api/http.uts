@@ -276,10 +276,25 @@ export function queryOrderSuccess(id: string, payChannelId: string, withToken: b
 
 // 订单详情里去支付Xcx
 export function goPayXcx(orderId:string, withToken: boolean = true): Promise<ApiResponse<any>> {
+  // #ifdef MP-WEIXIN
+  const url = (ApiUrl.goPayXcx as string) + orderId
+  const token = true
+  // #endif
+
+  // #ifdef H5
+  const url = (ApiUrl.goPayGnH5 as string) + orderId
+  const token = false
+  // #endif
+  // #ifndef MP-WEIXIN || H5
+  // 其他平台默认使用H5配置
+  const url = (ApiUrl.goPayGnH5 as string) + orderId
+  const token = false
+  // #endif
+  
   return request<any>({
-    url: (ApiUrl.goPayXcx as string) + orderId,
+    url: url,
     method: 'POST',
-    withToken: withToken
+    withToken: token
   })
 }
 

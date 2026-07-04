@@ -276,6 +276,8 @@ function queryOrderSuccess(id, payChannelId, withToken = true) {
   }));
 }
 function goPayXcx(orderId, withToken = true) {
+  const url = api_url.ApiUrl.goPayXcx + orderId;
+  const token = true;
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,
@@ -289,9 +291,9 @@ function goPayXcx(orderId, withToken = true) {
     successCodes: null,
     unauthorizedCodes: null,
     onErrorCode: null,
-    url: api_url.ApiUrl.goPayXcx + orderId,
+    url,
     method: "POST",
-    withToken
+    withToken: token
   }));
 }
 function queryPkgInfoXcx(id, withToken = true) {

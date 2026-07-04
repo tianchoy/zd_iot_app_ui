@@ -7,14 +7,16 @@ const utils_doc = require("../../utils/doc.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_checkbox_1 = common_vendor.resolveComponent("rice-checkbox");
+  const _easycom_rice_divider_1 = common_vendor.resolveComponent("rice-divider");
   const _easycom_rice_dialog_1 = common_vendor.resolveComponent("rice-dialog");
-  (_easycom_topNavBar_1 + _easycom_rice_checkbox_1 + _easycom_rice_dialog_1)();
+  (_easycom_topNavBar_1 + _easycom_rice_checkbox_1 + _easycom_rice_divider_1 + _easycom_rice_dialog_1)();
 }
 const _easycom_topNavBar = () => "../../components/topNavBar/topNavBar.js";
 const _easycom_rice_checkbox = () => "../../uni_modules/rice-ui/components/rice-checkbox/rice-checkbox.js";
+const _easycom_rice_divider = () => "../../uni_modules/rice-ui/components/rice-divider/rice-divider.js";
 const _easycom_rice_dialog = () => "../../uni_modules/rice-ui/components/rice-dialog/rice-dialog.js";
 if (!Math) {
-  (_easycom_topNavBar + _easycom_rice_checkbox + _easycom_rice_dialog)();
+  (_easycom_topNavBar + _easycom_rice_checkbox + _easycom_rice_divider + _easycom_rice_dialog)();
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "login",
@@ -24,6 +26,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const docState = common_vendor.ref(false);
     const showTitle = common_vendor.ref(false);
     const message = common_vendor.ref("");
+    const from = common_vendor.ref("");
+    const rechargeNo = common_vendor.ref("");
     const isDocState = () => {
       docState.value = !docState.value;
     };
@@ -35,12 +39,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isLogin: wxGetPhoneLogin.value
         }));
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:46", "登录成功:", res.data.access_token);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:51", "登录成功:", res.data.access_token);
           common_config.setToken(res.data.access_token, res.data.refreshToken);
           common_config.setStorageSync("usePhoneNumber", true);
-          common_vendor.index.reLaunch({
-            url: "/pages/card/card"
-          });
+          if (from.value == "other") {
+            common_vendor.index.reLaunch({
+              url: "/pages/recharge/recharge?rechargeNo=" + rechargeNo.value
+            });
+          } else {
+            common_vendor.index.reLaunch({
+              url: "/pages/card/card"
+            });
+          }
         }
       });
     };
@@ -54,6 +64,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       const detail = res["detail"];
       getLogin(detail["code"]);
+    };
+    const noNowLogin = () => {
+      common_vendor.index.reLaunch({
+        url: "/pages/card/card"
+      });
     };
     const gotoAgreement = () => {
       showTitle.value = true;
@@ -70,6 +85,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (options["wxGetPhoneLogin"] != null) {
         wxGetPhoneLogin.value = options["wxGetPhoneLogin"];
         userId.value = options["userId"];
+        from.value = options["from"];
+        rechargeNo.value = options["rechargeNo"];
       }
     });
     return (_ctx, _cache) => {
@@ -92,19 +109,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         f: common_vendor.o(gotoAgreement, "01"),
         g: common_vendor.o(gotoPrivacy, "e7"),
-        h: common_vendor.o(agree, "15"),
-        i: common_vendor.o(($event) => {
+        h: common_vendor.p({
+          dashed: true,
+          class: "data-v-27a30816"
+        }),
+        i: common_vendor.o(noNowLogin, "2e"),
+        j: common_vendor.o(agree, "64"),
+        k: common_vendor.o(($event) => {
           return common_vendor.isRef(showTitle) ? showTitle.value = $event : null;
-        }, "01"),
-        j: common_vendor.p({
+        }, "62"),
+        l: common_vendor.p({
           width: "80%",
           message: common_vendor.unref(message),
           ["show-cancel-button"]: false,
           show: common_vendor.unref(showTitle),
           class: "data-v-27a30816"
         }),
-        k: `${_ctx.u_s_b_h}px`,
-        l: `${_ctx.u_s_a_i_b}px`
+        m: `${_ctx.u_s_b_h}px`,
+        n: `${_ctx.u_s_a_i_b}px`
       };
       return __returned__;
     };

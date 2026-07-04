@@ -172,9 +172,9 @@
 
 <script setup lang="uts">
 	import { ref, computed } from 'vue';
-	import { queryCardDetail, addOrder } from '@/api/http.uts';
+	import { queryCardDetail, addOrder,login,getTenantInfo} from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
-	import { config , isWechat,isH5} from '@/common/config.uts';
+	import { config , getTenantId,isWechat,isH5,setToken} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	import tousu from '@/components/tousu.uvue';
 	defineOptions({
@@ -386,12 +386,12 @@
 		showPopup.value = false;
 	}
 
-	const orderId = ref<string>('')
+	const orderNo = ref<string>('')
 	const payChannelId = ref<string>('')
 	const toPay = (data:any) => {
 		if(!data) return
 		const res = data as any
-		orderId.value = res.orderId
+		orderNo.value = res.orderNo
 		payChannelId.value = res.payChannelId
 		// 设置正在支付流程中
 		isInPaymentProcess.value = true
@@ -409,7 +409,7 @@
 					console.log('微信支付成功',res)
 					uni.hideLoading()
 					uni.redirectTo({
-						url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+						url: '/pages/paySuccess/paySuccess?orderId=' + orderNo.value + '&payChannelId=' + payChannelId.value
 					})
 				},
 				fail: (res) => {
@@ -421,7 +421,7 @@
 					});
 					setTimeout(() => {
 						uni.reLaunch({
-							url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+							url: '/pages/orderDetail/orderDetail?orderNo=' + orderNo.value
 						});
 					}, 1000);
 					// 支付失败，重置标记
@@ -441,7 +441,7 @@
 						console.log('通联支付成功',res)
 						uni.hideLoading()
 						uni.redirectTo({
-							url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+							url: '/pages/paySuccess/paySuccess?orderId=' + orderNo.value + '&payChannelId=' + payChannelId.value
 						})
 					},
 					fail: function (err) {
@@ -453,7 +453,7 @@
 						});
 						setTimeout(() => {
 							uni.reLaunch({
-								url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+								url: '/pages/orderDetail/orderDetail?orderNo=' + orderNo.value
 							});
 						}, 1000);
 						// 支付失败，重置标记
@@ -669,13 +669,79 @@
 		}
 	})
 
+	const wxGetPhoneLogin = ref<string>('')
+	const code = ref<string>('')
+	//登录
+	const userId = ref<string>('')
+	const userLoginByOpenid = async (codes: string) => {
+		console.log('userLoginByOpenid:', codes)
+		const res = await login({
+			xcxCode: codes,
+			isLogin: '1',
+		})
+		
+		if(res.code == 200){
+			userId.value = '' + res.data.id
+			uni.navigateTo({
+				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value + '&from=other' + '&rechargeNo=' + cardNumber.value
+			})
+		}
+	}
+	const getCode = async () => {
+		uni.login({
+			success: (res) => {
+				code.value = res.code
+				console.log('wxGetPhoneLogin:', wxGetPhoneLogin.value)
+				if( wxGetPhoneLogin.value == '1'){
+					const params = {
+						isLogin: "1",
+						xcxCode: code.value,
+					}
+					login(params).then((res) => {
+						if(res.code == 200){
+							console.log('登录成功:', res.data.access_token)
+							setToken(res.data.access_token, res.data.refreshToken)
+							uni.reLaunch({
+								url: '/pages/recharge/recharge?rechargeNo=' + cardNumber.value
+							})
+						}
+					})
+				}else{
+					userLoginByOpenid(res.code);
+				}
+			}
+		})
+	}
+	const getTenantInfos = async () => {
+		const res = await getTenantInfo(getTenantId(),false)
+		if(res.code == 200){
+			const tenantInfo = res.data
+			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
+		}
+	}
+
+	const platform = async () => {
+		// 1. 微信环境且无token时，先完成登录
+		if (isWechat()) {
+			await getTenantInfos()
+			await getCode()
+		}
+	}
+
 	onShow(() => {
+		console.log('onShow111111111',isInPaymentProcess.value)
+		
+		
+		let options = uni.getEnterOptionsSync();
+		console.log('options.scene:', options.scene)
+		// 1011扫描二维码  1012长按图片识别二维码  1013相册选择二维码 1037小程序打开小程序 1038 从另一个小程序返回
+		if(options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037|| options.scene == 1038){
+			platform()
+		}
 		// 只有在支付流程中才处理支付回调
 		if (!isInPaymentProcess.value) {
 			return
 		}
-		
-		let options = uni.getEnterOptionsSync();
 		if (options.scene == '1038' &&
 			options.referrerInfo.appId == config.api.auth.appID) {
 			// 代表从收银台小程序返回
@@ -702,7 +768,7 @@
 							isInPaymentProcess.value = false
 							// 使用 redirectTo 替换当前页面，避免页面栈累积
 							uni.redirectTo({
-								url: '/pages/paySuccess/paySuccess?orderId=' + orderId.value + '&payChannelId=' + payChannelId.value
+								url: '/pages/paySuccess/paySuccess?orderId=' + orderNo.value + '&payChannelId=' + payChannelId.value
 							})
 						}
 					});
@@ -716,7 +782,7 @@
 					// 重置支付流程标记
 					setTimeout(() => {
 						uni.reLaunch({
-							url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+							url: '/pages/orderDetail/orderDetail?orderNo=' + orderNo.value
 						});
 					}, 1000);
 					isInPaymentProcess.value = false

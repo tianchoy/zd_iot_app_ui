@@ -50,9 +50,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const userId = common_vendor.ref("");
     const userLoginByOpenid = (codes) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.__f__("log", "at pages/mine/mine.uvue:83", "userLoginByOpenid:", codes);
         const res = yield api_http.login(new common_vendor.UTSJSONObject({
           xcxCode: codes,
-          isLogin: "0"
+          isLogin: "1"
         }));
         if (res.code == 200) {
           userId.value = "" + res.data.id;
@@ -68,6 +69,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.login(new common_vendor.UTSJSONObject({
           success: (res) => {
             code.value = res.code;
+            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:103", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
             if (wxGetPhoneLogin.value == "1") {
               const params = new common_vendor.UTSJSONObject({
                 isLogin: "1",
@@ -75,8 +77,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
               api_http.login(params).then((res2) => {
                 if (res2.code == 200) {
-                  common_vendor.index.__f__("log", "at pages/mine/mine.uvue:109", "登录成功:", res2.data.access_token);
-                  common_config.setToken(res2.data.access_token, res2.data.refreshToken);
+                  common_vendor.index.__f__("log", "at pages/mine/mine.uvue:111", "登录成功:", res2.data.access_token);
                   common_vendor.index.reLaunch({
                     url: "/pages/card/card"
                   });
@@ -94,6 +95,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_http.getTenantInfo(common_config.getTenantId(), false);
         if (res.code == 200) {
           const tenantInfo = res.data;
+          common_vendor.index.__f__("log", "at pages/mine/mine.uvue:130", "tenantInfo:", tenantInfo);
           wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
         }
       });
@@ -108,6 +110,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handleLogout = () => {
       common_config.clearToken();
+      common_config.removeStorageSync("usePhoneNumber");
       common_vendor.index.showToast({
         title: "退出登录成功",
         icon: "none"
@@ -125,11 +128,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             cardListSum.value = res.data;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:162", "查询卡列表统计异常:", error);
+          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:166", "查询卡列表统计异常:", error);
         }
       });
     };
-    common_vendor.onLoad(() => {
+    common_vendor.onShow(() => {
       if (common_config.isWechat()) {
         if (!checkToken())
           return null;
@@ -155,22 +158,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        f: common_vendor.o(toOrder, "3f"),
-        g: common_vendor.p({
-          name: "arrow-right",
-          size: "20rpx",
-          class: "data-v-284ae985"
-        }),
-        h: common_vendor.p({
-          name: "arrow-right",
-          size: "20rpx",
-          class: "data-v-284ae985"
-        }),
+        f: common_vendor.o(toOrder, "3f")
+      }, {}, {}, {
         i: isWechatEnv.value
       }, isWechatEnv.value ? common_vendor.e({
         j: isLoginState.value
       }, isLoginState.value ? {
-        k: common_vendor.o(handleLogin, "70"),
+        k: common_vendor.o(handleLogin, "37"),
         l: common_vendor.p({
           type: "primary",
           width: "100%",
@@ -178,7 +172,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-284ae985"
         })
       } : common_vendor.unref(common_config.getStorageSync)("usePhoneNumber") ? {
-        n: common_vendor.o(handleLogout, "61"),
+        n: common_vendor.o(handleLogout, "06"),
         o: common_vendor.p({
           type: "error",
           width: "100%",

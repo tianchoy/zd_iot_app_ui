@@ -127,7 +127,7 @@ class ProjectConfig extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-const ENV = "dev";
+const ENV = "prod";
 const API_CONFIG = new common_vendor.UTSJSONObject({
   dev: new common_vendor.UTSJSONObject({
     baseUrl: "http://192.168.1.45:8081",
@@ -195,6 +195,9 @@ function setStorageSync(key, value = null) {
 function getStorageSync(key) {
   return common_vendor.index.getStorageSync(key);
 }
+function removeStorageSync(key) {
+  common_vendor.index.removeStorageSync(key);
+}
 function isWechat() {
   return true;
 }
@@ -208,6 +211,7 @@ exports.getTenantId = getTenantId;
 exports.getToken = getToken;
 exports.isH5 = isH5;
 exports.isWechat = isWechat;
+exports.removeStorageSync = removeStorageSync;
 exports.setStorageSync = setStorageSync;
 exports.setToken = setToken;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/config.js.map

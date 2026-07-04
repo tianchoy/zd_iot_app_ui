@@ -81,7 +81,7 @@ import { queryCardList, login, getTenantInfo } from '@/api/http.uts'
 import { getToken, getTenantId, isWechat, setToken } from '@/common/config.uts'
 import type { RechargeData } from '@/api/types.uts'
 
-const card_number = ref('gn1000000000002')
+const card_number = ref('')
 const queryKeyword = ref('')
 const current = ref(0)
 const scrollViewHeight = ref(0)
@@ -196,9 +196,10 @@ const getCardList = async (state: string): Promise<RechargeData[]> => {
 
 // 去充值
 const handleRecharge = (rechargeNo: string) => {
+	console.log('去充值', rechargeNo)
 	uni.navigateTo({
-			url: '/pages/recharge/recharge?cardNumber=' + rechargeNo
-		})
+		url: '/pages/recharge/recharge?rechargeNo=' + rechargeNo
+	})
 }
 
 
@@ -258,28 +259,49 @@ const loadCardData = async () => {
 const platform = async () => {
 	// 1. 微信环境且无token时，先完成登录
 	if (isWechat()) {
-		if (!checkToken()) {
-			await getTenantInfos()
+		// if (!checkToken()) {
+		// 	await getTenantInfos()
 			
-			// 如果不需要手机号登录，直接跳过数据加载
-			if (wxGetPhoneLogin.value != '1') {
-				// 页面显示空状态
-				cardList.value = []
-				cardCounts.value = [0, 0, 0]
-				return
-			}
+		// 	// 如果不需要手机号登录，直接跳过数据加载
+		// 	if (wxGetPhoneLogin.value != '1') {
+		// 		// 页面显示空状态
+		// 		cardList.value = []
+		// 		cardCounts.value = [0, 0, 0]
+		// 		return
+		// 	}
 			
-			const loginSuccess = await getCode()
+		// 	const loginSuccess = await getCode()
 			
-			// 登录失败时，不加载数据
-			if (!loginSuccess) {
-				console.log('登录失败，跳过数据加载')
-				uni.showToast({
-					title: '登录失败，请重试',
-					icon: 'none'
-				})
-				return
-			}
+		// 	// 登录失败时，不加载数据
+		// 	if (!loginSuccess) {
+		// 		console.log('登录失败，跳过数据加载')
+		// 		uni.showToast({
+		// 			title: '登录失败，请重试',
+		// 			icon: 'none'
+		// 		})
+		// 		return
+		// 	}
+		// }
+		await getTenantInfos()
+			
+		// 如果不需要手机号登录，直接跳过数据加载
+		if (wxGetPhoneLogin.value != '1') {
+			// 页面显示空状态
+			cardList.value = []
+			cardCounts.value = [0, 0, 0]
+			return
+		}
+		
+		const loginSuccess = await getCode()
+		
+		// 登录失败时，不加载数据
+		if (!loginSuccess) {
+			console.log('登录失败，跳过数据加载')
+			uni.showToast({
+				title: '登录失败，请重试',
+				icon: 'none'
+			})
+			return
 		}
 	}
 

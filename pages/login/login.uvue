@@ -17,6 +17,9 @@
 				已阅读并同意<text class="doc-link" @click="gotoAgreement">《用户协议》</text>和<text class="doc-link" @click="gotoPrivacy">《隐私政策》</text>
 			</view>
 		</view>
+		<view></view>
+		<rice-divider dashed />
+		<view class="no-login" @click="noNowLogin">暂不登录</view>
 		<rice-dialog v-model:show="showTitle" width="80%" :message="message" :show-cancel-button="false" @confirm="agree" />
 	</view>
 </template>
@@ -30,6 +33,8 @@
 	const docState = ref(false)
 	const showTitle = ref(false)
 	const message = ref('')
+	const from = ref<string>('')
+	const rechargeNo = ref<string>('')
 
 	const isDocState = () => {
 		docState.value = !docState.value
@@ -46,9 +51,15 @@
 			console.log('登录成功:', res.data.access_token)
 			setToken(res.data.access_token, res.data.refreshToken)
 			setStorageSync('usePhoneNumber', true)
-			uni.reLaunch({
-				url: '/pages/card/card'
-			})
+			if(from.value == 'other'){
+				uni.reLaunch({
+					url: '/pages/recharge/recharge?rechargeNo=' + rechargeNo.value
+				})
+			}else{
+				uni.reLaunch({
+					url: '/pages/card/card'
+				})
+			}
 		}
 	}
 
@@ -90,6 +101,8 @@
 		if(options['wxGetPhoneLogin'] != null){
 			wxGetPhoneLogin.value = options['wxGetPhoneLogin'] as string
 			userId.value = options['userId'] as string
+			from.value = options['from'] as string
+			rechargeNo.value = options['rechargeNo'] as string
 		}
 	})
 	
@@ -114,20 +127,9 @@
 			margin: 0 40rpx;
 		}
 		.no-login{
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			margin-top: 100rpx;
-			width: 80%;
-			.no-login-text{
-				width: 100%;
-				border-top: 1rpx solid #e8eef7;
-				padding-top: 40rpx;
-				font-size: 24rpx;
-				color: #64748b;
-				line-height: 1.45;
-				text-align: center;
-			}
+			font-size: 24rpx;
+			color: #8f8f8f;
+			text-decoration: underline;
 		}
 		.documents {
 			display: flex;

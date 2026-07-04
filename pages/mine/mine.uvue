@@ -23,11 +23,11 @@
 				<text class="order-label">我的订单</text>
 				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
 			</view>
-			<view class="item">
+			<view class="item" v-if="false">
 				<text class="order-label">绑定卡片</text>
 				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
 			</view>
-			<view class="item">
+			<view class="item" v-if="false">
 				<text class="order-label">常见问题</text>
 				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
 			</view>
@@ -43,7 +43,7 @@
 	import { ref, computed } from 'vue'
 	import { login,getTenantInfo,queryCardListSum} from '@/api/http.uts'
 	import type { CardListSumData } from '@/api/types.uts'
-	import { getStorageSync,getTenantId,getToken ,clearToken,isWechat,config,setToken} from '@/common/config.uts'
+	import { getStorageSync,getTenantId,getToken ,clearToken,removeStorageSync,isWechat,config,setToken} from '@/common/config.uts'
 
 
 	const title = ref('用户');
@@ -80,9 +80,10 @@
 	//登录
 	const userId = ref<string>('')
 	const userLoginByOpenid = async (codes: string) => {
+		console.log('userLoginByOpenid:', codes)
 		const res = await login({
 			xcxCode: codes,
-			isLogin: '0',
+			isLogin: '1',
 		})
 		
 		if(res.code == 200){
@@ -99,6 +100,7 @@
 		uni.login({
 			success: (res) => {
 				code.value = res.code
+				console.log('wxGetPhoneLogin:', wxGetPhoneLogin.value)
 				if( wxGetPhoneLogin.value == '1'){
 					const params = {
 						isLogin: "1",
@@ -107,7 +109,7 @@
 					login(params).then((res) => {
 						if(res.code == 200){
 							console.log('登录成功:', res.data.access_token)
-							setToken(res.data.access_token, res.data.refreshToken)
+							// setToken(res.data.access_token, res.data.refreshToken)
 							uni.reLaunch({
 								url: '/pages/card/card'
 							})
@@ -125,6 +127,7 @@
 		const res = await getTenantInfo(getTenantId(),false)
 		if(res.code == 200){
 			const tenantInfo = res.data
+			console.log('tenantInfo:', tenantInfo)
 			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
 		}
 	}
@@ -141,6 +144,7 @@
 	// 退出登录
 	const handleLogout = () => {
 		clearToken()
+		removeStorageSync('usePhoneNumber')
 		uni.showToast({
 			title: '退出登录成功',
 			icon: 'none'
@@ -163,11 +167,10 @@
 		}
 	}
 
-	onLoad(() => {
+	onShow(() => {
 		if (isWechat()) {
 			if (!checkToken()) return;
 		}
-		// 检查token状态
 		getCardListSum()
 	})
 </script>

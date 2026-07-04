@@ -488,14 +488,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: common_vendor.t(order.payCurrencyAmount),
             g: index,
             h: common_vendor.o(($event) => {
-              return handleOrderDetail(order.id.toString());
+              return handleOrderDetail(order.orderNo.toString());
             }, index)
           };
         })
       }) : {}, {
         N: ((_K = cardDetail.value) == null ? void 0 : _K.isBind) || isBinded.value
       }, ((_L = cardDetail.value) == null ? void 0 : _L.isBind) || isBinded.value ? {
-        O: common_vendor.o(handleUnbind, "59"),
+        O: common_vendor.o(handleUnbind, "c7"),
         P: common_vendor.p({
           type: "error",
           ["plain-fill"]: true,
@@ -518,7 +518,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        S: common_vendor.o(handleBindCard, "38"),
+        S: common_vendor.o(handleBindCard, "a1"),
         T: common_vendor.p({
           height: "100rpx",
           bold: true,
@@ -528,7 +528,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        U: common_vendor.o(handleRecharge, "95"),
+        U: common_vendor.o(handleRecharge, "91"),
         V: common_vendor.p({
           height: "100rpx",
           type: "primary",
