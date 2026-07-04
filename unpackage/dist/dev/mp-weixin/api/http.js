@@ -275,7 +275,7 @@ function queryOrderSuccess(id, payChannelId, withToken = true) {
     withToken
   }));
 }
-function goPayXcx(orderId, withToken = true) {
+function goPayXcx(orderId, merchantConfigId, withToken = true) {
   const url = api_url.ApiUrl.goPayXcx + orderId;
   const token = true;
   return api_Request.request(new api_Request.RequestOptions({

@@ -127,7 +127,7 @@ class ProjectConfig extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-const ENV = "prod";
+const ENV = "dev";
 const API_CONFIG = new common_vendor.UTSJSONObject({
   dev: new common_vendor.UTSJSONObject({
     baseUrl: "http://192.168.1.45:8081",

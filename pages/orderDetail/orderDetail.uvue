@@ -126,6 +126,7 @@
 			:traffic="d('pkgFlow')"
 			:validityPeriod="d('validityPeriod')"
 			:pkgType="d('pkgType')"
+			:payMethod="d('payInfo')"
 		/>
 	</rice-popup>
 </template>
@@ -432,9 +433,10 @@
 
 	// 确认支付
 	const handleConfirmPayment = async (e: UTSJSONObject) => {
+		console.log('11111',e)
 		showPopup.value = false
 		try {
-			const res = await goPayXcx(orderId.value)
+			const res = await goPayXcx(orderId.value,e)
 			if (res.code == 200) {
 				console.log('支付成功:', res.data)
 				if(isWechat()){

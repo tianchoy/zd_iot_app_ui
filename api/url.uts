@@ -17,7 +17,7 @@ export const ApiUrl = {
     queryOrderPackInfo: '/order/pkgOrder/getOrderPackGnInfo/', // 查询订单套餐信息
     queryPkgInfoList: '/card/pkgInfo/list', // 查询套餐信息列表
     addOrderGnH5: '/order/pkgOrder/gnH5/add', // 添加订单国内 H5
-    goPayGnH5: '/gn/goPayment/', // 订单详情里去支付 H5
+    goPayGnH5: '/pay/orderGn/gn/goPayment/', // 订单详情里去支付 H5
 
     //微信小程序接口
     queryXcxCardList: '/card/pkgInfo/xcxList', // 查询卡套餐列表

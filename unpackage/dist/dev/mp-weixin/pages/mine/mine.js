@@ -57,6 +57,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }));
         if (res.code == 200) {
           userId.value = "" + res.data.id;
+          common_config.setStorageSync("userId", userId.value);
           common_vendor.index.navigateTo({
             url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value
           });
@@ -69,7 +70,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.login(new common_vendor.UTSJSONObject({
           success: (res) => {
             code.value = res.code;
-            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:103", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
+            common_vendor.index.__f__("log", "at pages/mine/mine.uvue:104", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
             if (wxGetPhoneLogin.value == "1") {
               const params = new common_vendor.UTSJSONObject({
                 isLogin: "1",
@@ -77,7 +78,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
               api_http.login(params).then((res2) => {
                 if (res2.code == 200) {
-                  common_vendor.index.__f__("log", "at pages/mine/mine.uvue:111", "登录成功:", res2.data.access_token);
+                  common_vendor.index.__f__("log", "at pages/mine/mine.uvue:112", "登录成功:", res2.data.access_token);
                   common_vendor.index.reLaunch({
                     url: "/pages/card/card"
                   });
@@ -95,8 +96,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_http.getTenantInfo(common_config.getTenantId(), false);
         if (res.code == 200) {
           const tenantInfo = res.data;
-          common_vendor.index.__f__("log", "at pages/mine/mine.uvue:130", "tenantInfo:", tenantInfo);
+          common_vendor.index.__f__("log", "at pages/mine/mine.uvue:131", "tenantInfo:", tenantInfo);
           wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
+          common_config.setStorageSync("wxGetPhoneLogin", tenantInfo.wxGetPhoneLogin);
         }
       });
     };
@@ -128,7 +130,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             cardListSum.value = res.data;
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:166", "查询卡列表统计异常:", error);
+          common_vendor.index.__f__("error", "at pages/mine/mine.uvue:168", "查询卡列表统计异常:", error);
         }
       });
     };

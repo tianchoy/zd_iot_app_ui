@@ -26,7 +26,7 @@
 
 <script setup lang="uts">
 	import {login} from '@/api/http.uts'
-	import {setToken,setStorageSync} from '@/common/config.uts'
+	import {setToken,setStorageSync,getStorageSync} from '@/common/config.uts'
 	import {userAgreement,privacyPolicy} from '@/utils/doc.uts'
 	const wxGetPhoneLogin = ref<string>('')
 	const userId = ref<string>('')
@@ -98,12 +98,11 @@
 	}
 
 	onLoad((options: OnLoadOptions) => {
-		if(options['wxGetPhoneLogin'] != null){
-			wxGetPhoneLogin.value = options['wxGetPhoneLogin'] as string
-			userId.value = options['userId'] as string
-			from.value = options['from'] as string
-			rechargeNo.value = options['rechargeNo'] as string
-		}
+		wxGetPhoneLogin.value = getStorageSync('wxGetPhoneLogin') as string || options['wxGetPhoneLogin'] as string
+		userId.value = getStorageSync('userId') as string || options['userId'] as string
+		from.value = options['from'] as string
+		rechargeNo.value = options['rechargeNo'] as string
+		
 	})
 	
 </script>

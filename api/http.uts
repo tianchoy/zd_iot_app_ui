@@ -275,14 +275,14 @@ export function queryOrderSuccess(id: string, payChannelId: string, withToken: b
 }
 
 // 订单详情里去支付Xcx
-export function goPayXcx(orderId:string, withToken: boolean = true): Promise<ApiResponse<any>> {
+export function goPayXcx(orderId:string, merchantConfigId: string, withToken: boolean = true): Promise<ApiResponse<any>> {
   // #ifdef MP-WEIXIN
   const url = (ApiUrl.goPayXcx as string) + orderId
   const token = true
   // #endif
 
   // #ifdef H5
-  const url = (ApiUrl.goPayGnH5 as string) + orderId
+  const url = (ApiUrl.goPayGnH5 as string) + orderId + '/' + merchantConfigId
   const token = false
   // #endif
   // #ifndef MP-WEIXIN || H5

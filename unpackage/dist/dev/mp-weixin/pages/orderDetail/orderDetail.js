@@ -143,7 +143,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:304", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:305", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"
@@ -239,10 +239,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:409", "打开支付小程序成功:", res);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:410", "打开支付小程序成功:", res);
             },
             fail(res = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:412", "打开支付小程序失败:", res);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:413", "打开支付小程序失败:", res);
               common_vendor.index.hideLoading();
               isInPaymentProcess.value = false;
             }
@@ -259,16 +259,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (form) {
         form.submit();
       } else {
-        common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:429", "未找到支付表单");
+        common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:430", "未找到支付表单");
       }
     };
     const handleConfirmPayment = (e) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:436", "11111", e);
         showPopup.value = false;
         try {
-          const res = yield api_http.goPayXcx(orderId.value);
+          const res = yield api_http.goPayXcx(orderId.value, e);
           if (res.code == 200) {
-            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:439", "支付成功:", res.data);
+            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:441", "支付成功:", res.data);
             if (common_config.isWechat()) {
               toPay(res.data);
             }
@@ -281,7 +282,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:459", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:461", "支付失败:", error);
           common_vendor.index.showToast({
             title: err.msg,
             icon: "none"
@@ -504,6 +505,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           traffic: d("pkgFlow"),
           validityPeriod: d("validityPeriod"),
           pkgType: d("pkgType"),
+          payMethod: d("payInfo"),
           class: "data-v-6ec85291"
         }),
         ad: common_vendor.o(onPopupClose, "2f"),

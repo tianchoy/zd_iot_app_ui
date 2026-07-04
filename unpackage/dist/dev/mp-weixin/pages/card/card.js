@@ -188,6 +188,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (res.code == 200) {
           const tenantInfo = res.data;
           wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
+          common_config.setStorageSync("wxGetPhoneLogin", tenantInfo.wxGetPhoneLogin);
         }
       });
     };
@@ -213,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
           const loginSuccess = yield getCode();
           if (!loginSuccess) {
-            common_vendor.index.__f__("log", "at pages/card/card.uvue:299", "登录失败，跳过数据加载");
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:300", "登录失败，跳过数据加载");
             common_vendor.index.showToast({
               title: "登录失败，请重试",
               icon: "none"

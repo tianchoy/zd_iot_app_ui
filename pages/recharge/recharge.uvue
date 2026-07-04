@@ -174,7 +174,7 @@
 	import { ref, computed } from 'vue';
 	import { queryCardDetail, addOrder,login,getTenantInfo} from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
-	import { config , getTenantId,isWechat,isH5,setToken} from '@/common/config.uts';
+	import { config , getTenantId,isWechat,isH5,setToken,setStorageSync} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	import tousu from '@/components/tousu.uvue';
 	defineOptions({
@@ -682,6 +682,7 @@
 		
 		if(res.code == 200){
 			userId.value = '' + res.data.id
+			setStorageSync('userId', userId.value)
 			uni.navigateTo({
 				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value + '&from=other' + '&rechargeNo=' + cardNumber.value
 			})
@@ -717,6 +718,7 @@
 		if(res.code == 200){
 			const tenantInfo = res.data
 			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
+			setStorageSync('wxGetPhoneLogin', tenantInfo.wxGetPhoneLogin)
 		}
 	}
 

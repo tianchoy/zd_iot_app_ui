@@ -82,12 +82,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showTitle.value = false;
     };
     common_vendor.onLoad((options) => {
-      if (options["wxGetPhoneLogin"] != null) {
-        wxGetPhoneLogin.value = options["wxGetPhoneLogin"];
-        userId.value = options["userId"];
-        from.value = options["from"];
-        rechargeNo.value = options["rechargeNo"];
-      }
+      wxGetPhoneLogin.value = common_config.getStorageSync("wxGetPhoneLogin") || options["wxGetPhoneLogin"];
+      userId.value = common_config.getStorageSync("userId") || options["userId"];
+      from.value = options["from"];
+      rechargeNo.value = options["rechargeNo"];
     });
     return (_ctx, _cache) => {
       "raw js";

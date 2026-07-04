@@ -78,7 +78,7 @@
 import { ref, computed, onMounted } from 'vue'
 import tousu from '@/components/tousu.uvue'
 import { queryCardList, login, getTenantInfo } from '@/api/http.uts'
-import { getToken, getTenantId, isWechat, setToken } from '@/common/config.uts'
+import { getToken, getTenantId, isWechat, setToken, setStorageSync } from '@/common/config.uts'
 import type { RechargeData } from '@/api/types.uts'
 
 const card_number = ref('')
@@ -241,6 +241,7 @@ const getTenantInfos = async () => {
 	if (res.code == 200) {
 		const tenantInfo = res.data
 		wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
+		setStorageSync('wxGetPhoneLogin', tenantInfo.wxGetPhoneLogin)
 	}
 }
 

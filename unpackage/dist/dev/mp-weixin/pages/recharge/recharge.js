@@ -432,6 +432,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       }));
       if (res.code == 200) {
         userId.value = "" + res.data.id;
+        common_config.setStorageSync("userId", userId.value);
         common_vendor.index.navigateTo({
           url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value + "&from=other&rechargeNo=" + cardNumber.value
         });
@@ -443,7 +444,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       common_vendor.index.login(new common_vendor.UTSJSONObject({
         success: (res) => {
           code.value = res.code;
-          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:694", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
+          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:695", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
           if (wxGetPhoneLogin.value == "1") {
             const params = new common_vendor.UTSJSONObject({
               isLogin: "1",
@@ -451,7 +452,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
             });
             api_http.login(params).then((res2) => {
               if (res2.code == 200) {
-                common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:702", "登录成功:", res2.data.access_token);
+                common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:703", "登录成功:", res2.data.access_token);
                 common_config.setToken(res2.data.access_token, res2.data.refreshToken);
                 common_vendor.index.reLaunch({
                   url: "/pages/recharge/recharge?rechargeNo=" + cardNumber.value
@@ -471,6 +472,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       if (res.code == 200) {
         const tenantInfo = res.data;
         wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
+        common_config.setStorageSync("wxGetPhoneLogin", tenantInfo.wxGetPhoneLogin);
       }
     });
   };
@@ -483,9 +485,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     });
   };
   common_vendor.onShow(() => {
-    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:732", "onShow111111111", isInPaymentProcess.value);
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:734", "onShow111111111", isInPaymentProcess.value);
     let options = common_vendor.index.getEnterOptionsSync();
-    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:736", "options.scene:", options.scene);
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:738", "options.scene:", options.scene);
     if (options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037 || options.scene == 1038) {
       platform();
     }
@@ -548,10 +550,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     common_vendor.index.makePhoneCall({
       phoneNumber: phone,
       success: () => {
-        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:809", "拨号界面弹出成功");
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:811", "拨号界面弹出成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:812", "拨号失败:", err);
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:814", "拨号失败:", err);
         common_vendor.index.showToast({
           title: "拨号失败，请重试",
           icon: "none"

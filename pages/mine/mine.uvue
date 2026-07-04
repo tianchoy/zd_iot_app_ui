@@ -43,7 +43,7 @@
 	import { ref, computed } from 'vue'
 	import { login,getTenantInfo,queryCardListSum} from '@/api/http.uts'
 	import type { CardListSumData } from '@/api/types.uts'
-	import { getStorageSync,getTenantId,getToken ,clearToken,removeStorageSync,isWechat,config,setToken} from '@/common/config.uts'
+	import { getStorageSync,getTenantId,getToken ,clearToken,removeStorageSync,isWechat,config,setToken,setStorageSync} from '@/common/config.uts'
 
 
 	const title = ref('用户');
@@ -88,6 +88,7 @@
 		
 		if(res.code == 200){
 			userId.value = '' + res.data.id
+			setStorageSync('userId', userId.value)
 			uni.navigateTo({
 				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value
 			})
@@ -129,6 +130,7 @@
 			const tenantInfo = res.data
 			console.log('tenantInfo:', tenantInfo)
 			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
+			setStorageSync('wxGetPhoneLogin', tenantInfo.wxGetPhoneLogin)
 		}
 	}
 
