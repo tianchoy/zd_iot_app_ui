@@ -29,7 +29,7 @@
 			>
 				<!-- 套餐头部 -->
 				<view class="package-header">
-					<text class="package-name" v-if="item.name">{{ item.name }}</text>
+					<text class="package-name" v-if="item.pkgName">{{ item.pkgName }}</text>
 					<rice-tag v-if="item.status" :text="getPackageStatusText(item.status)" :round="true" plain-fill size="small" :type="getPackageStatusType(item.status)"></rice-tag>
 				</view>
 

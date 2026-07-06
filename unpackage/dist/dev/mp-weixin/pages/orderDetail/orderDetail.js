@@ -143,7 +143,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:305", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:287", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"
@@ -239,10 +239,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:410", "打开支付小程序成功:", res);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:392", "打开支付小程序成功:", res);
             },
             fail(res = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:413", "打开支付小程序失败:", res);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:395", "打开支付小程序失败:", res);
               common_vendor.index.hideLoading();
               isInPaymentProcess.value = false;
             }
@@ -259,17 +259,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (form) {
         form.submit();
       } else {
-        common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:430", "未找到支付表单");
+        common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:412", "未找到支付表单");
       }
     };
     const handleConfirmPayment = (e) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:436", "11111", e);
+        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:418", "11111", e);
         showPopup.value = false;
         try {
           const res = yield api_http.goPayXcx(orderId.value, e);
           if (res.code == 200) {
-            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:441", "支付成功:", res.data);
+            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:423", "支付成功:", res.data);
             if (common_config.isWechat()) {
               toPay(res.data);
             }
@@ -282,7 +282,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:461", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:443", "支付失败:", error);
           common_vendor.index.showToast({
             title: err.msg,
             icon: "none"
@@ -303,10 +303,88 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
     };
+    const wxGetPhoneLogin = common_vendor.ref("");
+    const code = common_vendor.ref("");
+    const userId = common_vendor.ref("");
+    const userLoginByOpenid = (codes) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:473", "userLoginByOpenid:", codes);
+        const res = yield api_http.login(new common_vendor.UTSJSONObject({
+          xcxCode: codes,
+          isLogin: "1"
+        }));
+        if (res.code == 200) {
+          userId.value = "" + res.data.id;
+          common_config.setStorageSync("userId", userId.value);
+          common_vendor.index.navigateTo({
+            url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value + "&from=orderDetail&rechargeNo=" + cardNumber.value
+          });
+        }
+      });
+    };
+    const getCode = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.login(new common_vendor.UTSJSONObject({
+          success: (res) => {
+            code.value = res.code;
+            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:492", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
+            if (wxGetPhoneLogin.value == "1") {
+              const params = new common_vendor.UTSJSONObject({
+                isLogin: "1",
+                xcxCode: code.value
+              });
+              api_http.login(params).then((res2) => {
+                if (res2.code == 200) {
+                  common_config.setToken(res2.data.access_token, res2.data.refreshToken);
+                  common_vendor.index.reLaunch({
+                    url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
+                  });
+                }
+              });
+            } else {
+              userLoginByOpenid(res.code);
+            }
+          }
+        }));
+      });
+    };
+    const getTenantInfos = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const res = yield api_http.getTenantInfo(common_config.getTenantId(), false);
+        if (res.code == 200) {
+          const tenantInfo = res.data;
+          wxGetPhoneLogin.value = "" + tenantInfo.wxGetPhoneLogin;
+          common_config.setStorageSync("wxGetPhoneLogin", tenantInfo.wxGetPhoneLogin);
+        }
+      });
+    };
+    const checkToken = () => {
+      const token = getToken();
+      return !!token;
+    };
+    const platform = () => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (common_config.isWechat()) {
+          if (!checkToken()) {
+            yield getTenantInfos();
+            const loginSuccess = yield getCode();
+            if (!loginSuccess) {
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:536", "登录失败，跳过数据加载");
+              common_vendor.index.showToast({
+                title: "登录失败，请重试",
+                icon: "none"
+              });
+              return Promise.resolve(null);
+            }
+          }
+        }
+      });
+    };
     common_vendor.onLoad((options) => {
       const orderNo = options === null || options === void 0 ? null : options.orderNo;
       if (orderNo != null) {
         orderId.value = orderNo;
+        common_config.setStorageSync("orderId", orderNo);
         if ((options === null || options === void 0 ? null : options.from) === "paySuccess") {
           isFromPaySuccess.value = true;
         }
@@ -322,6 +400,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return null;
       }
       let options = common_vendor.index.getEnterOptionsSync();
+      if (options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037 || options.scene == 1038) {
+        platform();
+      }
       if (options.scene == "1038" && options.referrerInfo.appId == common_config.config.api.auth.appID) {
         let extraData = options.referrerInfo.extraData;
         if (!extraData) {

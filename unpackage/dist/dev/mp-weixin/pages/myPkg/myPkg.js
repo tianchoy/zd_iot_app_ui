@@ -139,9 +139,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, pkgInfoList.value.length == 0 ? {} : {}, {
         h: common_vendor.f(pkgInfoList.value, (item, index, i0) => {
           return common_vendor.e({
-            a: item.name
-          }, item.name ? {
-            b: common_vendor.t(item.name)
+            a: item.pkgName
+          }, item.pkgName ? {
+            b: common_vendor.t(item.pkgName)
           } : {}, {
             c: item.status
           }, item.status ? {

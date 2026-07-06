@@ -154,6 +154,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const code = common_vendor.ref("");
     const getCode = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        common_vendor.index.__f__("log", "at pages/card/card.uvue:210", "1111111111");
         return new Promise((resolve) => {
           common_vendor.index.login(new common_vendor.UTSJSONObject({
             provider: "weixin",
@@ -174,7 +175,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             },
             fail: (err) => {
-              common_vendor.index.__f__("error", "at pages/card/card.uvue:230", "登录失败:", err);
+              common_vendor.index.__f__("error", "at pages/card/card.uvue:231", "登录失败:", err);
               resolve(false);
             }
           }));
@@ -206,15 +207,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const platform = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (common_config.isWechat()) {
+          common_vendor.index.__f__("log", "at pages/card/card.uvue:264", "isWechat", 111111);
           yield getTenantInfos();
-          if (wxGetPhoneLogin.value != "1") {
-            cardList.value = [];
-            cardCounts.value = [0, 0, 0];
-            return Promise.resolve(null);
-          }
           const loginSuccess = yield getCode();
           if (!loginSuccess) {
-            common_vendor.index.__f__("log", "at pages/card/card.uvue:300", "登录失败，跳过数据加载");
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:279", "登录失败，跳过数据加载");
             common_vendor.index.showToast({
               title: "登录失败，请重试",
               icon: "none"

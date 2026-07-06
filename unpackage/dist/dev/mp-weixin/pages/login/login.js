@@ -28,6 +28,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const message = common_vendor.ref("");
     const from = common_vendor.ref("");
     const rechargeNo = common_vendor.ref("");
+    const orderId = common_vendor.ref("");
     const isDocState = () => {
       docState.value = !docState.value;
     };
@@ -39,12 +40,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isLogin: wxGetPhoneLogin.value
         }));
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/login/login.uvue:51", "登录成功:", res.data.access_token);
+          common_vendor.index.__f__("log", "at pages/login/login.uvue:52", "登录成功:", res.data.access_token);
+          orderId.value = common_config.getStorageSync("orderId") || "";
           common_config.setToken(res.data.access_token, res.data.refreshToken);
           common_config.setStorageSync("usePhoneNumber", true);
           if (from.value == "other") {
             common_vendor.index.reLaunch({
               url: "/pages/recharge/recharge?rechargeNo=" + rechargeNo.value
+            });
+          } else if (from.value == "orderDetail") {
+            common_vendor.index.reLaunch({
+              url: "/pages/orderDetail/orderDetail?orderNo=" + orderId.value
             });
           } else {
             common_vendor.index.reLaunch({

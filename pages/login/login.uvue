@@ -35,6 +35,7 @@
 	const message = ref('')
 	const from = ref<string>('')
 	const rechargeNo = ref<string>('')
+	const orderId = ref<string>('')
 
 	const isDocState = () => {
 		docState.value = !docState.value
@@ -49,13 +50,20 @@
 		})
 		if(res.code == 200){
 			console.log('登录成功:', res.data.access_token)
+			orderId.value = getStorageSync('orderId') as string || ''
 			setToken(res.data.access_token, res.data.refreshToken)
 			setStorageSync('usePhoneNumber', true)
 			if(from.value == 'other'){
 				uni.reLaunch({
 					url: '/pages/recharge/recharge?rechargeNo=' + rechargeNo.value
 				})
-			}else{
+			}
+			else if(from.value == 'orderDetail'){
+				uni.reLaunch({
+					url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+				})
+			}
+			else{
 				uni.reLaunch({
 					url: '/pages/card/card'
 				})

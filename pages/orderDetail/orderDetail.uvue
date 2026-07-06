@@ -132,8 +132,8 @@
 </template>
 
 <script setup lang="uts">
-	import { goPayXcx , queryOrderDetail } from '@/api/http';
-	import { config,isWechat,isH5 } from '@/common/config.uts';
+	import { goPayXcx , queryOrderDetail,login,getTenantInfo } from '@/api/http';
+	import { config,getTenantId,isWechat,setToken,isH5,setStorageSync } from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	
 	const showPopup = ref(false);
@@ -259,24 +259,6 @@
 		}
 
 		return ''
-	}
-	
-	// 获取说明文本
-	const getNoticeText = (): string => {
-		const detail = orderDetail.value as UTSJSONObject
-		const status = detail['status'] as string;
-		switch (status) {
-			case '0':
-				return '订单尚未支付，支付完成后套餐才会生效。'
-			case '1':
-				return '套餐已生效，可在有效期内使用。'
-			case '2':
-				return '订单已退款，金额将原路返回。'
-			case '3':
-				return '订单已取消。'
-			default:
-				return ''
-		}
 	}
 	
 	// 选择支付方式
@@ -482,11 +464,91 @@
 			})
 		}
 	}
+
+	const wxGetPhoneLogin = ref<string>('')
+	const code = ref<string>('')
+	//登录
+	const userId = ref<string>('')
+	const userLoginByOpenid = async (codes: string) => {
+		console.log('userLoginByOpenid:', codes)
+		const res = await login({
+			xcxCode: codes,
+			isLogin: '1',
+		})
+		
+		if(res.code == 200){
+			userId.value = '' + res.data.id
+			setStorageSync('userId', userId.value)
+			uni.navigateTo({
+				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value + '&from=orderDetail' + '&rechargeNo=' + cardNumber.value
+			})
+		}
+	}
+
+	const getCode = async () => {
+		uni.login({
+			success: (res) => {
+				code.value = res.code
+				console.log('wxGetPhoneLogin:', wxGetPhoneLogin.value)
+				if( wxGetPhoneLogin.value == '1'){
+					const params = {
+						isLogin: "1",
+						xcxCode: code.value,
+					}
+					login(params).then((res) => {
+						if(res.code == 200){
+							setToken(res.data.access_token, res.data.refreshToken)
+							uni.reLaunch({
+								url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+							})
+						}
+					})
+				}else{
+					userLoginByOpenid(res.code);
+				}
+			}
+		})
+	}
+	const getTenantInfos = async () => {
+		const res = await getTenantInfo(getTenantId(),false)
+		if(res.code == 200){
+			const tenantInfo = res.data
+			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
+			setStorageSync('wxGetPhoneLogin', tenantInfo.wxGetPhoneLogin)
+		}
+	}
+
+	const checkToken = (): boolean => {
+		const token = getToken()
+		return !!token
+	}
+
+	const platform = async () => {
+		// 1. 微信环境且无token时，先完成登录
+		if (isWechat()) {
+			if (!checkToken()) {
+				await getTenantInfos()
+				
+				const loginSuccess = await getCode()
+				
+				// 登录失败时，不加载数据
+				if (!loginSuccess) {
+					console.log('登录失败，跳过数据加载')
+					uni.showToast({
+						title: '登录失败，请重试',
+						icon: 'none'
+					})
+					return
+				}
+			}
+		}
+	}
 	
 	onLoad((options) => {
 		const orderNo = options?.orderNo as string | null
 		if (orderNo != null) {
 			orderId.value = orderNo
+			setStorageSync('orderId', orderNo)
 			// 检查是否从支付成功页面跳转过来
 			if (options?.from === 'paySuccess') {
 				isFromPaySuccess.value = true
@@ -496,6 +558,7 @@
 	})
 
 	onShow(() => {
+		
 		// 如果是从支付成功页面返回的，跳过支付回调处理
 		if (isFromPaySuccess.value) {
 			// 重置标记，避免下次进入时再次跳过
@@ -509,6 +572,11 @@
 		}
 		
 		let options = uni.getEnterOptionsSync();
+		// 1011扫描二维码  1012长按图片识别二维码  1013相册选择二维码 1037小程序打开小程序 1038 从另一个小程序返回
+		if(options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037|| options.scene == 1038){
+			platform()
+		}
+
 		if (options.scene == '1038' &&
 			options.referrerInfo.appId == config.api.auth.appID) {
 			// 代表从收银台小程序返回
