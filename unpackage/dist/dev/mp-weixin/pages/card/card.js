@@ -146,7 +146,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleRecharge = (rechargeNo) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:199", "去充值", rechargeNo);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:198", "去充值", rechargeNo);
       common_vendor.index.navigateTo({
         url: "/pages/recharge/recharge?rechargeNo=" + rechargeNo
       });
@@ -154,7 +154,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const code = common_vendor.ref("");
     const getCode = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/card/card.uvue:210", "1111111111");
         return new Promise((resolve) => {
           common_vendor.index.login(new common_vendor.UTSJSONObject({
             provider: "weixin",
@@ -175,7 +174,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             },
             fail: (err) => {
-              common_vendor.index.__f__("error", "at pages/card/card.uvue:231", "登录失败:", err);
+              common_vendor.index.__f__("error", "at pages/card/card.uvue:229", "登录失败:", err);
               resolve(false);
             }
           }));
@@ -207,11 +206,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const platform = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (common_config.isWechat()) {
-          common_vendor.index.__f__("log", "at pages/card/card.uvue:264", "isWechat", 111111);
           yield getTenantInfos();
+          if (wxGetPhoneLogin.value != "1") {
+            cardList.value = [];
+            cardCounts.value = [0, 0, 0];
+          }
           const loginSuccess = yield getCode();
           if (!loginSuccess) {
-            common_vendor.index.__f__("log", "at pages/card/card.uvue:279", "登录失败，跳过数据加载");
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:276", "登录失败，跳过数据加载");
             common_vendor.index.showToast({
               title: "登录失败，请重试",
               icon: "none"
@@ -277,10 +279,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "100%",
           class: "data-v-a89086b7"
         }),
-        i: common_vendor.o(handleClick, "e9"),
+        i: common_vendor.o(handleClick, "69"),
         j: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "82"),
+        }, "d3"),
         k: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
@@ -345,7 +347,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         o: cardList.value.length === 0
       }, cardList.value.length === 0 ? {} : {}, {
-        p: common_vendor.o(_ctx.handleConnectTousu, "69"),
+        p: common_vendor.o(_ctx.handleConnectTousu, "a2"),
         q: common_vendor.p({
           class: "data-v-a89086b7"
         }),

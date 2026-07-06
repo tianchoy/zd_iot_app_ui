@@ -369,7 +369,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             yield getTenantInfos();
             const loginSuccess = yield getCode();
             if (!loginSuccess) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:536", "登录失败，跳过数据加载");
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:535", "登录失败，跳过数据加载");
               common_vendor.index.showToast({
                 title: "登录失败，请重试",
                 icon: "none"

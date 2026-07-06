@@ -44,7 +44,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           orderId.value = common_config.getStorageSync("orderId") || "";
           common_config.setToken(res.data.access_token, res.data.refreshToken);
           common_config.setStorageSync("usePhoneNumber", true);
-          if (from.value == "other") {
+          if (from.value == "recharge") {
             common_vendor.index.reLaunch({
               url: "/pages/recharge/recharge?rechargeNo=" + rechargeNo.value
             });

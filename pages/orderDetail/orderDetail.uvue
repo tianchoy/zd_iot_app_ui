@@ -524,7 +524,6 @@
 	}
 
 	const platform = async () => {
-		// 1. 微信环境且无token时，先完成登录
 		if (isWechat()) {
 			if (!checkToken()) {
 				await getTenantInfos()

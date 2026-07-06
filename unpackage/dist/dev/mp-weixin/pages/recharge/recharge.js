@@ -434,7 +434,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         userId.value = "" + res.data.id;
         common_config.setStorageSync("userId", userId.value);
         common_vendor.index.navigateTo({
-          url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value + "&from=other&rechargeNo=" + cardNumber.value
+          url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value + "&from=recharge&rechargeNo=" + cardNumber.value
         });
       }
     });
@@ -485,9 +485,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     });
   };
   common_vendor.onShow(() => {
-    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:734", "onShow111111111", isInPaymentProcess.value);
     let options = common_vendor.index.getEnterOptionsSync();
-    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:738", "options.scene:", options.scene);
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:734", "options.scene:", options.scene);
     if (options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037 || options.scene == 1038) {
       platform();
     }
@@ -550,10 +549,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     common_vendor.index.makePhoneCall({
       phoneNumber: phone,
       success: () => {
-        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:811", "拨号界面弹出成功");
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:807", "拨号界面弹出成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:814", "拨号失败:", err);
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:810", "拨号失败:", err);
         common_vendor.index.showToast({
           title: "拨号失败，请重试",
           icon: "none"

@@ -684,7 +684,7 @@
 			userId.value = '' + res.data.id
 			setStorageSync('userId', userId.value)
 			uni.navigateTo({
-				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value + '&from=other' + '&rechargeNo=' + cardNumber.value
+				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value + '&from=recharge' + '&rechargeNo=' + cardNumber.value
 			})
 		}
 	}
@@ -723,7 +723,6 @@
 	}
 
 	const platform = async () => {
-		// 1. 微信环境且无token时，先完成登录
 		if (isWechat()) {
 			await getTenantInfos()
 			await getCode()
@@ -731,9 +730,6 @@
 	}
 
 	onShow(() => {
-		console.log('onShow111111111',isInPaymentProcess.value)
-		
-		
 		let options = uni.getEnterOptionsSync();
 		console.log('options.scene:', options.scene)
 		// 1011扫描二维码  1012长按图片识别二维码  1013相册选择二维码 1037小程序打开小程序 1038 从另一个小程序返回
