@@ -174,7 +174,7 @@
 	import { ref, computed } from 'vue';
 	import { queryCardDetail, addOrder,login,getTenantInfo} from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
-	import { config , getTenantId,isWechat,isH5,setToken,setStorageSync} from '@/common/config.uts';
+	import { config , getTenantId,isWechat,isH5,setToken,setStorageSync,getToken} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	import tousu from '@/components/tousu.uvue';
 	defineOptions({
@@ -324,7 +324,7 @@
 			}
 		}
 		
-		// 如果没有默认pkgId或未匹配到，使用原有逻辑：优先选中第一个套餐，没有套餐则选中第一个加油包
+		// 如果没有默认pkgId或未匹配到，优先选中第一个套餐，没有套餐则选中第一个加油包
 		if (packagesList.length > 0) {
 			selectedPackageIndex.value = 0;
 			active.value = 0;
@@ -438,7 +438,6 @@
 					paySign: res.paySign,
 					signType: res.signType,
 					success: function (res) {
-						console.log('通联支付成功',res)
 						uni.hideLoading()
 						uni.redirectTo({
 							url: '/pages/paySuccess/paySuccess?orderId=' + orderNo.value + '&payChannelId=' + payChannelId.value
@@ -640,6 +639,24 @@
 		
 	}
 
+	const checkToken = (): boolean => {
+		const token = getToken()
+		return !!token
+	}
+
+	const platform = async () => {
+		if (isWechat()) {
+			if (!checkToken()) {
+				await getTenantInfos()
+				await getCode()
+			}else{
+				getCardDetail(cardNumber.value, country.value)
+			}
+		}else{
+			getCardDetail(cardNumber.value, country.value)
+		}
+	}
+
 	const cardNumber = ref<string>('')
 	const country = ref<string>('')
 	onLoad((options: UTSJSONObject) => {
@@ -659,7 +676,7 @@
 		if (cardNumberValue) {
 			cardNumber.value = cardNumberValue
 			country.value = countryValue ?? ''
-			getCardDetail(cardNumber.value, country.value)
+			platform()
 		} else {
 			console.error('未获取到卡片号码')
 			uni.showToast({
@@ -674,12 +691,12 @@
 	//登录
 	const userId = ref<string>('')
 	const userLoginByOpenid = async (codes: string) => {
-		console.log('userLoginByOpenid:', codes)
+		console.log('recharge,,userLoginByOpenid:', codes)
 		const res = await login({
 			xcxCode: codes,
 			isLogin: '1',
 		})
-		
+		console.log('recharge,,userLoginByOpenid登录:', res)
 		if(res.code == 200){
 			userId.value = '' + res.data.id
 			setStorageSync('userId', userId.value)
@@ -692,7 +709,6 @@
 		uni.login({
 			success: (res) => {
 				code.value = res.code
-				console.log('wxGetPhoneLogin:', wxGetPhoneLogin.value)
 				if( wxGetPhoneLogin.value == '1'){
 					const params = {
 						isLogin: "1",
@@ -722,20 +738,15 @@
 		}
 	}
 
-	const platform = async () => {
-		if (isWechat()) {
-			await getTenantInfos()
-			await getCode()
-		}
-	}
+	
 
 	onShow(() => {
 		let options = uni.getEnterOptionsSync();
 		console.log('options.scene:', options.scene)
 		// 1011扫描二维码  1012长按图片识别二维码  1013相册选择二维码 1037小程序打开小程序 1038 从另一个小程序返回
-		if(options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037|| options.scene == 1038){
-			platform()
-		}
+		// if(options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037|| options.scene == 1038|| options.scene == 1065){
+		// 	platform()
+		// }
 		// 只有在支付流程中才处理支付回调
 		if (!isInPaymentProcess.value) {
 			return

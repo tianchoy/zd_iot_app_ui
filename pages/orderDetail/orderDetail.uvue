@@ -38,10 +38,6 @@
 					<text class="info-label">订单状态</text>
 					<text class="info-value status">{{ getOrderStatusText(ds('status')) }}</text>
 				</view>
-				<view class="info-row" v-if="d('payMethod')">
-					<text class="info-label">支付方式</text>
-					<text class="info-value">{{ getPaymentMethod() }}</text>
-				</view>
 				<view class="info-row" v-if="d('orderCreateTime')">
 					<text class="info-label">下单时间</text>
 					<text class="info-value">{{ d('orderCreateTime') }}</text>
@@ -121,11 +117,11 @@
 			:amount="currentPrice" 
 			@cancel="handleCancelPayment"
 			@confirm="handleConfirmPayment"
-			:cardNumber="d('rechargeNo')",
-			:productName="d('pkgName')"
-			:traffic="d('pkgFlow')"
-			:validityPeriod="d('validityPeriod')"
-			:pkgType="d('pkgType')"
+			:cardNumber="ds('rechargeNo')"
+			:productName="ds('pkgName')"
+			:traffic="ds('pkgFlow')"
+			:validityPeriod="ds('validityPeriod')"
+			:pkgType="ds('pkgType')"
 			:payMethod="d('payInfo')"
 		/>
 	</rice-popup>
@@ -133,7 +129,7 @@
 
 <script setup lang="uts">
 	import { goPayXcx , queryOrderDetail,login,getTenantInfo } from '@/api/http';
-	import { config,getTenantId,isWechat,setToken,isH5,setStorageSync } from '@/common/config.uts';
+	import { config,getTenantId,isWechat,setToken,isH5,setStorageSync,getToken} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	
 	const showPopup = ref(false);
@@ -248,19 +244,6 @@
 		}
 	}
 	
-	// 获取支付方式
-	const getPaymentMethod = (): string => {
-		if(isWechat()){
-			return '微信小程序支付'
-		}
-
-		if(isH5()){
-			return 'H5支付'
-		}
-
-		return ''
-	}
-	
 	// 选择支付方式
 	const choosePayment = () => {
 		const detail = orderDetail.value as UTSJSONObject
@@ -272,7 +255,13 @@
 
 	// 查询订单详情
 	const getOrderDetail = async () => {
-		if (!orderId.value) return
+		if (!orderId.value) {
+			uni.showToast({
+				title: '订单号不能为空',
+				icon: 'none'
+			})
+			return
+		}
 		try {
 			const res = await queryOrderDetail(orderId.value)
 			if (res.code == 200) {
@@ -316,6 +305,8 @@
 		// 设置正在支付流程中 - 所有支付方式统一处理
 		isInPaymentProcess.value = true
 		const payWxType = data['payWxType'] as string
+		
+		console.log('支付成功页面orderNos.value:', orderNos.value, 'payChannelId.value:', payChannelId.value)
 		if(payWxType == 'wechat_pay'){
 			uni.requestPayment({
 				provider: 'wxpay',
@@ -470,17 +461,17 @@
 	//登录
 	const userId = ref<string>('')
 	const userLoginByOpenid = async (codes: string) => {
-		console.log('userLoginByOpenid:', codes)
 		const res = await login({
 			xcxCode: codes,
 			isLogin: '1',
 		})
 		
+		console.log('userLoginByOpenid登录成功:', res)
 		if(res.code == 200){
 			userId.value = '' + res.data.id
 			setStorageSync('userId', userId.value)
 			uni.navigateTo({
-				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value + '&from=orderDetail' + '&rechargeNo=' + cardNumber.value
+				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value + '&from=orderDetail' + '&rechargeNo=gn1000000000002'
 			})
 		}
 	}
@@ -539,7 +530,11 @@
 					})
 					return
 				}
+			}else{
+				getOrderDetail()
 			}
+		}else{
+			getOrderDetail()
 		}
 	}
 	
@@ -552,7 +547,7 @@
 			if (options?.from === 'paySuccess') {
 				isFromPaySuccess.value = true
 			}
-			getOrderDetail()
+			platform()
 		}
 	})
 
@@ -572,7 +567,7 @@
 		
 		let options = uni.getEnterOptionsSync();
 		// 1011扫描二维码  1012长按图片识别二维码  1013相册选择二维码 1037小程序打开小程序 1038 从另一个小程序返回
-		if(options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037|| options.scene == 1038){
+		if(options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037|| options.scene == 1038|| options.scene == 1065){
 			platform()
 		}
 

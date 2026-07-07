@@ -226,7 +226,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           paySign: res.paySign,
           signType: res.signType,
           success: function(res2) {
-            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:441", "通联支付成功", res2);
             common_vendor.index.hideLoading();
             common_vendor.index.redirectTo({
               url: "/pages/paySuccess/paySuccess?orderId=" + orderNo.value + "&payChannelId=" + payChannelId.value
@@ -267,10 +266,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           appId: common_config.config.api.auth.appID,
           extraData: param,
           success(res2 = null) {
-            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:484", "支付成功:", res2);
+            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:483", "支付成功:", res2);
           },
           fail(res2 = null) {
-            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:487", "支付失败:", res2);
+            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:486", "支付失败:", res2);
             common_vendor.index.hideLoading();
             isInPaymentProcess.value = false;
           }
@@ -287,18 +286,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     if (form) {
       form.submit();
     } else {
-      common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:504", "未找到支付表单");
+      common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:503", "未找到支付表单");
     }
   };
   const handleConfirmPayment = (e = null) => {
     return common_vendor.__awaiter(this, void 0, void 0, function* () {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:510", "确认支付:", e);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:509", "确认支付:", e);
       common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
         title: "支付中..."
       }));
       showPopup.value = false;
       const currentItem = active.value === 0 ? packageList.value[selectedPackageIndex.value] : refillList.value[selectedRefillIndex.value];
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:522", "currentItem:", currentItem, currentItem.pkgId);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:521", "currentItem:", currentItem, currentItem.pkgId);
       let params = new common_vendor.UTSJSONObject({});
       if (common_config.isWechat()) {
         params = new common_vendor.UTSJSONObject({
@@ -306,11 +305,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           rechargeNo: cardNumber.value
         });
       }
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:540", "params:", params);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:539", "params:", params);
       try {
         const res = yield api_http.addOrder(params);
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:546", "添加订单成功:", res);
+          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:545", "添加订单成功:", res);
           if (common_config.isWechat()) {
             toPay(res.data);
           }
@@ -333,7 +332,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     });
   };
   const onPopupClose = () => {
-    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:577", "弹窗关闭");
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:576", "弹窗关闭");
   };
   const goBack = () => {
     common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -362,7 +361,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           }
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:610", "获取卡片详情失败:", error);
+        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:609", "获取卡片详情失败:", error);
         common_vendor.index.showToast({
           title: "获取卡片信息失败",
           icon: "none"
@@ -395,10 +394,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       }, 100);
     }
   };
+  const checkToken = () => {
+    const token = common_config.getToken();
+    return !!token;
+  };
+  const platform = () => {
+    return common_vendor.__awaiter(this, void 0, void 0, function* () {
+      if (common_config.isWechat()) {
+        if (!checkToken()) {
+          yield getTenantInfos();
+          yield getCode();
+        } else {
+          getCardDetail(cardNumber.value, country.value);
+        }
+      } else {
+        getCardDetail(cardNumber.value, country.value);
+      }
+    });
+  };
   const cardNumber = common_vendor.ref("");
   const country = common_vendor.ref("");
   common_vendor.onLoad((options) => {
-    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:646", "options:", options);
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:663", "options:", options);
     const opt = options;
     const cardNumberValue = opt.rechargeNo;
     const countryValue = opt.country;
@@ -411,9 +428,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     if (cardNumberValue) {
       cardNumber.value = cardNumberValue;
       country.value = countryValue !== null && countryValue !== void 0 ? countryValue : "";
-      getCardDetail(cardNumber.value, country.value);
+      platform();
     } else {
-      common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:664", "未获取到卡片号码");
+      common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:681", "未获取到卡片号码");
       common_vendor.index.showToast({
         title: "卡片号码不存在",
         icon: "none"
@@ -425,11 +442,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const userId = common_vendor.ref("");
   const userLoginByOpenid = (codes) => {
     return common_vendor.__awaiter(this, void 0, void 0, function* () {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:677", "userLoginByOpenid:", codes);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:694", "recharge,,userLoginByOpenid:", codes);
       const res = yield api_http.login(new common_vendor.UTSJSONObject({
         xcxCode: codes,
         isLogin: "1"
       }));
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:699", "recharge,,userLoginByOpenid登录:", res);
       if (res.code == 200) {
         userId.value = "" + res.data.id;
         common_config.setStorageSync("userId", userId.value);
@@ -444,7 +462,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       common_vendor.index.login(new common_vendor.UTSJSONObject({
         success: (res) => {
           code.value = res.code;
-          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:695", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
           if (wxGetPhoneLogin.value == "1") {
             const params = new common_vendor.UTSJSONObject({
               isLogin: "1",
@@ -452,7 +469,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
             });
             api_http.login(params).then((res2) => {
               if (res2.code == 200) {
-                common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:703", "登录成功:", res2.data.access_token);
+                common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:719", "登录成功:", res2.data.access_token);
                 common_config.setToken(res2.data.access_token, res2.data.refreshToken);
                 common_vendor.index.reLaunch({
                   url: "/pages/recharge/recharge?rechargeNo=" + cardNumber.value
@@ -476,20 +493,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       }
     });
   };
-  const platform = () => {
-    return common_vendor.__awaiter(this, void 0, void 0, function* () {
-      if (common_config.isWechat()) {
-        yield getTenantInfos();
-        yield getCode();
-      }
-    });
-  };
   common_vendor.onShow(() => {
     let options = common_vendor.index.getEnterOptionsSync();
-    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:734", "options.scene:", options.scene);
-    if (options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037 || options.scene == 1038) {
-      platform();
-    }
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:745", "options.scene:", options.scene);
     if (!isInPaymentProcess.value) {
       return null;
     }
@@ -549,10 +555,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     common_vendor.index.makePhoneCall({
       phoneNumber: phone,
       success: () => {
-        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:807", "拨号界面弹出成功");
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:818", "拨号界面弹出成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:810", "拨号失败:", err);
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:821", "拨号失败:", err);
         common_vendor.index.showToast({
           title: "拨号失败，请重试",
           icon: "none"

@@ -89,7 +89,7 @@
 		return value == null ? '' : '' + value
 	}
 	
-	/** 查询套餐信息列表 */
+	//查询套餐信息列表
 	const getPkgInfoList = async (state: string) => {
 		try {
 			const res = await queryPkgInfoList({

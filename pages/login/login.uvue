@@ -48,8 +48,9 @@
 			userId: userId.value,
 			isLogin: wxGetPhoneLogin.value,
 		})
+		console.log('login页面登录返回:', res)
+		console.log('login页面登录from:', from.value)
 		if(res.code == 200){
-			console.log('登录成功:', res.data.access_token)
 			orderId.value = getStorageSync('orderId') as string || ''
 			setToken(res.data.access_token, res.data.refreshToken)
 			setStorageSync('usePhoneNumber', true)
@@ -80,7 +81,9 @@
 			})
 			return
 		}
+		console.log('handleGetPhoneNumber:', res)
 		const detail = res['detail'] as UTSJSONObject
+		
 		getLogin(detail['code'] as string)
 	}
 
