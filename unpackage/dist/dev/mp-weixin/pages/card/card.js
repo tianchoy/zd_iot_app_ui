@@ -164,8 +164,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 xcxCode: code.value
               })).then((loginRes) => {
                 if (loginRes.code == 200) {
-                  common_config.setToken(loginRes.data.access_token, loginRes.data.refreshToken);
-                  resolve(true);
+                  if (wxGetPhoneLogin.value == "0") {
+                    if (common_config.getToken()) {
+                      resolve(true);
+                    } else {
+                      resolve(false);
+                    }
+                  } else {
+                    common_config.setToken(loginRes.data.access_token, loginRes.data.refreshToken);
+                    resolve(true);
+                  }
                 } else {
                   resolve(false);
                 }
@@ -174,7 +182,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             },
             fail: (err) => {
-              common_vendor.index.__f__("error", "at pages/card/card.uvue:229", "登录失败:", err);
+              common_vendor.index.__f__("error", "at pages/card/card.uvue:237", "登录失败:", err);
               resolve(false);
             }
           }));
@@ -207,18 +215,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (common_config.isWechat()) {
           yield getTenantInfos();
-          if (wxGetPhoneLogin.value != "1") {
+          if (wxGetPhoneLogin.value == "0") {
             cardList.value = [];
             cardCounts.value = [0, 0, 0];
-          }
-          const loginSuccess = yield getCode();
-          if (!loginSuccess) {
-            common_vendor.index.__f__("log", "at pages/card/card.uvue:276", "登录失败，跳过数据加载");
-            common_vendor.index.showToast({
-              title: "登录失败，请重试",
-              icon: "none"
-            });
-            return Promise.resolve(null);
+            const loginSuccess = yield getCode();
+            if (!loginSuccess) {
+              common_vendor.index.__f__("log", "at pages/card/card.uvue:281", "登录失败，跳过数据加载");
+              common_vendor.index.showToast({
+                title: "登录失败，请重试",
+                icon: "none"
+              });
+              return Promise.resolve(null);
+            }
           }
         }
         yield loadCardData();

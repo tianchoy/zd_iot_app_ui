@@ -298,9 +298,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (pages.length > 1) {
         common_vendor.index.navigateBack();
       } else {
-        common_vendor.index.reLaunch({
-          url: "/pages/card/card"
-        });
+        if (common_config.isWechat()) {
+          common_vendor.index.reLaunch({
+            url: "/pages/card/card"
+          });
+        }
       }
     };
     const wxGetPhoneLogin = common_vendor.ref("");
@@ -312,12 +314,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           xcxCode: codes,
           isLogin: "1"
         }));
-        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:469", "userLoginByOpenid登录成功:", res);
+        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:476", "userLoginByOpenid登录成功:", res);
         if (res.code == 200) {
           userId.value = "" + res.data.id;
           common_config.setStorageSync("userId", userId.value);
           common_vendor.index.navigateTo({
-            url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value + "&from=orderDetail&rechargeNo=gn1000000000002"
+            url: "/pages/login/login?wxGetPhoneLogin=" + wxGetPhoneLogin.value + "&userId=" + userId.value + "&from=orderDetail"
           });
         }
       });
@@ -327,7 +329,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.login(new common_vendor.UTSJSONObject({
           success: (res) => {
             code.value = res.code;
-            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:483", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
+            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:490", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
             if (wxGetPhoneLogin.value == "1") {
               const params = new common_vendor.UTSJSONObject({
                 isLogin: "1",
@@ -369,7 +371,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             yield getTenantInfos();
             const loginSuccess = yield getCode();
             if (!loginSuccess) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:526", "登录失败，跳过数据加载");
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:533", "登录失败，跳过数据加载");
               common_vendor.index.showToast({
                 title: "登录失败，请重试",
                 icon: "none"

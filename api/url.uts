@@ -12,7 +12,7 @@ export const ApiUrl = {
     goPay: '/pay/order/goPayment', // 去支付
     queryBySuccessId: '/order/pkgOrder/success/', // 根据成功ID查询订单
     
-    queryPkgInfoDetail: '/card/pkgInfo/info/', // 查询套餐信息详情
+    queryPkgInfoDetail: '/card/pkgInfo/gn/info/', // 查询套餐信息详情
     queryOrderList: '/order/pkgOrder/list', // 查询订单列表
     queryOrderPackInfo: '/order/pkgOrder/getOrderPackGnInfo/', // 查询订单套餐信息
     queryPkgInfoList: '/card/pkgInfo/list', // 查询套餐信息列表

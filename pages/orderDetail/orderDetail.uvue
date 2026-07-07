@@ -450,9 +450,16 @@
 		if (pages.length > 1) {
 			uni.navigateBack()
 		} else {
-			uni.reLaunch({
-				url: '/pages/card/card'
-			})
+			if(isWechat()){
+				uni.reLaunch({
+					url: '/pages/card/card'
+				})
+			}
+			if(isH5()){
+				uni.reLaunch({
+					url: '/pages/recharge/recharge?rechargeNo=' + orderDetail.value.rechargeNo
+				})
+			}
 		}
 	}
 
@@ -471,7 +478,7 @@
 			userId.value = '' + res.data.id
 			setStorageSync('userId', userId.value)
 			uni.navigateTo({
-				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value + '&from=orderDetail' + '&rechargeNo=gn1000000000002'
+				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value + '&from=orderDetail'
 			})
 		}
 	}

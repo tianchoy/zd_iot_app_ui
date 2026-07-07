@@ -297,6 +297,8 @@ function goPayXcx(orderId, merchantConfigId, withToken = true) {
   }));
 }
 function queryPkgInfoXcx(id, withToken = true) {
+  const url = api_url.ApiUrl.queryPkgInfoXcx + id;
+  const token = true;
   return api_Request.request(new api_Request.RequestOptions({
     data: null,
     header: null,
@@ -310,9 +312,9 @@ function queryPkgInfoXcx(id, withToken = true) {
     successCodes: null,
     unauthorizedCodes: null,
     onErrorCode: null,
-    url: api_url.ApiUrl.queryPkgInfoXcx + id,
+    url,
     method: "GET",
-    withToken
+    withToken: token
   }));
 }
 exports.addOrder = addOrder;

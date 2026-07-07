@@ -216,8 +216,16 @@ const getCode = async (): Promise<boolean> => {
 					xcxCode: code.value,
 				}).then((loginRes) => {
 					if (loginRes.code == 200) {
-						setToken(loginRes.data.access_token, loginRes.data.refreshToken)
-						resolve(true)
+						if(wxGetPhoneLogin.value == '0'){
+							if(getToken()){
+								resolve(true)
+							}else{
+								resolve(false)
+							}
+						}else{
+							setToken(loginRes.data.access_token, loginRes.data.refreshToken)
+							resolve(true)
+						}
 					} else {
 						resolve(false)
 					}
@@ -262,23 +270,21 @@ const platform = async () => {
 		await getTenantInfos()
 			
 		// 如果不需要手机号登录，直接跳过数据加载
-		if (wxGetPhoneLogin.value != '1') {
+		if (wxGetPhoneLogin.value == '0') {
 			// 页面显示空状态
 			cardList.value = []
 			cardCounts.value = [0, 0, 0]
-			// return
-		}
+			const loginSuccess = await getCode()
 		
-		const loginSuccess = await getCode()
-		
-		// 登录失败时，不加载数据
-		if (!loginSuccess) {
-			console.log('登录失败，跳过数据加载')
-			uni.showToast({
-				title: '登录失败，请重试',
-				icon: 'none'
-			})
-			return
+			// 登录失败时，不加载数据
+			if (!loginSuccess) {
+				console.log('登录失败，跳过数据加载')
+				uni.showToast({
+					title: '登录失败，请重试',
+					icon: 'none'
+				})
+				return
+			}
 		}
 	}
 
