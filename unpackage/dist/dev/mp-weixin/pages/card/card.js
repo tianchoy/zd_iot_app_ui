@@ -222,7 +222,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             if (!loginSuccess) {
               common_vendor.index.__f__("log", "at pages/card/card.uvue:281", "登录失败，跳过数据加载");
               common_vendor.index.showToast({
-                title: "登录失败，请重试",
+                title: "登录失败，请先登录",
                 icon: "none"
               });
               return Promise.resolve(null);

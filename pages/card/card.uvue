@@ -280,7 +280,7 @@ const platform = async () => {
 			if (!loginSuccess) {
 				console.log('登录失败，跳过数据加载')
 				uni.showToast({
-					title: '登录失败，请重试',
+					title: '登录失败，请先登录',
 					icon: 'none'
 				})
 				return

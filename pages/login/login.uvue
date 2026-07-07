@@ -48,8 +48,6 @@
 			userId: userId.value,
 			isLogin: wxGetPhoneLogin.value,
 		})
-		console.log('login页面登录返回:', res)
-		console.log('login页面登录from:', from.value)
 		if(res.code == 200){
 			orderId.value = getStorageSync('orderId') as string || ''
 			setToken(res.data.access_token, res.data.refreshToken)
@@ -137,7 +135,7 @@
 			margin: 0 40rpx;
 		}
 		.no-login{
-			font-size: 24rpx;
+			font-size: 28rpx;
 			color: #8f8f8f;
 			text-decoration: underline;
 		}

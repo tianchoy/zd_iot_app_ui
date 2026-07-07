@@ -39,8 +39,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           userId: userId.value,
           isLogin: wxGetPhoneLogin.value
         }));
-        common_vendor.index.__f__("log", "at pages/login/login.uvue:51", "login页面登录返回:", res);
-        common_vendor.index.__f__("log", "at pages/login/login.uvue:52", "login页面登录from:", from.value);
         if (res.code == 200) {
           orderId.value = common_config.getStorageSync("orderId") || "";
           common_config.setToken(res.data.access_token, res.data.refreshToken);
@@ -69,7 +67,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      common_vendor.index.__f__("log", "at pages/login/login.uvue:84", "handleGetPhoneNumber:", res);
+      common_vendor.index.__f__("log", "at pages/login/login.uvue:82", "handleGetPhoneNumber:", res);
       const detail = res["detail"];
       getLogin(detail["code"]);
     };

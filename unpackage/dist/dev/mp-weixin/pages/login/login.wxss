@@ -44,7 +44,7 @@
   margin: 0 40rpx;
 }
 .container .no-login[class].data-v-27a30816 {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #8f8f8f;
   text-decoration: underline;
 }
