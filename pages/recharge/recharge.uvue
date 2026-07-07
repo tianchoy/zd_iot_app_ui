@@ -14,7 +14,10 @@
 				</view>
 				<view class="info-item">
 					<text class="label">有效期</text>
-					<text class="value">{{ cardDetail?.effectiveTime }}~{{ cardDetail?.expirationTime}}</text>
+					<view class="value">
+						<text v-if="cardDetail?.effectiveTime">{{ cardDetail?.effectiveTime }}</text>
+						<text v-if="cardDetail?.expirationTime">~<{{ cardDetail?.expirationTime}}</text>
+					</view>
 				</view>
 			</view>
 			<view class="flow-box" v-if="cardDetail?.pkgFlow">

@@ -4,7 +4,7 @@
 		<view class="main-content">
 			<!-- 标题区域 -->
 			<view class="title-section">
-				<text class="main-title">国内版H5快捷充值</text>
+				<text class="main-title">快捷充值</text>
 				<text class="sub-title">输入卡号，快速查询缴费</text>
 				<text class="desc-text">支持短信链接、二维码、APP跳转进入H5页面，未登录</text>
 				<text class="desc-text">也可直接充值。</text>
@@ -13,11 +13,11 @@
 			<!-- 卡号查询卡片 -->
 			<view class="card-box">
 				<view class="card-label">卡号查询</view>
-				<view class="search-tips">请输入ICCID/MSISDN,或点击输入框右侧扫描图标识别卡号</view>
+				<view class="search-tips">请输入充值号,或点击输入框右侧扫描图标识别卡号</view>
 				<view class="search-value">
 					<input
 						v-model="cardNumber"
-						placeholder="请输入ICCID/MSISDN,或扫描图标识别卡号"
+						placeholder="请输入充值号,或扫描图标识别卡号"
 						class="search-input"
 					/>
 					<view class="scan-btn" @click="handleScan">
@@ -26,7 +26,7 @@
 				</view>
 				
 				<!-- 选择国家/地区 -->
-				<view class="select-country-wrapper">
+				<view class="select-country-wrapper" v-if="isINT()">
 					<view class="select-label">选择国家/地区</view>
 					<view class="select-trigger" @tap="openSelectCountry">
 						<text class="select-value" :class="{ placeholder: !selectedCountry }">
@@ -47,7 +47,6 @@
 				<view class="instruction-list">
 					<text class="instruction-item">1.H5支持未登录快速充值。</text>
 					<text class="instruction-item">2.APP跳转场景可直接进入充值首页，无需经过本入口页。</text>
-					<text class="instruction-item">3.本原型用于展示H5页面结构及跳转关系。</text>
 				</view>
 			</view>
 		</view>
@@ -80,8 +79,9 @@
 	import SearchSelect from '@/components/selectCountry.uvue'
 	import { getCountryList } from '@/api/http.uts'
 	import type { CountryData } from '@/api/types.uts'
+	import {isINT,isCN} from '@/common/config.uts'
 	
-	const cardNumber = ref<string>('gn1000000000026')
+	const cardNumber = ref<string>('')
 	
 	// 国家/地区相关
 	const showCountryPopup = ref<boolean>(false)
@@ -139,7 +139,7 @@
 			})
 			return
 		}
-		if (!selectedCountry.value) {
+		if (isINT() && !selectedCountry.value) {
 			uni.showToast({
 				title: '请选择国家/地区',
 				icon: 'none'
@@ -151,9 +151,17 @@
 			icon: 'loading'
 		})
 		// 跳转到充值页面
-		uni.navigateTo({
-			url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
-		})
+		if(isCN()){
+			uni.navigateTo({
+				url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&from=h5Search`
+			})
+		}
+		if(isINT()){
+			uni.navigateTo({
+				url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
+			})
+		}
+		
 	}
 	
 	// 监听扫码结果
@@ -183,7 +191,9 @@
 	}
 	
 	onMounted(() => {
-		initCountryList()
+		if(isINT()){
+			initCountryList()
+		}
 		uni.$on('scanResult', onScanResult)
 	})
 	

@@ -204,12 +204,16 @@ function isWechat() {
 function isH5() {
   return false;
 }
+function isINT() {
+  return false;
+}
 exports.clearToken = clearToken;
 exports.config = config;
 exports.getStorageSync = getStorageSync;
 exports.getTenantId = getTenantId;
 exports.getToken = getToken;
 exports.isH5 = isH5;
+exports.isINT = isINT;
 exports.isWechat = isWechat;
 exports.removeStorageSync = removeStorageSync;
 exports.setStorageSync = setStorageSync;

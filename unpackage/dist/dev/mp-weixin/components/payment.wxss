@@ -12,25 +12,23 @@
 	font-size: 36rpx;
 	font-weight: 600;
 	color: #333;
-	
 	text-align: center;
-    border-bottom: 1px solid #eef2f7;
+	border-bottom: 1px solid #eef2f7;
 	margin-bottom: 40rpx;
-    padding-bottom: 20rpx;
+	padding-bottom: 20rpx;
 }
 .info-item.data-v-0c94e3a5 {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	
-    padding: 20rpx 0;
+	padding: 20rpx 0;
 }
 .item-label.data-v-0c94e3a5 {
-    font-size: 28rpx;
+	font-size: 28rpx;
 	color: #64748b;
 }
 .item-value.data-v-0c94e3a5 {
-    font-size: 30rpx;
+	font-size: 30rpx;
 	color: #333;
 	font-weight: bold;
 }
@@ -39,33 +37,6 @@
 	font-size: 32rpx;
 	font-weight: 700;
 }
-
-
-
-
-
-
-
-
-/* 微信小程序平台：固定方式样式 */
-.method-item.fixed-method.data-v-0c94e3a5 {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	padding-bottom: 20rpx;
-}
-.method-item .method-label.data-v-0c94e3a5 {
-	font-size: 24rpx;
-	color: #666;
-}
-.method-item .method-name.data-v-0c94e3a5 {
-	font-size: 24rpx;
-	color: #333;
-	font-weight: 500;
-}
-
-/* H5平台：可选项样式 - 添加圆角边框 */
 .method-section.data-v-0c94e3a5 {
 	margin-top: 8rpx;
 }
@@ -73,6 +44,7 @@
 	font-size: 24rpx;
 	color: #64748b;
 	margin-bottom: 24rpx;
+	display: block;
 }
 .method-option.data-v-0c94e3a5 {
 	display: flex;
@@ -87,8 +59,7 @@
 	transition: all 0.3s ease;
 }
 
-
-/* 选中状态样式 */
+/* 支付方式选中状态 */
 .method-option.method-selected.data-v-0c94e3a5 {
 	border-color: #2563eb;
 	background-color: #f8fbff;
@@ -98,19 +69,36 @@
 	display: flex;
 	flex-direction: column;
 }
+
+/* 图标和文字头部布局 */
+.method-header.data-v-0c94e3a5 {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 16rpx;
+}
+
+/* 支付图标样式 */
+.method-icon.data-v-0c94e3a5 {
+	width: 48rpx;
+	height: 48rpx;
+	flex-shrink: 0;
+}
 .method-label.data-v-0c94e3a5 {
-	font-size: 24rpx;
+	font-size: 28rpx;
 	color: #333;
 	font-weight: 500;
-	margin-bottom: 8rpx;
 }
 .method-desc.data-v-0c94e3a5 {
-	font-size: 20rpx;
+	font-size: 22rpx;
 	color: #999;
+	margin-top: 6rpx;
 }
 .method-right.data-v-0c94e3a5 {
 	padding-left: 20rpx;
 }
+
+/* 自定义单选按钮 */
 .radio.data-v-0c94e3a5 {
 	width: 25rpx;
 	height: 25rpx;
@@ -125,21 +113,11 @@
 	border-color: #2563eb;
 	background-color: #2563eb;
 }
-.tips.data-v-0c94e3a5 {
-	background-color: #f9f9f9;
-	padding: 20rpx;
-	border-radius: 16rpx;
-	margin-bottom: 48rpx;
-}
-.tips-text.data-v-0c94e3a5 {
-	font-size: 24rpx;
-	color: #999;
-	line-height: 1.4;
-}
 .action-buttons.data-v-0c94e3a5 {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+	gap: 24rpx;
 }
 .btn.data-v-0c94e3a5 {
 	flex: 1;
@@ -149,13 +127,21 @@
 	font-weight: 500;
 	border: none;
 	background-color: transparent;
+	height: 88rpx;
+	line-height: 88rpx;
 }
 .cancel-btn.data-v-0c94e3a5 {
 	background-color: #ffffff;
-    border: 1rpx solid #dbe5f0;
+	border: 1rpx solid #dbe5f0;
 	color: #334155;
 }
 .confirm-btn.data-v-0c94e3a5 {
 	background: linear-gradient(135deg, #2563eb 0%, #4c88f4 100%);
-    color: #ffffff;
+	color: #ffffff;
+}
+.mr-24.data-v-0c94e3a5 {
+	margin-right: 24rpx;
+}
+.ml-24.data-v-0c94e3a5 {
+	margin-left: 24rpx;
 }

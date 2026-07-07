@@ -4,25 +4,6 @@ const api_url = require("./url.js");
 const api_Request = require("./Request.js");
 const common_config = require("../common/config.js");
 require("./types.js");
-function getCountryList(withToken = false) {
-  return api_Request.request(new api_Request.RequestOptions({
-    data: null,
-    header: null,
-    baseUrl: null,
-    timeout: null,
-    showError: null,
-    showLoading: null,
-    loadingText: null,
-    redirectOnUnauthorized: null,
-    loginPage: null,
-    successCodes: null,
-    unauthorizedCodes: null,
-    onErrorCode: null,
-    url: api_url.ApiUrl.countries,
-    method: "GET",
-    withToken
-  }));
-}
 function login(data, withToken = true) {
   return api_Request.request(new api_Request.RequestOptions({
     header: null,
@@ -318,7 +299,6 @@ function queryPkgInfoXcx(id, withToken = true) {
   }));
 }
 exports.addOrder = addOrder;
-exports.getCountryList = getCountryList;
 exports.getTenantInfo = getTenantInfo;
 exports.goPayXcx = goPayXcx;
 exports.login = login;

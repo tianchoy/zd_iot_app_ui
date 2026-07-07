@@ -196,7 +196,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         paySign: res.paySign,
         signType: res.signType,
         success: (res2) => {
-          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:409", "微信支付成功", res2);
+          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:412", "微信支付成功", res2);
           common_vendor.index.hideLoading();
           common_vendor.index.redirectTo({
             url: "/pages/paySuccess/paySuccess?orderId=" + orderNo.value + "&payChannelId=" + payChannelId.value
@@ -266,10 +266,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           appId: common_config.config.api.auth.appID,
           extraData: param,
           success(res2 = null) {
-            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:483", "支付成功:", res2);
+            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:486", "支付成功:", res2);
           },
           fail(res2 = null) {
-            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:486", "支付失败:", res2);
+            common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:489", "支付失败:", res2);
             common_vendor.index.hideLoading();
             isInPaymentProcess.value = false;
           }
@@ -286,18 +286,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     if (form) {
       form.submit();
     } else {
-      common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:503", "未找到支付表单");
+      common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:506", "未找到支付表单");
     }
   };
   const handleConfirmPayment = (e = null) => {
     return common_vendor.__awaiter(this, void 0, void 0, function* () {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:509", "确认支付:", e);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:512", "确认支付:", e);
       common_vendor.index.showLoading(new common_vendor.UTSJSONObject({
         title: "支付中..."
       }));
       showPopup.value = false;
       const currentItem = active.value === 0 ? packageList.value[selectedPackageIndex.value] : refillList.value[selectedRefillIndex.value];
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:521", "currentItem:", currentItem, currentItem.pkgId);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:524", "currentItem:", currentItem, currentItem.pkgId);
       let params = new common_vendor.UTSJSONObject({});
       if (common_config.isWechat()) {
         params = new common_vendor.UTSJSONObject({
@@ -305,11 +305,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           rechargeNo: cardNumber.value
         });
       }
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:539", "params:", params);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:542", "params:", params);
       try {
         const res = yield api_http.addOrder(params);
         if (res.code == 200) {
-          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:545", "添加订单成功:", res);
+          common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:548", "添加订单成功:", res);
           if (common_config.isWechat()) {
             toPay(res.data);
           }
@@ -332,7 +332,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     });
   };
   const onPopupClose = () => {
-    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:576", "弹窗关闭");
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:579", "弹窗关闭");
   };
   const goBack = () => {
     common_vendor.index.navigateBack(new common_vendor.UTSJSONObject({
@@ -361,7 +361,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           }
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:609", "获取卡片详情失败:", error);
+        common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:612", "获取卡片详情失败:", error);
         common_vendor.index.showToast({
           title: "获取卡片信息失败",
           icon: "none"
@@ -415,7 +415,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const cardNumber = common_vendor.ref("");
   const country = common_vendor.ref("");
   common_vendor.onLoad((options) => {
-    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:663", "options:", options);
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:666", "options:", options);
     const opt = options;
     const cardNumberValue = opt.rechargeNo;
     const countryValue = opt.country;
@@ -430,7 +430,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       country.value = countryValue !== null && countryValue !== void 0 ? countryValue : "";
       platform();
     } else {
-      common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:681", "未获取到卡片号码");
+      common_vendor.index.__f__("error", "at pages/recharge/recharge.uvue:684", "未获取到卡片号码");
       common_vendor.index.showToast({
         title: "卡片号码不存在",
         icon: "none"
@@ -442,12 +442,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const userId = common_vendor.ref("");
   const userLoginByOpenid = (codes) => {
     return common_vendor.__awaiter(this, void 0, void 0, function* () {
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:694", "recharge,,userLoginByOpenid:", codes);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:697", "recharge,,userLoginByOpenid:", codes);
       const res = yield api_http.login(new common_vendor.UTSJSONObject({
         xcxCode: codes,
         isLogin: "1"
       }));
-      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:699", "recharge,,userLoginByOpenid登录:", res);
+      common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:702", "recharge,,userLoginByOpenid登录:", res);
       if (res.code == 200) {
         userId.value = "" + res.data.id;
         common_config.setStorageSync("userId", userId.value);
@@ -469,7 +469,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
             });
             api_http.login(params).then((res2) => {
               if (res2.code == 200) {
-                common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:719", "登录成功:", res2.data.access_token);
+                common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:722", "登录成功:", res2.data.access_token);
                 common_config.setToken(res2.data.access_token, res2.data.refreshToken);
                 common_vendor.index.reLaunch({
                   url: "/pages/recharge/recharge?rechargeNo=" + cardNumber.value
@@ -495,7 +495,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   };
   common_vendor.onShow(() => {
     let options = common_vendor.index.getEnterOptionsSync();
-    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:745", "options.scene:", options.scene);
+    common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:748", "options.scene:", options.scene);
     if (!isInPaymentProcess.value) {
       return null;
     }
@@ -555,10 +555,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     common_vendor.index.makePhoneCall({
       phoneNumber: phone,
       success: () => {
-        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:818", "拨号界面弹出成功");
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:821", "拨号界面弹出成功");
       },
       fail: (err) => {
-        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:821", "拨号失败:", err);
+        common_vendor.index.__f__("log", "at pages/recharge/recharge.uvue:824", "拨号失败:", err);
         common_vendor.index.showToast({
           title: "拨号失败，请重试",
           icon: "none"
@@ -568,7 +568,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   };
   return (_ctx, _cache) => {
     "raw js";
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J;
     const __returned__ = common_vendor.e({
       a: common_vendor.o(goBack, "29"),
       b: common_vendor.p({
@@ -595,32 +595,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     }, ((_g = cardDetail.value) == null ? void 0 : _g.pkgName) ? {
       g: common_vendor.t(((_h = cardDetail.value) == null ? void 0 : _h.pkgName) || "未知")
     } : {}, {
-      h: common_vendor.t((_i = cardDetail.value) == null ? void 0 : _i.effectiveTime),
-      i: common_vendor.t((_j = cardDetail.value) == null ? void 0 : _j.expirationTime),
-      j: (_k = cardDetail.value) == null ? void 0 : _k.pkgFlow
-    }, ((_l = cardDetail.value) == null ? void 0 : _l.pkgFlow) ? {
-      k: common_vendor.t(((_m = cardDetail.value) == null ? void 0 : _m.usedFlow) || 0),
-      l: common_vendor.t(((_n = cardDetail.value) == null ? void 0 : _n.unUsedFlow) || 0),
-      m: common_vendor.t(((_o = cardDetail.value) == null ? void 0 : _o.pkgFlow) || 0),
-      n: common_vendor.p({
+      h: (_i = cardDetail.value) == null ? void 0 : _i.effectiveTime
+    }, ((_j = cardDetail.value) == null ? void 0 : _j.effectiveTime) ? {
+      i: common_vendor.t((_k = cardDetail.value) == null ? void 0 : _k.effectiveTime)
+    } : {}, {
+      j: (_l = cardDetail.value) == null ? void 0 : _l.expirationTime
+    }, ((_m = cardDetail.value) == null ? void 0 : _m.expirationTime) ? {
+      k: common_vendor.t((_n = cardDetail.value) == null ? void 0 : _n.expirationTime)
+    } : {}, {
+      l: (_o = cardDetail.value) == null ? void 0 : _o.pkgFlow
+    }, ((_p = cardDetail.value) == null ? void 0 : _p.pkgFlow) ? {
+      m: common_vendor.t(((_q = cardDetail.value) == null ? void 0 : _q.usedFlow) || 0),
+      n: common_vendor.t(((_r = cardDetail.value) == null ? void 0 : _r.unUsedFlow) || 0),
+      o: common_vendor.t(((_s = cardDetail.value) == null ? void 0 : _s.pkgFlow) || 0),
+      p: common_vendor.p({
         percentage: percentage.value,
         ["show-text"]: true,
         class: "data-v-722cdacb"
       })
     } : {}, {
-      o: common_vendor.o(toMyPackage, "f5"),
-      p: common_vendor.p({
+      q: common_vendor.o(toMyPackage, "c8"),
+      r: common_vendor.p({
         class: "btn mr-24 data-v-722cdacb"
       }),
-      q: common_vendor.o(toOrderRecord, "01"),
-      r: common_vendor.p({
+      s: common_vendor.o(toOrderRecord, "da"),
+      t: common_vendor.p({
         class: "btn data-v-722cdacb"
       }),
-      s: common_vendor.o(changeTab, "8d"),
-      t: common_vendor.o(($event) => {
+      v: common_vendor.o(changeTab, "9f"),
+      w: common_vendor.o(($event) => {
         return active.value = $event;
-      }, "58"),
-      v: common_vendor.p({
+      }, "88"),
+      x: common_vendor.p({
         ["line-color"]: "#ffffff",
         list: tabs.value,
         ["line-width"]: 0,
@@ -634,9 +640,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         modelValue: active.value,
         class: "data-v-722cdacb"
       }),
-      w: active.value === 0
+      y: active.value === 0
     }, active.value === 0 ? common_vendor.e({
-      x: common_vendor.f(packageList.value, (item, index, i0) => {
+      z: common_vendor.f(packageList.value, (item, index, i0) => {
         return common_vendor.e({
           a: common_vendor.t(item.pkgName),
           b: item.tag
@@ -664,9 +670,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           }, item.pkgId || index)
         });
       }),
-      y: packageList.value.length == 0
+      A: packageList.value.length == 0
     }, packageList.value.length == 0 ? {} : {}) : common_vendor.e({
-      z: common_vendor.f(refillList.value, (item, index, i0) => {
+      B: common_vendor.f(refillList.value, (item, index, i0) => {
         return common_vendor.e({
           a: common_vendor.t(item.pkgName),
           b: item.tag
@@ -694,75 +700,75 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           }, item.pkgId || index)
         });
       }),
-      A: refillList.value.length == 0
+      C: refillList.value.length == 0
     }, refillList.value.length == 0 ? {} : {}), {
-      B: `${_ctx.u_s_b_h}px`,
-      C: `${_ctx.u_s_a_i_b}px`,
-      D: common_vendor.o(handleCancelPayment, "20"),
-      E: common_vendor.o(handleConfirmPayment, "2f"),
-      F: common_vendor.p({
+      D: `${_ctx.u_s_b_h}px`,
+      E: `${_ctx.u_s_a_i_b}px`,
+      F: common_vendor.o(handleCancelPayment, "d4"),
+      G: common_vendor.o(handleConfirmPayment, "ea"),
+      H: common_vendor.p({
         amount: currentPrice.value,
-        cardNumber: (_p = cardDetail.value) == null ? void 0 : _p.rechargeNo,
-        productName: (_q = currentPackage.value) == null ? void 0 : _q.pkgName,
-        traffic: (_r = currentPackage.value) == null ? void 0 : _r.pkgFlow,
-        validityPeriod: (_s = currentPackage.value) == null ? void 0 : _s.validityPeriod,
-        pkgType: (_t = currentPackage.value) == null ? void 0 : _t.pkgType,
-        payMethod: (_u = cardDetail.value) == null ? void 0 : _u.objectMap.payInfo,
+        cardNumber: (_t = cardDetail.value) == null ? void 0 : _t.rechargeNo,
+        productName: (_u = currentPackage.value) == null ? void 0 : _u.pkgName,
+        traffic: (_v = currentPackage.value) == null ? void 0 : _v.pkgFlow,
+        validityPeriod: (_w = currentPackage.value) == null ? void 0 : _w.validityPeriod,
+        pkgType: (_x = currentPackage.value) == null ? void 0 : _x.pkgType,
+        payMethod: (_y = cardDetail.value) == null ? void 0 : _y.objectMap.payInfo,
         class: "data-v-722cdacb"
       }),
-      G: common_vendor.o(onPopupClose, "2d"),
-      H: common_vendor.o(($event) => {
+      I: common_vendor.o(onPopupClose, "fc"),
+      J: common_vendor.o(($event) => {
         return showPopup.value = $event;
-      }, "9d"),
-      I: common_vendor.p({
+      }, "18"),
+      K: common_vendor.p({
         position: "bottom",
         show: showPopup.value,
         class: "data-v-722cdacb"
       }),
-      J: packageList.value.length > 0 || refillList.value.length > 0
+      L: packageList.value.length > 0 || refillList.value.length > 0
     }, packageList.value.length > 0 || refillList.value.length > 0 ? common_vendor.e({
-      K: showTips.value && ((_w = (_v = cardDetail.value) == null ? void 0 : _v.objectMap) == null ? void 0 : _w.rechargeTip)
-    }, showTips.value && ((_y = (_x = cardDetail.value) == null ? void 0 : _x.objectMap) == null ? void 0 : _y.rechargeTip) ? {
-      L: common_vendor.t((_z = cardDetail.value) == null ? void 0 : _z.objectMap.rechargeTip),
-      M: common_vendor.p({
+      M: showTips.value && ((_A = (_z = cardDetail.value) == null ? void 0 : _z.objectMap) == null ? void 0 : _A.rechargeTip)
+    }, showTips.value && ((_C = (_B = cardDetail.value) == null ? void 0 : _B.objectMap) == null ? void 0 : _C.rechargeTip) ? {
+      N: common_vendor.t((_D = cardDetail.value) == null ? void 0 : _D.objectMap.rechargeTip),
+      O: common_vendor.p({
         name: "clear",
         color: "#cbd5e1",
         size: "35rpx",
         class: "data-v-722cdacb"
       }),
-      N: common_vendor.o(closeTips, "4c")
+      P: common_vendor.o(closeTips, "9c")
     } : {}, {
-      O: common_vendor.t(currentPrice.value),
-      P: common_vendor.o(choosePayment, "56"),
-      Q: common_vendor.p({
+      Q: common_vendor.t(currentPrice.value),
+      R: common_vendor.o(choosePayment, "6f"),
+      S: common_vendor.p({
         type: "primary",
         width: "300rpx",
         height: "110rpx",
         class: "btn data-v-722cdacb"
       }),
-      R: `${_ctx.u_s_b_h}px`,
-      S: `${_ctx.u_s_a_i_b}px`
+      T: `${_ctx.u_s_b_h}px`,
+      U: `${_ctx.u_s_a_i_b}px`
     }) : {}, {
-      T: common_vendor.sei("r0-722cdacb", "view", formContainer, {
+      V: common_vendor.sei("r0-722cdacb", "view", formContainer, {
         "k": "formContainer"
       }),
-      U: `${_ctx.u_s_b_h}px`,
-      V: `${_ctx.u_s_a_i_b}px`,
-      W: common_vendor.o(handleConnectService, "fb"),
-      X: common_vendor.p({
-        class: "data-v-722cdacb"
-      }),
-      Y: common_vendor.o(_ctx.handleConnectTousu, "ff"),
+      W: `${_ctx.u_s_b_h}px`,
+      X: `${_ctx.u_s_a_i_b}px`,
+      Y: common_vendor.o(handleConnectService, "4a"),
       Z: common_vendor.p({
         class: "data-v-722cdacb"
       }),
-      aa: (_B = (_A = cardDetail.value) == null ? void 0 : _A.objectMap) == null ? void 0 : _B.serviceQrcode
-    }, ((_D = (_C = cardDetail.value) == null ? void 0 : _C.objectMap) == null ? void 0 : _D.serviceQrcode) ? {
-      ab: (_F = (_E = cardDetail.value) == null ? void 0 : _E.objectMap) == null ? void 0 : _F.serviceQrcode
+      aa: common_vendor.o(_ctx.handleConnectTousu, "f9"),
+      ab: common_vendor.p({
+        class: "data-v-722cdacb"
+      }),
+      ac: (_F = (_E = cardDetail.value) == null ? void 0 : _E.objectMap) == null ? void 0 : _F.serviceQrcode
+    }, ((_H = (_G = cardDetail.value) == null ? void 0 : _G.objectMap) == null ? void 0 : _H.serviceQrcode) ? {
+      ad: (_J = (_I = cardDetail.value) == null ? void 0 : _I.objectMap) == null ? void 0 : _J.serviceQrcode
     } : {}, {
-      ac: phoneList.value
+      ae: phoneList.value
     }, phoneList.value ? {
-      ad: common_vendor.f(phoneList.value, (phone, index, i0) => {
+      af: common_vendor.f(phoneList.value, (phone, index, i0) => {
         return {
           a: common_vendor.t(phone),
           b: common_vendor.o(($event) => {
@@ -772,7 +778,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           d: index
         };
       }),
-      ae: common_vendor.p({
+      ag: common_vendor.p({
         type: "primary",
         icon: "phone-call",
         text: "拨打电话",
@@ -781,10 +787,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         class: "data-v-722cdacb"
       })
     } : {}, {
-      af: common_vendor.o(($event) => {
+      ah: common_vendor.o(($event) => {
         return showCustomService.value = $event;
-      }, "3b"),
-      ag: common_vendor.p({
+      }, "e8"),
+      ai: common_vendor.p({
         position: "bottom",
         show: showCustomService.value,
         class: "data-v-722cdacb"

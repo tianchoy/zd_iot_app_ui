@@ -1,6 +1,8 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const api_http = require("../../api/http.js");
+require("../../api/url.js");
+require("../../api/Request.js");
+const common_config = require("../../common/config.js");
 require("../../api/types.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
@@ -18,7 +20,7 @@ const SearchSelect = () => "../../components/selectCountry.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "h5Search",
   setup(__props) {
-    const cardNumber = common_vendor.ref("gn1000000000026");
+    const cardNumber = common_vendor.ref("");
     const showCountryPopup = common_vendor.ref(false);
     const selectedCountry = common_vendor.ref("");
     const searchSelectRef = common_vendor.ref(null);
@@ -60,19 +62,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         return null;
       }
-      if (!selectedCountry.value) {
-        common_vendor.index.showToast({
-          title: "请选择国家/地区",
-          icon: "none"
-        });
-        return null;
-      }
       common_vendor.index.showToast({
         title: "查询中...",
         icon: "loading"
-      });
-      common_vendor.index.navigateTo({
-        url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
       });
     };
     const onScanResult = (data) => {
@@ -86,22 +78,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
       }
     };
-    const initCountryList = () => {
-      return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        const res = yield api_http.getCountryList(false);
-        common_vendor.index.__f__("log", "at pages/h5Search/h5Search.uvue:174", "查询国家列表:", res);
-        if (res.code == 200) {
-          countryOptions.value = res.data.map((item) => {
-            return new common_vendor.UTSJSONObject({
-              value: item.letterCode,
-              label: item.fullName
-            });
-          });
-        }
-      });
-    };
     common_vendor.onMounted(() => {
-      initCountryList();
       common_vendor.index.$on("scanResult", onScanResult);
     });
     common_vendor.onUnmounted(() => {
@@ -109,7 +86,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     return (_ctx, _cache) => {
       "raw js";
-      const __returned__ = {
+      const __returned__ = common_vendor.e({
         a: common_vendor.p({
           title: "查询卡号",
           ["show-back"]: false,
@@ -120,28 +97,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: cardNumber.value,
         c: common_vendor.o(($event) => {
           return cardNumber.value = $event.detail.value;
-        }, "d8"),
+        }, "e3"),
         d: common_vendor.p({
           name: "scan",
           size: "40rpx",
           color: "#666",
           class: "data-v-9fa4edd6"
         }),
-        e: common_vendor.o(handleScan, "22"),
-        f: common_vendor.t(selectedCountryLabel.value || "请选择国家/地区"),
-        g: !selectedCountry.value ? 1 : "",
-        h: common_vendor.o(openSelectCountry, "0b"),
-        i: common_vendor.o(handleQuery, "e0"),
-        j: `${_ctx.u_s_b_h}px`,
-        k: `${_ctx.u_s_a_i_b}px`,
-        l: common_vendor.sr(searchSelectRef, "9fa4edd6-3,9fa4edd6-2", {
+        e: common_vendor.o(handleScan, "77"),
+        f: common_vendor.unref(common_config.isINT)()
+      }, common_vendor.unref(common_config.isINT)() ? {
+        g: common_vendor.t(selectedCountryLabel.value || "请选择国家/地区"),
+        h: !selectedCountry.value ? 1 : "",
+        i: common_vendor.o(openSelectCountry, "dc")
+      } : {}, {
+        j: common_vendor.o(handleQuery, "65"),
+        k: `${_ctx.u_s_b_h}px`,
+        l: `${_ctx.u_s_a_i_b}px`,
+        m: common_vendor.sr(searchSelectRef, "9fa4edd6-3,9fa4edd6-2", {
           "k": "searchSelectRef"
         }),
-        m: common_vendor.o(onCountryChange, "f0"),
-        n: common_vendor.o(($event) => {
+        n: common_vendor.o(onCountryChange, "d8"),
+        o: common_vendor.o(($event) => {
           return selectedCountry.value = $event;
-        }, "85"),
-        o: common_vendor.p({
+        }, "ef"),
+        p: common_vendor.p({
           options: countryOptions.value,
           maxHeight: "800rpx",
           minHeight: "800rpx",
@@ -149,16 +129,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: selectedCountry.value,
           class: "r data-v-9fa4edd6"
         }),
-        p: common_vendor.o(onPopupClose, "8e"),
-        q: common_vendor.o(($event) => {
+        q: common_vendor.o(onPopupClose, "13"),
+        r: common_vendor.o(($event) => {
           return showCountryPopup.value = $event;
-        }, "e5"),
-        r: common_vendor.p({
+        }, "45"),
+        s: common_vendor.p({
           position: "bottom",
           show: showCountryPopup.value,
           class: "data-v-9fa4edd6"
         })
-      };
+      });
       return __returned__;
     };
   }
