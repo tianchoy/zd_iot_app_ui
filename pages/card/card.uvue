@@ -306,14 +306,19 @@ const handleClick = (e: UTSJSONObject) => {
 }
 
 onLoad(() => {
+	platform()
+	uni.$on('loadSimList',()=>{
+		loadCardData()
+	})
 	uni.$on('scanResult', onScanResult)
 })
 
 onShow(() => {
-	platform()
+	
 })
 
 onUnload(() => {
+	uni.$off('loadSimList')
 	uni.$off('scanResult', onScanResult)
 })
 </script>

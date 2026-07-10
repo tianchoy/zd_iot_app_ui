@@ -245,12 +245,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     common_vendor.onLoad(() => {
+      platform();
+      common_vendor.index.$on("loadSimList", () => {
+        loadCardData();
+      });
       common_vendor.index.$on("scanResult", onScanResult);
     });
     common_vendor.onShow(() => {
-      platform();
     });
     common_vendor.onUnload(() => {
+      common_vendor.index.$off("loadSimList");
       common_vendor.index.$off("scanResult", onScanResult);
     });
     return (_ctx, _cache) => {

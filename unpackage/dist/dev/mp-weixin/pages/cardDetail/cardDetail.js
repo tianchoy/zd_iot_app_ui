@@ -242,6 +242,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             title: "绑定成功",
             icon: "success"
           });
+          common_vendor.index.$emit("loadSimList");
           isBinded.value = true;
         } else {
           common_vendor.index.showToast({
@@ -260,7 +261,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             if (res.confirm) {
               api_http.userUnBindCard(card_number.value).then((result) => {
                 var _a;
-                common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:365", result);
+                common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:366", result);
                 if (result.code == 200) {
                   common_vendor.index.showToast({
                     title: "解绑成功",
@@ -277,7 +278,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   });
                 }
               }).catch((error = null) => {
-                common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:382", "解绑请求失败:", error);
+                common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:383", "解绑请求失败:", error);
                 common_vendor.index.showToast({
                   title: "网络异常，请重试",
                   icon: "none"
@@ -289,7 +290,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePkgDetail = (pkgId) => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:395", pkgId);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:396", pkgId);
       common_vendor.index.navigateTo({
         url: `/pages/pkgDetail/pkgDetail?pkgId=${pkgId}`
       });

@@ -234,11 +234,13 @@
 		const category = detail['pkgCategory'] as string;
 		switch (category) {
 			case '1':
-				return '日包'
+				return '测试套餐'
 			case '2':
-				return '非自然月包'
+				return '管理套餐'
 			case '3':
-				return '自然月包'
+				return '正式套餐'
+			case '4':
+				return '叠加包'
 			default:
 				return category || '-'
 		}
