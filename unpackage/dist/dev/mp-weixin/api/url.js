@@ -18,6 +18,7 @@ const ApiUrl = new common_vendor.UTSJSONObject({
   queryPkgInfoList: "/card/pkgInfo/list",
   addOrderGnH5: "/order/pkgOrder/gnH5/add",
   goPayGnH5: "/pay/orderGn/gn/goPayment/",
+  queryVerifyH5: "/app/card/verifyH5/",
   //微信小程序接口
   queryXcxCardList: "/card/pkgInfo/xcxList",
   queryCardList: "/app/card/list",
@@ -29,8 +30,8 @@ const ApiUrl = new common_vendor.UTSJSONObject({
   queryOrderDetailXcx: "/order/pkgOrder/getOrderPackInfo/xcx/",
   queryOrderSuccess: "/order/pkgOrder/xcxSuccess/",
   goPayXcx: "/pay/orderGn/xcx/goPayment/",
-  queryPkgInfoXcx: "/card/pkgInfo/xcxInfo/"
-  // 查询套餐信息详情Xcx
+  queryPkgInfoXcx: "/card/pkgInfo/xcxInfo/",
+  queryVerifyXcx: "/app/card/verifyXcx/"
 });
 exports.ApiUrl = ApiUrl;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/url.js.map

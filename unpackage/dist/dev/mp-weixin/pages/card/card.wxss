@@ -84,8 +84,8 @@
   line-height: 1.25;
 }
 .container .card-box .card-item .item-head .card-item-content[class].data-v-a89086b7 {
-  margin-top: 5px;
-  font-size: 12px;
+  margin-top: 15rpx;
+  font-size: 24rpx;
   color: #94a3b8;
   line-height: 1.45;
 }
@@ -95,14 +95,19 @@
   border-radius: 20rpx;
 }
 .container .card-box .card-item .item-head .status-completed[class].data-v-a89086b7 {
-  background: #ecfdf5;
-  color: #059669;
-  border: 1rpx solid #a7f3d0;
+  background: #e6ffee;
+  color: #07c160;
+  border: 1rpx solid #07c160;
 }
 .container .card-box .card-item .item-head .status-pending[class].data-v-a89086b7 {
-  background: #fff7ed;
-  color: #ea580c;
-  border: 1rpx solid #fdba74;
+  background: #fff2f0;
+  color: #f56c6c;
+  border: 1rpx solid #f56c6c;
+}
+.container .card-box .card-item .item-head .status-refunded[class].data-v-a89086b7 {
+  color: #e6a23c;
+  background-color: #fffbe8;
+  border: 1rpx solid #e6a23c;
 }
 .container .card-box .card-item .item-package[class].data-v-a89086b7 {
   margin: 20rpx 0;

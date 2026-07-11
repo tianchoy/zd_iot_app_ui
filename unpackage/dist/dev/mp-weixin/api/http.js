@@ -298,6 +298,27 @@ function queryPkgInfoXcx(id, withToken = true) {
     withToken: token
   }));
 }
+function queryVerify(id, withToken = true) {
+  const url = api_url.ApiUrl.queryVerifyXcx + id;
+  const token = true;
+  return api_Request.request(new api_Request.RequestOptions({
+    data: null,
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url,
+    method: "GET",
+    withToken: token
+  }));
+}
 exports.addOrder = addOrder;
 exports.getTenantInfo = getTenantInfo;
 exports.goPayXcx = goPayXcx;
@@ -310,6 +331,7 @@ exports.queryOrderList = queryOrderList;
 exports.queryOrderSuccess = queryOrderSuccess;
 exports.queryPkgInfoList = queryPkgInfoList;
 exports.queryPkgInfoXcx = queryPkgInfoXcx;
+exports.queryVerify = queryVerify;
 exports.userBindCard = userBindCard;
 exports.userUnBindCard = userUnBindCard;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

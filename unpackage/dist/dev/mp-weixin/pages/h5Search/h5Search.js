@@ -1,9 +1,8 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-require("../../api/url.js");
-require("../../api/Request.js");
-const common_config = require("../../common/config.js");
+const api_http = require("../../api/http.js");
 require("../../api/types.js");
+const common_config = require("../../common/config.js");
 if (!Array) {
   const _easycom_topNavBar_1 = common_vendor.resolveComponent("topNavBar");
   const _easycom_rice_icon_1 = common_vendor.resolveComponent("rice-icon");
@@ -49,22 +48,55 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const onPopupClose = () => {
       showCountryPopup.value = false;
     };
+    const CardVerify = (id) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const res = yield api_http.queryVerify(id);
+          if (res.code == 200) {
+            if (res.data) {
+              return true;
+            } else {
+              common_vendor.index.showToast({
+                title: "充值号无效",
+                icon: "none"
+              });
+              return false;
+            }
+          } else {
+            common_vendor.index.showToast({
+              title: res.msg || "验证失败",
+              icon: "none"
+            });
+            return false;
+          }
+        } catch (error) {
+          common_vendor.index.showToast({
+            title: error.msg || "充值号无效",
+            icon: "none"
+          });
+          return false;
+        }
+      });
+    };
     const handleScan = () => {
       common_vendor.index.navigateTo({
         url: "/pages/scanCode/scanCode"
       });
     };
     const handleQuery = () => {
-      if (!cardNumber.value) {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        if (!cardNumber.value) {
+          common_vendor.index.showToast({
+            title: "请输入充值号",
+            icon: "none"
+          });
+          return Promise.resolve(null);
+        }
         common_vendor.index.showToast({
-          title: "请输入卡号",
-          icon: "none"
+          title: "查询中...",
+          icon: "loading"
         });
-        return null;
-      }
-      common_vendor.index.showToast({
-        title: "查询中...",
-        icon: "loading"
+        yield CardVerify(cardNumber.value);
       });
     };
     const onScanResult = (data) => {

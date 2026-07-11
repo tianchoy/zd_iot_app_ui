@@ -13,40 +13,40 @@
 		<view class="card-container">
 			<!-- 卡号 -->
 			<view class="info-row" v-if="d('rechargeNo')">
-				<text class="label">卡号</text>
+				<text class="label">充值号</text>
 				<text class="value">{{ d('rechargeNo') }}</text>
 			</view>
-			
+
 			<!-- ICCID -->
 			<view class="info-row" v-if="d('iccid')">
 				<text class="label">ICCID</text>
 				<text class="value">{{ d('iccid') }}</text>
 			</view>
-			
+
 			<!-- 订单编号 -->
 			<view class="info-row" v-if="d('orderNo')">
 				<text class="label">订单编号</text>
 				<text class="value">{{ d('orderNo') }}</text>
 			</view>
-			
+
 			<!-- 套餐名称 -->
 			<view class="info-row" v-if="d('pkgName')">
 				<text class="label">套餐名称</text>
 				<text class="value">{{ d('pkgName') }}</text>
 			</view>
-			
+
 			<!-- 套餐类型 -->
 			<view class="info-row" v-if="d('pkgType')">
 				<text class="label">套餐类型</text>
 				<text class="value">{{ d('pkgType') }}</text>
 			</view>
-			
+
 			<!-- 支付方式 -->
 			<view class="info-row" v-if="ds('payType') != ''">
 				<text class="label">支付方式</text>
 				<text class="value">{{ d('payType') }}</text>
 			</view>
-			
+
 			<!-- 支付金额 (突出显示) -->
 			<view class="info-row" v-if="d('payAmount')">
 				<text class="label">支付金额</text>
@@ -58,7 +58,7 @@
 				<text class="value">{{ d('payTime') }}</text>
 			</view>
 		</view>
-		
+
 		<!-- 按钮区域 -->
 		<view class="button-section">
 			<button class="action-btn primary-btn mb-24" @click="handleViewOrder">查看订单</button>
@@ -94,7 +94,7 @@
 		})
 
 	}
-	
+
 	// 返回卡片详情点击处理
 	const handleBackCard = () => {
 		const detail = orderDetail.value as UTSJSONObject
@@ -112,7 +112,7 @@
 	}
 
 	onLoad((options: UTSJSONObject) => {
-		console.log('orderId:',options)	
+		console.log('orderId:',options)
 		const oid = options['orderId'] as string
 		orderId.value = oid != null ? oid : ''
 		const pid = options['payChannelId'] as string
@@ -130,14 +130,14 @@
 		box-sizing: border-box;
 		height: 100%;
 	}
-	
+
 	// 成功状态区域
 	.status-section {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		margin-bottom: 40rpx;
-		
+
 		.success-icon {
 			width: 120rpx;
 			height: 120rpx;
@@ -148,7 +148,7 @@
 			align-items: center;
 			justify-content: center;
 			margin-bottom: 20rpx;
-			
+
 			.checkmark {
 				color: #ffffff;
 				font-size: 80rpx;
@@ -156,14 +156,14 @@
 				line-height: 1;
 			}
 		}
-		
+
 		.status-text {
 			font-size: 40rpx;
 			font-weight: 500;
 			color: #333333;
 		}
 	}
-	
+
 	// 卡片容器
 	.card-container {
 		background-color: #ffffff;
@@ -173,7 +173,7 @@
 		margin-bottom: 60rpx;
 		box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
 	}
-	
+
 	// 信息行
 	.info-row {
 		display: flex;
@@ -183,14 +183,14 @@
 		padding: 24rpx 0;
 		border-bottom: 1rpx solid #f0f0f0;
 
-		
+
 		.label {
 			font-size: 24rpx;
 			color: #64748b;
 			flex-shrink: 0;
 			width: 160rpx;
 		}
-		
+
 		.value {
 			font-size: 25rpx;
 			color: #0f172a;
@@ -204,12 +204,12 @@
 			color: #ff6b00;
 		}
 	}
-	
+
 	// 按钮区域
 	.button-section {
 		display: flex;
 		flex-direction: column;
-		
+
 		.action-btn {
 			width: 100%;
 			height: 88rpx;
@@ -220,17 +220,17 @@
 			text-align: center;
 			border: none;
 			padding: 0;
-			
+
 			&::after {
 				border: none;
 			}
 		}
-		
+
 		.primary-btn {
 			background-color: #2563eb;
 			color: #ffffff;
 		}
-		
+
 		.secondary-btn {
 			background-color: #ffffff;
 			color: #2563eb;

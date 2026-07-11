@@ -2,11 +2,11 @@
 	<topNavBar title="卡片" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
 		<view class="card-box mb-24">
-			<view class="card-label">卡号查询</view>
+			<view class="card-label">卡片查询</view>
 			<view class="search-value mt-24">
 				<rice-input
 					v-model="card_number"
-					placeholder="请输入 ICCID / MSISDN"
+					placeholder="请输入充值号"
 					class="search-input"
 					@input="handleInput"
 				>
@@ -35,7 +35,10 @@
 					<view class="item-head">
 						<view class="item-head-label">
 							<text class="card-item-title" v-if="card.rechargeNo">{{ card.rechargeNo || '-' }}</text>
-							<text class="card-item-content" v-if="card.pkgName">套餐：{{ card.pkgName || '-' }}</text>
+							<view class="card-item-content">
+								<text v-if="card.pkgName">套餐：{{ card.pkgName || '-' }}</text>
+								<text v-else>套餐：无</text>
+							</view>
 						</view>
 						<text class="status-tag" :class="getStatusClass(card.statusStr)" v-if="card.statusStr">{{ card.statusStr || '未知' }}</text>
 					</view>
@@ -45,19 +48,19 @@
 					</view>
 					<rice-divider dashed :customStyle="{margin: '0'}"/>
 					<view class="card-metrics">
-						<view class="metric-box mr-24">
-							<view class="metric-label">生效时间</view>
-							<view class="metric-value">{{ card.effectiveTime || '-' }}</view>
-						</view>
 						<view class="metric-box">
 							<view class="metric-label">到期时间</view>
 							<view class="metric-value">{{ card.expirationTime || '-' }}</view>
 						</view>
+						<view class="metric-box mr-24">
+							<view class="metric-label">流量使用</view>
+							<view class="metric-value">{{ card.usedPeriod || '-' }}</view>
+						</view>
 					</view>
-					<view class="card-bottom">
-						<view class="card-cycle-text">
+					<view class="card-bottom" :style="{justifyContent: card.usedPeriod && card.totalPeriod ? 'space-between' : 'flex-end'}">
+						<view class="card-cycle-text" v-if="card.usedPeriod && card.totalPeriod">
 							<text class="cycle-label">当前周期：</text>
-							<text class="cycle-value">{{ getCycleText(card) }}</text>
+							<text class="cycle-value">{{ card.usedPeriod }} / {{ card.totalPeriod }}</text>
 						</view>
 						<rice-button type="primary" size="mini" :customStyle="{fontSize:'24rpx'}" @click="handleRecharge(card.rechargeNo)" >去充值</rice-button>
 					</view>
@@ -76,7 +79,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import tousu from '@/components/tousu.uvue'
-import { queryCardList, login, getTenantInfo } from '@/api/http.uts'
+import { queryCardList, login, getTenantInfo, queryVerify } from '@/api/http.uts'
 import { getToken, getTenantId, isWechat, setToken, setStorageSync } from '@/common/config.uts'
 import type { RechargeData } from '@/api/types.uts'
 
@@ -110,6 +113,8 @@ const getStatusClass = (status: string): string => {
 			return 'status-completed'
 		case '停机':
 			return 'status-pending'
+		case '可激活':
+			return 'status-refunded'
 		default:
 			return ''
 	}
@@ -118,12 +123,6 @@ const getStatusClass = (status: string): string => {
 const getFlowText = (card: RechargeData): string => {
 	const used = card.usedFlow ?? 0
 	const total = card.pkgFlow ?? 0
-	return `${used} / ${total}`
-}
-
-const getCycleText = (card: RechargeData): string => {
-	const used = card.usedPeriod ?? '-'
-	const total = card.totalPeriod ?? '-'
 	return `${used} / ${total}`
 }
 
@@ -146,19 +145,53 @@ const handleInput = () => {
 	}
 }
 
-const handleQuery = () => {
+// 验证卡片是否有效
+const CardVerify = async (id: string): Promise<boolean> => {
+	try {
+		const res = await queryVerify(id)
+		if (res.code == 200) {
+			console.log(typeof res.data)
+			if (res.data) {
+				return true
+			} else {
+				uni.showToast({
+					title: '充值号无效',
+					icon: 'none'
+				})
+				return false
+			}
+		} else {
+			uni.showToast({
+				title: res.msg || '验证失败',
+				icon: 'none'
+			})
+			return false
+		}
+	} catch (error) {
+		uni.showToast({
+			title: error.msg || '充值号无效',
+			icon: 'none'
+		})
+		return false
+	}
+}
+
+const handleQuery = async () => {
 	const keyword = card_number.value.trim()
 	if (!keyword) {
 		uni.showToast({
-			title: '请输入卡号',
+			title: '请输入充值号',
 			icon: 'none'
 		})
 		return
 	}
 	queryKeyword.value = keyword
-	uni.navigateTo({
-		url: '/pages/cardDetail/cardDetail?cardNumber=' + keyword
-	})
+	const isValid = await CardVerify(keyword)
+	if (isValid) {
+		uni.navigateTo({
+			url: '/pages/cardDetail/cardDetail?cardNumber=' + keyword
+		})
+	}
 }
 
 const onScanResult = async (data: UTSJSONObject) => {
@@ -386,8 +419,8 @@ onUnload(() => {
 						line-height: 1.25;
 					}
 					.card-item-content{
-						margin-top: 5px;
-						font-size: 12px;
+						margin-top: 15rpx;
+						font-size: 24rpx;
 						color: #94a3b8;
 						line-height: 1.45;
 					}
@@ -398,15 +431,20 @@ onUnload(() => {
 						border-radius: 20rpx;
 					}
 					.status-completed {
-						background: #ecfdf5;
-						color: #059669;
-						border: 1rpx solid #a7f3d0;
+						background: #e6ffee;
+						color: #07c160;
+						border: 1rpx solid #07c160;
 					}
 					
 					.status-pending {
-						background: #fff7ed;
-						color: #ea580c;
-						border: 1rpx solid #fdba74;
+						background: #fff2f0;
+						color: #f56c6c;
+						border: 1rpx solid #f56c6c;
+					}
+					.status-refunded{
+						color:#e6a23c;
+						background-color: #fffbe8;
+						border: 1rpx solid #e6a23c;
 					}
 				}
 				.item-package{

@@ -77,7 +77,7 @@
 <script setup lang="uts">
 	import { ref, computed, onMounted, onUnmounted } from 'vue'
 	import SearchSelect from '@/components/selectCountry.uvue'
-	import { getCountryList } from '@/api/http.uts'
+	import { getCountryList,queryVerify } from '@/api/http.uts'
 	import type { CountryData } from '@/api/types.uts'
 	import {isINT,isCN} from '@/common/config.uts'
 	
@@ -122,6 +122,36 @@
 	const onPopupClose = () => {
 		showCountryPopup.value = false
 	}
+
+	// 验证卡片是否有效
+	const CardVerify = async (id: string): Promise<boolean> => {
+		try {
+			const res = await queryVerify(id)
+			if (res.code == 200) {
+				if (res.data) {
+					return true
+				} else {
+					uni.showToast({
+						title: '充值号无效',
+						icon: 'none'
+					})
+					return false
+				}
+			} else {
+				uni.showToast({
+					title: res.msg || '验证失败',
+					icon: 'none'
+				})
+				return false
+			}
+		} catch (error) {
+			uni.showToast({
+				title: error.msg || '充值号无效',
+				icon: 'none'
+			})
+			return false
+		}
+	}
 	
 	// 扫码
 	const handleScan = () => {
@@ -131,10 +161,10 @@
 	}
 	
 	// 查询缴费
-	const handleQuery = () => {
+	const handleQuery = async () => {
 		if (!cardNumber.value) {
 			uni.showToast({
-				title: '请输入卡号',
+				title: '请输入充值号',
 				icon: 'none'
 			})
 			return
@@ -150,13 +180,14 @@
 			title: '查询中...',
 			icon: 'loading'
 		})
+		const isValid = await CardVerify(cardNumber.value)
 		// 跳转到充值页面
-		if(isCN()){
+		if(isCN() && isValid){
 			uni.navigateTo({
 				url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&from=h5Search`
 			})
 		}
-		if(isINT()){
+		if(isINT() && isValid){
 			uni.navigateTo({
 				url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
 			})

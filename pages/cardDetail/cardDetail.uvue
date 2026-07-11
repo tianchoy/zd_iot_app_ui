@@ -5,15 +5,15 @@
 			<view class="card-box fixed-tabs" :style="fixedTabsStyle">
 				<rice-tabs
 					v-model="active"
-					line-color="#ffffff" 
-					:list="tabs" 
-					:line-width="0" 
+					line-color="#ffffff"
+					:list="tabs"
+					:line-width="0"
 					:item-style="{ overflow: 'hidden' }"
-					:title-active-color="'#2563eb'" 
+					:title-active-color="'#2563eb'"
 					:title-inactive-color="'#334155'"
 					:active-style="{ backgroundColor: '#ffffff',border:'1rpx solid #e5edf6',borderRadius:'24rpx'}"
 					:inactive-style="{ backgroundColor: '#f3f7fb',border:'1rpx solid #e5edf6',borderRadius:'24rpx' }"
-					@change="changeTab" 
+					@change="changeTab"
 					:customStyle="{height:'85rpx',padding:'10rpx',backgroundColor:'#ffffff',border:'1rpx solid #ffffff'}"
 					>
 				</rice-tabs>
@@ -28,7 +28,11 @@
 								<view class="base-info">
 									<view class="info-item" v-if="cardDetail?.rechargeNo"><text class="info-label">充值号</text><text class="info-value">{{cardDetail?.rechargeNo}}</text></view>
 									<view class="info-item" v-if="cardDetail?.statusStr"><text class="info-label">状态</text><rice-tag type="success" plain-fill :text="cardDetail?.statusStr" size="small"/></view>
-									<view class="info-item" v-if="cardDetail?.pkgName"><text class="info-label">套餐名称</text><text class="info-value">{{cardDetail?.pkgName}}</text></view>
+									<view class="info-item">
+										<text class="info-label">当前套餐</text>
+										<text class="info-value" v-if="cardDetail?.pkgName">{{cardDetail?.pkgName}}</text>
+										<text class="info-value" v-else>暂无套餐</text>
+									</view>
 									<view class="info-item" v-if="cardDetail?.effectiveTime"><text class="info-label">生效时间</text><text class="info-value">{{cardDetail?.effectiveTime}}</text></view>
 									<view class="info-item" v-if="cardDetail?.expirationTime"><text class="info-label">到期时间</text><text class="info-value">{{cardDetail?.expirationTime}}</text></view>
 									<view class="info-item" v-if="cardDetail?.usedPeriod && cardDetail?.totalPeriod"><text class="info-label">周期</text><text class="info-value">{{cardDetail?.usedPeriod}} / {{cardDetail?.totalPeriod}}</text></view>
@@ -37,21 +41,21 @@
 							</view>
 							<view class="section-title" v-if="cardDetail?.pkgFlow">流量使用</view>
 							<view class="data-total" v-if="cardDetail?.pkgFlow">
-								<view class="total-item"><text class="total-label">已用流量:</text><text class="total-value">{{cardDetail?.usedFlow != null && cardDetail?.usedFlow !== '' ? cardDetail?.usedFlow : '0'}}</text></view>
-								<view class="total-item"><text class="total-label">剩余流量:</text><text class="total-value">{{cardDetail?.unUsedFlow != null && cardDetail?.unUsedFlow !== '' ? cardDetail?.unUsedFlow : '0'}}</text></view>
-								<view class="total-item"><text class="total-label">总流量:</text><text class="total-value">{{cardDetail?.pkgFlow != null && cardDetail?.pkgFlow !== '' ? cardDetail?.pkgFlow : '0'}}</text></view>
+								<view class="total-item"><text class="total-label">本期已用</text><text class="total-value">{{cardDetail?.usedFlow != null && cardDetail?.usedFlow !== '' ? cardDetail?.usedFlow : '0'}}GB</text></view>
+								<view class="total-item"><text class="total-label">本期剩余</text><text class="total-value">{{cardDetail?.unUsedFlow != null && cardDetail?.unUsedFlow !== '' ? cardDetail?.unUsedFlow : '0'}}GB</text></view>
+								<view class="total-item"><text class="total-label">总流量</text><text class="total-value">{{cardDetail?.pkgFlow != null && cardDetail?.pkgFlow !== '' ? cardDetail?.pkgFlow : '0'}}GB</text></view>
 							</view>
 						</view>
 
 						<view class="section-content" v-if="activeName == '卡片套餐'">
 							<rice-tabs
 								v-model="current"
-								line-color="#ffffff" 
-								:list="pkgTabs" 
-								:line-width="0" 
-								:title-active-color="'#2563eb'" 
+								line-color="#ffffff"
+								:list="pkgTabs"
+								:line-width="0"
+								:title-active-color="'#2563eb'"
 								:title-inactive-color="'#334155'"
-								@change="handleClick" 
+								@change="handleClick"
 								:customStyle="{height:'85rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}"
 								>
 							</rice-tabs>
@@ -89,11 +93,11 @@
 							<view class="item" v-for="(order, index) in orderList" :key="index"  @click="handleOrderDetail(order.orderNo.toString())">
 								<view class="item-head">
 									<text class="item-label">{{ order.pkgName || '未知套餐' }}</text>
-									<rice-tag 
-										:type="getOrderStatusType(order.status)" 
-										:text="getOrderStatusText(order.status)" 
-										:round="true" 
-										plain-fill 
+									<rice-tag
+										:type="getOrderStatusType(order.status)"
+										:text="getOrderStatusText(order.status)"
+										:round="true"
+										plain-fill
 										size="small"
 									></rice-tag>
 								</view>
@@ -225,7 +229,7 @@
 	// 获取套餐状态对应的文本
 	const getPackageStatusText = (status: string): string => {
 		const statusMap = new Map<string, string>()
-		statusMap.set('0', '未生效')
+		statusMap.set('0', '待生效')
 		statusMap.set('1', '生效中')
 		statusMap.set('2', '已失效')
 		return statusMap.get(status) ?? status ?? '未知'
@@ -658,33 +662,31 @@
 				color: #ef4444;
 			}
 		}
-	}
+		.empty-order {
+			text-align: center;
+			padding: 60rpx 20rpx;
+			color: #94a3b8;
+			font-size: 28rpx;
 
-
-	.empty-order {
-		text-align: center;
-		padding: 60rpx 20rpx;
-		color: #94a3b8;
-		font-size: 28rpx;
-
-		.empty-state {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			padding: 120rpx 32rpx;
-			background-color: #ffffff;
-			margin: 0 24rpx;
-			border-radius: 24rpx;
-			
-			.empty-text {
-				text-align: center;
-				font-size: 28rpx;
-				color: #9ca3af;
+			.empty-state {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				padding: 120rpx 32rpx;
+				background-color: #ffffff;
+				margin: 0 24rpx;
+				border-radius: 24rpx;
+				
+				.empty-text {
+					text-align: center;
+					font-size: 28rpx;
+					color: #9ca3af;
+				}
 			}
 		}
 	}
-	
+
 }
 
 .fixed-bottom-buttons {
@@ -703,6 +705,25 @@
 
 	.btn{
 		flex:1
+	}
+
+	
+}
+
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 120rpx 32rpx;
+	background-color: #ffffff;
+	margin: 0 24rpx;
+	border-radius: 24rpx;
+
+	.empty-text {
+		text-align: center;
+		font-size: 28rpx;
+		color: #9ca3af;
 	}
 }
 

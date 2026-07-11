@@ -106,11 +106,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const category = detail["pkgCategory"];
       switch (category) {
         case "1":
-          return "日包";
+          return "测试套餐";
         case "2":
-          return "非自然月包";
+          return "管理套餐";
         case "3":
-          return "自然月包";
+          return "正式套餐";
+        case "4":
+          return "叠加包";
         default:
           return category || "-";
       }
@@ -142,7 +144,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:276", "查询订单详情失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:278", "查询订单详情失败:", error);
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
             icon: "none"
@@ -169,7 +171,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       payChannelId.value = data["payChannelId"];
       isInPaymentProcess.value = true;
       const payWxType = data["payWxType"];
-      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:309", "支付成功页面orderNos.value:", orderNos.value, "payChannelId.value:", payChannelId.value);
+      common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:311", "支付成功页面orderNos.value:", orderNos.value, "payChannelId.value:", payChannelId.value);
       if (payWxType == "wechat_pay") {
         common_vendor.index.requestPayment({
           provider: "wxpay",
@@ -239,10 +241,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             appId: common_config.config.api.auth.appID,
             extraData: param,
             success(res = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:383", "打开支付小程序成功:", res);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:385", "打开支付小程序成功:", res);
             },
             fail(res = null) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:386", "打开支付小程序失败:", res);
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:388", "打开支付小程序失败:", res);
               common_vendor.index.hideLoading();
               isInPaymentProcess.value = false;
             }
@@ -259,17 +261,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (form) {
         form.submit();
       } else {
-        common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:403", "未找到支付表单");
+        common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:405", "未找到支付表单");
       }
     };
     const handleConfirmPayment = (e) => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
-        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:409", "11111", e);
+        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:411", "11111", e);
         showPopup.value = false;
         try {
           const res = yield api_http.goPayXcx(orderId.value, e);
           if (res.code == 200) {
-            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:414", "支付成功:", res.data);
+            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:416", "支付成功:", res.data);
             if (common_config.isWechat()) {
               toPay(res.data);
             }
@@ -282,7 +284,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:434", "支付失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderDetail/orderDetail.uvue:436", "支付失败:", error);
           common_vendor.index.showToast({
             title: err.msg,
             icon: "none"
@@ -314,7 +316,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           xcxCode: codes,
           isLogin: "1"
         }));
-        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:476", "userLoginByOpenid登录成功:", res);
+        common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:478", "userLoginByOpenid登录成功:", res);
         if (res.code == 200) {
           userId.value = "" + res.data.id;
           common_config.setStorageSync("userId", userId.value);
@@ -329,7 +331,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.login(new common_vendor.UTSJSONObject({
           success: (res) => {
             code.value = res.code;
-            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:490", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
+            common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:492", "wxGetPhoneLogin:", wxGetPhoneLogin.value);
             if (wxGetPhoneLogin.value == "1") {
               const params = new common_vendor.UTSJSONObject({
                 isLogin: "1",
@@ -371,7 +373,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             yield getTenantInfos();
             const loginSuccess = yield getCode();
             if (!loginSuccess) {
-              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:533", "登录失败，跳过数据加载");
+              common_vendor.index.__f__("log", "at pages/orderDetail/orderDetail.uvue:535", "登录失败，跳过数据加载");
               common_vendor.index.showToast({
                 title: "登录失败，请重试",
                 icon: "none"

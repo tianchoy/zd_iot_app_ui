@@ -66,6 +66,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return "status-completed";
         case "停机":
           return "status-pending";
+        case "可激活":
+          return "status-refunded";
         default:
           return "";
       }
@@ -74,12 +76,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a, _b;
       const used = (_a = card.usedFlow) !== null && _a !== void 0 ? _a : 0;
       const total = (_b = card.pkgFlow) !== null && _b !== void 0 ? _b : 0;
-      return `${used} / ${total}`;
-    };
-    const getCycleText = (card) => {
-      var _a, _b;
-      const used = (_a = card.usedPeriod) !== null && _a !== void 0 ? _a : "-";
-      const total = (_b = card.totalPeriod) !== null && _b !== void 0 ? _b : "-";
       return `${used} / ${total}`;
     };
     const checkToken = () => {
@@ -96,18 +92,54 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         queryKeyword.value = "";
       }
     };
+    const CardVerify = (id) => {
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        try {
+          const res = yield api_http.queryVerify(id);
+          if (res.code == 200) {
+            common_vendor.index.__f__("log", "at pages/card/card.uvue:153", typeof res.data);
+            if (res.data) {
+              return true;
+            } else {
+              common_vendor.index.showToast({
+                title: "充值号无效",
+                icon: "none"
+              });
+              return false;
+            }
+          } else {
+            common_vendor.index.showToast({
+              title: res.msg || "验证失败",
+              icon: "none"
+            });
+            return false;
+          }
+        } catch (error) {
+          common_vendor.index.showToast({
+            title: error.msg || "充值号无效",
+            icon: "none"
+          });
+          return false;
+        }
+      });
+    };
     const handleQuery = () => {
-      const keyword = card_number.value.trim();
-      if (!keyword) {
-        common_vendor.index.showToast({
-          title: "请输入卡号",
-          icon: "none"
-        });
-        return null;
-      }
-      queryKeyword.value = keyword;
-      common_vendor.index.navigateTo({
-        url: "/pages/cardDetail/cardDetail?cardNumber=" + keyword
+      return common_vendor.__awaiter(this, void 0, void 0, function* () {
+        const keyword = card_number.value.trim();
+        if (!keyword) {
+          common_vendor.index.showToast({
+            title: "请输入充值号",
+            icon: "none"
+          });
+          return Promise.resolve(null);
+        }
+        queryKeyword.value = keyword;
+        const isValid = yield CardVerify(keyword);
+        if (isValid) {
+          common_vendor.index.navigateTo({
+            url: "/pages/cardDetail/cardDetail?cardNumber=" + keyword
+          });
+        }
       });
     };
     const onScanResult = (data) => {
@@ -146,7 +178,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleRecharge = (rechargeNo) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:198", "去充值", rechargeNo);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:231", "去充值", rechargeNo);
       common_vendor.index.navigateTo({
         url: "/pages/recharge/recharge?rechargeNo=" + rechargeNo
       });
@@ -182,7 +214,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             },
             fail: (err) => {
-              common_vendor.index.__f__("error", "at pages/card/card.uvue:237", "登录失败:", err);
+              common_vendor.index.__f__("error", "at pages/card/card.uvue:270", "登录失败:", err);
               resolve(false);
             }
           }));
@@ -220,7 +252,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             cardCounts.value = [0, 0, 0];
             const loginSuccess = yield getCode();
             if (!loginSuccess) {
-              common_vendor.index.__f__("log", "at pages/card/card.uvue:281", "登录失败，跳过数据加载");
+              common_vendor.index.__f__("log", "at pages/card/card.uvue:314", "登录失败，跳过数据加载");
               common_vendor.index.showToast({
                 title: "登录失败，请先登录",
                 icon: "none"
@@ -268,22 +300,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           showCapsule: false,
           class: "data-v-a89086b7"
         }),
-        b: common_vendor.o(handleInput, "6c"),
+        b: common_vendor.o(handleInput, "ed"),
         c: common_vendor.o(($event) => {
           return card_number.value = $event;
         }, "ed"),
         d: common_vendor.p({
-          placeholder: "请输入 ICCID / MSISDN",
+          placeholder: "请输入充值号",
           modelValue: card_number.value,
           class: "search-input data-v-a89086b7"
         }),
-        e: common_vendor.o(scanCode, "67"),
+        e: common_vendor.o(scanCode, "05"),
         f: common_vendor.p({
           height: "100%",
           icon: "scan",
           class: "scan-btn data-v-a89086b7"
         }),
-        g: common_vendor.o(handleQuery, "87"),
+        g: common_vendor.o(handleQuery, "37"),
         h: common_vendor.p({
           type: "primary",
           color: "#1989fa",
@@ -291,10 +323,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "100%",
           class: "data-v-a89086b7"
         }),
-        i: common_vendor.o(handleClick, "69"),
+        i: common_vendor.o(handleClick, "80"),
         j: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "d3"),
+        }, "bb"),
         k: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
@@ -329,15 +361,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             i: common_vendor.t(getFlowText(card))
           } : {}, {
             j: "a89086b7-5-" + i0,
-            k: common_vendor.t(card.effectiveTime || "-"),
-            l: common_vendor.t(card.expirationTime || "-"),
-            m: common_vendor.t(getCycleText(card)),
-            n: common_vendor.o(($event) => {
+            k: common_vendor.t(card.expirationTime || "-"),
+            l: common_vendor.t(card.usedPeriod || "-"),
+            m: card.usedPeriod && card.totalPeriod
+          }, card.usedPeriod && card.totalPeriod ? {
+            n: common_vendor.t(card.usedPeriod),
+            o: common_vendor.t(card.totalPeriod)
+          } : {}, {
+            p: common_vendor.o(($event) => {
               return handleRecharge(card.rechargeNo);
             }, index),
-            o: "a89086b7-6-" + i0,
-            p: index,
-            q: common_vendor.o(($event) => {
+            q: "a89086b7-6-" + i0,
+            r: card.usedPeriod && card.totalPeriod ? "space-between" : "flex-end",
+            s: index,
+            t: common_vendor.o(($event) => {
               return handleDetail(card);
             }, index)
           });
@@ -359,7 +396,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         o: cardList.value.length === 0
       }, cardList.value.length === 0 ? {} : {}, {
-        p: common_vendor.o(_ctx.handleConnectTousu, "a2"),
+        p: common_vendor.o(_ctx.handleConnectTousu, "b0"),
         q: common_vendor.p({
           class: "data-v-a89086b7"
         }),

@@ -95,8 +95,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, d("payTime") ? {
         q: common_vendor.t(d("payTime"))
       } : {}, {
-        r: common_vendor.o(handleViewOrder, "7b"),
-        s: common_vendor.o(handleBackCard, "f8"),
+        r: common_vendor.o(handleViewOrder, "1b"),
+        s: common_vendor.o(handleBackCard, "a5"),
         t: `${_ctx.u_s_b_h}px`,
         v: `${_ctx.u_s_a_i_b}px`
       });
