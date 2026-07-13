@@ -1,0 +1,550 @@
+<template>
+	<topNavBar title="反馈详情" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<view class="page-container">
+		<!-- 反馈基本信息 -->
+		<view class="info-card">
+			<view class="info-header">
+				<text class="feedback-no">{{ feedbackData.feedbackNo }}</text>
+				<rice-tag :type="getStatusType(feedbackData.status)" :text="getStatusText(feedbackData.status)" size="small" plain-fill></rice-tag>
+			</view>
+			<view class="info-row">
+				<text class="label">反馈类型：</text>
+				<text class="value">{{ getFeedbackTypeText(feedbackData.feedbackType) }}</text>
+			</view>
+			<view class="info-row">
+				<text class="label">提交时间：</text>
+				<text class="value">{{ feedbackData.subTime }}</text>
+			</view>
+			<view class="info-row" v-if="feedbackData.userPhone">
+				<text class="label">联系电话：</text>
+				<text class="value">{{ feedbackData.userPhone }}</text>
+			</view>
+		</view>
+
+		<!-- 沟通记录 -->
+		<view class="message-section">
+			<view class="section-title">沟通记录</view>
+			<view class="message-list">
+				<view class="message-item" v-for="(item, index) in feedbackData.feedbackContentList" :key="index">
+					<view class="message-header">
+						<rice-tag :type="item.sendType === '0' ? 'primary' : 'success'" :text="item.sendType === '0' ? '用户' : '平台'" size="small"></rice-tag>
+						<text class="message-time">{{ item.time }}</text>
+					</view>
+					<view class="message-content">{{ item.replyContent }}</view>
+					<view class="message-images" v-if="item.imgOssUrl && item.imgOssUrl.length > 0">
+						<image class="msg-image" v-for="(img, imgIndex) in item.imgOssUrl.split(',')" :key="imgIndex" :src="img" mode="aspectFill" @click="previewImage(img, item.imgOssUrl)"></image>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 底部操作区 -->
+		<view class="bottom-action" v-if="feedbackData.status !== '3'">
+			<rice-button type="primary" text="继续反馈" :customStyle="{ borderRadius: '40rpx', flex: 1, marginRight: '20rpx' }" @click="handleShowReply"></rice-button>
+			<rice-button type="default" text="关闭反馈" :customStyle="{ borderRadius: '40rpx', flex: 1 }" @click="handleClose"></rice-button>
+		</view>
+
+		<!-- 继续反馈弹窗 -->
+		<rice-popup v-model="showReplyPopup" position="bottom" :round="true" :customStyle="{ height: '60%' }">
+			<view class="popup-container">
+				<view class="popup-header">
+					<text class="popup-title">继续反馈</text>
+					<text class="popup-close" @click="showReplyPopup = false">关闭</text>
+				</view>
+
+				<view class="popup-content">
+					<view class="form-item">
+						<text class="form-label">反馈内容</text>
+						<textarea class="content-input" v-model="replyContent" placeholder="请输入反馈内容" maxlength="500" :showCount="true"></textarea>
+					</view>
+
+					<view class="form-item">
+						<text class="form-label">上传图片</text>
+						<view class="image-upload">
+							<view class="image-item" v-for="(img, index) in replyImages" :key="index">
+								<image class="preview-image" :src="img" mode="aspectFill" @click="previewReplyImage(index)"></image>
+								<view class="delete-btn" @click="removeReplyImage(index)">×</view>
+							</view>
+							<view class="upload-btn" v-if="replyImages.length < 5" @click="chooseReplyImage">
+								<text class="plus">+</text>
+								<text class="text">添加图片</text>
+							</view>
+						</view>
+					</view>
+				</view>
+
+				<view class="popup-footer">
+					<rice-button type="primary" text="提交" :loading="replyLoading" @click="handleReply"></rice-button>
+				</view>
+			</view>
+		</rice-popup>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+	import { request, type ApiResponse } from '@/api/Request.uts'
+	import { config } from '@/common/config.uts'
+
+	type FeedbackDetail = {
+		id: number,
+		feedbackNo: string,
+		feedbackType: string,
+		status: string,
+		subTime: string,
+		userPhone: string,
+		imgOssUrl: string,
+		feedbackContentList: FeedbackMessageItem[]
+	}
+
+	type FeedbackMessageItem = {
+		sendType: string,
+		time: string,
+		replyContent: string,
+		imgOssUrl: string
+	}
+
+	const feedbackId = ref(0)
+	const iccid = ref('')
+	const feedbackData = ref<FeedbackDetail>({
+		id: 0,
+		feedbackNo: '',
+		feedbackType: '',
+		status: '',
+		subTime: '',
+		userPhone: '',
+		imgOssUrl: '',
+		feedbackContentList: []
+	})
+
+	const showReplyPopup = ref(false)
+	const replyContent = ref('')
+	const replyImages = ref<string[]>([])
+	const replyLoading = ref(false)
+
+	// 获取状态标签类型
+	const getStatusType = (status: string): string => {
+		const typeMap = new Map<string, string>()
+		typeMap.set('0', 'warning')
+		typeMap.set('1', 'primary')
+		typeMap.set('2', 'success')
+		typeMap.set('3', 'default')
+		return typeMap.get(status) ?? 'default'
+	}
+
+	// 获取状态文字
+	const getStatusText = (status: string): string => {
+		const textMap = new Map<string, string>()
+		textMap.set('0', '待处理')
+		textMap.set('1', '处理中')
+		textMap.set('2', '已回复')
+		textMap.set('3', '已关闭')
+		return textMap.get(status) ?? status
+	}
+
+	// 获取反馈类型文字
+	const getFeedbackTypeText = (type: string): string => {
+		const textMap = new Map<string, string>()
+		textMap.set('0', '功能建议')
+		textMap.set('1', '问题报错')
+		textMap.set('2', '投诉举报')
+		textMap.set('3', '订单售后')
+		textMap.set('4', '其他')
+		return textMap.get(type) ?? type
+	}
+
+	// 获取详情
+	const getDetail = async () => {
+		try {
+			const res = await request<FeedbackDetail>({
+				url: config.api.baseUrl + '/h5/questionFeedback/' + feedbackId.value,
+				method: 'GET',
+				data: { iccid: iccid.value },
+				withToken: false
+			})
+			if (res.code == 200) {
+				const data = res.data as FeedbackDetail
+				if (data != null) {
+					feedbackData.value = data
+				}
+			} else {
+				uni.showToast({ title: res.msg ?? '查询失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('查询详情异常:', error)
+		}
+	}
+
+	// 预览图片
+	const previewImage = (current: string, urls: string) => {
+		uni.previewImage({
+			current: current,
+			urls: urls.split(',')
+		})
+	}
+
+	// 显示回复弹窗
+	const handleShowReply = () => {
+		replyContent.value = ''
+		replyImages.value = []
+		showReplyPopup.value = true
+	}
+
+	// 选择回复图片
+	const chooseReplyImage = () => {
+		const maxCount = 5 - replyImages.value.length
+		uni.chooseImage({
+			count: maxCount,
+			sizeType: ['compressed'],
+			sourceType: ['album', 'camera'],
+			success: (res) => {
+				const tempFilePaths = res.tempFilePaths
+				if (tempFilePaths != null) {
+					for (let i = 0; i < tempFilePaths.length; i++) {
+						replyImages.value.push(tempFilePaths[i])
+					}
+				}
+			}
+		})
+	}
+
+	// 预览回复图片
+	const previewReplyImage = (index: number) => {
+		uni.previewImage({
+			current: index,
+			urls: replyImages.value
+		})
+	}
+
+	// 删除回复图片
+	const removeReplyImage = (index: number) => {
+		replyImages.value.splice(index, 1)
+	}
+
+	// 提交回复
+	const handleReply = async () => {
+		if (!replyContent.value) {
+			uni.showToast({ title: '请输入反馈内容', icon: 'none' })
+			return
+		}
+
+		replyLoading.value = true
+		try {
+			const formData = new UTSJSONObject()
+			formData['id'] = feedbackId.value
+			formData['iccid'] = iccid.value
+			formData['feedbackContent'] = replyContent.value
+
+			const res = await request<any>({
+				url: config.api.baseUrl + '/h5/questionFeedback/reply',
+				method: 'POST',
+				data: formData,
+				files: replyImages.value,
+				withToken: false
+			})
+
+			if (res.code == 200) {
+				uni.showToast({ title: '提交成功', icon: 'success' })
+				showReplyPopup.value = false
+				getDetail()
+			} else {
+				uni.showToast({ title: res.msg ?? '提交失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('提交回复异常:', error)
+			uni.showToast({ title: '网络异常，请重试', icon: 'none' })
+		} finally {
+			replyLoading.value = false
+		}
+	}
+
+	// 关闭反馈
+	const handleClose = () => {
+		uni.showModal({
+			title: '提示',
+			content: '确定要关闭此反馈吗？关闭后将无法继续回复。',
+			success: (res) => {
+				if (res.confirm) {
+					doClose()
+				}
+			}
+		})
+	}
+
+	const doClose = async () => {
+		try {
+			const res = await request<any>({
+				url: config.api.baseUrl + '/h5/questionFeedback/close/' + feedbackId.value,
+				method: 'POST',
+				data: { iccid: iccid.value },
+				withToken: false
+			})
+
+			if (res.code == 200) {
+				uni.showToast({ title: '已关闭', icon: 'success' })
+				getDetail()
+			} else {
+				uni.showToast({ title: res.msg ?? '操作失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('关闭反馈异常:', error)
+			uni.showToast({ title: '网络异常，请重试', icon: 'none' })
+		}
+	}
+
+	const goBack = () => {
+		uni.navigateBack({ delta: 1 })
+	}
+
+	onLoad((options) => {
+		feedbackId.value = parseInt(options.feedbackId ?? '0')
+		iccid.value = options.iccid ?? ''
+		getDetail()
+	})
+</script>
+
+<style lang="scss" scoped>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
+	background-color: #f4f7fb;
+	padding-bottom: 140rpx;
+}
+
+.info-card {
+	background-color: #ffffff;
+	margin: 24rpx;
+	padding: 24rpx;
+	border-radius: 24rpx;
+	border: 1rpx solid #e7edf5;
+
+	.info-header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: 20rpx;
+		margin-bottom: 20rpx;
+		border-bottom: 1rpx solid #f1f5f9;
+
+		.feedback-no {
+			font-size: 30rpx;
+			color: #0f172a;
+			font-weight: bold;
+		}
+	}
+
+	.info-row {
+		display: flex;
+		flex-direction: row;
+		margin-bottom: 16rpx;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		.label {
+			font-size: 26rpx;
+			color: #64748b;
+			width: 160rpx;
+		}
+
+		.value {
+			font-size: 26rpx;
+			color: #334155;
+			flex: 1;
+		}
+	}
+}
+
+.message-section {
+	margin: 0 24rpx;
+
+	.section-title {
+		font-size: 30rpx;
+		color: #0f172a;
+		font-weight: bold;
+		margin-bottom: 20rpx;
+	}
+
+	.message-list {
+		background-color: #ffffff;
+		border-radius: 24rpx;
+		padding: 24rpx;
+		border: 1rpx solid #e7edf5;
+	}
+
+	.message-item {
+		padding-bottom: 24rpx;
+		margin-bottom: 24rpx;
+		border-bottom: 1rpx solid #f1f5f9;
+
+		&:last-child {
+			padding-bottom: 0;
+			margin-bottom: 0;
+			border-bottom: none;
+		}
+
+		.message-header {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 12rpx;
+
+			.message-time {
+				font-size: 22rpx;
+				color: #94a3b8;
+			}
+		}
+
+		.message-content {
+			font-size: 28rpx;
+			color: #334155;
+			line-height: 1.6;
+			margin-bottom: 12rpx;
+		}
+
+		.message-images {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			gap: 12rpx;
+
+			.msg-image {
+				width: 160rpx;
+				height: 160rpx;
+				border-radius: 12rpx;
+			}
+		}
+	}
+}
+
+.bottom-action {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 24rpx;
+	background-color: #ffffff;
+	border-top: 1rpx solid #e7edf5;
+	display: flex;
+	flex-direction: row;
+}
+
+.popup-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.popup-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 24rpx;
+	border-bottom: 1rpx solid #e7edf5;
+
+	.popup-title {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #0f172a;
+	}
+
+	.popup-close {
+		font-size: 28rpx;
+		color: #64748b;
+	}
+}
+
+.popup-content {
+	flex: 1;
+	overflow-y: auto;
+	padding: 24rpx;
+
+	.form-item {
+		margin-bottom: 32rpx;
+
+		.form-label {
+			display: block;
+			font-size: 28rpx;
+			color: #334155;
+			margin-bottom: 16rpx;
+		}
+
+		.content-input {
+			width: 100%;
+			height: 200rpx;
+			padding: 20rpx;
+			font-size: 28rpx;
+			background-color: #f8fafc;
+			border-radius: 16rpx;
+			border: 1rpx solid #e2e8f0;
+		}
+	}
+
+	.image-upload {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 16rpx;
+
+		.image-item {
+			position: relative;
+			width: 160rpx;
+			height: 160rpx;
+
+			.preview-image {
+				width: 100%;
+				height: 100%;
+				border-radius: 12rpx;
+			}
+
+			.delete-btn {
+				position: absolute;
+				top: -12rpx;
+				right: -12rpx;
+				width: 36rpx;
+				height: 36rpx;
+				background-color: #ef4444;
+				color: #ffffff;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 24rpx;
+			}
+		}
+
+		.upload-btn {
+			width: 160rpx;
+			height: 160rpx;
+			background-color: #f8fafc;
+			border: 2rpx dashed #cbd5e1;
+			border-radius: 12rpx;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+
+			.plus {
+				font-size: 48rpx;
+				color: #94a3b8;
+			}
+
+			.text {
+				font-size: 22rpx;
+				color: #94a3b8;
+				margin-top: 8rpx;
+			}
+		}
+	}
+}
+
+.popup-footer {
+	padding: 24rpx;
+	border-top: 1rpx solid #e7edf5;
+}
+</style>
