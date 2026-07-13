@@ -97,7 +97,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         try {
           const res = yield api_http.queryVerify(id);
           if (res.code == 200) {
-            common_vendor.index.__f__("log", "at pages/card/card.uvue:153", typeof res.data);
             if (res.data) {
               return true;
             } else {
@@ -178,7 +177,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleRecharge = (rechargeNo) => {
-      common_vendor.index.__f__("log", "at pages/card/card.uvue:231", "去充值", rechargeNo);
+      common_vendor.index.__f__("log", "at pages/card/card.uvue:230", "去充值", rechargeNo);
       common_vendor.index.navigateTo({
         url: "/pages/recharge/recharge?rechargeNo=" + rechargeNo
       });
@@ -214,7 +213,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             },
             fail: (err) => {
-              common_vendor.index.__f__("error", "at pages/card/card.uvue:270", "登录失败:", err);
+              common_vendor.index.__f__("error", "at pages/card/card.uvue:269", "登录失败:", err);
               resolve(false);
             }
           }));
@@ -252,7 +251,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             cardCounts.value = [0, 0, 0];
             const loginSuccess = yield getCode();
             if (!loginSuccess) {
-              common_vendor.index.__f__("log", "at pages/card/card.uvue:314", "登录失败，跳过数据加载");
+              common_vendor.index.__f__("log", "at pages/card/card.uvue:313", "登录失败，跳过数据加载");
               common_vendor.index.showToast({
                 title: "登录失败，请先登录",
                 icon: "none"

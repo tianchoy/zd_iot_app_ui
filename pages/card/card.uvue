@@ -150,7 +150,6 @@ const CardVerify = async (id: string): Promise<boolean> => {
 	try {
 		const res = await queryVerify(id)
 		if (res.code == 200) {
-			console.log(typeof res.data)
 			if (res.data) {
 				return true
 			} else {
