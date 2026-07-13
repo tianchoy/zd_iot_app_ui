@@ -5,12 +5,12 @@
 			<text class="info-title">确认支付信息</text>
 
 			<view class="info-item" v-if="props.cardNumber">
-				<text class="item-label">卡号</text>
+				<text class="item-label">充值号</text>
 				<text class="item-value">{{ props.cardNumber }}</text>
 			</view>
 
 			<view class="info-item" v-if="props.productName">
-				<text class="item-label">商品</text>
+				<text class="item-label">套餐名称</text>
 				<text class="item-value">{{ props.productName }}</text>
 			</view>
 

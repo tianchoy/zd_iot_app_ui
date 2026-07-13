@@ -396,7 +396,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         o: cardList.value.length === 0
       }, cardList.value.length === 0 ? {} : {}, {
-        p: common_vendor.o(_ctx.handleConnectTousu, "b0"),
+        p: common_vendor.o(_ctx.handleConnectTousu, "a8"),
         q: common_vendor.p({
           class: "data-v-a89086b7"
         }),

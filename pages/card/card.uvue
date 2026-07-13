@@ -36,8 +36,8 @@
 						<view class="item-head-label">
 							<text class="card-item-title" v-if="card.rechargeNo">{{ card.rechargeNo || '-' }}</text>
 							<view class="card-item-content">
-								<text v-if="card.pkgName">套餐：{{ card.pkgName || '-' }}</text>
-								<text v-else>套餐：无</text>
+								<text v-if="card.pkgName">当前套餐：{{ card.pkgName || '-' }}</text>
+								<text v-else>当前套餐：无</text>
 							</view>
 						</view>
 						<text class="status-tag" :class="getStatusClass(card.statusStr)" v-if="card.statusStr">{{ card.statusStr || '未知' }}</text>

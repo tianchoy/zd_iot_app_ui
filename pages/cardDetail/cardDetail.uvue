@@ -57,10 +57,12 @@
 								:title-inactive-color="'#334155'"
 								@change="handleClick"
 								:customStyle="{height:'85rpx',padding:'5rpx 10rpx',border:'1rpx solid #e5edf6'}"
-								>
+							>
 							</rice-tabs>
 							<view class="card-pkg-box">
-								<view v-if="pkgInfoList.length == 0" class="empty-order">暂无套餐记录</view>
+								<view v-if="pkgInfoList.length == 0" class="empty-order">
+									<view class="empty-text">暂无套餐记录</view>
+								</view>
 								<view class="item" v-for="(item, index) in pkgInfoList" :key="index" @click="handlePkgDetail(item.id)">
 									<view class="item-head">
 										<text class="item-label" v-if="item.pkgName">{{ item.pkgName }}</text>
@@ -662,12 +664,14 @@
 				color: #ef4444;
 			}
 		}
+	}
+}
+
 		.empty-order {
 			text-align: center;
 			padding: 60rpx 20rpx;
 			color: #94a3b8;
 			font-size: 28rpx;
-
 			.empty-state {
 				display: flex;
 				flex-direction: column;
@@ -685,9 +689,6 @@
 				}
 			}
 		}
-	}
-
-}
 
 .fixed-bottom-buttons {
 	position: fixed;

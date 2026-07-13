@@ -87,7 +87,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getCardDetail = () => {
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         const res = yield api_http.queryCardDetail(card_number.value, "", "1");
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:174", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:176", res);
         if (res.code == 200) {
           cardDetail.value = res.data;
         }
@@ -107,11 +107,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               orderList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:194", "查询订单列表失败:", resp.msg);
+            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:196", "查询订单列表失败:", resp.msg);
             orderList.value = [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:198", "查询订单列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:200", "查询订单列表异常:", error);
           orderList.value = [];
         }
       });
@@ -131,11 +131,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               pkgInfoList.value = [];
             }
           } else {
-            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:218", "查询套餐列表失败:", res.msg);
+            common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:220", "查询套餐列表失败:", res.msg);
             pkgInfoList.value = [];
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:222", "查询套餐列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:224", "查询套餐列表异常:", error);
           pkgInfoList.value = [];
         }
       });
@@ -204,7 +204,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }));
     };
     const handleOrderDetail = (pkgId) => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:304", pkgId);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:306", pkgId);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${pkgId}`
       });
@@ -220,7 +220,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             navBarHeight.value = navHeight > 0 ? navHeight : 44;
           }
         } catch (e) {
-          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:324", "获取导航栏信息失败", e);
+          common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:326", "获取导航栏信息失败", e);
         }
       }
     };
@@ -236,7 +236,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const res = yield api_http.userBindCard(new api_types.BindCard({
           rechargeNo: card_number.value
         }));
-        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:346", res);
+        common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:348", res);
         if (res.code == 200) {
           common_vendor.index.showToast({
             title: "绑定成功",
@@ -261,7 +261,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             if (res.confirm) {
               api_http.userUnBindCard(card_number.value).then((result) => {
                 var _a;
-                common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:370", result);
+                common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:372", result);
                 if (result.code == 200) {
                   common_vendor.index.showToast({
                     title: "解绑成功",
@@ -278,7 +278,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                   });
                 }
               }).catch((error = null) => {
-                common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:387", "解绑请求失败:", error);
+                common_vendor.index.__f__("error", "at pages/cardDetail/cardDetail.uvue:389", "解绑请求失败:", error);
                 common_vendor.index.showToast({
                   title: "网络异常，请重试",
                   icon: "none"
@@ -290,7 +290,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handlePkgDetail = (pkgId) => {
-      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:400", pkgId);
+      common_vendor.index.__f__("log", "at pages/cardDetail/cardDetail.uvue:402", pkgId);
       common_vendor.index.navigateTo({
         url: `/pages/pkgDetail/pkgDetail?pkgId=${pkgId}`
       });
@@ -496,7 +496,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }) : {}, {
         N: ((_K = cardDetail.value) == null ? void 0 : _K.isBind) || isBinded.value
       }, ((_L = cardDetail.value) == null ? void 0 : _L.isBind) || isBinded.value ? {
-        O: common_vendor.o(handleUnbind, "36"),
+        O: common_vendor.o(handleUnbind, "7c"),
         P: common_vendor.p({
           type: "error",
           ["plain-fill"]: true,
@@ -519,7 +519,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        S: common_vendor.o(handleBindCard, "03"),
+        S: common_vendor.o(handleBindCard, "97"),
         T: common_vendor.p({
           height: "100rpx",
           bold: true,
@@ -529,7 +529,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        U: common_vendor.o(handleRecharge, "59"),
+        U: common_vendor.o(handleRecharge, "42"),
         V: common_vendor.p({
           height: "100rpx",
           type: "primary",

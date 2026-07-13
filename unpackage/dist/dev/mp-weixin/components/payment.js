@@ -92,11 +92,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         i: common_vendor.t((props == null ? void 0 : props.pkgType) == "1" ? "天" : "个月")
       } : {}, {
         j: common_vendor.t(common_vendor.unref(formattedAmount)),
-        k: common_vendor.o(handleCancel, "8d"),
+        k: common_vendor.o(handleCancel, "41"),
         l: common_vendor.p({
           class: "btn cancel-btn mr-24 data-v-0c94e3a5"
         }),
-        m: common_vendor.o(handleConfirm, "19"),
+        m: common_vendor.o(handleConfirm, "90"),
         n: common_vendor.p({
           textColor: "#fff",
           class: "btn confirm-btn ml-24 data-v-0c94e3a5"
