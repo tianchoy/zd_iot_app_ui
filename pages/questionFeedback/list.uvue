@@ -1,0 +1,489 @@
+<template>
+	<topNavBar title="问题反馈" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<view class="page-container">
+		<!-- 反馈列表 -->
+		<view class="feedback-list" v-if="feedbackList.length > 0">
+			<view class="feedback-item" v-for="(item, index) in feedbackList" :key="index" @click="handleDetail(item.id)">
+				<view class="item-header">
+					<text class="feedback-no">{{ item.feedbackNo }}</text>
+					<rice-tag :type="getStatusType(item.status)" :text="getStatusText(item.status)" size="small" plain-fill></rice-tag>
+				</view>
+				<view class="item-content">{{ item.feedbackContent }}</view>
+				<view class="item-footer">
+					<text class="time">{{ item.subTime }}</text>
+					<text class="type">{{ getFeedbackTypeText(item.feedbackType) }}</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 空状态 -->
+		<view class="empty-state" v-else-if="!loading">
+			<text class="empty-text">暂无反馈记录</text>
+		</view>
+
+		<!-- 提交反馈按钮 -->
+		<view class="submit-btn-container">
+			<rice-button type="primary" text="提交新反馈" :customStyle="{ borderRadius: '40rpx' }" @click="handleShowSubmit"></rice-button>
+		</view>
+
+		<!-- 提交反馈弹窗 -->
+		<rice-popup v-model="showSubmitPopup" position="bottom" :round="true" :customStyle="{ height: '80%' }">
+			<view class="popup-container">
+				<view class="popup-header">
+					<text class="popup-title">提交反馈</text>
+					<text class="popup-close" @click="showSubmitPopup = false">关闭</text>
+				</view>
+
+				<view class="popup-content">
+					<view class="form-item">
+						<text class="form-label">反馈类型</text>
+						<rice-radio-group v-model="submitForm.feedbackType" direction="horizontal">
+							<rice-radio v-for="type in feedbackTypes" :key="type.value" :label="type.value">{{ type.name }}</rice-radio>
+						</rice-radio-group>
+					</view>
+
+					<view class="form-item">
+						<text class="form-label">反馈内容</text>
+						<textarea class="content-input" v-model="submitForm.feedbackContent" placeholder="请输入反馈内容" maxlength="500" :showCount="true"></textarea>
+					</view>
+
+					<view class="form-item">
+						<text class="form-label">联系电话</text>
+						<input class="phone-input" v-model="submitForm.userPhone" placeholder="请输入联系电话（选填）" type="tel" maxlength="20" />
+					</view>
+
+					<view class="form-item">
+						<text class="form-label">上传图片</text>
+						<view class="image-upload">
+							<view class="image-item" v-for="(img, index) in submitForm.images" :key="index">
+								<image class="preview-image" :src="img" mode="aspectFill" @click="previewImage(index)"></image>
+								<view class="delete-btn" @click="removeImage(index)">×</view>
+							</view>
+							<view class="upload-btn" v-if="submitForm.images.length < 5" @click="chooseImage">
+								<text class="plus">+</text>
+								<text class="text">添加图片</text>
+							</view>
+						</view>
+					</view>
+				</view>
+
+				<view class="popup-footer">
+					<rice-button type="primary" text="提交" :loading="submitLoading" @click="handleSubmit"></rice-button>
+				</view>
+			</view>
+		</rice-popup>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+	import { request, type ApiResponse } from '@/api/Request.uts'
+	import { config } from '@/common/config.uts'
+
+	type FeedbackItem = {
+		id: number,
+		feedbackNo: string,
+		feedbackType: string,
+		feedbackContent: string,
+		status: string,
+		subTime: string,
+		userPhone: string,
+		imgOssUrl: string
+	}
+
+	type FeedbackType = {
+		name: string,
+		value: string
+	}
+
+	const iccid = ref('')
+	const loading = ref(true)
+	const feedbackList = ref<FeedbackItem[]>([])
+	const showSubmitPopup = ref(false)
+	const submitLoading = ref(false)
+
+	const submitForm = ref({
+		feedbackType: '0',
+		feedbackContent: '',
+		userPhone: '',
+		images: [] as string[]
+	})
+
+	const feedbackTypes = ref<FeedbackType[]>([
+		{ name: '功能建议', value: '0' },
+		{ name: '问题报错', value: '1' },
+		{ name: '投诉举报', value: '2' },
+		{ name: '订单售后', value: '3' },
+		{ name: '其他', value: '4' }
+	])
+
+	// 获取状态标签类型
+	const getStatusType = (status: string): string => {
+		const typeMap = new Map<string, string>()
+		typeMap.set('0', 'warning')
+		typeMap.set('1', 'primary')
+		typeMap.set('2', 'success')
+		typeMap.set('3', 'default')
+		return typeMap.get(status) ?? 'default'
+	}
+
+	// 获取状态文字
+	const getStatusText = (status: string): string => {
+		const textMap = new Map<string, string>()
+		textMap.set('0', '待处理')
+		textMap.set('1', '处理中')
+		textMap.set('2', '已回复')
+		textMap.set('3', '已关闭')
+		return textMap.get(status) ?? status
+	}
+
+	// 获取反馈类型文字
+	const getFeedbackTypeText = (type: string): string => {
+		const textMap = new Map<string, string>()
+		textMap.set('0', '功能建议')
+		textMap.set('1', '问题报错')
+		textMap.set('2', '投诉举报')
+		textMap.set('3', '订单售后')
+		textMap.set('4', '其他')
+		return textMap.get(type) ?? type
+	}
+
+	// 查询反馈列表
+	const getFeedbackList = async () => {
+		loading.value = true
+		try {
+			const res = await request<FeedbackItem[]>({
+				url: config.api.baseUrl + '/h5/questionFeedback/list',
+				method: 'GET',
+				data: { iccid: iccid.value },
+				withToken: false
+			})
+			if (res.code == 200) {
+				const rows = res.data as FeedbackItem[]
+				if (rows != null && Array.isArray(rows)) {
+					feedbackList.value = rows
+				} else {
+					feedbackList.value = []
+				}
+			} else {
+				uni.showToast({ title: res.msg ?? '查询失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('查询反馈列表异常:', error)
+		} finally {
+			loading.value = false
+		}
+	}
+
+	// 显示提交弹窗
+	const handleShowSubmit = () => {
+		submitForm.value = {
+			feedbackType: '0',
+			feedbackContent: '',
+			userPhone: '',
+			images: []
+		}
+		showSubmitPopup.value = true
+	}
+
+	// 选择图片
+	const chooseImage = () => {
+		const maxCount = 5 - submitForm.value.images.length
+		uni.chooseImage({
+			count: maxCount,
+			sizeType: ['compressed'],
+			sourceType: ['album', 'camera'],
+			success: (res) => {
+				const tempFilePaths = res.tempFilePaths
+				if (tempFilePaths != null) {
+					for (let i = 0; i < tempFilePaths.length; i++) {
+						submitForm.value.images.push(tempFilePaths[i])
+					}
+				}
+			}
+		})
+	}
+
+	// 预览图片
+	const previewImage = (index: number) => {
+		uni.previewImage({
+			current: index,
+			urls: submitForm.value.images
+		})
+	}
+
+	// 删除图片
+	const removeImage = (index: number) => {
+		submitForm.value.images.splice(index, 1)
+	}
+
+	// 提交反馈
+	const handleSubmit = async () => {
+		if (!submitForm.value.feedbackContent) {
+			uni.showToast({ title: '请输入反馈内容', icon: 'none' })
+			return
+		}
+
+		submitLoading.value = true
+		try {
+			// 构建表单数据
+			const formData = new UTSJSONObject()
+			formData['iccid'] = iccid.value
+			formData['feedbackType'] = submitForm.value.feedbackType
+			formData['feedbackContent'] = submitForm.value.feedbackContent
+			formData['userPhone'] = submitForm.value.userPhone
+
+			// 上传图片
+			const imageFiles = submitForm.value.images
+
+			const res = await request<any>({
+				url: config.api.baseUrl + '/h5/questionFeedback/submit',
+				method: 'POST',
+				data: formData,
+				files: imageFiles,
+				withToken: false
+			})
+
+			if (res.code == 200) {
+				uni.showToast({ title: '提交成功', icon: 'success' })
+				showSubmitPopup.value = false
+				getFeedbackList()
+			} else {
+				uni.showToast({ title: res.msg ?? '提交失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('提交反馈异常:', error)
+			uni.showToast({ title: '网络异常，请重试', icon: 'none' })
+		} finally {
+			submitLoading.value = false
+		}
+	}
+
+	// 查看详情
+	const handleDetail = (id: number) => {
+		uni.navigateTo({
+			url: `/pages/questionFeedback/detail?feedbackId=${id}&iccid=${iccid.value}`
+		})
+	}
+
+	const goBack = () => {
+		uni.navigateBack({ delta: 1 })
+	}
+
+	onLoad((options) => {
+		iccid.value = options.iccid ?? ''
+		getFeedbackList()
+	})
+</script>
+
+<style lang="scss" scoped>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
+	background-color: #f4f7fb;
+	padding-bottom: 120rpx;
+}
+
+.feedback-list {
+	padding: 24rpx;
+}
+
+.feedback-item {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 24rpx;
+	margin-bottom: 24rpx;
+	border: 1rpx solid #e7edf5;
+
+	.item-header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 16rpx;
+
+		.feedback-no {
+			font-size: 26rpx;
+			color: #334155;
+			font-weight: bold;
+		}
+	}
+
+	.item-content {
+		font-size: 28rpx;
+		color: #0f172a;
+		line-height: 1.6;
+		margin-bottom: 16rpx;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		overflow: hidden;
+	}
+
+	.item-footer {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+
+		.time {
+			font-size: 22rpx;
+			color: #94a3b8;
+		}
+
+		.type {
+			font-size: 22rpx;
+			color: #64748b;
+		}
+	}
+}
+
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 120rpx 32rpx;
+
+	.empty-text {
+		font-size: 28rpx;
+		color: #9ca3af;
+	}
+}
+
+.submit-btn-container {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 24rpx;
+	background-color: #ffffff;
+	border-top: 1rpx solid #e7edf5;
+}
+
+.popup-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.popup-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 24rpx;
+	border-bottom: 1rpx solid #e7edf5;
+
+	.popup-title {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #0f172a;
+	}
+
+	.popup-close {
+		font-size: 28rpx;
+		color: #64748b;
+	}
+}
+
+.popup-content {
+	flex: 1;
+	overflow-y: auto;
+	padding: 24rpx;
+
+	.form-item {
+		margin-bottom: 32rpx;
+
+		.form-label {
+			display: block;
+			font-size: 28rpx;
+			color: #334155;
+			margin-bottom: 16rpx;
+		}
+
+		.content-input {
+			width: 100%;
+			height: 200rpx;
+			padding: 20rpx;
+			font-size: 28rpx;
+			background-color: #f8fafc;
+			border-radius: 16rpx;
+			border: 1rpx solid #e2e8f0;
+		}
+
+		.phone-input {
+			width: 100%;
+			height: 80rpx;
+			padding: 0 20rpx;
+			font-size: 28rpx;
+			background-color: #f8fafc;
+			border-radius: 16rpx;
+			border: 1rpx solid #e2e8f0;
+		}
+
+		.image-upload {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			gap: 16rpx;
+
+			.image-item {
+				position: relative;
+				width: 160rpx;
+				height: 160rpx;
+
+				.preview-image {
+					width: 100%;
+					height: 100%;
+					border-radius: 12rpx;
+				}
+
+				.delete-btn {
+					position: absolute;
+					top: -12rpx;
+					right: -12rpx;
+					width: 36rpx;
+					height: 36rpx;
+					background-color: #ef4444;
+					color: #ffffff;
+					border-radius: 50%;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					font-size: 24rpx;
+				}
+			}
+
+			.upload-btn {
+				width: 160rpx;
+				height: 160rpx;
+				background-color: #f8fafc;
+				border: 2rpx dashed #cbd5e1;
+				border-radius: 12rpx;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+
+				.plus {
+					font-size: 48rpx;
+					color: #94a3b8;
+				}
+
+				.text {
+					font-size: 22rpx;
+					color: #94a3b8;
+					margin-top: 8rpx;
+				}
+			}
+		}
+	}
+}
+
+.popup-footer {
+	padding: 24rpx;
+	border-top: 1rpx solid #e7edf5;
+}
+</style>
