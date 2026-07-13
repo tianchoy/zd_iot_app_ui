@@ -205,3 +205,40 @@ export type QueryOrderSuccessParams = {
   payType: string;
   rechargeNo: string;
 }
+
+// 问题反馈类型
+export type FeedbackItem = {
+  id: number
+  feedbackNo: string
+  feedbackType: string
+  feedbackContent: string
+  status: string
+  createTime: string
+  userPhone: string
+  imgOssUrl: string
+  orderNo: string
+  packageName: string
+  replyContent: string
+  rechargeNo: string
+}
+
+// 问题反馈消息项
+export type FeedbackMessageItem = {
+  sendType: string
+  time: string
+  replyContent: string
+  imgOssUrl: string
+}
+
+// 问题反馈详情
+export type FeedbackDetail = {
+  id: number
+  feedbackNo: string
+  feedbackType: string
+  status: string
+  subTime: string
+  userPhone: string
+  imgOssUrl: string
+  feedbackContentList: FeedbackMessageItem[]
+  rechargeNo: string
+}

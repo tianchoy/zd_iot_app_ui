@@ -14,7 +14,9 @@ import type {
   QueryOrderListXcxData,
   QueryOrderDetailXcxData,
   QueryOrderSuccessParams,
-  RechargeData
+  RechargeData,
+  FeedbackItem,
+  FeedbackDetail
 } from './types'
 
 // 查询国家列表
@@ -343,5 +345,56 @@ export function queryVerify(id: string, withToken: boolean = true): Promise<ApiR
     url: url,
     method: 'GET',
     withToken: token
+  })
+}
+
+// 查询反馈列表（H5）
+export function getFeedbackList(rechargeNo: string, withToken: boolean = false): Promise<ApiResponse<FeedbackItem[]>> {
+  const data: UTSJSONObject = {
+    rechargeNo: rechargeNo
+  }
+  return request<FeedbackItem[]>({
+    url: ApiUrl.feedbackList as string,
+    method: 'GET',
+    data: data,
+    withToken: withToken
+  })
+}
+
+// 查询反馈详情（H5）
+export function getFeedbackDetail(id: string, withToken: boolean = false): Promise<ApiResponse<FeedbackDetail>> {
+  return request<FeedbackDetail>({
+    url: (ApiUrl.feedbackDetail as string) + id,
+    method: 'GET',
+    withToken: withToken
+  })
+}
+
+// 提交反馈（H5）
+export function submitFeedback(data: UTSJSONObject, withToken: boolean = false): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: ApiUrl.feedbackSubmit as string,
+    method: 'POST',
+    data: data,
+    withToken: withToken
+  })
+}
+
+// 回复反馈（H5）
+export function replyFeedback(data: UTSJSONObject, withToken: boolean = false): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: ApiUrl.feedbackReply as string,
+    method: 'POST',
+    data: data,
+    withToken: withToken
+  })
+}
+
+// 关闭反馈（H5）
+export function closeFeedback(id: string, withToken: boolean = false): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: (ApiUrl.feedbackClose as string) + id,
+    method: 'POST',
+    withToken: withToken
   })
 }

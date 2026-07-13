@@ -1,5 +1,5 @@
 <template>
- <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+ <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" rightText="我的反馈" @capsuleClick="handleMyFeedback"></topNavBar>
  <view class="container">
   <view class="card-box">
    <rice-tabs
@@ -51,7 +51,10 @@
        <text class="detail-value" v-if="order.createTime">{{ order.createTime }}</text>
        <view class="order-footer">
         <text class="price" v-if="order.payCurrencyAmount">¥{{ order.payCurrencyAmount }}</text>
-        <text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
+        <view class="footer-actions">
+         <text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
+         <text class="feedback-btn" @click.stop="handleFeedback(order)">问题反馈</text>
+        </view>
        </view>
       </view>
      </view>
@@ -67,6 +70,22 @@
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref } from 'vue'
 	import { isWechat,isH5 } from '@/common/config.uts'
+
+	// 跳转到问题反馈列表
+	const handleMyFeedback = () => {
+		uni.navigateTo({
+			url: `/pages/questionFeedback/list`
+		})
+	}
+
+	// 问题反馈
+	const handleFeedback = (order: OrderListXcxItem) => {
+		const o = order as UTSJSONObject
+		uni.navigateTo({
+			url: `/pages/questionFeedback/submit?rechargeNo=${o['rechargeNo'] || ''}&orderNo=${o['orderNo'] || ''}&pkgName=${o['pkgName'] || ''}`
+		})
+	}
+
 	const rechargeNo = ref<string>('')
 	
 	// 订单状态映射
@@ -324,18 +343,35 @@
 						justify-content: space-between;
 						align-items: center;
 						padding-top: 20rpx;
-						
+
 						.price {
 							font-size: 28rpx;
 							font-weight: bold;
 							color: #ef4444;
 							margin-right: 20rpx;
 						}
-						
+
+						.footer-actions {
+							display: flex;
+							flex-direction: row;
+							align-items: center;
+							gap: 16rpx;
+						}
+
 						.pay-btn {
 							background: #eff6ff;
 							border: 1px solid #bfdbfe;
 							color: #2563eb;
+							font-size: 24rpx;
+							padding: 10rpx 25rpx;
+							border-radius: 40rpx;
+							font-weight: bold;
+						}
+
+						.feedback-btn {
+							background: #f0fdf4;
+							border: 1px solid #bbf7d0;
+							color: #16a34a;
 							font-size: 24rpx;
 							padding: 10rpx 25rpx;
 							border-radius: 40rpx;

@@ -1,0 +1,323 @@
+<template>
+	<topNavBar title="问题反馈" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" rightText="我的反馈" @capsuleClick="toMyFeedback"></topNavBar>
+	<view class="page-container">
+		<view class="info-card">
+			<view class="info-row">
+				<text class="label">充值号</text>
+				<text class="value">{{ rechargeNo }}</text>
+			</view>
+			<view class="info-row" v-if="orderNo">
+				<text class="label">订单号</text>
+				<text class="value">{{ orderNo }}</text>
+			</view>
+			<view class="info-row" v-if="pkgName">
+				<text class="label">套餐名称</text>
+				<text class="value">{{ pkgName }}</text>
+			</view>
+		</view>
+
+		<view class="form-section">
+			<view class="form-item">
+				<text class="form-label"><text class="required">*</text>问题描述</text>
+				<textarea class="content-input" v-model="feedbackContent" placeholder="请详细描述您的问题" maxlength="200" :showCount="true"></textarea>
+			</view>
+
+			<view class="form-item">
+				<text class="form-label">问题截图(最多 3 张)</text>
+				<view class="image-upload">
+					<view class="image-item" v-for="(img, index) in images" :key="index">
+						<image class="preview-image" :src="img" mode="aspectFill" @click="previewImage(index)"></image>
+						<view class="delete-btn" @click="removeImage(index)">×</view>
+					</view>
+					<view class="upload-btn" v-if="images.length < 3" @click="chooseImage">
+						<text class="plus">+</text>
+					</view>
+				</view>
+			</view>
+
+			<view class="form-item">
+				<text class="form-label"><text class="required">*</text>联系方式</text>
+				<input class="phone-input" v-model="userPhone" placeholder="请输入手机号或邮箱" type="text" maxlength="50" />
+			</view>
+		</view>
+
+		<view class="submit-btn-container">
+			<rice-button type="primary" text="提交" :loading="submitLoading" :customStyle="{ borderRadius: '40rpx' }" @click="handleSubmit"></rice-button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref } from 'vue'
+	import { submitFeedback } from '@/api/http.uts'
+	import { ApiUrl } from '@/api/url.uts'
+	import { http } from '@/api/Request.uts'
+
+	const rechargeNo = ref('')
+	const orderNo = ref('')
+	const pkgName = ref('')
+	const feedbackContent = ref('')
+	const userPhone = ref('')
+	const images = ref<string[]>([])
+	const submitLoading = ref(false)
+
+	onLoad((options) => {
+		rechargeNo.value = options.rechargeNo ?? ''
+		orderNo.value = options.orderNo ?? ''
+		pkgName.value = options.pkgName ?? ''
+	})
+
+	// 选择图片
+	const chooseImage = () => {
+		const maxCount = 3 - images.value.length
+		uni.chooseImage({
+			count: maxCount,
+			sizeType: ['compressed'],
+			sourceType: ['album', 'camera'],
+			success: (res) => {
+				const tempFilePaths = res.tempFilePaths
+				if (tempFilePaths != null) {
+					for (let i = 0; i < tempFilePaths.length; i++) {
+						images.value.push(tempFilePaths[i])
+					}
+				}
+			}
+		})
+	}
+
+	// 预览图片
+	const previewImage = (index: number) => {
+		uni.previewImage({
+			current: index,
+			urls: images.value
+		})
+	}
+
+	// 删除图片
+	const removeImage = (index: number) => {
+		images.value.splice(index, 1)
+	}
+
+	// 提交反馈 - 分两步：先上传图片拿到URL，再提交JSON
+	const handleSubmit = async () => {
+		if (!feedbackContent.value.trim()) {
+			uni.showToast({ title: '请输入问题描述', icon: 'none' })
+			return
+		}
+		if (!userPhone.value.trim()) {
+			uni.showToast({ title: '请输入联系方式', icon: 'none' })
+			return
+		}
+
+		submitLoading.value = true
+		try {
+			// 第一步：上传图片，拿到URL
+			const uploadedUrls: string[] = []
+			for (let i = 0; i < images.value.length; i++) {
+				const uploadResult = await http.upload({
+					url: ApiUrl.feedbackUploadImage as string,
+					filePath: images.value[i],
+					name: 'image',
+					withToken: false,
+					showLoading: false
+				})
+				if (uploadResult.code == 200 && uploadResult.data != null) {
+					const data = uploadResult.data as UTSJSONObject
+					const imgUrl = data['url'] as string ?? ''
+					if (imgUrl !== '') {
+						uploadedUrls.push(imgUrl)
+					}
+				}
+			}
+
+			// 第二步：提交反馈（JSON格式，带图片URL）
+			const formData = new UTSJSONObject()
+			formData['rechargeNo'] = rechargeNo.value
+			formData['feedbackContent'] = feedbackContent.value
+			formData['userPhone'] = userPhone.value
+			formData['feedbackType'] = '1'
+			if (orderNo.value) {
+				formData['orderNo'] = orderNo.value
+			}
+			if (pkgName.value) {
+				formData['packageName'] = pkgName.value
+			}
+			if (uploadedUrls.length > 0) {
+				formData['imgOssUrl'] = uploadedUrls.join(',')
+			}
+
+			const res = await submitFeedback(formData, false)
+			if (res.code == 200) {
+				uni.showToast({ title: '提交成功', icon: 'success' })
+				uni.redirectTo({
+					url: `/pages/questionFeedback/list?rechargeNo=${rechargeNo.value}`
+				})
+			} else {
+				uni.showToast({ title: res.msg ?? '提交失败', icon: 'none' })
+			}
+		} catch (error) {
+			console.error('提交反馈异常:', error)
+			uni.showToast({ title: '网络异常，请重试', icon: 'none' })
+		} finally {
+			submitLoading.value = false
+		}
+	}
+
+	// 跳转到我的反馈
+	const toMyFeedback = () => {
+		uni.navigateTo({
+			url: `/pages/questionFeedback/list?rechargeNo=${rechargeNo.value}`
+		})
+	}
+
+	const goBack = () => {
+		uni.navigateBack({ delta: 1 })
+	}
+</script>
+
+<style lang="scss" scoped>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
+	background-color: #f4f7fb;
+	padding-bottom: 120rpx;
+}
+
+.info-card {
+	background-color: #ffffff;
+	margin: 24rpx;
+	padding: 24rpx;
+	border-radius: 24rpx;
+	border: 1rpx solid #e7edf5;
+
+	.info-row {
+		display: flex;
+		flex-direction: row;
+		margin-bottom: 16rpx;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		.label {
+			font-size: 26rpx;
+			color: #64748b;
+			width: 140rpx;
+			flex-shrink: 0;
+		}
+
+		.value {
+			font-size: 26rpx;
+			color: #334155;
+			font-weight: 600;
+			flex: 1;
+		}
+	}
+}
+
+.form-section {
+	background-color: #ffffff;
+	margin: 0 24rpx;
+	padding: 24rpx;
+	border-radius: 24rpx;
+	border: 1rpx solid #e7edf5;
+}
+
+.form-item {
+	margin-bottom: 32rpx;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	.form-label {
+		display: block;
+		font-size: 28rpx;
+		color: #334155;
+		margin-bottom: 16rpx;
+		font-weight: 600;
+
+		.required {
+			color: #ef4444;
+			margin-right: 4rpx;
+		}
+	}
+
+	.content-input {
+		width: 100%;
+		height: 200rpx;
+		padding: 20rpx;
+		font-size: 28rpx;
+		background-color: #f8fafc;
+		border-radius: 16rpx;
+		border: 1rpx solid #e2e8f0;
+		box-sizing: border-box;
+	}
+
+	.phone-input {
+		width: 100%;
+		height: 80rpx;
+		padding: 0 20rpx;
+		font-size: 28rpx;
+		background-color: #f8fafc;
+		border-radius: 16rpx;
+		border: 1rpx solid #e2e8f0;
+		box-sizing: border-box;
+	}
+
+	.image-upload {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 16rpx;
+
+		.image-item {
+			position: relative;
+			width: 160rpx;
+			height: 160rpx;
+
+			.preview-image {
+				width: 100%;
+				height: 100%;
+				border-radius: 12rpx;
+			}
+
+			.delete-btn {
+				position: absolute;
+				top: -12rpx;
+				right: -12rpx;
+				width: 36rpx;
+				height: 36rpx;
+				background-color: #ef4444;
+				color: #ffffff;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 24rpx;
+			}
+		}
+
+		.upload-btn {
+			width: 160rpx;
+			height: 160rpx;
+			background-color: #f8fafc;
+			border: 2rpx dashed #cbd5e1;
+			border-radius: 12rpx;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			.plus {
+				font-size: 48rpx;
+				color: #94a3b8;
+			}
+		}
+	}
+}
+
+.submit-btn-container {
+	margin: 48rpx 24rpx;
+}
+</style>

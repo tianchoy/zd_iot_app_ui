@@ -45,7 +45,7 @@
 		</view>
 
 		<!-- 继续反馈弹窗 -->
-		<rice-popup v-model="showReplyPopup" position="bottom" :round="true" :customStyle="{ height: '60%' }">
+		<rice-popup v-model:show="showReplyPopup" position="bottom" :round="true" :customStyle="{ height: '60%' }">
 			<view class="popup-container">
 				<view class="popup-header">
 					<text class="popup-title">继续反馈</text>
@@ -83,8 +83,9 @@
 
 <script setup lang="uts">
 	import { ref } from 'vue'
-	import { request, type ApiResponse } from '@/api/Request.uts'
-	import { config } from '@/common/config.uts'
+	import { getFeedbackDetail, replyFeedback, closeFeedback } from '@/api/http.uts'
+	import { ApiUrl } from '@/api/url.uts'
+	import { http } from '@/api/Request.uts'
 
 	type FeedbackDetail = {
 		id: number,
@@ -94,7 +95,8 @@
 		subTime: string,
 		userPhone: string,
 		imgOssUrl: string,
-		feedbackContentList: FeedbackMessageItem[]
+		feedbackContentList: FeedbackMessageItem[],
+		rechargeNo: string
 	}
 
 	type FeedbackMessageItem = {
@@ -104,8 +106,7 @@
 		imgOssUrl: string
 	}
 
-	const feedbackId = ref(0)
-	const iccid = ref('')
+	const feedbackId = ref('')
 	const feedbackData = ref<FeedbackDetail>({
 		id: 0,
 		feedbackNo: '',
@@ -114,7 +115,8 @@
 		subTime: '',
 		userPhone: '',
 		imgOssUrl: '',
-		feedbackContentList: []
+		feedbackContentList: [],
+		rechargeNo: ''
 	})
 
 	const showReplyPopup = ref(false)
@@ -154,14 +156,9 @@
 	}
 
 	// 获取详情
-	const getDetail = async () => {
+	const loadDetail = async () => {
 		try {
-			const res = await request<FeedbackDetail>({
-				url: config.api.baseUrl + '/h5/questionFeedback/' + feedbackId.value,
-				method: 'GET',
-				data: { iccid: iccid.value },
-				withToken: false
-			})
+			const res = await getFeedbackDetail(feedbackId.value, false)
 			if (res.code == 200) {
 				const data = res.data as FeedbackDetail
 				if (data != null) {
@@ -230,23 +227,38 @@
 
 		replyLoading.value = true
 		try {
+			// 先上传图片
+			const uploadedUrls: string[] = []
+			for (let i = 0; i < replyImages.value.length; i++) {
+				const uploadResult = await http.upload({
+					url: ApiUrl.feedbackUploadImage as string,
+					filePath: replyImages.value[i],
+					name: 'image',
+					withToken: false,
+					showLoading: false
+				})
+				if (uploadResult.code == 200 && uploadResult.data != null) {
+					const data = uploadResult.data as UTSJSONObject
+					const imgUrl = data['url'] as string ?? ''
+					if (imgUrl !== '') {
+						uploadedUrls.push(imgUrl)
+					}
+				}
+			}
+
+			// 提交回复
 			const formData = new UTSJSONObject()
 			formData['id'] = feedbackId.value
-			formData['iccid'] = iccid.value
 			formData['feedbackContent'] = replyContent.value
+			if (uploadedUrls.length > 0) {
+				formData['imgOssUrl'] = uploadedUrls.join(',')
+			}
 
-			const res = await request<any>({
-				url: config.api.baseUrl + '/h5/questionFeedback/reply',
-				method: 'POST',
-				data: formData,
-				files: replyImages.value,
-				withToken: false
-			})
-
+			const res = await replyFeedback(formData, false)
 			if (res.code == 200) {
 				uni.showToast({ title: '提交成功', icon: 'success' })
 				showReplyPopup.value = false
-				getDetail()
+				loadDetail()
 			} else {
 				uni.showToast({ title: res.msg ?? '提交失败', icon: 'none' })
 			}
@@ -273,16 +285,10 @@
 
 	const doClose = async () => {
 		try {
-			const res = await request<any>({
-				url: config.api.baseUrl + '/h5/questionFeedback/close/' + feedbackId.value,
-				method: 'POST',
-				data: { iccid: iccid.value },
-				withToken: false
-			})
-
+			const res = await closeFeedback(feedbackId.value, false)
 			if (res.code == 200) {
 				uni.showToast({ title: '已关闭', icon: 'success' })
-				getDetail()
+				loadDetail()
 			} else {
 				uni.showToast({ title: res.msg ?? '操作失败', icon: 'none' })
 			}
@@ -297,9 +303,8 @@
 	}
 
 	onLoad((options) => {
-		feedbackId.value = parseInt(options.feedbackId ?? '0')
-		iccid.value = options.iccid ?? ''
-		getDetail()
+		feedbackId.value = options.feedbackId as string ?? ''
+		loadDetail()
 	})
 </script>
 

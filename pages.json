@@ -106,7 +106,6 @@
 				"navigationBarTitleText": ""
 			}
 		},
-		// #ifdef H5
 		{
 			"path": "pages/questionFeedback/list",
 			"style": {
@@ -118,8 +117,13 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
+		},
+		{
+			"path": "pages/questionFeedback/submit",
+			"style": {
+				"navigationBarTitleText": ""
+			}
 		}
-		// #endif
 	],
 	"tabBar": {
 		"color": "#64748b",
