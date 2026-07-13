@@ -148,6 +148,9 @@ export function isH5(): boolean {
 
 //判断当前是国内版
 export function isCN(): boolean {
+  // #ifdef VERSION_CN
+  return true
+  // #endif
   return config.configInfo.isCN
 }
 
