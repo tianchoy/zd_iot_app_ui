@@ -13,7 +13,7 @@ const ApiUrl = new common_vendor.UTSJSONObject({
   goPay: "/pay/order/goPayment",
   queryBySuccessId: "/order/pkgOrder/success/",
   queryPkgInfoDetail: "/card/pkgInfo/gn/info/",
-  queryOrderList: "/order/pkgOrder/list",
+  queryOrderListGn: "/order/pkgOrder/gn/list",
   queryOrderPackInfo: "/order/pkgOrder/getOrderPackGnInfo/",
   queryPkgInfoList: "/card/pkgInfo/list",
   addOrderGnH5: "/order/pkgOrder/gnH5/add",

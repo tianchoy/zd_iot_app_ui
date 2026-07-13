@@ -50,7 +50,7 @@
       <view class="detail-row last">
        <text class="detail-value" v-if="order.createTime">{{ order.createTime }}</text>
        <view class="order-footer">
-        <text class="price">¥{{ order.payCurrencyAmount }}</text>
+        <text class="price" v-if="order.payCurrencyAmount">¥{{ order.payCurrencyAmount }}</text>
         <text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
        </view>
       </view>

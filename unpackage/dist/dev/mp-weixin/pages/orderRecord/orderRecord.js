@@ -220,15 +220,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, order.createTime ? {
             m: common_vendor.t(order.createTime)
           } : {}, {
-            n: common_vendor.t(order.payCurrencyAmount),
-            o: order.status === "0"
+            n: order.payCurrencyAmount
+          }, order.payCurrencyAmount ? {
+            o: common_vendor.t(order.payCurrencyAmount)
+          } : {}, {
+            p: order.status === "0"
           }, order.status === "0" ? {
-            p: common_vendor.o(($event) => {
+            q: common_vendor.o(($event) => {
               return handlePay(order);
             }, index)
           } : {}, {
-            q: index,
-            r: common_vendor.o(($event) => {
+            r: index,
+            s: common_vendor.o(($event) => {
               return handleOrderClick(order);
             }, index)
           });

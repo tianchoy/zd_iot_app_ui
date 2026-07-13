@@ -197,11 +197,11 @@ export function queryOrderList(data: UTSJSONObject, withToken: boolean = true): 
   // #endif
 
   // #ifdef H5
-  const url = (ApiUrl.queryOrderList as string)
+  const url = (ApiUrl.queryOrderListGn as string)
   const token = false
   // #endif
 
-  // #ifndef MP-WEIXIN || H5
+  // #ifdef H5 && VERSION_INT
   // 其他平台默认使用H5配置
   const url = (ApiUrl.queryOrderList as string)
   const token = false
