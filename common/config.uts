@@ -19,6 +19,7 @@ export type ConfigInfo = {
   appId?: string
   logo?: string
   desc?: string
+  isCN?: boolean
 }
 
 export type StorageKeys = {
@@ -38,11 +39,11 @@ export type ProjectConfig = {
 }
 
 // 环境配置
-const ENV = 'prod' //  dev | prod
+const ENV = 'dev' //  dev | prod
 
 const API_CONFIG: UTSJSONObject = {
   dev: {
-    baseUrl: 'http://192.168.1.45:8081',
+    baseUrl: 'http://192.168.1.222:8081',
     timeout: 30000
   },
   prod: {
@@ -78,7 +79,8 @@ export const config: ProjectConfig = {
     name: '中导云卡',
     versionCode: 1,
     versionName: '1.0.0',
-    appId: 'your-app-id'
+    appId: 'your-app-id',
+    isCN: true,
   },
   loginPagePath: '',
   loginRequiredPaths: []
@@ -146,10 +148,7 @@ export function isH5(): boolean {
 
 //判断当前是国内版
 export function isCN(): boolean {
-  // #ifdef VERSION_CN
-  return true
-  // #endif
-  return false
+  return config.configInfo.isCN
 }
 
 //判断当前是否为国际版

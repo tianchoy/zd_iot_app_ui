@@ -55,7 +55,8 @@ class ConfigInfo extends common_vendor.UTS.UTSType {
           versionName: { type: String, optional: false },
           appId: { type: String, optional: true },
           logo: { type: String, optional: true },
-          desc: { type: String, optional: true }
+          desc: { type: String, optional: true },
+          isCN: { type: Boolean, optional: true }
         };
       },
       name: "ConfigInfo"
@@ -70,6 +71,7 @@ class ConfigInfo extends common_vendor.UTS.UTSType {
     this.appId = this.__props__.appId;
     this.logo = this.__props__.logo;
     this.desc = this.__props__.desc;
+    this.isCN = this.__props__.isCN;
     delete this.__props__;
   }
 }
@@ -127,10 +129,10 @@ class ProjectConfig extends common_vendor.UTS.UTSType {
     delete this.__props__;
   }
 }
-const ENV = "prod";
+const ENV = "dev";
 const API_CONFIG = new common_vendor.UTSJSONObject({
   dev: new common_vendor.UTSJSONObject({
-    baseUrl: "http://192.168.1.45:8081",
+    baseUrl: "http://192.168.1.222:8081",
     timeout: 3e4
   }),
   prod: new common_vendor.UTSJSONObject({
@@ -162,7 +164,8 @@ const config = new ProjectConfig(
       name: "中导云卡",
       versionCode: 1,
       versionName: "1.0.0",
-      appId: "your-app-id"
+      appId: "your-app-id",
+      isCN: true
     }),
     loginPagePath: "",
     loginRequiredPaths: []
@@ -204,6 +207,9 @@ function isWechat() {
 function isH5() {
   return false;
 }
+function isCN() {
+  return config.configInfo.isCN;
+}
 function isINT() {
   return false;
 }
@@ -212,6 +218,7 @@ exports.config = config;
 exports.getStorageSync = getStorageSync;
 exports.getTenantId = getTenantId;
 exports.getToken = getToken;
+exports.isCN = isCN;
 exports.isH5 = isH5;
 exports.isINT = isINT;
 exports.isWechat = isWechat;

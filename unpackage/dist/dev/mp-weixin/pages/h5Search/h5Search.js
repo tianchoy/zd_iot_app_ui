@@ -96,7 +96,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: "查询中...",
           icon: "loading"
         });
-        yield CardVerify(cardNumber.value);
+        const isValid = yield CardVerify(cardNumber.value);
+        if (common_config.isCN() && isValid) {
+          common_vendor.index.navigateTo({
+            url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&from=h5Search`
+          });
+        }
       });
     };
     const onScanResult = (data) => {
