@@ -6,7 +6,7 @@
 			<view class="search-value">
 				<input
 					v-model="card_number"
-					placeholder="请输入订单号/卡号"
+					placeholder="请输入订单号/充值号"
 					class="search-input"
 				/>
 				<rice-button class="scan-btn" height="100%" @click="scanCode" icon="scan"></rice-button>

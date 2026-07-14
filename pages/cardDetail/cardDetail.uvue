@@ -64,7 +64,7 @@
 									<view class="empty-text">暂无套餐记录</view>
 								</view>
 								<view class="item" v-for="(item, index) in pkgInfoList" :key="index" @click="handlePkgDetail(item.id)">
-									<view class="item-head">
+									<view class="item-head" :style="{justifyContent: item.pkgName?'justify-between':'flex-end'}">
 										<text class="item-label" v-if="item.pkgName">{{ item.pkgName }}</text>
 										<rice-tag v-if="item.status" :text="getPackageStatusText(item.status)" :round="true" plain-fill size="small" :type="getPackageStatusType(item.status)"></rice-tag>
 									</view>
