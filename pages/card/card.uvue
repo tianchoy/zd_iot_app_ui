@@ -361,7 +361,10 @@ onUnload(() => {
 		flex-direction: column;
 		background-color: #f4f7fb;
 		padding-bottom: 40rpx;
+
+		// #ifdef MP-WEIXIN || H5
 		min-height: 100%;
+		// #endif
 		
 		.card-box{
 			display: flex;

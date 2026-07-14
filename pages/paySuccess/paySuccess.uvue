@@ -128,7 +128,9 @@
 		display: flex;
 		flex-direction: column;
 		box-sizing: border-box;
-		height: 100%;
+		// #ifdef MP-WEIXIN || H5
+		min-height: 100%;
+		// #endif
 	}
 
 	// 成功状态区域

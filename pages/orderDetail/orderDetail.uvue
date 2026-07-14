@@ -638,7 +638,9 @@
 <style lang="scss" scoped>
 	.container {
 		background-color: #f4f7fb;
-		height: 100%;
+		// #ifdef MP-WEIXIN || H5
+		min-height: 100%;
+		// #endif
 		padding: 24rpx;
 		box-sizing: border-box;
 	}

@@ -312,7 +312,9 @@
 .page-container {
 	display: flex;
 	flex-direction: column;
+	// #ifdef MP-WEIXIN || H5
 	min-height: 100%;
+	// #endif
 	background-color: #f4f7fb;
 	padding-bottom: 140rpx;
 }
