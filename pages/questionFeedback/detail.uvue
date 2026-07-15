@@ -13,7 +13,7 @@
 			</view>
 			<view class="info-row">
 				<text class="label">提交时间：</text>
-				<text class="value">{{ feedbackData.subTime }}</text>
+				<text class="value">{{ feedbackData.createTime }}</text>
 			</view>
 			<view class="info-row" v-if="feedbackData.userPhone">
 				<text class="label">联系电话：</text>
@@ -92,7 +92,7 @@
 		feedbackNo: string,
 		feedbackType: string,
 		status: string,
-		subTime: string,
+		createTime: string,
 		userPhone: string,
 		imgOssUrl: string,
 		feedbackContentList: FeedbackMessageItem[],
@@ -112,7 +112,7 @@
 		feedbackNo: '',
 		feedbackType: '',
 		status: '',
-		subTime: '',
+		createTime: '',
 		userPhone: '',
 		imgOssUrl: '',
 		feedbackContentList: [],
