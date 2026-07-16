@@ -111,8 +111,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       e: common_vendor.s(common_vendor.unref(overlayStyle)),
       f: common_vendor.s(_ctx.customStyle),
       g: common_vendor.s({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`,
-        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+        "--status-bar-height": `${_ctx.u_s_b_h}px`
       }),
       h: common_vendor.o(overlayClick, "66"),
       i: common_vendor.o(onTouchmove, "06")

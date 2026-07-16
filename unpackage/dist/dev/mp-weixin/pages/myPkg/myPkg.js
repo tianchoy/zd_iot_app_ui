@@ -108,21 +108,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(goBack, "f5"),
-        b: common_vendor.p({
+        a: common_vendor.o(goBack, "a5"),
+        b: `${_ctx.u_s_b_h}px`,
+        c: common_vendor.p({
           title: "我的套餐",
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
-          class: "data-v-8137f92d"
+          class: "data-v-8137f92d",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        c: common_vendor.t(card_number.value),
-        d: common_vendor.o(handleClick, "69"),
-        e: common_vendor.o(($event) => {
+        d: common_vendor.t(card_number.value),
+        e: common_vendor.o(handleClick, "84"),
+        f: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "88"),
-        f: common_vendor.p({
+        }, "6f"),
+        g: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: pkgTabs.value,
           ["line-width"]: 0,
@@ -135,9 +139,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: current.value,
           class: "data-v-8137f92d"
         }),
-        g: pkgInfoList.value.length == 0
+        h: pkgInfoList.value.length == 0
       }, pkgInfoList.value.length == 0 ? {} : {}, {
-        h: common_vendor.f(pkgInfoList.value, (item, index, i0) => {
+        i: common_vendor.f(pkgInfoList.value, (item, index, i0) => {
           return common_vendor.e({
             a: item.pkgName
           }, item.pkgName ? {
@@ -181,8 +185,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, index)
           });
         }),
-        i: `${_ctx.u_s_b_h}px`,
-        j: `${_ctx.u_s_a_i_b}px`
+        j: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

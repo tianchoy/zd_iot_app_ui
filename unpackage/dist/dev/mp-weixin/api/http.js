@@ -319,7 +319,108 @@ function queryVerify(id, withToken = true) {
     withToken: token
   }));
 }
+function getFeedbackList(rechargeNo, withToken = false) {
+  const data = new common_vendor.UTSJSONObject({
+    rechargeNo
+  });
+  return api_Request.request(new api_Request.RequestOptions({
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.feedbackList,
+    method: "GET",
+    data,
+    withToken
+  }));
+}
+function getFeedbackDetail(id, withToken = false) {
+  return api_Request.request(new api_Request.RequestOptions({
+    data: null,
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.feedbackDetail + id,
+    method: "GET",
+    withToken
+  }));
+}
+function submitFeedback(data, withToken = false) {
+  return api_Request.request(new api_Request.RequestOptions({
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.feedbackSubmit,
+    method: "POST",
+    data,
+    withToken
+  }));
+}
+function replyFeedback(data, withToken = false) {
+  return api_Request.request(new api_Request.RequestOptions({
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.feedbackReply,
+    method: "POST",
+    data,
+    withToken
+  }));
+}
+function closeFeedback(id, withToken = false) {
+  return api_Request.request(new api_Request.RequestOptions({
+    data: null,
+    header: null,
+    baseUrl: null,
+    timeout: null,
+    showError: null,
+    showLoading: null,
+    loadingText: null,
+    redirectOnUnauthorized: null,
+    loginPage: null,
+    successCodes: null,
+    unauthorizedCodes: null,
+    onErrorCode: null,
+    url: api_url.ApiUrl.feedbackClose + id,
+    method: "POST",
+    withToken
+  }));
+}
 exports.addOrder = addOrder;
+exports.closeFeedback = closeFeedback;
+exports.getFeedbackDetail = getFeedbackDetail;
+exports.getFeedbackList = getFeedbackList;
 exports.getTenantInfo = getTenantInfo;
 exports.goPayXcx = goPayXcx;
 exports.login = login;
@@ -332,6 +433,8 @@ exports.queryOrderSuccess = queryOrderSuccess;
 exports.queryPkgInfoList = queryPkgInfoList;
 exports.queryPkgInfoXcx = queryPkgInfoXcx;
 exports.queryVerify = queryVerify;
+exports.replyFeedback = replyFeedback;
+exports.submitFeedback = submitFeedback;
 exports.userBindCard = userBindCard;
 exports.userUnBindCard = userUnBindCard;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/http.js.map

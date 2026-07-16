@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "top-nav-bar": "../../components/topNavBar/topNavBar",
+    "rice-button": "../../uni_modules/rice-ui/components/rice-button/rice-button"
+  }
+}

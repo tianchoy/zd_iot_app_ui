@@ -19,6 +19,13 @@ const ApiUrl = new common_vendor.UTSJSONObject({
   addOrderGnH5: "/order/pkgOrder/gnH5/add",
   goPayGnH5: "/pay/orderGn/gn/goPayment/",
   queryVerifyH5: "/app/card/verifyH5/",
+  //H5问题反馈
+  feedbackList: "/h5/questionFeedback/list",
+  feedbackDetail: "/h5/questionFeedback/detail/",
+  feedbackSubmit: "/h5/questionFeedback/submit",
+  feedbackReply: "/h5/questionFeedback/reply",
+  feedbackClose: "/h5/questionFeedback/close/",
+  feedbackUploadImage: "/h5/questionFeedback/uploadImage",
   //微信小程序接口
   queryXcxCardList: "/card/pkgInfo/xcxList",
   queryCardList: "/app/card/list",

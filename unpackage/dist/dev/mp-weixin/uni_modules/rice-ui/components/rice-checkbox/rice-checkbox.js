@@ -225,8 +225,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       v: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass),
       w: common_vendor.s(_ctx.customStyle),
       x: common_vendor.s({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`,
-        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+        "--status-bar-height": `${_ctx.u_s_b_h}px`
       }),
       y: common_vendor.o(handleClick, "cf")
     });

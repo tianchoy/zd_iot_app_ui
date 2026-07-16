@@ -39,6 +39,17 @@ class OrderStatusTab extends common_vendor.UTS.UTSType {
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "orderRecord",
   setup(__props) {
+    const handleMyFeedback = () => {
+      common_vendor.index.navigateTo({
+        url: `/pages/questionFeedback/list`
+      });
+    };
+    const handleFeedback = (order) => {
+      const o = order;
+      common_vendor.index.navigateTo({
+        url: `/pages/questionFeedback/submit?rechargeNo=${o["rechargeNo"] || ""}&orderNo=${o["orderNo"] || ""}&pkgName=${o["pkgName"] || ""}`
+      });
+    };
     const rechargeNo = common_vendor.ref("");
     const tabs = common_vendor.ref([
       new OrderStatusTab({ name: "全部", value: "" }),
@@ -94,7 +105,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:139", "获取订单列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:160", "获取订单列表失败:", error);
           orderList.value = [];
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
@@ -104,7 +115,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleTabClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:150", e);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:171", e);
       const index = e.index;
       current.value = index;
       getOrderList(e.value);
@@ -139,7 +150,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handlePay = (order = null) => {
       const o = order;
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:193", "去支付:", order);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:214", "去支付:", order);
       if (common_config.isWechat()) {
         common_vendor.index.showToast({
           title: `支付订单 ${o["id"]}`,
@@ -157,20 +168,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(handleBack, "56"),
-        b: common_vendor.p({
+        a: common_vendor.o(handleBack, "35"),
+        b: common_vendor.o(handleMyFeedback, "04"),
+        c: `${_ctx.u_s_b_h}px`,
+        d: common_vendor.p({
           title: "我的订单",
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
-          showCapsule: false,
-          class: "data-v-a151b594"
+          showCapsule: true,
+          isIcon: false,
+          class: "data-v-a151b594",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        c: common_vendor.o(handleTabClick, "9e"),
-        d: common_vendor.o(($event) => {
+        e: common_vendor.o(handleTabClick, "70"),
+        f: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "fd"),
-        e: common_vendor.p({
+        }, "2b"),
+        g: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
           ["line-width"]: 0,
@@ -184,9 +201,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: current.value,
           class: "data-v-a151b594"
         }),
-        f: orderList.value.length === 0
+        h: orderList.value.length === 0
       }, orderList.value.length === 0 ? {} : {
-        g: common_vendor.f(orderList.value, (order, index, i0) => {
+        i: common_vendor.f(orderList.value, (order, index, i0) => {
           return common_vendor.e({
             a: order.pkgName
           }, order.pkgName ? {
@@ -230,15 +247,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               return handlePay(order);
             }, index)
           } : {}, {
-            r: index,
-            s: common_vendor.o(($event) => {
+            r: common_vendor.o(($event) => {
+              return handleFeedback(order);
+            }, index),
+            s: index,
+            t: common_vendor.o(($event) => {
               return handleOrderClick(order);
             }, index)
           });
         })
       }, {
-        h: `${_ctx.u_s_b_h}px`,
-        i: `${_ctx.u_s_a_i_b}px`
+        j: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

@@ -126,22 +126,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       h: common_vendor.s(common_vendor.unref(contentStyle)),
       i: common_vendor.s(_ctx.badgeStyle)
     }) : {}, {
-      j: `${_ctx.u_s_b_h}px`,
-      k: `${_ctx.u_s_a_i_b}px`
+      j: `${_ctx.u_s_b_h}px`
     }) : common_vendor.e({
-      l: common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(common_vendor.unref(formatValue))
+      k: common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(common_vendor.unref(formatValue))
     }, common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(common_vendor.unref(formatValue)) ? {
-      m: common_vendor.t(common_vendor.unref(formatValue)),
-      n: common_vendor.n(_ctx.textClass),
-      o: common_vendor.s(common_vendor.unref(textStyle))
+      l: common_vendor.t(common_vendor.unref(formatValue)),
+      m: common_vendor.n(_ctx.textClass),
+      n: common_vendor.s(common_vendor.unref(textStyle))
     } : {}, {
-      p: common_vendor.n(common_vendor.unref(ns).b("")),
-      q: common_vendor.n(common_vendor.unref(contentClass)),
-      r: common_vendor.s(common_vendor.unref(contentStyle)),
-      s: common_vendor.s(_ctx.badgeStyle),
-      t: common_vendor.s({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`,
-        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      o: common_vendor.n(common_vendor.unref(ns).b("")),
+      p: common_vendor.n(common_vendor.unref(contentClass)),
+      q: common_vendor.s(common_vendor.unref(contentStyle)),
+      r: common_vendor.s(_ctx.badgeStyle),
+      s: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`
       })
     }));
     return __returned__;

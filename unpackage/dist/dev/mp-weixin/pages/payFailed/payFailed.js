@@ -20,18 +20,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.p({
+        a: `${_ctx.u_s_b_h}px`,
+        b: common_vendor.p({
           title: "支付结果",
           ["show-back"]: false,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
-          class: "data-v-95bda543"
+          class: "data-v-95bda543",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        b: common_vendor.o(handleRetryPay, "d2"),
-        c: common_vendor.o(handleBackCard, "ce"),
-        d: `${_ctx.u_s_b_h}px`,
-        e: `${_ctx.u_s_a_i_b}px`
+        c: common_vendor.o(handleRetryPay, "c4"),
+        d: common_vendor.o(handleBackCard, "23"),
+        e: `${_ctx.u_s_b_h}px`
       };
       return __returned__;
     };

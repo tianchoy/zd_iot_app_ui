@@ -15,7 +15,10 @@
     "pages/login/login",
     "uni_modules/rice-ui/pages/action-sheet/action-sheet",
     "uni_modules/rice-ui/pages/dialog/dialog",
-    "pages/pkgDetail/pkgDetail"
+    "pages/pkgDetail/pkgDetail",
+    "pages/questionFeedback/list",
+    "pages/questionFeedback/detail",
+    "pages/questionFeedback/submit"
   ],
   "window": {
     "navigationStyle": "custom",

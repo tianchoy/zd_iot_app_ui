@@ -6,12 +6,16 @@
 			<view class="feedback-item" v-for="(item, index) in feedbackList" :key="index" @click="handleDetail(item.id)">
 				<view class="item-header">
 					<text class="feedback-no">{{ item.feedbackNo }}</text>
-					<rice-tag :type="getStatusType(item.status)" :text="getStatusText(item.status)" size="small" plain-fill></rice-tag>
 				</view>
-				<view class="item-content">{{ item.feedbackContent }}</view>
+				<view class="item-content">{{ item.feedbackContent || '-' }}</view>
+				<view v-if="item.replyContent" class="latest-reply">
+					<text class="latest-reply-label">最新回复</text>
+					<text class="latest-reply-content">{{ item.replyContent }}</text>
+				</view>
+				<view class="order-no">订单编号：{{ item.orderNo || '-' }}</view>
 				<view class="item-footer">
 					<text class="time">{{ item.createTime }}</text>
-					<text class="type">{{ getFeedbackTypeText(item.feedbackType) }}</text>
+					<rice-tag :type="getStatusType(item.status)" :text="getStatusText(item.status)" size="small" plain-fill></rice-tag>
 				</view>
 			</view>
 		</view>
@@ -65,17 +69,6 @@
 		return textMap.get(status) ?? status
 	}
 
-	// 获取反馈类型文字
-	const getFeedbackTypeText = (type: string): string => {
-		const textMap = new Map<string, string>()
-		textMap.set('0', '功能建议')
-		textMap.set('1', '问题报错')
-		textMap.set('2', '投诉举报')
-		textMap.set('3', '订单售后')
-		textMap.set('4', '其他')
-		return textMap.get(type) ?? type
-	}
-
 	// 查询反馈列表
 	const loadFeedbackList = async () => {
 		loading.value = true
@@ -122,20 +115,20 @@
 	// #ifdef MP-WEIXIN || H5
 	min-height: 100%;
 	// #endif
-	background-color: #f4f7fb;
-	padding-bottom: 120rpx;
+	background-color: #f5f7fa;
+	padding-bottom: 48rpx;
 }
 
 .feedback-list {
-	padding: 24rpx;
+	padding: 20rpx;
 }
 
 .feedback-item {
+	margin-bottom: 20rpx;
+	padding: 28rpx;
+	border: 0;
+	border-radius: 20rpx;
 	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 24rpx;
-	margin-bottom: 24rpx;
-	border: 1rpx solid #e7edf5;
 
 	.item-header {
 		display: flex;
@@ -146,20 +139,51 @@
 
 		.feedback-no {
 			font-size: 26rpx;
-			color: #334155;
-			font-weight: bold;
+			color: #303133;
+			font-weight: 600;
 		}
 	}
 
 	.item-content {
 		font-size: 28rpx;
-		color: #0f172a;
+		color: #303133;
 		line-height: 1.6;
 		margin-bottom: 16rpx;
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 2;
 		overflow: hidden;
+	}
+
+	.latest-reply {
+		display: flex;
+		flex-direction: column;
+		gap: 8rpx;
+		margin: 20rpx 0;
+		padding: 16rpx;
+		border-radius: 16rpx;
+		background-color: #f4f4f4;
+
+		.latest-reply-label {
+			font-size: 24rpx;
+			color: #909399;
+		}
+
+		.latest-reply-content {
+			display: -webkit-box;
+			overflow: hidden;
+			color: #606266;
+			font-size: 26rpx;
+			line-height: 1.5;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+		}
+	}
+
+	.order-no {
+		margin-bottom: 20rpx;
+		font-size: 26rpx;
+		color: #606266;
 	}
 
 	.item-footer {
@@ -170,12 +194,7 @@
 
 		.time {
 			font-size: 22rpx;
-			color: #94a3b8;
-		}
-
-		.type {
-			font-size: 22rpx;
-			color: #64748b;
+			color: #909399;
 		}
 	}
 }

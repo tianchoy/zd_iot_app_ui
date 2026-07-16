@@ -21,6 +21,9 @@ if (!Math) {
   "./uni_modules/rice-ui/pages/action-sheet/action-sheet.js";
   "./uni_modules/rice-ui/pages/dialog/dialog.js";
   "./pages/pkgDetail/pkgDetail.js";
+  "./pages/questionFeedback/list.js";
+  "./pages/questionFeedback/detail.js";
+  "./pages/questionFeedback/submit.js";
 }
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "App",

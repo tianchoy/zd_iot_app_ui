@@ -1,5 +1,5 @@
-@import "../../uvue.wxss";
 :host{display:flex;flex-direction:column}
+@import "/uvue.wxss";
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -25,14 +25,14 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.container[class].data-v-36efee10 {
+page .container.data-v-36efee10 {
   display: flex;
   flex-direction: column;
   min-height: 100%;
   background-color: #f4f7fb;
   padding-bottom: 40rpx;
 }
-.card-box[class].data-v-36efee10 {
+page .card-box.data-v-36efee10 {
   display: flex;
   flex-direction: column;
   margin: 0 24rpx 24rpx 24rpx;
@@ -41,127 +41,127 @@
   border-radius: 24rpx;
   padding: 24rpx;
 }
-.card-header[class].data-v-36efee10 {
+page .card-header.data-v-36efee10 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16rpx;
 }
-.package-name[class].data-v-36efee10 {
+page .package-name.data-v-36efee10 {
   font-size: 36rpx;
   font-weight: bold;
   color: #1a2332;
 }
-.status-badge[class].data-v-36efee10 {
+page .status-badge.data-v-36efee10 {
   background-color: #e8f5e9;
   border-radius: 30rpx;
   padding: 6rpx 20rpx;
 }
-.status-text[class].data-v-36efee10 {
+page .status-text.data-v-36efee10 {
   font-size: 24rpx;
   color: #2e7d32;
   font-weight: 500;
 }
-.card-number[class].data-v-36efee10 {
+page .card-number.data-v-36efee10 {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
   margin-bottom: 24rpx;
 }
-.number-label[class].data-v-36efee10 {
+page .number-label.data-v-36efee10 {
   font-size: 26rpx;
   color: #8c9aa8;
   margin-right: 10rpx;
 }
-.number-value[class].data-v-36efee10 {
+page .number-value.data-v-36efee10 {
   font-size: 26rpx;
   color: #1a2332;
   font-weight: 500;
 }
-.traffic-section[class].data-v-36efee10 {
+page .traffic-section.data-v-36efee10 {
   background-color: #f8fafc;
   border-radius: 16rpx;
   padding: 20rpx;
   margin-bottom: 24rpx;
 }
-.traffic-text[class].data-v-36efee10 {
+page .traffic-text.data-v-36efee10 {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 }
-.traffic-header[class].data-v-36efee10 {
+page .traffic-header.data-v-36efee10 {
   margin-bottom: 12rpx;
 }
-.traffic-title[class].data-v-36efee10 {
+page .traffic-title.data-v-36efee10 {
   font-size: 28rpx;
   color: #1a2332;
   font-weight: 600;
 }
-.traffic-progress[class].data-v-36efee10 {
+page .traffic-progress.data-v-36efee10 {
   display: flex;
   flex-direction: row;
   align-items: baseline;
   margin-bottom: 12rpx;
 }
-.used-text[class].data-v-36efee10 {
+page .used-text.data-v-36efee10 {
   font-size: 24rpx;
   color: #8c9aa8;
 }
-.divider[class].data-v-36efee10 {
+page .divider.data-v-36efee10 {
   font-size: 28rpx;
   color: #8c9aa8;
   margin: 0 8rpx;
 }
-.total-text[class].data-v-36efee10 {
+page .total-text.data-v-36efee10 {
   font-size: 24rpx;
   color: #8c9aa8;
 }
-.info-grid[class].data-v-36efee10 {
+page .info-grid.data-v-36efee10 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20rpx 0;
 }
-.info-item[class].data-v-36efee10 {
+page .info-item.data-v-36efee10 {
   display: flex;
   flex-direction: column;
 }
-.info-label[class].data-v-36efee10 {
+page .info-label.data-v-36efee10 {
   font-size: 24rpx;
   color: #8c9aa8;
   margin-bottom: 6rpx;
 }
-.info-value[class].data-v-36efee10 {
+page .info-value.data-v-36efee10 {
   font-size: 28rpx;
   color: #1a2332;
   font-weight: 500;
 }
-.order-card[class].data-v-36efee10 {
+page .order-card.data-v-36efee10 {
   margin-top: 0;
 }
-.order-title[class].data-v-36efee10 {
+page .order-title.data-v-36efee10 {
   display: flex;
   flex-direction: column;
   margin-bottom: 20rpx;
 }
-.order-title-text[class].data-v-36efee10 {
+page .order-title-text.data-v-36efee10 {
   font-size: 30rpx;
   font-weight: bold;
   color: #1a2332;
   margin-bottom: 6rpx;
 }
-.order-desc[class].data-v-36efee10 {
+page .order-desc.data-v-36efee10 {
   font-size: 24rpx;
   color: #8c9aa8;
 }
-.order-detail[class].data-v-36efee10 {
+page .order-detail.data-v-36efee10 {
   display: flex;
   flex-direction: column;
   gap: 16rpx;
 }
-.order-row[class].data-v-36efee10 {
+page .order-row.data-v-36efee10 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -169,22 +169,22 @@
   padding: 10rpx 0;
   border-bottom: 1rpx solid #f0f2f5;
 }
-.order-row[class].data-v-36efee10:last-child {
+page .order-row.data-v-36efee10:last-child {
   border-bottom: none;
 }
-.order-label[class].data-v-36efee10 {
+page .order-label.data-v-36efee10 {
   font-size: 26rpx;
   color: #8c9aa8;
 }
-.order-value[class].data-v-36efee10 {
+page .order-value.data-v-36efee10 {
   font-size: 26rpx;
   color: #1a2332;
   font-weight: 500;
 }
-.price[class].data-v-36efee10 {
+page .price.data-v-36efee10 {
   color: #ef4444;
   font-weight: bold;
 }
-.status-completed[class].data-v-36efee10 {
+page .status-completed.data-v-36efee10 {
   color: #2e7d32;
 }

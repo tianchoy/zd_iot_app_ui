@@ -308,22 +308,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N;
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(goBack, "61"),
-        b: common_vendor.p({
+        a: common_vendor.o(goBack, "16"),
+        b: `${_ctx.u_s_b_h}px`,
+        c: common_vendor.p({
           title: card_number.value,
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
-          class: "data-v-2bc48812"
+          class: "data-v-2bc48812",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        c: cardDetail.value
+        d: cardDetail.value
       }, cardDetail.value ? common_vendor.e({
-        d: common_vendor.o(changeTab, "c8"),
-        e: common_vendor.o(($event) => {
+        e: common_vendor.o(changeTab, "fe"),
+        f: common_vendor.o(($event) => {
           return active.value = $event;
-        }, "b2"),
-        f: common_vendor.p({
+        }, "8a"),
+        g: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
           ["line-width"]: 0,
@@ -351,17 +355,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: active.value,
           class: "data-v-2bc48812"
         }),
-        g: common_vendor.s(fixedTabsStyle.value),
-        h: common_vendor.t(activeName.value),
-        i: activeName.value == "基本信息"
+        h: common_vendor.s(fixedTabsStyle.value),
+        i: common_vendor.t(activeName.value),
+        j: activeName.value == "基本信息"
       }, activeName.value == "基本信息" ? common_vendor.e({
-        j: (_a = cardDetail.value) == null ? void 0 : _a.rechargeNo
+        k: (_a = cardDetail.value) == null ? void 0 : _a.rechargeNo
       }, ((_b = cardDetail.value) == null ? void 0 : _b.rechargeNo) ? {
-        k: common_vendor.t((_c = cardDetail.value) == null ? void 0 : _c.rechargeNo)
+        l: common_vendor.t((_c = cardDetail.value) == null ? void 0 : _c.rechargeNo)
       } : {}, {
-        l: (_d = cardDetail.value) == null ? void 0 : _d.statusStr
+        m: (_d = cardDetail.value) == null ? void 0 : _d.statusStr
       }, ((_e = cardDetail.value) == null ? void 0 : _e.statusStr) ? {
-        m: common_vendor.p({
+        n: common_vendor.p({
           type: "success",
           ["plain-fill"]: true,
           text: (_f = cardDetail.value) == null ? void 0 : _f.statusStr,
@@ -369,45 +373,45 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-2bc48812"
         })
       } : {}, {
-        n: (_g = cardDetail.value) == null ? void 0 : _g.pkgName
+        o: (_g = cardDetail.value) == null ? void 0 : _g.pkgName
       }, ((_h = cardDetail.value) == null ? void 0 : _h.pkgName) ? {
-        o: common_vendor.t((_i = cardDetail.value) == null ? void 0 : _i.pkgName)
+        p: common_vendor.t((_i = cardDetail.value) == null ? void 0 : _i.pkgName)
       } : {}, {
-        p: (_j = cardDetail.value) == null ? void 0 : _j.effectiveTime
+        q: (_j = cardDetail.value) == null ? void 0 : _j.effectiveTime
       }, ((_k = cardDetail.value) == null ? void 0 : _k.effectiveTime) ? {
-        q: common_vendor.t((_l = cardDetail.value) == null ? void 0 : _l.effectiveTime)
+        r: common_vendor.t((_l = cardDetail.value) == null ? void 0 : _l.effectiveTime)
       } : {}, {
-        r: (_m = cardDetail.value) == null ? void 0 : _m.expirationTime
+        s: (_m = cardDetail.value) == null ? void 0 : _m.expirationTime
       }, ((_n = cardDetail.value) == null ? void 0 : _n.expirationTime) ? {
-        s: common_vendor.t((_o = cardDetail.value) == null ? void 0 : _o.expirationTime)
+        t: common_vendor.t((_o = cardDetail.value) == null ? void 0 : _o.expirationTime)
       } : {}, {
-        t: ((_p = cardDetail.value) == null ? void 0 : _p.usedPeriod) && ((_q = cardDetail.value) == null ? void 0 : _q.totalPeriod)
+        v: ((_p = cardDetail.value) == null ? void 0 : _p.usedPeriod) && ((_q = cardDetail.value) == null ? void 0 : _q.totalPeriod)
       }, ((_r = cardDetail.value) == null ? void 0 : _r.usedPeriod) && ((_s = cardDetail.value) == null ? void 0 : _s.totalPeriod) ? {
-        v: common_vendor.t((_t = cardDetail.value) == null ? void 0 : _t.usedPeriod),
-        w: common_vendor.t((_u = cardDetail.value) == null ? void 0 : _u.totalPeriod)
+        w: common_vendor.t((_t = cardDetail.value) == null ? void 0 : _t.usedPeriod),
+        x: common_vendor.t((_u = cardDetail.value) == null ? void 0 : _u.totalPeriod)
       } : {}, {
-        x: (_v = cardDetail.value) == null ? void 0 : _v.pkgFlow
+        y: (_v = cardDetail.value) == null ? void 0 : _v.pkgFlow
       }, ((_w = cardDetail.value) == null ? void 0 : _w.pkgFlow) ? {
-        y: common_vendor.p({
+        z: common_vendor.p({
           dashed: true,
           class: "data-v-2bc48812"
         })
       } : {}, {
-        z: (_x = cardDetail.value) == null ? void 0 : _x.pkgFlow
+        A: (_x = cardDetail.value) == null ? void 0 : _x.pkgFlow
       }, ((_y = cardDetail.value) == null ? void 0 : _y.pkgFlow) ? {} : {}, {
-        A: (_z = cardDetail.value) == null ? void 0 : _z.pkgFlow
+        B: (_z = cardDetail.value) == null ? void 0 : _z.pkgFlow
       }, ((_A = cardDetail.value) == null ? void 0 : _A.pkgFlow) ? {
-        B: common_vendor.t(((_B = cardDetail.value) == null ? void 0 : _B.usedFlow) != null && ((_C = cardDetail.value) == null ? void 0 : _C.usedFlow) !== "" ? (_D = cardDetail.value) == null ? void 0 : _D.usedFlow : "0"),
-        C: common_vendor.t(((_E = cardDetail.value) == null ? void 0 : _E.unUsedFlow) != null && ((_F = cardDetail.value) == null ? void 0 : _F.unUsedFlow) !== "" ? (_G = cardDetail.value) == null ? void 0 : _G.unUsedFlow : "0"),
-        D: common_vendor.t(((_H = cardDetail.value) == null ? void 0 : _H.pkgFlow) != null && ((_I = cardDetail.value) == null ? void 0 : _I.pkgFlow) !== "" ? (_J = cardDetail.value) == null ? void 0 : _J.pkgFlow : "0")
+        C: common_vendor.t(((_B = cardDetail.value) == null ? void 0 : _B.usedFlow) != null && ((_C = cardDetail.value) == null ? void 0 : _C.usedFlow) !== "" ? (_D = cardDetail.value) == null ? void 0 : _D.usedFlow : "0"),
+        D: common_vendor.t(((_E = cardDetail.value) == null ? void 0 : _E.unUsedFlow) != null && ((_F = cardDetail.value) == null ? void 0 : _F.unUsedFlow) !== "" ? (_G = cardDetail.value) == null ? void 0 : _G.unUsedFlow : "0"),
+        E: common_vendor.t(((_H = cardDetail.value) == null ? void 0 : _H.pkgFlow) != null && ((_I = cardDetail.value) == null ? void 0 : _I.pkgFlow) !== "" ? (_J = cardDetail.value) == null ? void 0 : _J.pkgFlow : "0")
       } : {}) : {}, {
-        E: activeName.value == "卡片套餐"
+        F: activeName.value == "卡片套餐"
       }, activeName.value == "卡片套餐" ? common_vendor.e({
-        F: common_vendor.o(handleClick, "a2"),
-        G: common_vendor.o(($event) => {
+        G: common_vendor.o(handleClick, "3d"),
+        H: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "4f"),
-        H: common_vendor.p({
+        }, "69"),
+        I: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: pkgTabs.value,
           ["line-width"]: 0,
@@ -421,9 +425,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: current.value,
           class: "data-v-2bc48812"
         }),
-        I: pkgInfoList.value.length == 0
+        J: pkgInfoList.value.length == 0
       }, pkgInfoList.value.length == 0 ? {} : {}, {
-        J: common_vendor.f(pkgInfoList.value, (item, index, i0) => {
+        K: common_vendor.f(pkgInfoList.value, (item, index, i0) => {
           return common_vendor.e({
             a: item.pkgName
           }, item.pkgName ? {
@@ -441,38 +445,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               class: "data-v-2bc48812"
             })
           } : {}, {
-            f: item.effectiveTime
+            f: item.pkgName ? "justify-between" : "flex-end",
+            g: item.effectiveTime
           }, item.effectiveTime ? {
-            g: common_vendor.t(item.effectiveTime)
+            h: common_vendor.t(item.effectiveTime)
           } : {}, {
-            h: item.expirationTime
+            i: item.expirationTime
           }, item.expirationTime ? {
-            i: common_vendor.t(item.expirationTime)
+            j: common_vendor.t(item.expirationTime)
           } : {}, {
-            j: item.pkgFlow
+            k: item.pkgFlow
           }, item.pkgFlow ? {
-            k: common_vendor.t(item.pkgFlow)
+            l: common_vendor.t(item.pkgFlow)
           } : {}, {
-            l: item.usedFlow
+            m: item.usedFlow
           }, item.usedFlow ? {
-            m: common_vendor.t(item.usedFlow)
+            n: common_vendor.t(item.usedFlow)
           } : {}, {
-            n: item.unUsedFlow
+            o: item.unUsedFlow
           }, item.unUsedFlow ? {
-            o: common_vendor.t(item.unUsedFlow)
+            p: common_vendor.t(item.unUsedFlow)
           } : {}, {
-            p: index,
-            q: common_vendor.o(($event) => {
+            q: index,
+            r: common_vendor.o(($event) => {
               return handlePkgDetail(item.id);
             }, index)
           });
         })
       }) : {}, {
-        K: activeName.value == "卡片订单"
+        L: activeName.value == "卡片订单"
       }, activeName.value == "卡片订单" ? common_vendor.e({
-        L: orderList.value.length == 0
+        M: orderList.value.length == 0
       }, orderList.value.length == 0 ? {} : {}, {
-        M: common_vendor.f(orderList.value, (order, index, i0) => {
+        N: common_vendor.f(orderList.value, (order, index, i0) => {
           return {
             a: common_vendor.t(order.pkgName || "未知套餐"),
             b: "2bc48812-6-" + i0,
@@ -494,10 +499,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       }) : {}, {
-        N: ((_K = cardDetail.value) == null ? void 0 : _K.isBind) || isBinded.value
+        O: ((_K = cardDetail.value) == null ? void 0 : _K.isBind) || isBinded.value
       }, ((_L = cardDetail.value) == null ? void 0 : _L.isBind) || isBinded.value ? {
-        O: common_vendor.o(handleUnbind, "7c"),
-        P: common_vendor.p({
+        P: common_vendor.o(handleUnbind, "bc"),
+        Q: common_vendor.p({
           type: "error",
           ["plain-fill"]: true,
           text: "解绑卡片",
@@ -507,9 +512,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "ml-24 mr-24 mt-24 mb-24 data-v-2bc48812"
         })
       } : {}, {
-        Q: ((_M = cardDetail.value) == null ? void 0 : _M.isBind) || isBinded.value
+        R: ((_M = cardDetail.value) == null ? void 0 : _M.isBind) || isBinded.value
       }, ((_N = cardDetail.value) == null ? void 0 : _N.isBind) || isBinded.value ? {
-        R: common_vendor.p({
+        S: common_vendor.p({
           height: "100rpx",
           bold: true,
           disabled: true,
@@ -519,8 +524,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        S: common_vendor.o(handleBindCard, "97"),
-        T: common_vendor.p({
+        T: common_vendor.o(handleBindCard, "f5"),
+        U: common_vendor.p({
           height: "100rpx",
           bold: true,
           customStyle: {
@@ -529,8 +534,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        U: common_vendor.o(handleRecharge, "42"),
-        V: common_vendor.p({
+        V: common_vendor.o(handleRecharge, "43"),
+        W: common_vendor.p({
           height: "100rpx",
           type: "primary",
           color: "#1989fa",
@@ -543,8 +548,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }) : {}, {
-        W: `${_ctx.u_s_b_h}px`,
-        X: `${_ctx.u_s_a_i_b}px`
+        X: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

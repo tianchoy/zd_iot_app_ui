@@ -20,6 +20,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     isIcon: { type: Boolean, default: true },
     Icon: { type: String, default: "add-circle" },
     rightText: { type: String, default: "" },
+    rightActionBackgroundColor: { type: String, default: "transparent" },
     isShowStyle: { type: Boolean, default: true },
     iconColor: { type: String, default: "#606266" }
   },
@@ -65,7 +66,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = navHeight > 0 ? navHeight : 44;
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at components/topNavBar/topNavBar.uvue:107", "获取导航栏信息失败", e);
+        common_vendor.index.__f__("error", "at components/topNavBar/topNavBar.uvue:108", "获取导航栏信息失败", e);
       }
     };
     const handleBack = () => {
@@ -83,15 +84,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, __props.isShowStyle ? {
         b: common_vendor.s(statusBarStyle.value),
         c: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`,
-          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
         })
       } : {}, {
         d: __props.isShowStyle
       }, __props.isShowStyle ? common_vendor.e({
         e: __props.showBack
       }, __props.showBack ? {
-        f: common_vendor.o(handleBack, "4b"),
+        f: common_vendor.o(handleBack, "1b"),
         g: common_vendor.p({
           name: "arrow-left",
           size: "35rpx",
@@ -116,71 +116,66 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {
         o: common_vendor.t(__props.rightText)
       }, {
-        p: common_vendor.o(($event) => {
+        p: !__props.isIcon && __props.rightActionBackgroundColor !== "transparent" ? 1 : "",
+        q: common_vendor.s(!__props.isIcon ? {
+          backgroundColor: __props.rightActionBackgroundColor
+        } : {}),
+        r: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        }, "a5")
+        }, "c1")
       }) : {}, {
-        q: common_vendor.s(navBarStyle.value),
-        r: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`,
-          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+        s: common_vendor.s(navBarStyle.value),
+        t: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
         })
       }) : common_vendor.e({
-        s: common_vendor.s({
-          height: common_vendor.unref(statusBarHeight) + "px",
-          backgroundColor: __props.backgroundColor
-        }),
-        t: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`,
-          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-        }),
-        v: __props.showBack
+        v: common_vendor.unref(statusBarHeight) + "px",
+        w: __props.backgroundColor,
+        x: __props.showBack
       }, __props.showBack ? {
-        w: common_vendor.o(handleBack, "f6"),
-        x: common_vendor.p({
+        y: common_vendor.o(handleBack, "76"),
+        z: common_vendor.p({
           name: "arrow-left",
           size: "40rpx",
           class: "icon data-v-83d0d8fa"
         })
       } : {}, {
-        y: __props.showBack ? "visible" : "hidden",
-        z: common_vendor.t(__props.title),
-        A: __props.textColor,
-        B: common_vendor.unref(navBarHeight) + "px",
-        C: __props.showCapsule
+        A: __props.showBack ? "visible" : "hidden",
+        B: common_vendor.t(__props.title),
+        C: __props.textColor,
+        D: common_vendor.unref(navBarHeight) + "px",
+        E: __props.showCapsule
       }, __props.showCapsule ? common_vendor.e({
-        D: __props.isIcon
+        F: __props.isIcon
       }, __props.isIcon ? {
-        E: common_vendor.p({
+        G: common_vendor.p({
           name: __props.Icon,
           size: "26",
           color: __props.iconColor,
           class: "data-v-83d0d8fa"
         })
       } : {
-        F: common_vendor.t(__props.rightText)
+        H: common_vendor.t(__props.rightText)
       }, {
-        G: common_vendor.o(($event) => {
+        I: !__props.isIcon && __props.rightActionBackgroundColor !== "transparent" ? 1 : "",
+        J: common_vendor.s(!__props.isIcon ? {
+          backgroundColor: __props.rightActionBackgroundColor
+        } : {}),
+        K: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        }, "05")
+        }, "d3")
       }) : {}, {
-        H: common_vendor.s({
-          height: common_vendor.unref(navBarHeight) + "px",
-          backgroundColor: __props.backgroundColor
-        }),
-        I: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`,
-          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-        })
+        L: common_vendor.unref(navBarHeight) + "px",
+        M: __props.backgroundColor,
+        N: `${_ctx.u_s_b_h}px`
       }), {
-        J: __props.isShowStyle
+        O: __props.isShowStyle
       }, __props.isShowStyle ? {
-        K: common_vendor.s({
+        P: common_vendor.s({
           height: totalNavHeight.value + "px"
         }),
-        L: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`,
-          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+        Q: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
         })
       } : {});
       return __returned__;

@@ -96,41 +96,44 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = {
-        a: common_vendor.p({
+        a: `${_ctx.u_s_b_h}px`,
+        b: common_vendor.p({
           title: "中导云卡登录",
           ["show-back"]: false,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
-          class: "data-v-27a30816"
+          class: "data-v-27a30816",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        b: common_assets._imports_0,
-        c: common_vendor.o(handleGetPhoneNumber, "6d"),
-        d: common_vendor.o(isDocState, "a6"),
-        e: common_vendor.p({
+        c: common_assets._imports_0,
+        d: common_vendor.o(handleGetPhoneNumber, "8e"),
+        e: common_vendor.o(isDocState, "dc"),
+        f: common_vendor.p({
           checked: common_vendor.unref(docState),
           class: "data-v-27a30816"
         }),
-        f: common_vendor.o(gotoAgreement, "01"),
-        g: common_vendor.o(gotoPrivacy, "e7"),
-        h: common_vendor.p({
+        g: common_vendor.o(gotoAgreement, "a2"),
+        h: common_vendor.o(gotoPrivacy, "64"),
+        i: common_vendor.p({
           dashed: true,
           class: "data-v-27a30816"
         }),
-        i: common_vendor.o(noNowLogin, "2e"),
-        j: common_vendor.o(agree, "64"),
-        k: common_vendor.o(($event) => {
+        j: common_vendor.o(noNowLogin, "b7"),
+        k: common_vendor.o(agree, "ea"),
+        l: common_vendor.o(($event) => {
           return common_vendor.isRef(showTitle) ? showTitle.value = $event : null;
-        }, "62"),
-        l: common_vendor.p({
+        }, "e1"),
+        m: common_vendor.p({
           width: "80%",
           message: common_vendor.unref(message),
           ["show-cancel-button"]: false,
           show: common_vendor.unref(showTitle),
           class: "data-v-27a30816"
         }),
-        m: `${_ctx.u_s_b_h}px`,
-        n: `${_ctx.u_s_a_i_b}px`
+        n: `${_ctx.u_s_b_h}px`
       };
       return __returned__;
     };

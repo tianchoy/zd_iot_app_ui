@@ -7,13 +7,29 @@
 				<text class="feedback-no">{{ feedbackData.feedbackNo }}</text>
 				<rice-tag :type="getStatusType(feedbackData.status)" :text="getStatusText(feedbackData.status)" size="small" plain-fill></rice-tag>
 			</view>
+			<view class="info-row" v-if="feedbackData.rechargeNo">
+				<text class="label">充值号：</text>
+				<text class="value">{{ feedbackData.rechargeNo }}</text>
+			</view>
+			<view class="info-row" v-if="feedbackData.cardNo">
+				<text class="label">接入号：</text>
+				<text class="value">{{ feedbackData.cardNo }}</text>
+			</view>
+			<view class="info-row" v-if="feedbackData.iccid">
+				<text class="label">ICCID：</text>
+				<text class="value">{{ feedbackData.iccid }}</text>
+			</view>
 			<view class="info-row">
-				<text class="label">反馈类型：</text>
-				<text class="value">{{ getFeedbackTypeText(feedbackData.feedbackType) }}</text>
+				<text class="label">订单号：</text>
+				<text class="value">{{ feedbackData.orderNo || '-' }}</text>
+			</view>
+			<view class="info-row">
+				<text class="label">套餐名：</text>
+				<text class="value">{{ feedbackData.packageName || '-' }}</text>
 			</view>
 			<view class="info-row">
 				<text class="label">提交时间：</text>
-				<text class="value">{{ feedbackData.createTime }}</text>
+				<text class="value">{{ feedbackData.createTime || '-' }}</text>
 			</view>
 			<view class="info-row" v-if="feedbackData.userPhone">
 				<text class="label">联系电话：</text>
@@ -27,12 +43,12 @@
 			<view class="message-list">
 				<view class="message-item" v-for="(item, index) in feedbackData.feedbackContentList" :key="index">
 					<view class="message-header">
-						<rice-tag :type="item.sendType === '0' ? 'primary' : 'success'" :text="item.sendType === '0' ? '用户' : '平台'" size="small"></rice-tag>
+						<text class="message-sender">{{ item.sendType === '0' ? '我的反馈' : '平台回复' }}</text>
 						<text class="message-time">{{ item.time }}</text>
 					</view>
 					<view class="message-content">{{ item.replyContent }}</view>
-					<view class="message-images" v-if="item.imgOssUrl && item.imgOssUrl.length > 0">
-						<image class="msg-image" v-for="(img, imgIndex) in item.imgOssUrl.split(',')" :key="imgIndex" :src="img" mode="aspectFill" @click="previewImage(img, item.imgOssUrl)"></image>
+					<view class="message-images" v-if="getImageUrls(item.imgOssUrl).length > 0">
+						<image class="msg-image" v-for="(img, imgIndex) in getImageUrls(item.imgOssUrl)" :key="imgIndex" :src="img" mode="aspectFill" @click="previewImage(img, item.imgOssUrl)"></image>
 					</view>
 				</view>
 			</view>
@@ -40,8 +56,8 @@
 
 		<!-- 底部操作区 -->
 		<view class="bottom-action" v-if="feedbackData.status !== '3'">
-			<rice-button type="primary" text="继续反馈" :customStyle="{ borderRadius: '40rpx', flex: 1, marginRight: '20rpx' }" @click="handleShowReply"></rice-button>
-			<rice-button type="default" text="关闭反馈" :customStyle="{ borderRadius: '40rpx', flex: 1 }" @click="handleClose"></rice-button>
+			<rice-button type="primary" text="继续反馈" :customStyle="{ borderRadius: '40rpx', flex: 1 }" @click="handleShowReply"></rice-button>
+			<rice-button type="default" text="已解决" :customStyle="{ borderRadius: '40rpx', flex: 1 }" @click="handleClose"></rice-button>
 		</view>
 
 		<!-- 继续反馈弹窗 -->
@@ -96,7 +112,11 @@
 		userPhone: string,
 		imgOssUrl: string,
 		feedbackContentList: FeedbackMessageItem[],
-		rechargeNo: string
+		rechargeNo: string,
+		cardNo?: string,
+		iccid?: string,
+		orderNo?: string,
+		packageName?: string
 	}
 
 	type FeedbackMessageItem = {
@@ -116,7 +136,11 @@
 		userPhone: '',
 		imgOssUrl: '',
 		feedbackContentList: [],
-		rechargeNo: ''
+		rechargeNo: '',
+		cardNo: '',
+		iccid: '',
+		orderNo: '',
+		packageName: ''
 	})
 
 	const showReplyPopup = ref(false)
@@ -144,17 +168,6 @@
 		return textMap.get(status) ?? status
 	}
 
-	// 获取反馈类型文字
-	const getFeedbackTypeText = (type: string): string => {
-		const textMap = new Map<string, string>()
-		textMap.set('0', '功能建议')
-		textMap.set('1', '问题报错')
-		textMap.set('2', '投诉举报')
-		textMap.set('3', '订单售后')
-		textMap.set('4', '其他')
-		return textMap.get(type) ?? type
-	}
-
 	// 获取详情
 	const loadDetail = async () => {
 		try {
@@ -172,11 +185,15 @@
 		}
 	}
 
+	const getImageUrls = (urls: string): string[] => {
+		return urls.split(',').map((url) => url.trim()).filter((url) => url.length > 0)
+	}
+
 	// 预览图片
 	const previewImage = (current: string, urls: string) => {
 		uni.previewImage({
 			current: current,
-			urls: urls.split(',')
+			urls: getImageUrls(urls)
 		})
 	}
 
@@ -220,15 +237,15 @@
 
 	// 提交回复
 	const handleReply = async () => {
-		if (!replyContent.value) {
+		const content = replyContent.value.trim()
+		if (!content) {
 			uni.showToast({ title: '请输入反馈内容', icon: 'none' })
 			return
 		}
 
 		replyLoading.value = true
 		try {
-			// 先上传图片
-			const uploadedUrls: string[] = []
+			const uploadedIds: string[] = []
 			for (let i = 0; i < replyImages.value.length; i++) {
 				const uploadResult = await http.upload({
 					url: ApiUrl.feedbackUploadImage as string,
@@ -237,21 +254,21 @@
 					withToken: false,
 					showLoading: false
 				})
-				if (uploadResult.code == 200 && uploadResult.data != null) {
-					const data = uploadResult.data as UTSJSONObject
-					const imgUrl = data['url'] as string ?? ''
-					if (imgUrl !== '') {
-						uploadedUrls.push(imgUrl)
-					}
+				const ossId = uploadResult.code == 200 && uploadResult.data != null
+					? String(uploadResult.data).trim()
+					: ''
+				if (!ossId) {
+					uni.showToast({ title: uploadResult.msg ?? '图片上传失败', icon: 'none' })
+					return
 				}
+				uploadedIds.push(ossId)
 			}
 
-			// 提交回复
 			const formData = new UTSJSONObject()
 			formData['id'] = feedbackId.value
-			formData['feedbackContent'] = replyContent.value
-			if (uploadedUrls.length > 0) {
-				formData['imgOssUrl'] = uploadedUrls.join(',')
+			formData['feedbackContent'] = content
+			if (uploadedIds.length > 0) {
+				formData['imgOssIds'] = uploadedIds.join(',')
 			}
 
 			const res = await replyFeedback(formData, false)
@@ -315,16 +332,16 @@
 	// #ifdef MP-WEIXIN || H5
 	min-height: 100%;
 	// #endif
-	background-color: #f4f7fb;
-	padding-bottom: 140rpx;
+	background-color: #f5f7fa;
+	padding-bottom: 160rpx;
 }
 
 .info-card {
+	margin: 20rpx;
+	padding: 20rpx 28rpx;
+	border: 0;
+	border-radius: 20rpx;
 	background-color: #ffffff;
-	margin: 24rpx;
-	padding: 24rpx;
-	border-radius: 24rpx;
-	border: 1rpx solid #e7edf5;
 
 	.info-header {
 		display: flex;
@@ -333,12 +350,12 @@
 		align-items: center;
 		padding-bottom: 20rpx;
 		margin-bottom: 20rpx;
-		border-bottom: 1rpx solid #f1f5f9;
+		border-bottom: 1rpx solid #f1f1f1;
 
 		.feedback-no {
 			font-size: 30rpx;
-			color: #0f172a;
-			font-weight: bold;
+			color: #303133;
+			font-weight: 600;
 		}
 	}
 
@@ -353,39 +370,39 @@
 
 		.label {
 			font-size: 26rpx;
-			color: #64748b;
+			color: #606266;
 			width: 160rpx;
 		}
 
 		.value {
 			font-size: 26rpx;
-			color: #334155;
+			color: #303133;
 			flex: 1;
 		}
 	}
 }
 
 .message-section {
-	margin: 0 24rpx;
+	margin: 0 20rpx;
 
 	.section-title {
 		font-size: 30rpx;
-		color: #0f172a;
-		font-weight: bold;
+		color: #303133;
+		font-weight: 600;
 		margin-bottom: 20rpx;
 	}
 
 	.message-list {
 		background-color: #ffffff;
-		border-radius: 24rpx;
-		padding: 24rpx;
-		border: 1rpx solid #e7edf5;
+		border: 0;
+		border-radius: 20rpx;
+		padding: 20rpx 28rpx;
 	}
 
 	.message-item {
-		padding-bottom: 24rpx;
-		margin-bottom: 24rpx;
-		border-bottom: 1rpx solid #f1f5f9;
+		padding-bottom: 20rpx;
+		margin-bottom: 20rpx;
+		border-bottom: 1rpx dashed #cccfd5;
 
 		&:last-child {
 			padding-bottom: 0;
@@ -396,19 +413,25 @@
 		.message-header {
 			display: flex;
 			flex-direction: row;
-			justify-content: space-between;
+			justify-content: flex-start;
 			align-items: center;
+			gap: 16rpx;
 			margin-bottom: 12rpx;
 
+			.message-sender {
+				font-size: 26rpx;
+				color: #909399;
+			}
+
 			.message-time {
-				font-size: 22rpx;
-				color: #94a3b8;
+				font-size: 24rpx;
+				color: #909399;
 			}
 		}
 
 		.message-content {
 			font-size: 28rpx;
-			color: #334155;
+			color: #303133;
 			line-height: 1.6;
 			margin-bottom: 12rpx;
 		}
@@ -420,8 +443,8 @@
 			gap: 12rpx;
 
 			.msg-image {
-				width: 160rpx;
-				height: 160rpx;
+				width: 180rpx;
+				height: 180rpx;
 				border-radius: 12rpx;
 			}
 		}
@@ -433,11 +456,12 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	padding: 24rpx;
-	background-color: #ffffff;
-	border-top: 1rpx solid #e7edf5;
+	padding: 20rpx;
+	background-color: #f5f7fa;
+	border-top: 0;
 	display: flex;
 	flex-direction: row;
+	gap: 24rpx;
 }
 
 .popup-container {

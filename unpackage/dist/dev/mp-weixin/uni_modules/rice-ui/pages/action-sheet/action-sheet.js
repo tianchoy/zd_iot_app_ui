@@ -153,17 +153,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     "raw js";
     const __returned__ = {
       a: common_vendor.gei(_ctx, ""),
-      b: common_vendor.o(onSelect, "67"),
-      c: common_vendor.o(onCancel, "25"),
-      d: common_vendor.o(onOpen, "f9"),
-      e: common_vendor.o(onClose, "d4"),
-      f: common_vendor.o(onOpened, "60"),
-      g: common_vendor.o(onClosed, "3a"),
-      h: common_vendor.o(clickOverlay, "a0"),
-      i: common_vendor.o(($event) => {
+      b: common_vendor.o(onSelect, "e1"),
+      c: common_vendor.o(onCancel, "64"),
+      d: common_vendor.o(onOpen, "99"),
+      e: common_vendor.o(onClose, "6a"),
+      f: common_vendor.o(onOpened, "05"),
+      g: common_vendor.o(onClosed, "95"),
+      h: common_vendor.o(clickOverlay, "ac"),
+      i: `${_ctx.u_s_b_h}px`,
+      j: common_vendor.o(($event) => {
         return common_vendor.isRef(show) ? show.value = $event : null;
-      }, "f2"),
-      j: common_vendor.p({
+      }, "f0"),
+      k: common_vendor.p({
         title: common_vendor.unref(params).title,
         actions: common_vendor.unref(actionsList),
         ["use-dialog-page"]: false,
@@ -180,9 +181,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         ["safe-area-inset-bottom"]: common_vendor.unref(params).safeAreaInsetBottom,
         ["custom-style"]: common_vendor.unref(params).customStyle,
         show: common_vendor.unref(show),
-        id: common_vendor.gei(_ctx, "")
+        id: common_vendor.gei(_ctx, ""),
+        style: common_vendor.normalizeStyle({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
+        })
       }),
-      k: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+      l: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
     };
     return __returned__;
   };

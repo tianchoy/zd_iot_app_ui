@@ -272,34 +272,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       a: common_vendor.unref(showOverlay)
     }, common_vendor.unref(showOverlay) ? {
       b: common_vendor.o(overlayClick, "9b"),
-      c: common_vendor.p({
+      c: `${_ctx.u_s_b_h}px`,
+      d: common_vendor.p({
         show: show.value,
         duration: _ctx.duration,
         ["close-on-click-overlay"]: false,
         ["bg-color"]: _ctx.overlayBgColor,
         ["z-index"]: _ctx.zIndex - 1,
-        class: "data-v-13572bed"
+        class: "data-v-13572bed",
+        style: common_vendor.normalizeStyle({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
+        })
       })
     } : {}, {
-      d: common_vendor.unref(realShow)
+      e: common_vendor.unref(realShow)
     }, common_vendor.unref(realShow) ? common_vendor.e({
-      e: common_vendor.unref(hasTitle)
+      f: common_vendor.unref(hasTitle)
     }, common_vendor.unref(hasTitle) ? {
-      f: common_vendor.t(_ctx.title)
+      g: common_vendor.t(_ctx.title)
     } : {}, {
-      g: common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(_ctx.message)
+      h: common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(_ctx.message)
     }, common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(_ctx.message) ? {
-      h: common_vendor.t(_ctx.message),
-      i: common_vendor.n(common_vendor.unref(messageTextClass))
+      i: common_vendor.t(_ctx.message),
+      j: common_vendor.n(common_vendor.unref(messageTextClass))
     } : {}, {
-      j: common_vendor.n(common_vendor.unref(contentClass)),
-      k: _ctx.showCancelButton
+      k: common_vendor.n(common_vendor.unref(contentClass)),
+      l: _ctx.showCancelButton
     }, _ctx.showCancelButton ? common_vendor.e({
-      l: _ctx.buttonTheme != "default"
+      m: _ctx.buttonTheme != "default"
     }, _ctx.buttonTheme != "default" ? {
-      m: common_vendor.s(common_vendor.unref(cancelButtonStyle)),
-      n: common_vendor.o(cancel, "08"),
-      o: common_vendor.p({
+      n: common_vendor.s(common_vendor.unref(cancelButtonStyle)),
+      o: common_vendor.o(cancel, "08"),
+      p: common_vendor.p({
         type: "primary",
         ["plain-fill"]: true,
         text: _ctx.cancelButtonText,
@@ -310,19 +314,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         style: common_vendor.normalizeStyle(common_vendor.unref(cancelButtonStyle))
       })
     } : {
-      p: common_vendor.t(_ctx.cancelButtonText),
-      q: common_vendor.s(common_vendor.unref(cancelTextStyle)),
-      r: common_vendor.n(getButtonClass("cancel")),
-      s: common_vendor.unref(cancelButtonHover),
-      t: common_vendor.o(cancel, "26")
+      q: common_vendor.t(_ctx.cancelButtonText),
+      r: common_vendor.s(common_vendor.unref(cancelTextStyle)),
+      s: common_vendor.n(getButtonClass("cancel")),
+      t: common_vendor.unref(cancelButtonHover),
+      v: common_vendor.o(cancel, "26")
     }) : {}, {
-      v: _ctx.showConfirmButton
+      w: _ctx.showConfirmButton
     }, _ctx.showConfirmButton ? common_vendor.e({
-      w: _ctx.buttonTheme != "default"
+      x: _ctx.buttonTheme != "default"
     }, _ctx.buttonTheme != "default" ? {
-      x: common_vendor.s(common_vendor.unref(confirmButtonStyle)),
-      y: common_vendor.o(confirm, "4c"),
-      z: common_vendor.p({
+      y: common_vendor.s(common_vendor.unref(confirmButtonStyle)),
+      z: common_vendor.o(confirm, "4c"),
+      A: common_vendor.p({
         type: "primary",
         text: _ctx.confirmButtonText,
         color: _ctx.confirmButtonColor,
@@ -333,30 +337,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         style: common_vendor.normalizeStyle(common_vendor.unref(confirmButtonStyle))
       })
     } : common_vendor.e({
-      A: !common_vendor.unref(confirmLoading)
+      B: !common_vendor.unref(confirmLoading)
     }, !common_vendor.unref(confirmLoading) ? {
-      B: common_vendor.t(_ctx.confirmButtonText),
-      C: common_vendor.s(common_vendor.unref(confirmTextStyle))
+      C: common_vendor.t(_ctx.confirmButtonText),
+      D: common_vendor.s(common_vendor.unref(confirmTextStyle))
     } : {
-      D: common_vendor.p({
+      E: common_vendor.p({
         color: _ctx.confirmButtonColor,
         class: "data-v-13572bed"
       })
     }, {
-      E: common_vendor.n(getButtonClass("confirm")),
-      F: common_vendor.unref(confirmButtonHover),
-      G: common_vendor.o(confirm, "f9")
+      F: common_vendor.n(getButtonClass("confirm")),
+      G: common_vendor.unref(confirmButtonHover),
+      H: common_vendor.o(confirm, "f9")
     })) : {}, {
-      H: common_vendor.n(common_vendor.unref(footerClass)),
-      I: common_vendor.sei("r0-13572bed", "view", dialogRef, {
+      I: common_vendor.n(common_vendor.unref(footerClass)),
+      J: common_vendor.sei("r0-13572bed", "view", dialogRef, {
         "k": "dialogRef"
       }),
-      J: common_vendor.n(common_vendor.unref(dialogClass)),
-      K: common_vendor.s(common_vendor.unref(dialogStyle)),
-      L: common_vendor.s(_ctx.customStyle),
-      M: common_vendor.s({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`,
-        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      K: common_vendor.n(common_vendor.unref(dialogClass)),
+      L: common_vendor.s(common_vendor.unref(dialogStyle)),
+      M: common_vendor.s(_ctx.customStyle),
+      N: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`
       })
     }) : {});
     return __returned__;

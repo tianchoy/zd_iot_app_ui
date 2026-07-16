@@ -1,5 +1,5 @@
 <template>
-	<topNavBar title="问题反馈" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" rightText="我的反馈" @capsuleClick="toMyFeedback"></topNavBar>
+	<topNavBar title="问题反馈" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" rightText="我的反馈" rightActionBackgroundColor="#f0fdf4" @capsuleClick="toMyFeedback"></topNavBar>
 	<view class="page-container">
 		<view class="info-card">
 			<view class="info-row">
@@ -37,7 +37,7 @@
 
 			<view class="form-item">
 				<text class="form-label"><text class="required">*</text>联系方式</text>
-				<input class="phone-input" v-model="userPhone" placeholder="请输入手机号或邮箱" type="text" maxlength="50" />
+				<input class="phone-input" v-model="userPhone" placeholder="请输入手机号" type="text" maxlength="11" />
 			</view>
 		</view>
 
@@ -98,21 +98,22 @@
 		images.value.splice(index, 1)
 	}
 
-	// 提交反馈 - 分两步：先上传图片拿到URL，再提交JSON
+	// 提交反馈：提交时上传本地图片，再保存OSS主键
 	const handleSubmit = async () => {
-		if (!feedbackContent.value.trim()) {
+		const content = feedbackContent.value.trim()
+		const phone = userPhone.value.trim()
+		if (!content) {
 			uni.showToast({ title: '请输入问题描述', icon: 'none' })
 			return
 		}
-		if (!userPhone.value.trim()) {
-			uni.showToast({ title: '请输入联系方式', icon: 'none' })
+		if (!/^1[3-9]\d{9}$/.test(phone)) {
+			uni.showToast({ title: '请输入正确的手机号', icon: 'none' })
 			return
 		}
 
 		submitLoading.value = true
 		try {
-			// 第一步：上传图片，拿到URL
-			const uploadedUrls: string[] = []
+			const uploadedIds: string[] = []
 			for (let i = 0; i < images.value.length; i++) {
 				const uploadResult = await http.upload({
 					url: ApiUrl.feedbackUploadImage as string,
@@ -121,29 +122,29 @@
 					withToken: false,
 					showLoading: false
 				})
-				if (uploadResult.code == 200 && uploadResult.data != null) {
-					const data = uploadResult.data as UTSJSONObject
-					const imgUrl = data['url'] as string ?? ''
-					if (imgUrl !== '') {
-						uploadedUrls.push(imgUrl)
-					}
+				const ossId = uploadResult.code == 200 && uploadResult.data != null
+					? String(uploadResult.data).trim()
+					: ''
+				if (!ossId) {
+					uni.showToast({ title: uploadResult.msg ?? '图片上传失败', icon: 'none' })
+					return
 				}
+				uploadedIds.push(ossId)
 			}
 
-			// 第二步：提交反馈（JSON格式，带图片URL）
 			const formData = new UTSJSONObject()
 			formData['rechargeNo'] = rechargeNo.value
-			formData['feedbackContent'] = feedbackContent.value
-			formData['userPhone'] = userPhone.value
-			formData['feedbackType'] = '1'
+			formData['feedbackContent'] = content
+			formData['userPhone'] = phone
+			formData['feedbackType'] = '3'
 			if (orderNo.value) {
 				formData['orderNo'] = orderNo.value
 			}
 			if (pkgName.value) {
 				formData['packageName'] = pkgName.value
 			}
-			if (uploadedUrls.length > 0) {
-				formData['imgOssUrl'] = uploadedUrls.join(',')
+			if (uploadedIds.length > 0) {
+				formData['imgOssIds'] = uploadedIds.join(',')
 			}
 
 			const res = await submitFeedback(formData, false)
@@ -182,16 +183,17 @@
 	// #ifdef MP-WEIXIN || H5
 	min-height: 100%;
 	// #endif
-	background-color: #f4f7fb;
-	padding-bottom: 120rpx;
+	background-color: #f5f7fa;
+	padding-bottom: 48rpx;
 }
 
 .info-card {
 	background-color: #ffffff;
-	margin: 24rpx;
-	padding: 24rpx;
-	border-radius: 24rpx;
-	border: 1rpx solid #e7edf5;
+	margin: 20rpx;
+	margin-bottom: 0;
+	padding: 28rpx;
+	border: 0;
+	border-radius: 20rpx;
 
 	.info-row {
 		display: flex;
@@ -204,15 +206,15 @@
 
 		.label {
 			font-size: 26rpx;
-			color: #64748b;
+			color: #606266;
 			width: 140rpx;
 			flex-shrink: 0;
 		}
 
 		.value {
 			font-size: 26rpx;
-			color: #334155;
-			font-weight: 600;
+			color: #303133;
+			font-weight: 500;
 			flex: 1;
 		}
 	}
@@ -220,10 +222,10 @@
 
 .form-section {
 	background-color: #ffffff;
-	margin: 0 24rpx;
-	padding: 24rpx;
-	border-radius: 24rpx;
-	border: 1rpx solid #e7edf5;
+	margin: 20rpx;
+	padding: 28rpx;
+	border: 0;
+	border-radius: 20rpx;
 }
 
 .form-item {
@@ -235,8 +237,8 @@
 
 	.form-label {
 		display: block;
-		font-size: 28rpx;
-		color: #334155;
+		font-size: 30rpx;
+		color: #303133;
 		margin-bottom: 16rpx;
 		font-weight: 600;
 
@@ -251,9 +253,9 @@
 		height: 200rpx;
 		padding: 20rpx;
 		font-size: 28rpx;
-		background-color: #f8fafc;
-		border-radius: 16rpx;
-		border: 1rpx solid #e2e8f0;
+		background-color: #ffffff;
+		border-radius: 14rpx;
+		border: 1rpx solid #dcdfe6;
 		box-sizing: border-box;
 	}
 
@@ -262,9 +264,9 @@
 		height: 80rpx;
 		padding: 0 20rpx;
 		font-size: 28rpx;
-		background-color: #f8fafc;
-		border-radius: 16rpx;
-		border: 1rpx solid #e2e8f0;
+		background-color: #ffffff;
+		border-radius: 14rpx;
+		border: 1rpx solid #dcdfe6;
 		box-sizing: border-box;
 	}
 
@@ -304,12 +306,12 @@
 		.upload-btn {
 			width: 160rpx;
 			height: 160rpx;
-			background-color: #f8fafc;
-			border: 2rpx dashed #cbd5e1;
-			border-radius: 12rpx;
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			background-color: #fafafa;
+			border: 1rpx dashed #dcdfe6;
+			border-radius: 14rpx;
 
 			.plus {
 				font-size: 48rpx;
@@ -320,6 +322,6 @@
 }
 
 .submit-btn-container {
-	margin: 48rpx 24rpx;
+	margin: 56rpx 20rpx 32rpx;
 }
 </style>

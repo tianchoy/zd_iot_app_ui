@@ -11,7 +11,7 @@
 		</view>
 		<view class="capsule">
 			<view class="capsule-item">
-				<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
+				<view v-if="showCapsule" :class="{ 'capsule-text-action': !isIcon && rightActionBackgroundColor !== 'transparent' }" :style="!isIcon ? { backgroundColor: rightActionBackgroundColor } : {}" @click="emit('capsuleClick', 'menu')">
 					<rice-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></rice-icon>
 					<text v-else>{{rightText}}</text>
 				</view>
@@ -31,7 +31,7 @@
 			</view>
 			<view class="capsule">
 				<view class="capsule-item">
-					<view v-if="showCapsule" @click="emit('capsuleClick', 'menu')">
+					<view v-if="showCapsule" :class="{ 'capsule-text-action': !isIcon && rightActionBackgroundColor !== 'transparent' }" :style="!isIcon ? { backgroundColor: rightActionBackgroundColor } : {}" @click="emit('capsuleClick', 'menu')">
 						<rice-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></rice-icon>
 						<text v-else>{{rightText}}</text>
 					</view>
@@ -57,6 +57,7 @@ const props = defineProps({
 	isIcon: { type: Boolean, default: true },
 	Icon: { type: String, default: 'add-circle' },
 	rightText: { type: String, default: '' },
+	rightActionBackgroundColor: { type: String, default: 'transparent' },
 	isShowStyle: { type: Boolean, default: true },
 	iconColor: { type: String, default: '#606266' }
 });
@@ -172,6 +173,16 @@ onMounted(() => {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+.capsule-text-action {
+	border: 1px solid #bbf7d0;
+	border-radius: 40rpx;
+	color: #16a34a;
+	font-size: 24rpx;
+	font-weight: bold;
+	padding: 10rpx 25rpx;
+	white-space: nowrap;
 }
 
 .icon {

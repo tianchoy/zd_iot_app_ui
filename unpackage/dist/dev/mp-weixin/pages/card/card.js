@@ -291,42 +291,46 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.p({
+        a: `${_ctx.u_s_b_h}px`,
+        b: common_vendor.p({
           title: "卡片",
           ["show-back"]: false,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
-          class: "data-v-a89086b7"
+          class: "data-v-a89086b7",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        b: common_vendor.o(handleInput, "ed"),
-        c: common_vendor.o(($event) => {
+        c: common_vendor.o(handleInput, "cf"),
+        d: common_vendor.o(($event) => {
           return card_number.value = $event;
-        }, "ed"),
-        d: common_vendor.p({
+        }, "63"),
+        e: common_vendor.p({
           placeholder: "请输入充值号",
           modelValue: card_number.value,
           class: "search-input data-v-a89086b7"
         }),
-        e: common_vendor.o(scanCode, "05"),
-        f: common_vendor.p({
+        f: common_vendor.o(scanCode, "7d"),
+        g: common_vendor.p({
           height: "100%",
           icon: "scan",
           class: "scan-btn data-v-a89086b7"
         }),
-        g: common_vendor.o(handleQuery, "37"),
-        h: common_vendor.p({
+        h: common_vendor.o(handleQuery, "54"),
+        i: common_vendor.p({
           type: "primary",
           color: "#1989fa",
           textColor: "#ffffff",
           height: "100%",
           class: "data-v-a89086b7"
         }),
-        i: common_vendor.o(handleClick, "80"),
-        j: common_vendor.o(($event) => {
+        j: common_vendor.o(handleClick, "43"),
+        k: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "bb"),
-        k: common_vendor.p({
+        }, "78"),
+        l: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
           ["line-width"]: 0,
@@ -340,7 +344,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: current.value,
           class: "data-v-a89086b7"
         }),
-        l: common_vendor.f(cardList.value, (card, index, i0) => {
+        m: common_vendor.f(cardList.value, (card, index, i0) => {
           return common_vendor.e({
             a: card.rechargeNo
           }, card.rechargeNo ? {
@@ -378,14 +382,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             }, index)
           });
         }),
-        m: common_vendor.p({
+        n: common_vendor.p({
           dashed: true,
           customStyle: {
             margin: "0"
           },
           class: "data-v-a89086b7"
         }),
-        n: common_vendor.p({
+        o: common_vendor.p({
           type: "primary",
           size: "mini",
           customStyle: {
@@ -393,14 +397,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           class: "data-v-a89086b7"
         }),
-        o: cardList.value.length === 0
+        p: cardList.value.length === 0
       }, cardList.value.length === 0 ? {} : {}, {
-        p: common_vendor.o(_ctx.handleConnectTousu, "a8"),
-        q: common_vendor.p({
+        q: common_vendor.o(_ctx.handleConnectTousu, "3c"),
+        r: common_vendor.p({
           class: "data-v-a89086b7"
         }),
-        r: `${_ctx.u_s_b_h}px`,
-        s: `${_ctx.u_s_a_i_b}px`
+        s: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

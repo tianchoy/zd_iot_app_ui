@@ -55,50 +55,53 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.p({
+        a: `${_ctx.u_s_b_h}px`,
+        b: common_vendor.p({
           title: "支付结果",
           ["show-back"]: false,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
-          class: "data-v-4b5f1e90"
+          class: "data-v-4b5f1e90",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        b: d("rechargeNo")
+        c: d("rechargeNo")
       }, d("rechargeNo") ? {
-        c: common_vendor.t(d("rechargeNo"))
+        d: common_vendor.t(d("rechargeNo"))
       } : {}, {
-        d: d("iccid")
+        e: d("iccid")
       }, d("iccid") ? {
-        e: common_vendor.t(d("iccid"))
+        f: common_vendor.t(d("iccid"))
       } : {}, {
-        f: d("orderNo")
+        g: d("orderNo")
       }, d("orderNo") ? {
-        g: common_vendor.t(d("orderNo"))
+        h: common_vendor.t(d("orderNo"))
       } : {}, {
-        h: d("pkgName")
+        i: d("pkgName")
       }, d("pkgName") ? {
-        i: common_vendor.t(d("pkgName"))
+        j: common_vendor.t(d("pkgName"))
       } : {}, {
-        j: d("pkgType")
+        k: d("pkgType")
       }, d("pkgType") ? {
-        k: common_vendor.t(d("pkgType"))
+        l: common_vendor.t(d("pkgType"))
       } : {}, {
-        l: ds("payType") != ""
+        m: ds("payType") != ""
       }, ds("payType") != "" ? {
-        m: common_vendor.t(d("payType"))
+        n: common_vendor.t(d("payType"))
       } : {}, {
-        n: d("payAmount")
+        o: d("payAmount")
       }, d("payAmount") ? {
-        o: common_vendor.t(d("payAmount"))
+        p: common_vendor.t(d("payAmount"))
       } : {}, {
-        p: d("payTime")
+        q: d("payTime")
       }, d("payTime") ? {
-        q: common_vendor.t(d("payTime"))
+        r: common_vendor.t(d("payTime"))
       } : {}, {
-        r: common_vendor.o(handleViewOrder, "1b"),
-        s: common_vendor.o(handleBackCard, "a5"),
-        t: `${_ctx.u_s_b_h}px`,
-        v: `${_ctx.u_s_a_i_b}px`
+        s: common_vendor.o(handleViewOrder, "6d"),
+        t: common_vendor.o(handleBackCard, "fc"),
+        v: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

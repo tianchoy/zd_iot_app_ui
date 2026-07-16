@@ -1,5 +1,5 @@
 <template>
-	<topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="feedbackEnabled" :isIcon="false" rightText="我的反馈" @capsuleClick="handleMyFeedback"></topNavBar>
+	<topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="feedbackEnabled" :isIcon="false" rightText="我的反馈" rightActionBackgroundColor="#f0fdf4" @capsuleClick="handleMyFeedback"></topNavBar>
 	<view class="container">
 		<view class="card-box">
 			<!-- 搜索框区域 -->
