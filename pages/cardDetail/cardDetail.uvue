@@ -26,7 +26,7 @@
 						<view class="section-content" v-if="activeName == '基本信息'">
 							<view class="base-info-box">
 								<view class="base-info">
-									<view class="info-item" v-if="cardDetail?.rechargeNo"><text class="info-label">充值号</text><text class="info-value">{{cardDetail?.rechargeNo}}</text></view>
+									<view class="info-item" v-if="cardDetail?.rechargeNo"><text class="info-label">卡号</text><text class="info-value">{{cardDetail?.rechargeNo}}</text></view>
 									<view class="info-item" v-if="cardDetail?.statusStr"><text class="info-label">状态</text><rice-tag type="success" plain-fill :text="cardDetail?.statusStr" size="small"/></view>
 									<view class="info-item">
 										<text class="info-label">当前套餐</text>

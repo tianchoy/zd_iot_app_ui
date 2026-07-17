@@ -57,7 +57,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               return true;
             } else {
               common_vendor.index.showToast({
-                title: "充值号无效",
+                title: "卡号无效",
                 icon: "none"
               });
               return false;
@@ -71,7 +71,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.showToast({
-            title: error.msg || "充值号无效",
+            title: error.msg || "卡号无效",
             icon: "none"
           });
           return false;
@@ -87,7 +87,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (!cardNumber.value) {
           common_vendor.index.showToast({
-            title: "请输入充值号",
+            title: "请输入卡号",
             icon: "none"
           });
           return Promise.resolve(null);
@@ -138,29 +138,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: cardNumber.value,
         d: common_vendor.o(($event) => {
           return cardNumber.value = $event.detail.value;
-        }, "8a"),
+        }, "5a"),
         e: common_vendor.p({
           name: "scan",
           size: "40rpx",
           color: "#666",
           class: "data-v-9fa4edd6"
         }),
-        f: common_vendor.o(handleScan, "c1"),
+        f: common_vendor.o(handleScan, "8b"),
         g: common_vendor.unref(common_config.isINT)()
       }, common_vendor.unref(common_config.isINT)() ? {
         h: common_vendor.t(selectedCountryLabel.value || "请选择国家/地区"),
         i: !selectedCountry.value ? 1 : "",
-        j: common_vendor.o(openSelectCountry, "df")
+        j: common_vendor.o(openSelectCountry, "02")
       } : {}, {
-        k: common_vendor.o(handleQuery, "3f"),
+        k: common_vendor.o(handleQuery, "01"),
         l: `${_ctx.u_s_b_h}px`,
         m: common_vendor.sr(searchSelectRef, "9fa4edd6-3,9fa4edd6-2", {
           "k": "searchSelectRef"
         }),
-        n: common_vendor.o(onCountryChange, "4c"),
+        n: common_vendor.o(onCountryChange, "b2"),
         o: common_vendor.o(($event) => {
           return selectedCountry.value = $event;
-        }, "4d"),
+        }, "67"),
         p: common_vendor.p({
           options: countryOptions.value,
           maxHeight: "800rpx",
@@ -169,11 +169,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: selectedCountry.value,
           class: "r data-v-9fa4edd6"
         }),
-        q: common_vendor.o(onPopupClose, "f4"),
+        q: common_vendor.o(onPopupClose, "90"),
         r: `${_ctx.u_s_b_h}px`,
         s: common_vendor.o(($event) => {
           return showCountryPopup.value = $event;
-        }, "44"),
+        }, "8a"),
         t: common_vendor.p({
           position: "bottom",
           show: showCountryPopup.value,

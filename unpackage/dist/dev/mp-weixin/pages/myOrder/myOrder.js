@@ -230,6 +230,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }
       });
     };
+    const handleFeedback = (order) => {
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:320", "order", order);
+      common_vendor.index.navigateTo({
+        url: `/pages/questionFeedback/submit?rechargeNo=${order.rechargeNo || ""}&orderNo=${order.orderNo || ""}&pkgName=${order.pkgName || ""}`
+      });
+    };
     const handlePay = (order) => {
       if (common_config.isWechat()) {
         common_vendor.index.showToast({
@@ -277,13 +283,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: common_vendor.o(($event) => {
           return card_number.value = $event.detail.value;
         }, "38"),
-        g: common_vendor.o(scanCode, "88"),
+        g: common_vendor.o(scanCode, "eb"),
         h: common_vendor.p({
           height: "100%",
           icon: "scan",
           class: "scan-btn data-v-87fe8731"
         }),
-        i: common_vendor.o(handleQuery, "ff"),
+        i: common_vendor.o(handleQuery, "90"),
         j: common_vendor.p({
           type: "primary",
           color: "#1989fa",
@@ -291,10 +297,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "100%",
           class: "data-v-87fe8731"
         }),
-        k: common_vendor.o(handleTabClick, "3c"),
+        k: common_vendor.o(handleTabClick, "5a"),
         l: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "d4"),
+        }, "e6"),
         m: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
@@ -333,9 +339,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, order.orderNo ? {
             g: common_vendor.t(order.orderNo || "-")
           } : {}, {
-            h: order.cardNo
-          }, order.cardNo ? {
-            i: common_vendor.t(order.cardNo || "-")
+            h: order.rechargeNo
+          }, order.rechargeNo ? {
+            i: common_vendor.t(order.rechargeNo || "-")
           } : {}, {
             j: common_vendor.t(order.createTime || "-"),
             k: common_vendor.t(order.payCurrencyAmount || "0.00"),
@@ -345,8 +351,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               return handlePay(order);
             }, index)
           } : {}, {
-            n: index,
+            n: order.status === "1"
+          }, order.status === "1" ? {
             o: common_vendor.o(($event) => {
+              return handleFeedback(order);
+            }, index)
+          } : {}, {
+            p: index,
+            q: common_vendor.o(($event) => {
               return handleOrderClick(order);
             }, index)
           });

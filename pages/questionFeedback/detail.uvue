@@ -8,7 +8,7 @@
 				<rice-tag :type="getStatusType(feedbackData.status)" :text="getStatusText(feedbackData.status)" size="small" plain-fill></rice-tag>
 			</view>
 			<view class="info-row" v-if="feedbackData.rechargeNo">
-				<text class="label">充值号：</text>
+				<text class="label">卡号：</text>
 				<text class="value">{{ feedbackData.rechargeNo }}</text>
 			</view>
 			<view class="info-row" v-if="feedbackData.cardNo">
