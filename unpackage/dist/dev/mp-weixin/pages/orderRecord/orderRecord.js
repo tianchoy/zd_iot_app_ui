@@ -105,7 +105,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:160", "获取订单列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/orderRecord/orderRecord.uvue:162", "获取订单列表失败:", error);
           orderList.value = [];
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
@@ -115,7 +115,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleTabClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:171", e);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:173", e);
       const index = e.index;
       current.value = index;
       getOrderList(e.value);
@@ -150,7 +150,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handlePay = (order = null) => {
       const o = order;
-      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:214", "去支付:", order);
+      common_vendor.index.__f__("log", "at pages/orderRecord/orderRecord.uvue:216", "去支付:", order);
       if (common_config.isWechat()) {
         common_vendor.index.showToast({
           title: `支付订单 ${o["id"]}`,
@@ -168,8 +168,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(handleBack, "35"),
-        b: common_vendor.o(handleMyFeedback, "04"),
+        a: common_vendor.o(handleBack, "f0"),
+        b: common_vendor.o(handleMyFeedback, "99"),
         c: `${_ctx.u_s_b_h}px`,
         d: common_vendor.p({
           title: "我的订单",
@@ -178,15 +178,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textColor: "#333",
           showCapsule: true,
           isIcon: false,
+          rightTextFontSize: "26rpx",
+          rightText: "我的反馈",
           class: "data-v-a151b594",
           style: common_vendor.normalizeStyle({
             "--status-bar-height": `${_ctx.u_s_b_h}px`
           })
         }),
-        e: common_vendor.o(handleTabClick, "70"),
+        e: common_vendor.o(handleTabClick, "e4"),
         f: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "2b"),
+        }, "b0"),
         g: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,

@@ -149,7 +149,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:222", "获取订单列表失败:", error);
+          common_vendor.index.__f__("error", "at pages/myOrder/myOrder.uvue:224", "获取订单列表失败:", error);
           orderList.value = [];
           common_vendor.index.showToast({
             title: "网络错误，请稍后重试",
@@ -159,7 +159,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     };
     const handleTabClick = (e) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:233", e);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:235", e);
       const index = e.index;
       current.value = index;
       isSearching.value = false;
@@ -188,7 +188,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     };
     const handleOrderClick = (order) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:267", order);
+      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:269", order);
       common_vendor.index.navigateTo({
         url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
       });
@@ -219,7 +219,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         var _a;
         const result = (_a = data.getString("result")) !== null && _a !== void 0 ? _a : "";
-        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:304", result);
+        common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:306", result);
         if (result.length > 0) {
           card_number.value = result;
           common_vendor.index.showToast({
@@ -228,12 +228,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           yield handleQuery();
         }
-      });
-    };
-    const handleFeedback = (order) => {
-      common_vendor.index.__f__("log", "at pages/myOrder/myOrder.uvue:318", "order", order);
-      common_vendor.index.navigateTo({
-        url: `/pages/questionFeedback/submit?rechargeNo=${order.rechargeNo || ""}&orderNo=${order.orderNo || ""}&pkgName=${order.pkgName || ""}`
       });
     };
     const handlePay = (order) => {
@@ -343,23 +337,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, order.cardNo ? {
             i: common_vendor.t(order.cardNo || "-")
           } : {}, {
-            j: order.id
-          }, order.id ? {
-            k: common_vendor.t(order.id || "-")
-          } : {}, {
-            l: common_vendor.t(order.createTime || "-"),
-            m: common_vendor.t(order.payCurrencyAmount || "0.00"),
-            n: order.status === "0"
+            j: common_vendor.t(order.createTime || "-"),
+            k: common_vendor.t(order.payCurrencyAmount || "0.00"),
+            l: order.status === "0"
           }, order.status === "0" ? {
-            o: common_vendor.o(($event) => {
+            m: common_vendor.o(($event) => {
               return handlePay(order);
             }, index)
           } : {}, {
-            p: common_vendor.o(($event) => {
-              return handleFeedback(order);
-            }, index),
-            q: index,
-            r: common_vendor.o(($event) => {
+            n: index,
+            o: common_vendor.o(($event) => {
               return handleOrderClick(order);
             }, index)
           });

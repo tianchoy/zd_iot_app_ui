@@ -13,12 +13,12 @@
 			<view class="capsule-item">
 				<view v-if="showCapsule" :class="{ 'capsule-text-action': !isIcon && rightActionBackgroundColor !== 'transparent' }" :style="!isIcon ? { backgroundColor: rightActionBackgroundColor } : {}" @click="emit('capsuleClick', 'menu')">
 					<rice-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></rice-icon>
-					<text v-else>{{rightText}}</text>
+					<text v-else :style="{ fontSize: rightTextFontSize }">{{rightText}}</text>
 				</view>
 			</view>
 		</view>
 	</view>
-	
+
 	<!-- 非固定定位模式（普通布局） -->
 	<template v-else>
 		<view :style="{ height: statusBarHeight + 'px', backgroundColor: backgroundColor }"></view>
@@ -33,7 +33,7 @@
 				<view class="capsule-item">
 					<view v-if="showCapsule" :class="{ 'capsule-text-action': !isIcon && rightActionBackgroundColor !== 'transparent' }" :style="!isIcon ? { backgroundColor: rightActionBackgroundColor } : {}" @click="emit('capsuleClick', 'menu')">
 						<rice-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></rice-icon>
-						<text v-else>{{rightText}}</text>
+						<text v-else :style="{ fontSize: rightTextFontSize }">{{rightText}}</text>
 					</view>
 				</view>
 			</view>
@@ -58,6 +58,7 @@ const props = defineProps({
 	Icon: { type: String, default: 'add-circle' },
 	rightText: { type: String, default: '' },
 	rightActionBackgroundColor: { type: String, default: 'transparent' },
+	rightTextFontSize: { type: String, default: '22rpx' },
 	isShowStyle: { type: Boolean, default: true },
 	iconColor: { type: String, default: '#606266' }
 });
@@ -166,13 +167,14 @@ onMounted(() => {
 	align-items: center;
 	justify-content: flex-end;
 	flex-shrink: 0;
-	width: 70rpx;
+	min-width: 70rpx;
 }
 
 .capsule-item {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	white-space: nowrap;
 }
 
 .capsule-text-action {

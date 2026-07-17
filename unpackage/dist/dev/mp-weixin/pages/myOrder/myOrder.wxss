@@ -141,7 +141,13 @@ page .container .order-list .orders-container .order-card .order-footer .pay-btn
   border-radius: 40rpx;
   font-weight: bold;
 }
-page .container .order-list .orders-container .order-card .order-footer .feedback-btn.data-v-87fe8731 {
+page .container .order-list .orders-container .order-card .feedback-row.data-v-87fe8731 {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-top: 20rpx;
+}
+page .container .order-list .orders-container .order-card .feedback-row .feedback-btn.data-v-87fe8731 {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   color: #16a34a;

@@ -195,16 +195,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 xcxCode: code.value
               })).then((loginRes) => {
                 if (loginRes.code == 200) {
-                  if (wxGetPhoneLogin.value == "0") {
-                    if (common_config.getToken()) {
-                      resolve(true);
-                    } else {
-                      resolve(false);
-                    }
-                  } else {
-                    common_config.setToken(loginRes.data.access_token, loginRes.data.refreshToken);
-                    resolve(true);
-                  }
+                  common_config.setToken(loginRes.data.access_token, loginRes.data.refreshToken);
+                  resolve(true);
                 } else {
                   resolve(false);
                 }
@@ -213,7 +205,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               });
             },
             fail: (err) => {
-              common_vendor.index.__f__("error", "at pages/card/card.uvue:269", "登录失败:", err);
+              common_vendor.index.__f__("error", "at pages/card/card.uvue:261", "登录失败:", err);
               resolve(false);
             }
           }));
@@ -246,18 +238,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return common_vendor.__awaiter(this, void 0, void 0, function* () {
         if (common_config.isWechat()) {
           yield getTenantInfos();
-          if (wxGetPhoneLogin.value == "0") {
+          if (wxGetPhoneLogin.value == "1") {
             cardList.value = [];
             cardCounts.value = [0, 0, 0];
             const loginSuccess = yield getCode();
             if (!loginSuccess) {
-              common_vendor.index.__f__("log", "at pages/card/card.uvue:313", "登录失败，跳过数据加载");
+              common_vendor.index.__f__("log", "at pages/card/card.uvue:304", "登录失败，跳过数据加载");
               common_vendor.index.showToast({
                 title: "登录失败，请先登录",
                 icon: "none"
               });
               return Promise.resolve(null);
             }
+          } else {
+            return Promise.resolve(null);
           }
         }
         yield loadCardData();

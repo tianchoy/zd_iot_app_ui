@@ -53,20 +53,22 @@
 							<text class="detail-label">卡号</text>
 							<text class="detail-value">{{ order.cardNo || '-' }}</text>
 						</view>
-						<view class="detail-row" v-if="order.id">
+						<!-- <view class="detail-row" v-if="order.id">
 							<text class="detail-label">订单Id</text>
 							<text class="detail-value">{{ order.id || '-' }}</text>
-						</view>
+						</view> -->
 						<view class="detail-row last">
 							<text class="detail-value">{{ order.createTime || '-' }}</text>
 							<view class="order-footer">
 								<text class="price">¥{{ order.payCurrencyAmount || '0.00' }}</text>
 								<view class="footer-actions">
 									<text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
-									<text class="feedback-btn" @click.stop="handleFeedback(order)">问题反馈</text>
 								</view>
 							</view>
 						</view>
+						<!-- <view class="feedback-row">
+							<text class="feedback-btn" @click.stop="handleFeedback(order)">问题反馈</text>
+						</view> -->
 					</view>
 					
 				</view>
@@ -495,6 +497,14 @@
 							border-radius: 40rpx;
 							font-weight: bold;
 						}
+
+					}
+
+					.feedback-row {
+						display: flex;
+						flex-direction: row;
+						justify-content: flex-end;
+						margin-top: 20rpx;
 
 						.feedback-btn {
 							background: #f0fdf4;

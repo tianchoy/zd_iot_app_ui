@@ -12,6 +12,7 @@
 					<text class="latest-reply-label">最新回复</text>
 					<text class="latest-reply-content">{{ item.replyContent }}</text>
 				</view>
+				<view class="order-no">接入号：{{ item.msisdn || '-' }}</view>
 				<view class="order-no">订单编号：{{ item.orderNo || '-' }}</view>
 				<view class="item-footer">
 					<text class="time">{{ item.createTime }}</text>
@@ -40,6 +41,7 @@
 		createTime: string,
 		userPhone: string,
 		imgOssUrl: string,
+		msisdn: string,
 		orderNo: string,
 		packageName: string,
 		replyContent: string

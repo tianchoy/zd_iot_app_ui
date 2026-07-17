@@ -25,6 +25,7 @@ class FeedbackItem extends common_vendor.UTS.UTSType {
           createTime: { type: String, optional: false },
           userPhone: { type: String, optional: false },
           imgOssUrl: { type: String, optional: false },
+          msisdn: { type: String, optional: false },
           orderNo: { type: String, optional: false },
           packageName: { type: String, optional: false },
           replyContent: { type: String, optional: false }
@@ -44,6 +45,7 @@ class FeedbackItem extends common_vendor.UTS.UTSType {
     this.createTime = this.__props__.createTime;
     this.userPhone = this.__props__.userPhone;
     this.imgOssUrl = this.__props__.imgOssUrl;
+    this.msisdn = this.__props__.msisdn;
     this.orderNo = this.__props__.orderNo;
     this.packageName = this.__props__.packageName;
     this.replyContent = this.__props__.replyContent;
@@ -91,7 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             common_vendor.index.showToast({ title: (_a = res.msg) !== null && _a !== void 0 ? _a : "查询失败", icon: "none" });
           }
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/questionFeedback/list.uvue:88", "查询反馈列表异常:", error);
+          common_vendor.index.__f__("error", "at pages/questionFeedback/list.uvue:90", "查询反馈列表异常:", error);
         } finally {
           loading.value = false;
         }
@@ -136,18 +138,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, item.replyContent ? {
             d: common_vendor.t(item.replyContent)
           } : {}, {
-            e: common_vendor.t(item.orderNo || "-"),
-            f: common_vendor.t(item.createTime),
-            g: "144c46a5-1-" + i0,
-            h: common_vendor.p({
+            e: common_vendor.t(item.msisdn || "-"),
+            f: common_vendor.t(item.orderNo || "-"),
+            g: common_vendor.t(item.createTime),
+            h: "144c46a5-1-" + i0,
+            i: common_vendor.p({
               type: getStatusType(item.status),
               text: getStatusText(item.status),
               size: "small",
               ["plain-fill"]: true,
               class: "data-v-144c46a5"
             }),
-            i: index,
-            j: common_vendor.o(($event) => {
+            j: index,
+            k: common_vendor.o(($event) => {
               return handleDetail(item.id);
             }, index)
           });

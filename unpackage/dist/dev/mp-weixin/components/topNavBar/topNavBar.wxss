@@ -35,12 +35,13 @@
 	align-items: center;
 	justify-content: flex-end;
 	flex-shrink: 0;
-	width: 70rpx;
+	min-width: 70rpx;
 }
 .capsule-item.data-v-83d0d8fa {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	white-space: nowrap;
 }
 .capsule-text-action.data-v-83d0d8fa {
 	border: 1px solid #bbf7d0;

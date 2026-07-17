@@ -1,7 +1,7 @@
 <template>
-<!-- <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" rightText="我的反馈" @capsuleClick="handleMyFeedback"></topNavBar>
- --> 
- <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" @capsuleClick="handleMyFeedback"></topNavBar>
+<topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" rightTextFontSize="26rpx" rightText="我的反馈" @capsuleClick="handleMyFeedback"></topNavBar>
+ 
+ <!-- <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" @capsuleClick="handleMyFeedback"></topNavBar> -->
  <view class="container">
   <view class="card-box">
    <rice-tabs
@@ -55,9 +55,11 @@
         <text class="price" v-if="order.payCurrencyAmount">¥{{ order.payCurrencyAmount }}</text>
         <view class="footer-actions">
          <text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
-         <text class="feedback-btn" @click.stop="handleFeedback(order)">问题反馈</text>
         </view>
        </view>
+      </view>
+      <view class="feedback-row">
+       <text class="feedback-btn" @click.stop="handleFeedback(order)">问题反馈</text>
       </view>
      </view>
 
@@ -371,6 +373,14 @@
 							border-radius: 40rpx;
 							font-weight: bold;
 						}
+
+					}
+
+					.feedback-row {
+						display: flex;
+						flex-direction: row;
+						justify-content: flex-end;
+						margin-top: 20rpx;
 
 						.feedback-btn {
 							background: #f0fdf4;

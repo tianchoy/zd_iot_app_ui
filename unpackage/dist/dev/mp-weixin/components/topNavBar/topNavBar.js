@@ -21,6 +21,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     Icon: { type: String, default: "add-circle" },
     rightText: { type: String, default: "" },
     rightActionBackgroundColor: { type: String, default: "transparent" },
+    rightTextFontSize: { type: String, default: "22rpx" },
     isShowStyle: { type: Boolean, default: true },
     iconColor: { type: String, default: "#606266" }
   },
@@ -66,7 +67,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           navBarHeight.value = navHeight > 0 ? navHeight : 44;
         }
       } catch (e) {
-        common_vendor.index.__f__("error", "at components/topNavBar/topNavBar.uvue:108", "获取导航栏信息失败", e);
+        common_vendor.index.__f__("error", "at components/topNavBar/topNavBar.uvue:109", "获取导航栏信息失败", e);
       }
     };
     const handleBack = () => {
@@ -114,67 +115,69 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-83d0d8fa"
         })
       } : {
-        o: common_vendor.t(__props.rightText)
+        o: common_vendor.t(__props.rightText),
+        p: __props.rightTextFontSize
       }, {
-        p: !__props.isIcon && __props.rightActionBackgroundColor !== "transparent" ? 1 : "",
-        q: common_vendor.s(!__props.isIcon ? {
+        q: !__props.isIcon && __props.rightActionBackgroundColor !== "transparent" ? 1 : "",
+        r: common_vendor.s(!__props.isIcon ? {
           backgroundColor: __props.rightActionBackgroundColor
         } : {}),
-        r: common_vendor.o(($event) => {
+        s: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
         }, "c1")
       }) : {}, {
-        s: common_vendor.s(navBarStyle.value),
-        t: common_vendor.s({
+        t: common_vendor.s(navBarStyle.value),
+        v: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`
         })
       }) : common_vendor.e({
-        v: common_vendor.unref(statusBarHeight) + "px",
-        w: __props.backgroundColor,
-        x: __props.showBack
+        w: common_vendor.unref(statusBarHeight) + "px",
+        x: __props.backgroundColor,
+        y: __props.showBack
       }, __props.showBack ? {
-        y: common_vendor.o(handleBack, "76"),
-        z: common_vendor.p({
+        z: common_vendor.o(handleBack, "39"),
+        A: common_vendor.p({
           name: "arrow-left",
           size: "40rpx",
           class: "icon data-v-83d0d8fa"
         })
       } : {}, {
-        A: __props.showBack ? "visible" : "hidden",
-        B: common_vendor.t(__props.title),
-        C: __props.textColor,
-        D: common_vendor.unref(navBarHeight) + "px",
-        E: __props.showCapsule
+        B: __props.showBack ? "visible" : "hidden",
+        C: common_vendor.t(__props.title),
+        D: __props.textColor,
+        E: common_vendor.unref(navBarHeight) + "px",
+        F: __props.showCapsule
       }, __props.showCapsule ? common_vendor.e({
-        F: __props.isIcon
+        G: __props.isIcon
       }, __props.isIcon ? {
-        G: common_vendor.p({
+        H: common_vendor.p({
           name: __props.Icon,
           size: "26",
           color: __props.iconColor,
           class: "data-v-83d0d8fa"
         })
       } : {
-        H: common_vendor.t(__props.rightText)
+        I: common_vendor.t(__props.rightText),
+        J: __props.rightTextFontSize
       }, {
-        I: !__props.isIcon && __props.rightActionBackgroundColor !== "transparent" ? 1 : "",
-        J: common_vendor.s(!__props.isIcon ? {
+        K: !__props.isIcon && __props.rightActionBackgroundColor !== "transparent" ? 1 : "",
+        L: common_vendor.s(!__props.isIcon ? {
           backgroundColor: __props.rightActionBackgroundColor
         } : {}),
-        K: common_vendor.o(($event) => {
+        M: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        }, "d3")
+        }, "b3")
       }) : {}, {
-        L: common_vendor.unref(navBarHeight) + "px",
-        M: __props.backgroundColor,
-        N: `${_ctx.u_s_b_h}px`
+        N: common_vendor.unref(navBarHeight) + "px",
+        O: __props.backgroundColor,
+        P: `${_ctx.u_s_b_h}px`
       }), {
-        O: __props.isShowStyle
+        Q: __props.isShowStyle
       }, __props.isShowStyle ? {
-        P: common_vendor.s({
+        R: common_vendor.s({
           height: totalNavHeight.value + "px"
         }),
-        Q: common_vendor.s({
+        S: common_vendor.s({
           "--status-bar-height": `${_ctx.u_s_b_h}px`
         })
       } : {});
