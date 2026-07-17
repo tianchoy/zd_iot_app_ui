@@ -6,7 +6,7 @@
 			<view class="search-value mt-24">
 				<rice-input
 					v-model="card_number"
-					placeholder="请输入卡号
+					placeholder="请输入卡号"
 					class="search-input"
 					@input="handleInput"
 				>
@@ -308,12 +308,9 @@ const platform = async () => {
 				})
 				return
 			}
+		}
+		if (checkToken()) {
 			await loadCardData()
-		}else{
-			//如果有 token 则加载数据
-			if (checkToken()) {
-				await loadCardData()
-			}
 		}
 	}
 }
