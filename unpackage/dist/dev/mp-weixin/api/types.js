@@ -452,7 +452,7 @@ class OrderListXcxItem extends common_vendor.UTS.UTSType {
         return {
           id: { type: Number, optional: false },
           orderNo: { type: String, optional: false },
-          cardNo: { type: String, optional: false },
+          rechargeNo: { type: String, optional: false },
           iccid: { type: String, optional: true },
           pkgName: { type: String, optional: false },
           createTime: { type: String, optional: false },
@@ -468,7 +468,7 @@ class OrderListXcxItem extends common_vendor.UTS.UTSType {
     this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
     this.id = this.__props__.id;
     this.orderNo = this.__props__.orderNo;
-    this.cardNo = this.__props__.cardNo;
+    this.rechargeNo = this.__props__.rechargeNo;
     this.iccid = this.__props__.iccid;
     this.pkgName = this.__props__.pkgName;
     this.createTime = this.__props__.createTime;
