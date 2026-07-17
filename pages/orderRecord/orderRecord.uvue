@@ -58,7 +58,7 @@
         </view>
        </view>
       </view>
-      <view class="feedback-row">
+      <view v-if="order.status === '1'" class="feedback-row">
        <text class="feedback-btn" @click.stop="handleFeedback(order)">问题反馈</text>
       </view>
      </view>
@@ -232,6 +232,13 @@
 
 	onLoad((options: UTSJSONObject) => {
 		rechargeNo.value = options['rechargeNo'] as string
+		if(!rechargeNo.value){
+			uni.showToast({
+			 title: `卡号为空！请确认`,
+			 icon: 'none'
+			})
+			return;
+		}
 		getOrderList('')
 	})
 

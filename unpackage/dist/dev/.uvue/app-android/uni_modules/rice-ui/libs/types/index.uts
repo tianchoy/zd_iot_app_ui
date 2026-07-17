@@ -1,2 +1,0 @@
-export type BeforeChangeInterceptor = () => Promise<boolean> | boolean;
-//# sourceMappingURL=index.uts.map
