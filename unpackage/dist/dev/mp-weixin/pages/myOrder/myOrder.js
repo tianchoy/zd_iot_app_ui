@@ -256,10 +256,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(handleBack, "fc"),
-        b: common_vendor.o(handleMyFeedback, "35"),
-        c: `${_ctx.u_s_b_h}px`,
-        d: common_vendor.p({
+        a: common_vendor.o(handleBack, "56"),
+        b: common_vendor.o(handleMyFeedback, "67"),
+        c: common_vendor.p({
           title: "我的订单",
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
@@ -268,34 +267,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isIcon: false,
           rightText: "我的反馈",
           rightActionBackgroundColor: "#f0fdf4",
-          class: "data-v-87fe8731",
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          class: "data-v-87fe8731"
         }),
-        e: card_number.value,
-        f: common_vendor.o(($event) => {
+        d: card_number.value,
+        e: common_vendor.o(($event) => {
           return card_number.value = $event.detail.value;
-        }, "38"),
-        g: common_vendor.o(scanCode, "88"),
-        h: common_vendor.p({
+        }, "ee"),
+        f: common_vendor.o(scanCode, "34"),
+        g: common_vendor.p({
           height: "100%",
           icon: "scan",
           class: "scan-btn data-v-87fe8731"
         }),
-        i: common_vendor.o(handleQuery, "ff"),
-        j: common_vendor.p({
+        h: common_vendor.o(handleQuery, "79"),
+        i: common_vendor.p({
           type: "primary",
           color: "#1989fa",
           textColor: "#ffffff",
           height: "100%",
           class: "data-v-87fe8731"
         }),
-        k: common_vendor.o(handleTabClick, "3c"),
-        l: common_vendor.o(($event) => {
+        j: common_vendor.o(handleTabClick, "86"),
+        k: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "d4"),
-        m: common_vendor.p({
+        }, "5f"),
+        l: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
           ["line-width"]: 0,
@@ -309,9 +305,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: current.value,
           class: "data-v-87fe8731"
         }),
-        n: orderList.value.length === 0
+        m: orderList.value.length === 0
       }, orderList.value.length === 0 ? {} : {
-        o: common_vendor.f(orderList.value, (order, index, i0) => {
+        n: common_vendor.f(orderList.value, (order, index, i0) => {
           return common_vendor.e({
             a: order.pkgName
           }, order.pkgName ? {
@@ -352,7 +348,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }, {
-        p: `${_ctx.u_s_b_h}px`
+        o: `${_ctx.u_s_b_h}px`,
+        p: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

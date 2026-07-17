@@ -1,2 +1,1 @@
 :host{display:flex;flex-direction:column}
-@import "/uvue.wxss";

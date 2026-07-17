@@ -58,6 +58,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
   const hasText = common_vendor.computed(() => {
     return props.text != null && props.text != "" || slot["default"] != null;
   });
+  common_vendor.computed(() => {
+    return props.mode;
+  });
   const rootClass = common_vendor.computed(() => {
     return [
       ns.b(""),
@@ -135,7 +138,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       r: common_vendor.s(_ctx.customStyle),
       s: common_vendor.s(_ctx.__cssVars()),
       t: common_vendor.s({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       })
     });
     return __returned__;

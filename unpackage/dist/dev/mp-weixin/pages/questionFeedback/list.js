@@ -115,22 +115,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(goBack, "a5"),
-        b: `${_ctx.u_s_b_h}px`,
-        c: common_vendor.p({
+        a: common_vendor.o(goBack, "f5"),
+        b: common_vendor.p({
           title: "我的反馈",
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
-          class: "data-v-144c46a5",
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          class: "data-v-144c46a5"
         }),
-        d: feedbackList.value.length > 0
+        c: feedbackList.value.length > 0
       }, feedbackList.value.length > 0 ? {
-        e: common_vendor.f(feedbackList.value, (item, index, i0) => {
+        d: common_vendor.f(feedbackList.value, (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.feedbackNo),
             b: common_vendor.t(item.feedbackContent || "-"),
@@ -156,8 +152,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       } : !loading.value ? {} : {}, {
-        f: !loading.value,
-        g: `${_ctx.u_s_b_h}px`
+        e: !loading.value,
+        f: `${_ctx.u_s_b_h}px`,
+        g: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

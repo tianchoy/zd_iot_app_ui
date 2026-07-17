@@ -82,7 +82,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       d: common_vendor.s(common_vendor.unref(iconStyle)),
       e: common_vendor.s(_ctx.customStyle),
       f: common_vendor.s({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
       g: common_vendor.o(iconClick, "3e")
     } : {
@@ -90,7 +91,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       i: common_vendor.s(common_vendor.unref(imageStyle)),
       j: common_vendor.s(_ctx.customStyle),
       k: common_vendor.s({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       }),
       l: common_vendor.o(iconClick, "02")
     });

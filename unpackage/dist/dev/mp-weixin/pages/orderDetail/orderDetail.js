@@ -460,7 +460,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(handleBack, "c1"),
+        a: common_vendor.o(handleBack, "d6"),
         b: common_vendor.p({
           title: "订单详情",
           ["show-back"]: true,
@@ -564,23 +564,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         O: d("status") === "0"
       }, d("status") === "0" ? {
         P: common_vendor.t(getDisplayAmount()),
-        Q: common_vendor.o(handleCountDownFinish, "fb"),
+        Q: common_vendor.o(handleCountDownFinish, "94"),
         R: common_vendor.p({
           time: getCurrentSeconds() * 1e3,
           ["font-size"]: "28rpx",
           color: "#f56c6c",
           class: "data-v-6ec85291"
         }),
-        S: common_vendor.o(choosePayment, "e2")
+        S: common_vendor.o(choosePayment, "a2")
       } : {}, {
         T: `${_ctx.u_s_b_h}px`,
-        U: common_vendor.sei("r0-6ec85291", "view", formContainer, {
+        U: `${_ctx.u_s_a_i_b}px`,
+        V: common_vendor.sei("r0-6ec85291", "view", formContainer, {
           "k": "formContainer"
         }),
-        V: `${_ctx.u_s_b_h}px`,
-        W: common_vendor.o(handleCancelPayment, "e5"),
-        X: common_vendor.o(handleConfirmPayment, "fc"),
-        Y: common_vendor.p({
+        W: `${_ctx.u_s_b_h}px`,
+        X: `${_ctx.u_s_a_i_b}px`,
+        Y: common_vendor.o(handleCancelPayment, "f8"),
+        Z: common_vendor.o(handleConfirmPayment, "fc"),
+        aa: common_vendor.p({
           amount: common_vendor.unref(currentPrice),
           cardNumber: ds("rechargeNo"),
           productName: ds("pkgName"),
@@ -590,18 +592,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           payMethod: d("payInfo"),
           class: "data-v-6ec85291"
         }),
-        Z: common_vendor.o(onPopupClose, "8c"),
-        aa: `${_ctx.u_s_b_h}px`,
-        ab: common_vendor.o(($event) => {
+        ab: common_vendor.o(onPopupClose, "70"),
+        ac: common_vendor.o(($event) => {
           return common_vendor.isRef(showPopup) ? showPopup.value = $event : null;
-        }, "2a"),
-        ac: common_vendor.p({
+        }, "7e"),
+        ad: common_vendor.p({
           position: "bottom",
           show: common_vendor.unref(showPopup),
-          class: "data-v-6ec85291",
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          class: "data-v-6ec85291"
         })
       });
       return __returned__;

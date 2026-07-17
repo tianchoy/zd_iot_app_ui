@@ -21,9 +21,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       "raw js";
       const __returned__ = {
         a: common_vendor.gei(_ctx, ""),
-        b: common_vendor.o(handleClick, "39"),
-        c: `${_ctx.u_s_b_h}px`,
-        d: common_vendor.p({
+        b: common_vendor.o(handleClick, "22"),
+        c: common_vendor.p({
           ["default-position"]: "bottom-right",
           icon: "chat-fill",
           width: "80rpx",
@@ -31,12 +30,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["icon-size"]: "50rpx",
           ["gap-bottom"]: "500rpx",
           ["gap-right"]: "20rpx",
-          id: common_vendor.gei(_ctx, ""),
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          id: common_vendor.gei(_ctx, "")
         }),
-        e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        d: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

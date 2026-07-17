@@ -1,5 +1,5 @@
+@import "../../uvue.wxss";
 :host{display:flex;flex-direction:column}
-@import "/uvue.wxss";
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -25,36 +25,36 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-page .page-container.data-v-144c46a5 {
+.page-container[class].data-v-144c46a5 {
   display: flex;
   flex-direction: column;
   min-height: 100%;
   background-color: #f5f7fa;
   padding-bottom: 48rpx;
 }
-page .feedback-list.data-v-144c46a5 {
+.feedback-list[class].data-v-144c46a5 {
   padding: 20rpx;
 }
-page .feedback-item.data-v-144c46a5 {
+.feedback-item[class].data-v-144c46a5 {
   margin-bottom: 20rpx;
   padding: 28rpx;
   border: 0;
   border-radius: 20rpx;
   background-color: #ffffff;
 }
-page .feedback-item .item-header.data-v-144c46a5 {
+.feedback-item .item-header[class].data-v-144c46a5 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16rpx;
 }
-page .feedback-item .item-header .feedback-no.data-v-144c46a5 {
+.feedback-item .item-header .feedback-no[class].data-v-144c46a5 {
   font-size: 26rpx;
   color: #303133;
   font-weight: 600;
 }
-page .feedback-item .item-content.data-v-144c46a5 {
+.feedback-item .item-content[class].data-v-144c46a5 {
   font-size: 28rpx;
   color: #303133;
   line-height: 1.6;
@@ -64,7 +64,7 @@ page .feedback-item .item-content.data-v-144c46a5 {
   -webkit-line-clamp: 2;
   overflow: hidden;
 }
-page .feedback-item .latest-reply.data-v-144c46a5 {
+.feedback-item .latest-reply[class].data-v-144c46a5 {
   display: flex;
   flex-direction: column;
   gap: 8rpx;
@@ -73,11 +73,11 @@ page .feedback-item .latest-reply.data-v-144c46a5 {
   border-radius: 16rpx;
   background-color: #f4f4f4;
 }
-page .feedback-item .latest-reply .latest-reply-label.data-v-144c46a5 {
+.feedback-item .latest-reply .latest-reply-label[class].data-v-144c46a5 {
   font-size: 24rpx;
   color: #909399;
 }
-page .feedback-item .latest-reply .latest-reply-content.data-v-144c46a5 {
+.feedback-item .latest-reply .latest-reply-content[class].data-v-144c46a5 {
   display: -webkit-box;
   overflow: hidden;
   color: #606266;
@@ -86,33 +86,33 @@ page .feedback-item .latest-reply .latest-reply-content.data-v-144c46a5 {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
-page .feedback-item .order-no.data-v-144c46a5 {
+.feedback-item .order-no[class].data-v-144c46a5 {
   margin-bottom: 20rpx;
   font-size: 26rpx;
   color: #606266;
 }
-page .feedback-item .item-footer.data-v-144c46a5 {
+.feedback-item .item-footer[class].data-v-144c46a5 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
-page .feedback-item .item-footer .time.data-v-144c46a5 {
+.feedback-item .item-footer .time[class].data-v-144c46a5 {
   font-size: 22rpx;
   color: #909399;
 }
-page .empty-state.data-v-144c46a5 {
+.empty-state[class].data-v-144c46a5 {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 120rpx 32rpx;
 }
-page .empty-state .empty-text.data-v-144c46a5 {
+.empty-state .empty-text[class].data-v-144c46a5 {
   font-size: 28rpx;
   color: #9ca3af;
 }
-page .loading-box.data-v-144c46a5 {
+.loading-box[class].data-v-144c46a5 {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -122,6 +122,6 @@ page .loading-box.data-v-144c46a5 {
   font-size: 16px;
   gap: 12px;
 }
-page .loading-box .el-icon.data-v-144c46a5 {
+.loading-box .el-icon[class].data-v-144c46a5 {
   font-size: 28px;
 }

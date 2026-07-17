@@ -1,5 +1,4 @@
 :host{display:flex;flex-direction:column}
-@import "/uvue.wxss";
 /**
  * 这里是uni-app内置的常用样式变量
  *

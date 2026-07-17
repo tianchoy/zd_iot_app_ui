@@ -308,11 +308,9 @@ const platform = async () => {
 				})
 				return
 			}
-		}else{
-			//如果有 token 则加载数据
-			if (checkToken()) {
-				await loadCardData()
-			}
+		}
+		if (checkToken()) {
+			await loadCardData()
 		}
 	}
 }

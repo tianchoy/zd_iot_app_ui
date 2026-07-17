@@ -92,18 +92,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         i: common_vendor.t((props == null ? void 0 : props.pkgType) == "1" ? "天" : "个月")
       } : {}, {
         j: common_vendor.t(common_vendor.unref(formattedAmount)),
-        k: common_vendor.o(handleCancel, "c7"),
+        k: common_vendor.o(handleCancel, "41"),
         l: common_vendor.p({
           class: "btn cancel-btn mr-24 data-v-0c94e3a5"
         }),
-        m: common_vendor.o(handleConfirm, "d6"),
+        m: common_vendor.o(handleConfirm, "90"),
         n: common_vendor.p({
           textColor: "#fff",
           class: "btn confirm-btn ml-24 data-v-0c94e3a5"
         }),
         o: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         p: `${_ctx.u_s_b_h}px`,
-        q: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        q: `${_ctx.u_s_a_i_b}px`,
+        r: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       });
       return __returned__;
     };

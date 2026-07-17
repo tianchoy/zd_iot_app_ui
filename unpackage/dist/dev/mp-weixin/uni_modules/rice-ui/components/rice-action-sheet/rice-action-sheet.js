@@ -203,26 +203,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       a: common_vendor.unref(showOverlay)
     }, common_vendor.unref(showOverlay) ? {
       b: common_vendor.o(overlayClick, "8f"),
-      c: `${_ctx.u_s_b_h}px`,
-      d: common_vendor.p({
+      c: common_vendor.p({
         show: show.value,
         ["z-index"]: _ctx.zIndex - 1,
         ["close-on-click-overlay"]: false,
         duration: _ctx.duration,
         ["bg-color"]: _ctx.overlayBgColor,
-        class: "data-v-36d96d8c",
-        style: common_vendor.normalizeStyle({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
-        })
+        class: "data-v-36d96d8c"
       })
     } : {}, {
-      e: common_vendor.unref(realShow)
+      d: common_vendor.unref(realShow)
     }, common_vendor.unref(realShow) ? common_vendor.e({
-      f: common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(props.title)
+      e: common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(props.title)
     }, common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(props.title) ? {
-      g: common_vendor.t(props.title)
+      f: common_vendor.t(props.title)
     } : {}, {
-      h: common_vendor.f(common_vendor.unref(actionsList), (item, index, i0) => {
+      g: common_vendor.f(common_vendor.unref(actionsList), (item, index, i0) => {
         return common_vendor.e({
           a: common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(item.icon)
         }, common_vendor.unref(uni_modules_riceUi_libs_utils_basic.hasStrValue)(item.icon) ? {
@@ -254,21 +250,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           }, `${item.name}${index}`)
         });
       }),
-      i: _ctx.showCancel
+      h: _ctx.showCancel
     }, _ctx.showCancel ? {} : {}, {
-      j: _ctx.showCancel
+      i: _ctx.showCancel
     }, _ctx.showCancel ? {
-      k: common_vendor.t(_ctx.cancelText),
-      l: common_vendor.o(cancel, "20")
+      j: common_vendor.t(_ctx.cancelText),
+      k: common_vendor.o(cancel, "20")
     } : {}, {
-      m: common_vendor.sei("r0-36d96d8c", "view", actionSheetRef, {
+      l: common_vendor.sei("r0-36d96d8c", "view", actionSheetRef, {
         "k": "actionSheetRef"
       }),
-      n: common_vendor.n(common_vendor.unref(actionSheetClass)),
-      o: common_vendor.s(common_vendor.unref(actionSheetStyle)),
-      p: common_vendor.s(_ctx.customStyle),
-      q: common_vendor.s({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`
+      m: common_vendor.n(common_vendor.unref(actionSheetClass)),
+      n: common_vendor.s(common_vendor.unref(actionSheetStyle)),
+      o: common_vendor.s(_ctx.customStyle),
+      p: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       })
     }) : {});
     return __returned__;

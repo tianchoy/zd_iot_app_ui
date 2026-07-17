@@ -570,20 +570,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
     "raw js";
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J;
     const __returned__ = common_vendor.e({
-      a: common_vendor.o(goBack, "f3"),
-      b: `${_ctx.u_s_b_h}px`,
-      c: common_vendor.p({
+      a: common_vendor.o(goBack, "29"),
+      b: common_vendor.p({
         title: "充值首页",
         ["show-back"]: showBack.value,
         backgroundColor: "#f4f7fb",
         textColor: "#333",
         showCapsule: false,
-        class: "data-v-722cdacb",
-        style: common_vendor.normalizeStyle({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
-        })
+        class: "data-v-722cdacb"
       }),
-      d: common_vendor.p({
+      c: common_vendor.p({
         text: ((_a = cardDetail.value) == null ? void 0 : _a.statusStr) || "未知",
         round: true,
         ["plain-fill"]: true,
@@ -591,46 +587,46 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         type: getOrderStatusType((_b = cardDetail.value) == null ? void 0 : _b.statusStr),
         class: "data-v-722cdacb"
       }),
-      e: (_c = cardDetail.value) == null ? void 0 : _c.rechargeNo
+      d: (_c = cardDetail.value) == null ? void 0 : _c.rechargeNo
     }, ((_d = cardDetail.value) == null ? void 0 : _d.rechargeNo) ? {
-      f: common_vendor.t(((_e = cardDetail.value) == null ? void 0 : _e.rechargeNo) || "未知")
+      e: common_vendor.t(((_e = cardDetail.value) == null ? void 0 : _e.rechargeNo) || "未知")
     } : {}, {
-      g: (_f = cardDetail.value) == null ? void 0 : _f.pkgName
+      f: (_f = cardDetail.value) == null ? void 0 : _f.pkgName
     }, ((_g = cardDetail.value) == null ? void 0 : _g.pkgName) ? {
-      h: common_vendor.t(((_h = cardDetail.value) == null ? void 0 : _h.pkgName) || "未知")
+      g: common_vendor.t(((_h = cardDetail.value) == null ? void 0 : _h.pkgName) || "未知")
     } : {}, {
-      i: (_i = cardDetail.value) == null ? void 0 : _i.effectiveTime
+      h: (_i = cardDetail.value) == null ? void 0 : _i.effectiveTime
     }, ((_j = cardDetail.value) == null ? void 0 : _j.effectiveTime) ? {
-      j: common_vendor.t((_k = cardDetail.value) == null ? void 0 : _k.effectiveTime)
+      i: common_vendor.t((_k = cardDetail.value) == null ? void 0 : _k.effectiveTime)
     } : {}, {
-      k: !((_l = cardDetail.value) == null ? void 0 : _l.expirationTime)
+      j: !((_l = cardDetail.value) == null ? void 0 : _l.expirationTime)
     }, !((_m = cardDetail.value) == null ? void 0 : _m.expirationTime) ? {
-      l: common_vendor.t((_n = cardDetail.value) == null ? void 0 : _n.effectiveTime)
+      k: common_vendor.t((_n = cardDetail.value) == null ? void 0 : _n.effectiveTime)
     } : {}, {
-      m: (_o = cardDetail.value) == null ? void 0 : _o.pkgFlow
+      l: (_o = cardDetail.value) == null ? void 0 : _o.pkgFlow
     }, ((_p = cardDetail.value) == null ? void 0 : _p.pkgFlow) ? {
-      n: common_vendor.t(((_q = cardDetail.value) == null ? void 0 : _q.usedFlow) || 0),
-      o: common_vendor.t(((_r = cardDetail.value) == null ? void 0 : _r.unUsedFlow) || 0),
-      p: common_vendor.t(((_s = cardDetail.value) == null ? void 0 : _s.pkgFlow) || 0),
-      q: common_vendor.p({
+      m: common_vendor.t(((_q = cardDetail.value) == null ? void 0 : _q.usedFlow) || 0),
+      n: common_vendor.t(((_r = cardDetail.value) == null ? void 0 : _r.unUsedFlow) || 0),
+      o: common_vendor.t(((_s = cardDetail.value) == null ? void 0 : _s.pkgFlow) || 0),
+      p: common_vendor.p({
         percentage: percentage.value,
         ["show-text"]: true,
         class: "data-v-722cdacb"
       })
     } : {}, {
-      r: common_vendor.o(toMyPackage, "c1"),
-      s: common_vendor.p({
+      q: common_vendor.o(toMyPackage, "c2"),
+      r: common_vendor.p({
         class: "btn mr-24 data-v-722cdacb"
       }),
-      t: common_vendor.o(toOrderRecord, "b5"),
-      v: common_vendor.p({
+      s: common_vendor.o(toOrderRecord, "4d"),
+      t: common_vendor.p({
         class: "btn data-v-722cdacb"
       }),
-      w: common_vendor.o(changeTab, "53"),
-      x: common_vendor.o(($event) => {
+      v: common_vendor.o(changeTab, "93"),
+      w: common_vendor.o(($event) => {
         return active.value = $event;
-      }, "07"),
-      y: common_vendor.p({
+      }, "bd"),
+      x: common_vendor.p({
         ["line-color"]: "#ffffff",
         list: tabs.value,
         ["line-width"]: 0,
@@ -644,9 +640,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         modelValue: active.value,
         class: "data-v-722cdacb"
       }),
-      z: active.value === 0
+      y: active.value === 0
     }, active.value === 0 ? common_vendor.e({
-      A: common_vendor.f(packageList.value, (item, index, i0) => {
+      z: common_vendor.f(packageList.value, (item, index, i0) => {
         return common_vendor.e({
           a: common_vendor.t(item.pkgName),
           b: item.tag
@@ -674,9 +670,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           }, item.pkgId || index)
         });
       }),
-      B: packageList.value.length == 0
+      A: packageList.value.length == 0
     }, packageList.value.length == 0 ? {} : {}) : common_vendor.e({
-      C: common_vendor.f(refillList.value, (item, index, i0) => {
+      B: common_vendor.f(refillList.value, (item, index, i0) => {
         return common_vendor.e({
           a: common_vendor.t(item.pkgName),
           b: item.tag
@@ -704,11 +700,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           }, item.pkgId || index)
         });
       }),
-      D: refillList.value.length == 0
+      C: refillList.value.length == 0
     }, refillList.value.length == 0 ? {} : {}), {
-      E: `${_ctx.u_s_b_h}px`,
-      F: common_vendor.o(handleCancelPayment, "a5"),
-      G: common_vendor.o(handleConfirmPayment, "30"),
+      D: `${_ctx.u_s_b_h}px`,
+      E: `${_ctx.u_s_a_i_b}px`,
+      F: common_vendor.o(handleCancelPayment, "a3"),
+      G: common_vendor.o(handleConfirmPayment, "63"),
       H: common_vendor.p({
         amount: currentPrice.value,
         cardNumber: (_t = cardDetail.value) == null ? void 0 : _t.rechargeNo,
@@ -719,69 +716,59 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         payMethod: (_y = cardDetail.value) == null ? void 0 : _y.objectMap.payInfo,
         class: "data-v-722cdacb"
       }),
-      I: common_vendor.o(onPopupClose, "7c"),
-      J: `${_ctx.u_s_b_h}px`,
-      K: common_vendor.o(($event) => {
+      I: common_vendor.o(onPopupClose, "64"),
+      J: common_vendor.o(($event) => {
         return showPopup.value = $event;
-      }, "7d"),
-      L: common_vendor.p({
+      }, "5c"),
+      K: common_vendor.p({
         position: "bottom",
         show: showPopup.value,
-        class: "data-v-722cdacb",
-        style: common_vendor.normalizeStyle({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
-        })
+        class: "data-v-722cdacb"
       }),
-      M: packageList.value.length > 0 || refillList.value.length > 0
+      L: packageList.value.length > 0 || refillList.value.length > 0
     }, packageList.value.length > 0 || refillList.value.length > 0 ? common_vendor.e({
-      N: showTips.value && ((_A = (_z = cardDetail.value) == null ? void 0 : _z.objectMap) == null ? void 0 : _A.rechargeTip)
+      M: showTips.value && ((_A = (_z = cardDetail.value) == null ? void 0 : _z.objectMap) == null ? void 0 : _A.rechargeTip)
     }, showTips.value && ((_C = (_B = cardDetail.value) == null ? void 0 : _B.objectMap) == null ? void 0 : _C.rechargeTip) ? {
-      O: common_vendor.t((_D = cardDetail.value) == null ? void 0 : _D.objectMap.rechargeTip),
-      P: common_vendor.p({
+      N: common_vendor.t((_D = cardDetail.value) == null ? void 0 : _D.objectMap.rechargeTip),
+      O: common_vendor.p({
         name: "clear",
         color: "#cbd5e1",
         size: "35rpx",
         class: "data-v-722cdacb"
       }),
-      Q: common_vendor.o(closeTips, "1f")
+      P: common_vendor.o(closeTips, "c1")
     } : {}, {
-      R: common_vendor.t(currentPrice.value),
-      S: common_vendor.o(choosePayment, "33"),
-      T: common_vendor.p({
+      Q: common_vendor.t(currentPrice.value),
+      R: common_vendor.o(choosePayment, "0f"),
+      S: common_vendor.p({
         type: "primary",
         width: "300rpx",
         height: "110rpx",
         class: "btn data-v-722cdacb"
       }),
-      U: `${_ctx.u_s_b_h}px`
+      T: `${_ctx.u_s_b_h}px`,
+      U: `${_ctx.u_s_a_i_b}px`
     }) : {}, {
       V: common_vendor.sei("r0-722cdacb", "view", formContainer, {
         "k": "formContainer"
       }),
       W: `${_ctx.u_s_b_h}px`,
-      X: common_vendor.o(handleConnectService, "c5"),
-      Y: `${_ctx.u_s_b_h}px`,
+      X: `${_ctx.u_s_a_i_b}px`,
+      Y: common_vendor.o(handleConnectService, "d0"),
       Z: common_vendor.p({
-        class: "data-v-722cdacb",
-        style: common_vendor.normalizeStyle({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
-        })
+        class: "data-v-722cdacb"
       }),
-      aa: common_vendor.o(_ctx.handleConnectTousu, "6a"),
-      ab: `${_ctx.u_s_b_h}px`,
-      ac: common_vendor.p({
-        class: "data-v-722cdacb",
-        style: common_vendor.normalizeStyle({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
-        })
+      aa: common_vendor.o(_ctx.handleConnectTousu, "80"),
+      ab: common_vendor.p({
+        class: "data-v-722cdacb"
       }),
-      ad: (_F = (_E = cardDetail.value) == null ? void 0 : _E.objectMap) == null ? void 0 : _F.serviceQrcode
+      ac: (_F = (_E = cardDetail.value) == null ? void 0 : _E.objectMap) == null ? void 0 : _F.serviceQrcode
     }, ((_H = (_G = cardDetail.value) == null ? void 0 : _G.objectMap) == null ? void 0 : _H.serviceQrcode) ? {
-      ae: (_J = (_I = cardDetail.value) == null ? void 0 : _I.objectMap) == null ? void 0 : _J.serviceQrcode
+      ad: (_J = (_I = cardDetail.value) == null ? void 0 : _I.objectMap) == null ? void 0 : _J.serviceQrcode
     } : {}, {
-      af: phoneList.value
+      ae: phoneList.value
     }, phoneList.value ? {
-      ag: common_vendor.f(phoneList.value, (phone, index, i0) => {
+      af: common_vendor.f(phoneList.value, (phone, index, i0) => {
         return {
           a: common_vendor.t(phone),
           b: common_vendor.o(($event) => {
@@ -791,7 +778,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
           d: index
         };
       }),
-      ah: common_vendor.p({
+      ag: common_vendor.p({
         type: "primary",
         icon: "phone-call",
         text: "拨打电话",
@@ -800,17 +787,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
         class: "data-v-722cdacb"
       })
     } : {}, {
-      ai: `${_ctx.u_s_b_h}px`,
-      aj: common_vendor.o(($event) => {
+      ah: common_vendor.o(($event) => {
         return showCustomService.value = $event;
-      }, "f2"),
-      ak: common_vendor.p({
+      }, "e5"),
+      ai: common_vendor.p({
         position: "bottom",
         show: showCustomService.value,
-        class: "data-v-722cdacb",
-        style: common_vendor.normalizeStyle({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`
-        })
+        class: "data-v-722cdacb"
       })
     });
     return __returned__;

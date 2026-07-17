@@ -38,7 +38,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = {
         a: common_vendor.sei(common_vendor.gei(_ctx, ""), "view"),
         b: `${_ctx.u_s_b_h}px`,
-        c: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        c: `${_ctx.u_s_a_i_b}px`,
+        d: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };

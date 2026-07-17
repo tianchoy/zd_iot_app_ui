@@ -73,7 +73,7 @@ function padZero(number, len = 2) {
   const num = typeof number == "number" ? number.toString() : number;
   return num.padStart(len, "0");
 }
-let SplitCssPropertyResult$1 = class SplitCssPropertyResult extends common_vendor.UTS.UTSType {
+class SplitCssPropertyResult extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -93,11 +93,11 @@ let SplitCssPropertyResult$1 = class SplitCssPropertyResult extends common_vendo
     this.rectCssProperty = this.__props__.rectCssProperty;
     delete this.__props__;
   }
-};
+}
 const isPromise = (val = null) => {
   return val && typeof val == "object" && typeof val["then"] == "function" && typeof val["catch"] == "function";
 };
-let InterceptorOption$1 = class InterceptorOption extends common_vendor.UTS.UTSType {
+class InterceptorOption extends common_vendor.UTS.UTSType {
   static get$UTSMetadata$() {
     return {
       kind: 2,
@@ -125,7 +125,7 @@ let InterceptorOption$1 = class InterceptorOption extends common_vendor.UTS.UTST
     this.complete = this.__props__.complete;
     delete this.__props__;
   }
-};
+}
 function callInterceptor(interceptor, interceptorOption) {
   const done = interceptorOption.done, canceled = interceptorOption.canceled, error = interceptorOption.error, undone = interceptorOption.undone, complete = interceptorOption.complete;
   const returnVal = interceptor();
@@ -164,57 +164,7 @@ function callInterceptor(interceptor, interceptorOption) {
       complete();
   }
 }
-class SplitCssPropertyResult2 extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          textCssProperty: { type: "Unknown", optional: false },
-          rectCssProperty: { type: "Unknown", optional: false }
-        };
-      },
-      name: "SplitCssPropertyResult"
-    };
-  }
-  constructor(options, metadata = SplitCssPropertyResult2.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.textCssProperty = this.__props__.textCssProperty;
-    this.rectCssProperty = this.__props__.rectCssProperty;
-    delete this.__props__;
-  }
-}
-class InterceptorOption2 extends common_vendor.UTS.UTSType {
-  static get$UTSMetadata$() {
-    return {
-      kind: 2,
-      get fields() {
-        return {
-          done: { type: "Unknown", optional: false },
-          args: { type: common_vendor.UTS.UTSType.withGenerics(Array, ["Any"]), optional: true },
-          canceled: { type: "Unknown", optional: true },
-          error: { type: "Unknown", optional: true },
-          undone: { type: "Unknown", optional: true },
-          complete: { type: "Unknown", optional: true }
-        };
-      },
-      name: "InterceptorOption"
-    };
-  }
-  constructor(options, metadata = InterceptorOption2.get$UTSMetadata$(), isJSONParse = false) {
-    super();
-    this.__props__ = common_vendor.UTS.UTSType.initProps(options, metadata, isJSONParse);
-    this.done = this.__props__.done;
-    this.args = this.__props__.args;
-    this.canceled = this.__props__.canceled;
-    this.error = this.__props__.error;
-    this.undone = this.__props__.undone;
-    this.complete = this.__props__.complete;
-    delete this.__props__;
-  }
-}
-exports.InterceptorOption = InterceptorOption2;
+exports.InterceptorOption = InterceptorOption;
 exports.addUnit = addUnit;
 exports.callInterceptor = callInterceptor;
 exports.clamp = clamp;

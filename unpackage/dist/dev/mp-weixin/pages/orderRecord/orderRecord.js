@@ -168,10 +168,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(handleBack, "f0"),
-        b: common_vendor.o(handleMyFeedback, "99"),
-        c: `${_ctx.u_s_b_h}px`,
-        d: common_vendor.p({
+        a: common_vendor.o(handleBack, "1a"),
+        b: common_vendor.o(handleMyFeedback, "ef"),
+        c: common_vendor.p({
           title: "我的订单",
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
@@ -180,16 +179,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isIcon: false,
           rightTextFontSize: "26rpx",
           rightText: "我的反馈",
-          class: "data-v-a151b594",
-          style: common_vendor.normalizeStyle({
-            "--status-bar-height": `${_ctx.u_s_b_h}px`
-          })
+          class: "data-v-a151b594"
         }),
-        e: common_vendor.o(handleTabClick, "e4"),
-        f: common_vendor.o(($event) => {
+        d: common_vendor.o(handleTabClick, "b3"),
+        e: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "b0"),
-        g: common_vendor.p({
+        }, "48"),
+        f: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
           ["line-width"]: 0,
@@ -203,9 +199,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: current.value,
           class: "data-v-a151b594"
         }),
-        h: orderList.value.length === 0
+        g: orderList.value.length === 0
       }, orderList.value.length === 0 ? {} : {
-        i: common_vendor.f(orderList.value, (order, index, i0) => {
+        h: common_vendor.f(orderList.value, (order, index, i0) => {
           return common_vendor.e({
             a: order.pkgName
           }, order.pkgName ? {
@@ -259,7 +255,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }, {
-        j: `${_ctx.u_s_b_h}px`
+        i: `${_ctx.u_s_b_h}px`,
+        j: `${_ctx.u_s_a_i_b}px`
       });
       return __returned__;
     };

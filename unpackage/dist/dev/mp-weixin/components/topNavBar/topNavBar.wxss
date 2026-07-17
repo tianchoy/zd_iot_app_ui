@@ -1,5 +1,5 @@
 :host{display:flex;flex-direction:column}
-@import "/uvue.wxss";
+
 .navbar.data-v-83d0d8fa {
 	display: flex;
 	flex-direction: row;
@@ -56,24 +56,3 @@
 	width: 40rpx;
 	height: 40rpx;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -281,7 +281,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       m: common_vendor.s(common_vendor.unref(tabsStyle)),
       n: common_vendor.s(_ctx.customStyle),
       o: common_vendor.s({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`
+        "--status-bar-height": `${_ctx.u_s_b_h}px`,
+        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
       })
     });
     return __returned__;
