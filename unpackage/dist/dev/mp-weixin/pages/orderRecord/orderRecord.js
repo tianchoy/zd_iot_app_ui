@@ -227,9 +227,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, order.orderNo ? {
             g: common_vendor.t(order.orderNo)
           } : {}, {
-            h: order.rechargeNo
-          }, order.rechargeNo ? {
-            i: common_vendor.t(order.rechargeNo)
+            h: order.cardNo
+          }, order.cardNo ? {
+            i: common_vendor.t(order.cardNo)
           } : {}, {
             j: order.iccid
           }, order.iccid ? {
@@ -249,14 +249,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               return handlePay(order);
             }, index)
           } : {}, {
-            r: order.status === "1"
-          }, order.status === "1" ? {
-            s: common_vendor.o(($event) => {
+            r: common_vendor.o(($event) => {
               return handleFeedback(order);
-            }, index)
-          } : {}, {
-            t: index,
-            v: common_vendor.o(($event) => {
+            }, index),
+            s: index,
+            t: common_vendor.o(($event) => {
               return handleOrderClick(order);
             }, index)
           });

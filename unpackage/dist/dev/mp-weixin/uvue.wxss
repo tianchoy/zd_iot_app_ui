@@ -16,9 +16,7 @@ button,
 camera,
 canvas,
 checkbox-group,
-
 checkbox,
-
 cover-image,
 cover-view,
 custom-tab-bar,
@@ -44,9 +42,7 @@ picker-view,
 picker,
 progress,
 radio-group,
-
-radio, 
-
+radio,
 rich-text,
 scroll-view,
 slider,
@@ -209,5 +205,4 @@ radio .wx-radio-wrapper {
 radio .wx-radio-wrapper {
   flex: 1;
 }
-
 

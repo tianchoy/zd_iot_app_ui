@@ -407,10 +407,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       } : {}) : {}, {
         F: activeName.value == "卡片套餐"
       }, activeName.value == "卡片套餐" ? common_vendor.e({
-        G: common_vendor.o(handleClick, "a9"),
+        G: common_vendor.o(handleClick, "3d"),
         H: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "74"),
+        }, "69"),
         I: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: pkgTabs.value,
@@ -501,7 +501,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }) : {}, {
         O: ((_K = cardDetail.value) == null ? void 0 : _K.isBind) || isBinded.value
       }, ((_L = cardDetail.value) == null ? void 0 : _L.isBind) || isBinded.value ? {
-        P: common_vendor.o(handleUnbind, "39"),
+        P: common_vendor.o(handleUnbind, "bc"),
         Q: common_vendor.p({
           type: "error",
           ["plain-fill"]: true,
@@ -524,7 +524,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       } : {
-        T: common_vendor.o(handleBindCard, "c8"),
+        T: common_vendor.o(handleBindCard, "f5"),
         U: common_vendor.p({
           height: "100rpx",
           bold: true,
@@ -534,7 +534,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "btn data-v-2bc48812"
         })
       }, {
-        V: common_vendor.o(handleRecharge, "b1"),
+        V: common_vendor.o(handleRecharge, "43"),
         W: common_vendor.p({
           height: "100rpx",
           type: "primary",

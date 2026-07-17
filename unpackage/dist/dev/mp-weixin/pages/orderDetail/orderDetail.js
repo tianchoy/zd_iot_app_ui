@@ -564,22 +564,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         O: d("status") === "0"
       }, d("status") === "0" ? {
         P: common_vendor.t(getDisplayAmount()),
-        Q: common_vendor.o(handleCountDownFinish, "d1"),
+        Q: common_vendor.o(handleCountDownFinish, "fb"),
         R: common_vendor.p({
           time: getCurrentSeconds() * 1e3,
           ["font-size"]: "28rpx",
           color: "#f56c6c",
           class: "data-v-6ec85291"
         }),
-        S: common_vendor.o(choosePayment, "2b")
+        S: common_vendor.o(choosePayment, "e2")
       } : {}, {
         T: `${_ctx.u_s_b_h}px`,
         U: common_vendor.sei("r0-6ec85291", "view", formContainer, {
           "k": "formContainer"
         }),
         V: `${_ctx.u_s_b_h}px`,
-        W: common_vendor.o(handleCancelPayment, "66"),
-        X: common_vendor.o(handleConfirmPayment, "d2"),
+        W: common_vendor.o(handleCancelPayment, "e5"),
+        X: common_vendor.o(handleConfirmPayment, "fc"),
         Y: common_vendor.p({
           amount: common_vendor.unref(currentPrice),
           cardNumber: ds("rechargeNo"),
@@ -590,11 +590,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           payMethod: d("payInfo"),
           class: "data-v-6ec85291"
         }),
-        Z: common_vendor.o(onPopupClose, "fe"),
+        Z: common_vendor.o(onPopupClose, "8c"),
         aa: `${_ctx.u_s_b_h}px`,
         ab: common_vendor.o(($event) => {
           return common_vendor.isRef(showPopup) ? showPopup.value = $event : null;
-        }, "ff"),
+        }, "2a"),
         ac: common_vendor.p({
           position: "bottom",
           show: common_vendor.unref(showPopup),

@@ -156,7 +156,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         j: feedbackContent.value,
         k: common_vendor.o(($event) => {
           return feedbackContent.value = $event.detail.value;
-        }, "5d"),
+        }, "00"),
         l: common_vendor.f(images.value, (img, index, i0) => {
           return {
             a: img,
@@ -171,13 +171,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         m: images.value.length < 3
       }, images.value.length < 3 ? {
-        n: common_vendor.o(chooseImage, "61")
+        n: common_vendor.o(chooseImage, "10")
       } : {}, {
         o: userPhone.value,
         p: common_vendor.o(($event) => {
           return userPhone.value = $event.detail.value;
-        }, "0c"),
-        q: common_vendor.o(handleSubmit, "0f"),
+        }, "bd"),
+        q: common_vendor.o(handleSubmit, "b4"),
         r: common_vendor.p({
           type: "primary",
           text: "提交",

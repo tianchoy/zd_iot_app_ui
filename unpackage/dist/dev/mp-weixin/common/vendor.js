@@ -7900,7 +7900,7 @@ function populateParameters(fromRes, toRes) {
   let _SDKVersion = SDKVersion;
   const hostLanguage = (language || "").replace(/_/g, "-");
   const parameters = {
-    appId: "__UNI__1E9055A",
+    appId: "__UNI__A16A3FC",
     appName: "zd_iot_app",
     appVersion: "1.0.0",
     appVersionCode: "100",
@@ -8051,7 +8051,7 @@ const getAppBaseInfo = {
     let _hostName = getHostName(fromRes);
     let hostLanguage = (language || "").replace(/_/g, "-");
     const parameters = {
-      appId: "__UNI__1E9055A",
+      appId: "__UNI__A16A3FC",
       appName: "zd_iot_app",
       appVersion: "1.0.0",
       appVersionCode: "100",
@@ -8904,7 +8904,7 @@ function isConsoleWritable() {
 function initRuntimeSocketService() {
   const hosts = "192.168.248.1,192.168.163.1,10.147.20.3,192.168.1.222,127.0.0.1";
   const port = "8090";
-  const id = "mp-weixin_ksZGts";
+  const id = "mp-weixin_9dgJnR";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();

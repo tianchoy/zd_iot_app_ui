@@ -101,7 +101,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               return true;
             } else {
               common_vendor.index.showToast({
-                title: "卡号效",
+                title: "充值号无效",
                 icon: "none"
               });
               return false;
@@ -115,7 +115,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         } catch (error) {
           common_vendor.index.showToast({
-            title: error.msg || "卡号无效",
+            title: error.msg || "充值号无效",
             icon: "none"
           });
           return false;
@@ -127,7 +127,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const keyword = card_number.value.trim();
         if (!keyword) {
           common_vendor.index.showToast({
-            title: "请输入卡号",
+            title: "请输入充值号",
             icon: "none"
           });
           return Promise.resolve(null);
@@ -297,22 +297,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             "--status-bar-height": `${_ctx.u_s_b_h}px`
           })
         }),
-        c: common_vendor.o(handleInput, "b9"),
+        c: common_vendor.o(handleInput, "cf"),
         d: common_vendor.o(($event) => {
           return card_number.value = $event;
         }, "63"),
         e: common_vendor.p({
-          placeholder: "请输入卡号",
+          placeholder: "请输入充值号",
           modelValue: card_number.value,
           class: "search-input data-v-a89086b7"
         }),
-        f: common_vendor.o(scanCode, "67"),
+        f: common_vendor.o(scanCode, "7d"),
         g: common_vendor.p({
           height: "100%",
           icon: "scan",
           class: "scan-btn data-v-a89086b7"
         }),
-        h: common_vendor.o(handleQuery, "c6"),
+        h: common_vendor.o(handleQuery, "54"),
         i: common_vendor.p({
           type: "primary",
           color: "#1989fa",
@@ -320,10 +320,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "100%",
           class: "data-v-a89086b7"
         }),
-        j: common_vendor.o(handleClick, "12"),
+        j: common_vendor.o(handleClick, "43"),
         k: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "e3"),
+        }, "78"),
         l: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
@@ -393,7 +393,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         p: cardList.value.length === 0
       }, cardList.value.length === 0 ? {} : {}, {
-        q: common_vendor.o(_ctx.handleConnectTousu, "43"),
+        q: common_vendor.o(_ctx.handleConnectTousu, "3c"),
         r: common_vendor.p({
           class: "data-v-a89086b7"
         }),
