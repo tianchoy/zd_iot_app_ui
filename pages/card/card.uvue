@@ -309,12 +309,12 @@ const platform = async () => {
 				return
 			}
 		}else{
-			return 
+			//如果有 token 则加载数据
+			if (checkToken()) {
+				await loadCardData()
+			}
 		}
 	}
-
-	// 2. 登录完成后（或已有token），再请求数据
-	await loadCardData()
 }
 
 const handleClick = (e: UTSJSONObject) => {
