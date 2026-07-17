@@ -13,7 +13,7 @@
 		<view class="card-container">
 			<!-- 卡号 -->
 			<view class="info-row" v-if="d('rechargeNo')">
-				<text class="label">充值号</text>
+				<text class="label">卡号</text>
 				<text class="value">{{ d('rechargeNo') }}</text>
 			</view>
 

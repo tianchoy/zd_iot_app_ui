@@ -13,11 +13,11 @@
 			<!-- 卡号查询卡片 -->
 			<view class="card-box">
 				<view class="card-label">卡号查询</view>
-				<view class="search-tips">请输入充值号,或点击输入框右侧扫描图标识别卡号</view>
+				<view class="search-tips">请输入卡号,或点击输入框右侧扫描图标识别卡号</view>
 				<view class="search-value">
 					<input
 						v-model="cardNumber"
-						placeholder="请输入充值号,或扫描图标识别卡号"
+						placeholder="请输入卡号,或扫描图标识别卡号"
 						class="search-input"
 					/>
 					<view class="scan-btn" @click="handleScan">
@@ -132,7 +132,7 @@
 					return true
 				} else {
 					uni.showToast({
-						title: '充值号无效',
+						title: '卡号无效',
 						icon: 'none'
 					})
 					return false
@@ -146,7 +146,7 @@
 			}
 		} catch (error) {
 			uni.showToast({
-				title: error.msg || '充值号无效',
+				title: error.msg || '卡号无效',
 				icon: 'none'
 			})
 			return false
@@ -164,7 +164,7 @@
 	const handleQuery = async () => {
 		if (!cardNumber.value) {
 			uni.showToast({
-				title: '请输入充值号',
+				title: '请输入卡号',
 				icon: 'none'
 			})
 			return

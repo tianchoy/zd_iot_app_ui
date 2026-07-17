@@ -1,9 +1,0 @@
-{
-  "navigationBarTitleText": "",
-  "usingComponents": {
-    "top-nav-bar": "../../components/topNavBar/topNavBar",
-    "rice-icon": "../../uni_modules/rice-ui/components/rice-icon/rice-icon",
-    "rice-popup": "../../uni_modules/rice-ui/components/rice-popup/rice-popup",
-    "search-select": "../../components/selectCountry"
-  }
-}

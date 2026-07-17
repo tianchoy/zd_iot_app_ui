@@ -15,7 +15,7 @@
 					></rice-tag>
 				</view>
 				<view class="card-number-row" v-if="d('rechargeNo')">
-					<text class="card-number-label">充值号：</text>
+					<text class="card-number-label">卡号：</text>
 					<text class="card-number">{{ d('rechargeNo') }}</text>
 				</view>
 			</view>

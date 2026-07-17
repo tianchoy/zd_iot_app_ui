@@ -5,7 +5,7 @@
 			<text class="info-title">确认支付信息</text>
 
 			<view class="info-item" v-if="props.cardNumber">
-				<text class="item-label">充值号</text>
+				<text class="item-label">卡号/text>
 				<text class="item-value">{{ props.cardNumber }}</text>
 			</view>
 

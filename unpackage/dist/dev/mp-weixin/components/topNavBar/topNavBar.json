@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "rice-icon": "../../uni_modules/rice-ui/components/rice-icon/rice-icon"
-  }
-}

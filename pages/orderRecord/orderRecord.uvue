@@ -41,9 +41,9 @@
        <text class="detail-label">订单号</text>
        <text class="detail-value">{{ order.orderNo }}</text>
       </view>
-      <view class="detail-row" v-if="order.cardNo">
+      <view class="detail-row" v-if="order.rechargeNo">
        <text class="detail-label">卡号</text>
-       <text class="detail-value">{{ order.cardNo }}</text>
+       <text class="detail-value">{{ order.rechargeNo }}</text>
       </view>
       <view class="detail-row" v-if="order.iccid">
        <text class="detail-label">ICCID</text>
@@ -58,7 +58,7 @@
         </view>
        </view>
       </view>
-      <view class="feedback-row">
+      <view v-if="order.status === '1'" class="feedback-row">
        <text class="feedback-btn" @click.stop="handleFeedback(order)">问题反馈</text>
       </view>
      </view>

@@ -6,7 +6,7 @@
 			<view class="search-value mt-24">
 				<rice-input
 					v-model="card_number"
-					placeholder="请输入充值号"
+					placeholder="请输入卡号
 					class="search-input"
 					@input="handleInput"
 				>
@@ -154,7 +154,7 @@ const CardVerify = async (id: string): Promise<boolean> => {
 				return true
 			} else {
 				uni.showToast({
-					title: '充值号无效',
+					title: '卡号效',
 					icon: 'none'
 				})
 				return false
@@ -168,7 +168,7 @@ const CardVerify = async (id: string): Promise<boolean> => {
 		}
 	} catch (error) {
 		uni.showToast({
-			title: error.msg || '充值号无效',
+			title: error.msg || '卡号无效',
 			icon: 'none'
 		})
 		return false
@@ -179,7 +179,7 @@ const handleQuery = async () => {
 	const keyword = card_number.value.trim()
 	if (!keyword) {
 		uni.showToast({
-			title: '请输入充值号',
+			title: '请输入卡号',
 			icon: 'none'
 		})
 		return

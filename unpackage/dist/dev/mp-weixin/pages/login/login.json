@@ -1,9 +1,0 @@
-{
-  "navigationBarTitleText": "",
-  "usingComponents": {
-    "top-nav-bar": "../../components/topNavBar/topNavBar",
-    "rice-checkbox": "../../uni_modules/rice-ui/components/rice-checkbox/rice-checkbox",
-    "rice-divider": "../../uni_modules/rice-ui/components/rice-divider/rice-divider",
-    "rice-dialog": "../../uni_modules/rice-ui/components/rice-dialog/rice-dialog"
-  }
-}
