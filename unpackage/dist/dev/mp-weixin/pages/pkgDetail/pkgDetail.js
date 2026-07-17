@@ -77,16 +77,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(handleBack, "56"),
-        b: common_vendor.p({
+        a: common_vendor.o(handleBack, "fc"),
+        b: `${_ctx.u_s_b_h}px`,
+        c: common_vendor.p({
           title: "套餐详情",
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
-          class: "data-v-36efee10"
+          class: "data-v-36efee10",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        c: common_vendor.p({
+        d: common_vendor.p({
           customStyle: {
             height: "100rpx",
             width: "100rpx",
@@ -97,22 +101,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           class: "data-v-36efee10"
         }),
-        d: common_vendor.o(($event) => {
+        e: `${_ctx.u_s_b_h}px`,
+        f: common_vendor.o(($event) => {
           return showLoading.value = $event;
-        }, "1a"),
-        e: common_vendor.p({
+        }, "f8"),
+        g: common_vendor.p({
           mode: "snow",
           ["bg-color"]: "rgba(255, 255, 255, 0.4)",
           show: showLoading.value,
-          class: "data-v-36efee10"
+          class: "data-v-36efee10",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        f: d("pkgName")
+        h: d("pkgName")
       }, d("pkgName") ? {
-        g: common_vendor.t(d("pkgName"))
+        i: common_vendor.t(d("pkgName"))
       } : {}, {
-        h: d("status")
+        j: d("status")
       }, d("status") ? {
-        i: common_vendor.p({
+        k: common_vendor.p({
           text: d("status"),
           round: true,
           ["plain-fill"]: true,
@@ -121,55 +129,54 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-36efee10"
         })
       } : {}, {
-        j: d("rechargeNo")
+        l: d("rechargeNo")
       }, d("rechargeNo") ? {
-        k: common_vendor.t(d("rechargeNo"))
+        m: common_vendor.t(d("rechargeNo"))
       } : {}, {
-        l: d("usedFlow") != null && d("unUsedFlow") != null
+        n: d("usedFlow") != null && d("unUsedFlow") != null
       }, d("usedFlow") != null && d("unUsedFlow") != null ? {
-        m: common_vendor.t(d("usedFlow")),
-        n: common_vendor.t(d("unUsedFlow")),
-        o: common_vendor.p({
+        o: common_vendor.t(d("usedFlow")),
+        p: common_vendor.t(d("unUsedFlow")),
+        q: common_vendor.p({
           percentage: flowPercentage.value,
           ["show-text"]: true,
           class: "data-v-36efee10"
         })
       } : {}, {
-        p: d("pkgFlow")
+        r: d("pkgFlow")
       }, d("pkgFlow") ? {
-        q: common_vendor.t(d("pkgFlow"))
+        s: common_vendor.t(d("pkgFlow"))
       } : {}, {
-        r: d("startDate")
+        t: d("startDate")
       }, d("startDate") ? {
-        s: common_vendor.t(d("startDate"))
+        v: common_vendor.t(d("startDate"))
       } : {}, {
-        t: d("validityPeriod")
+        w: d("validityPeriod")
       }, d("validityPeriod") ? {
-        v: common_vendor.t(d("validityPeriod")),
-        w: common_vendor.t(d("pkgType") == "1" ? "天" : "个月")
+        x: common_vendor.t(d("validityPeriod")),
+        y: common_vendor.t(d("pkgType") == "1" ? "天" : "个月")
       } : {}, {
-        x: d("endDate")
+        z: d("endDate")
       }, d("endDate") ? {
-        y: common_vendor.t(d("endDate"))
+        A: common_vendor.t(d("endDate"))
       } : {}, {
-        z: d("orderNo")
+        B: d("orderNo")
       }, d("orderNo") ? {
-        A: common_vendor.t(d("orderNo"))
+        C: common_vendor.t(d("orderNo"))
       } : {}, {
-        B: d("orderStatus")
+        D: d("orderStatus")
       }, d("orderStatus") ? {
-        C: common_vendor.t(d("orderStatus"))
+        E: common_vendor.t(d("orderStatus"))
       } : {}, {
-        D: d("payAmount")
+        F: d("payAmount")
       }, d("payAmount") ? {
-        E: common_vendor.t(d("payAmount"))
+        G: common_vendor.t(d("payAmount"))
       } : {}, {
-        F: d("orderCreateTime")
+        H: d("orderCreateTime")
       }, d("orderCreateTime") ? {
-        G: common_vendor.t(d("orderCreateTime"))
+        I: common_vendor.t(d("orderCreateTime"))
       } : {}, {
-        H: `${_ctx.u_s_b_h}px`,
-        I: `${_ctx.u_s_a_i_b}px`
+        J: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

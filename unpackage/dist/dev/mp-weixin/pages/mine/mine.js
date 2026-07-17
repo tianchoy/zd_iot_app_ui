@@ -144,48 +144,51 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.p({
+        a: `${_ctx.u_s_b_h}px`,
+        b: common_vendor.p({
           title: "我的",
           ["show-back"]: false,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
-          class: "data-v-284ae985"
+          class: "data-v-284ae985",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        b: common_vendor.t(cardListSum.value.all != null ? cardListSum.value.all : 0),
-        c: common_vendor.t(cardListSum.value.inUse != null ? cardListSum.value.inUse : 0),
-        d: common_vendor.t(cardListSum.value.inNotUse != null ? cardListSum.value.inNotUse : 0),
-        e: common_vendor.p({
+        c: common_vendor.t(cardListSum.value.all != null ? cardListSum.value.all : 0),
+        d: common_vendor.t(cardListSum.value.inUse != null ? cardListSum.value.inUse : 0),
+        e: common_vendor.t(cardListSum.value.inNotUse != null ? cardListSum.value.inNotUse : 0),
+        f: common_vendor.p({
           name: "arrow-right",
           size: "20rpx",
           class: "data-v-284ae985"
         }),
-        f: common_vendor.o(toOrder, "3f")
+        g: common_vendor.o(toOrder, "d4")
       }, {}, {}, {
-        i: isWechatEnv.value
+        j: isWechatEnv.value
       }, isWechatEnv.value ? common_vendor.e({
-        j: isLoginState.value
+        k: isLoginState.value
       }, isLoginState.value ? {
-        k: common_vendor.o(handleLogin, "37"),
-        l: common_vendor.p({
+        l: common_vendor.o(handleLogin, "60"),
+        m: common_vendor.p({
           type: "primary",
           width: "100%",
           shape: "round",
           class: "data-v-284ae985"
         })
       } : common_vendor.unref(common_config.getStorageSync)("usePhoneNumber") ? {
-        n: common_vendor.o(handleLogout, "06"),
-        o: common_vendor.p({
+        o: common_vendor.o(handleLogout, "16"),
+        p: common_vendor.p({
           type: "error",
           width: "100%",
           shape: "round",
           class: "data-v-284ae985"
         })
       } : {}, {
-        m: common_vendor.unref(common_config.getStorageSync)("usePhoneNumber")
+        n: common_vendor.unref(common_config.getStorageSync)("usePhoneNumber")
       }) : {}, {
-        p: `${_ctx.u_s_b_h}px`,
-        q: `${_ctx.u_s_a_i_b}px`
+        q: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

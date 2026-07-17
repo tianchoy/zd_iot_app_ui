@@ -1,5 +1,5 @@
-@import "../../uvue.wxss";
 :host{display:flex;flex-direction:column}
+@import "/uvue.wxss";
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -25,14 +25,14 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.page-container[class].data-v-3bd4e23f {
+page .page-container.data-v-3bd4e23f {
   display: flex;
   flex-direction: column;
   min-height: 100%;
   background-color: #f5f7fa;
   padding-bottom: 48rpx;
 }
-.info-card[class].data-v-3bd4e23f {
+page .info-card.data-v-3bd4e23f {
   background-color: #ffffff;
   margin: 20rpx;
   margin-bottom: 0;
@@ -40,51 +40,51 @@
   border: 0;
   border-radius: 20rpx;
 }
-.info-card .info-row[class].data-v-3bd4e23f {
+page .info-card .info-row.data-v-3bd4e23f {
   display: flex;
   flex-direction: row;
   margin-bottom: 16rpx;
 }
-.info-card .info-row[class].data-v-3bd4e23f:last-child {
+page .info-card .info-row.data-v-3bd4e23f:last-child {
   margin-bottom: 0;
 }
-.info-card .info-row .label[class].data-v-3bd4e23f {
+page .info-card .info-row .label.data-v-3bd4e23f {
   font-size: 26rpx;
   color: #606266;
   width: 140rpx;
   flex-shrink: 0;
 }
-.info-card .info-row .value[class].data-v-3bd4e23f {
+page .info-card .info-row .value.data-v-3bd4e23f {
   font-size: 26rpx;
   color: #303133;
   font-weight: 500;
   flex: 1;
 }
-.form-section[class].data-v-3bd4e23f {
+page .form-section.data-v-3bd4e23f {
   background-color: #ffffff;
   margin: 20rpx;
   padding: 28rpx;
   border: 0;
   border-radius: 20rpx;
 }
-.form-item[class].data-v-3bd4e23f {
+page .form-item.data-v-3bd4e23f {
   margin-bottom: 32rpx;
 }
-.form-item[class].data-v-3bd4e23f:last-child {
+page .form-item.data-v-3bd4e23f:last-child {
   margin-bottom: 0;
 }
-.form-item .form-label[class].data-v-3bd4e23f {
+page .form-item .form-label.data-v-3bd4e23f {
   display: block;
   font-size: 30rpx;
   color: #303133;
   margin-bottom: 16rpx;
   font-weight: 600;
 }
-.form-item .form-label .required[class].data-v-3bd4e23f {
+page .form-item .form-label .required.data-v-3bd4e23f {
   color: #ef4444;
   margin-right: 4rpx;
 }
-.form-item .content-input[class].data-v-3bd4e23f {
+page .form-item .content-input.data-v-3bd4e23f {
   width: 100%;
   height: 200rpx;
   padding: 20rpx;
@@ -94,7 +94,7 @@
   border: 1rpx solid #dcdfe6;
   box-sizing: border-box;
 }
-.form-item .phone-input[class].data-v-3bd4e23f {
+page .form-item .phone-input.data-v-3bd4e23f {
   width: 100%;
   height: 80rpx;
   padding: 0 20rpx;
@@ -104,23 +104,23 @@
   border: 1rpx solid #dcdfe6;
   box-sizing: border-box;
 }
-.form-item .image-upload[class].data-v-3bd4e23f {
+page .form-item .image-upload.data-v-3bd4e23f {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 16rpx;
 }
-.form-item .image-upload .image-item[class].data-v-3bd4e23f {
+page .form-item .image-upload .image-item.data-v-3bd4e23f {
   position: relative;
   width: 160rpx;
   height: 160rpx;
 }
-.form-item .image-upload .image-item .preview-image[class].data-v-3bd4e23f {
+page .form-item .image-upload .image-item .preview-image.data-v-3bd4e23f {
   width: 100%;
   height: 100%;
   border-radius: 12rpx;
 }
-.form-item .image-upload .image-item .delete-btn[class].data-v-3bd4e23f {
+page .form-item .image-upload .image-item .delete-btn.data-v-3bd4e23f {
   position: absolute;
   top: -12rpx;
   right: -12rpx;
@@ -134,7 +134,7 @@
   justify-content: center;
   font-size: 24rpx;
 }
-.form-item .image-upload .upload-btn[class].data-v-3bd4e23f {
+page .form-item .image-upload .upload-btn.data-v-3bd4e23f {
   width: 160rpx;
   height: 160rpx;
   display: flex;
@@ -144,10 +144,10 @@
   border: 1rpx dashed #dcdfe6;
   border-radius: 14rpx;
 }
-.form-item .image-upload .upload-btn .plus[class].data-v-3bd4e23f {
+page .form-item .image-upload .upload-btn .plus.data-v-3bd4e23f {
   font-size: 48rpx;
   color: #94a3b8;
 }
-.submit-btn-container[class].data-v-3bd4e23f {
+page .submit-btn-container.data-v-3bd4e23f {
   margin: 56rpx 20rpx 32rpx;
 }

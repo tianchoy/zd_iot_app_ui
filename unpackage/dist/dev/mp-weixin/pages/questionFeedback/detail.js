@@ -274,43 +274,47 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(goBack, "f5"),
-        b: common_vendor.p({
+        a: common_vendor.o(goBack, "a5"),
+        b: `${_ctx.u_s_b_h}px`,
+        c: common_vendor.p({
           title: "反馈详情",
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
           textColor: "#333",
           showCapsule: false,
-          class: "data-v-119f565c"
+          class: "data-v-119f565c",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        c: common_vendor.t(feedbackData.value.feedbackNo),
-        d: common_vendor.p({
+        d: common_vendor.t(feedbackData.value.feedbackNo),
+        e: common_vendor.p({
           type: getStatusType(feedbackData.value.status),
           text: getStatusText(feedbackData.value.status),
           size: "small",
           ["plain-fill"]: true,
           class: "data-v-119f565c"
         }),
-        e: feedbackData.value.rechargeNo
+        f: feedbackData.value.rechargeNo
       }, feedbackData.value.rechargeNo ? {
-        f: common_vendor.t(feedbackData.value.rechargeNo)
+        g: common_vendor.t(feedbackData.value.rechargeNo)
       } : {}, {
-        g: feedbackData.value.cardNo
+        h: feedbackData.value.cardNo
       }, feedbackData.value.cardNo ? {
-        h: common_vendor.t(feedbackData.value.cardNo)
+        i: common_vendor.t(feedbackData.value.cardNo)
       } : {}, {
-        i: feedbackData.value.iccid
+        j: feedbackData.value.iccid
       }, feedbackData.value.iccid ? {
-        j: common_vendor.t(feedbackData.value.iccid)
+        k: common_vendor.t(feedbackData.value.iccid)
       } : {}, {
-        k: common_vendor.t(feedbackData.value.orderNo || "-"),
-        l: common_vendor.t(feedbackData.value.packageName || "-"),
-        m: common_vendor.t(feedbackData.value.createTime || "-"),
-        n: feedbackData.value.userPhone
+        l: common_vendor.t(feedbackData.value.orderNo || "-"),
+        m: common_vendor.t(feedbackData.value.packageName || "-"),
+        n: common_vendor.t(feedbackData.value.createTime || "-"),
+        o: feedbackData.value.userPhone
       }, feedbackData.value.userPhone ? {
-        o: common_vendor.t(feedbackData.value.userPhone)
+        p: common_vendor.t(feedbackData.value.userPhone)
       } : {}, {
-        p: common_vendor.f(feedbackData.value.feedbackContentList, (item, index, i0) => {
+        q: common_vendor.f(feedbackData.value.feedbackContentList, (item, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(item.sendType === "0" ? "我的反馈" : "平台回复"),
             b: common_vendor.t(item.time),
@@ -330,10 +334,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             f: index
           });
         }),
-        q: feedbackData.value.status !== "3"
+        r: feedbackData.value.status !== "3"
       }, feedbackData.value.status !== "3" ? {
-        r: common_vendor.o(handleShowReply, "09"),
-        s: common_vendor.p({
+        s: common_vendor.o(handleShowReply, "7d"),
+        t: common_vendor.p({
           type: "primary",
           text: "继续反馈",
           customStyle: {
@@ -342,8 +346,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           class: "data-v-119f565c"
         }),
-        t: common_vendor.o(handleClose, "b7"),
-        v: common_vendor.p({
+        v: common_vendor.o(handleClose, "ae"),
+        w: common_vendor.p({
           type: "default",
           text: "已解决",
           customStyle: {
@@ -353,14 +357,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           class: "data-v-119f565c"
         })
       } : {}, {
-        w: common_vendor.o(($event) => {
+        x: common_vendor.o(($event) => {
           return showReplyPopup.value = false;
-        }, "b2"),
-        x: replyContent.value,
-        y: common_vendor.o(($event) => {
+        }, "1d"),
+        y: replyContent.value,
+        z: common_vendor.o(($event) => {
           return replyContent.value = $event.detail.value;
-        }, "dd"),
-        z: common_vendor.f(replyImages.value, (img, index, i0) => {
+        }, "39"),
+        A: common_vendor.f(replyImages.value, (img, index, i0) => {
           return {
             a: img,
             b: common_vendor.o(($event) => {
@@ -372,21 +376,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: index
           };
         }),
-        A: replyImages.value.length < 5
+        B: replyImages.value.length < 5
       }, replyImages.value.length < 5 ? {
-        B: common_vendor.o(chooseReplyImage, "75")
+        C: common_vendor.o(chooseReplyImage, "22")
       } : {}, {
-        C: common_vendor.o(handleReply, "cd"),
-        D: common_vendor.p({
+        D: common_vendor.o(handleReply, "42"),
+        E: common_vendor.p({
           type: "primary",
           text: "提交",
           loading: replyLoading.value,
           class: "data-v-119f565c"
         }),
-        E: common_vendor.o(($event) => {
+        F: common_vendor.o(($event) => {
           return showReplyPopup.value = $event;
-        }, "d6"),
-        F: common_vendor.p({
+        }, "79"),
+        G: common_vendor.p({
           position: "bottom",
           round: true,
           customStyle: {
@@ -395,8 +399,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           show: showReplyPopup.value,
           class: "data-v-119f565c"
         }),
-        G: `${_ctx.u_s_b_h}px`,
-        H: `${_ctx.u_s_a_i_b}px`
+        H: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

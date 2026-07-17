@@ -85,15 +85,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, __props.isShowStyle ? {
         b: common_vendor.s(statusBarStyle.value),
         c: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`,
-          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
         })
       } : {}, {
         d: __props.isShowStyle
       }, __props.isShowStyle ? common_vendor.e({
         e: __props.showBack
       }, __props.showBack ? {
-        f: common_vendor.o(handleBack, "4b"),
+        f: common_vendor.o(handleBack, "1b"),
         g: common_vendor.p({
           name: "arrow-left",
           size: "35rpx",
@@ -125,25 +124,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } : {}),
         s: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        }, "73")
+        }, "c1")
       }) : {}, {
         t: common_vendor.s(navBarStyle.value),
         v: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`,
-          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
         })
       }) : common_vendor.e({
-        w: common_vendor.s({
-          height: common_vendor.unref(statusBarHeight) + "px",
-          backgroundColor: __props.backgroundColor
-        }),
-        x: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`,
-          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-        }),
+        w: common_vendor.unref(statusBarHeight) + "px",
+        x: __props.backgroundColor,
         y: __props.showBack
       }, __props.showBack ? {
-        z: common_vendor.o(handleBack, "10"),
+        z: common_vendor.o(handleBack, "39"),
         A: common_vendor.p({
           name: "arrow-left",
           size: "40rpx",
@@ -174,25 +166,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         } : {}),
         M: common_vendor.o(($event) => {
           return emit("capsuleClick", "menu");
-        }, "df")
+        }, "b3")
       }) : {}, {
-        N: common_vendor.s({
-          height: common_vendor.unref(navBarHeight) + "px",
-          backgroundColor: __props.backgroundColor
-        }),
-        O: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`,
-          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
-        })
+        N: common_vendor.unref(navBarHeight) + "px",
+        O: __props.backgroundColor,
+        P: `${_ctx.u_s_b_h}px`
       }), {
-        P: __props.isShowStyle
+        Q: __props.isShowStyle
       }, __props.isShowStyle ? {
-        Q: common_vendor.s({
+        R: common_vendor.s({
           height: totalNavHeight.value + "px"
         }),
-        R: common_vendor.s({
-          "--status-bar-height": `${_ctx.u_s_b_h}px`,
-          "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+        S: common_vendor.s({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
         })
       } : {});
       return __returned__;

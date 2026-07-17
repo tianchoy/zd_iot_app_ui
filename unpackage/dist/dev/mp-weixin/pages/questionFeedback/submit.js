@@ -127,9 +127,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(goBack, "f5"),
-        b: common_vendor.o(toMyFeedback, "d2"),
-        c: common_vendor.p({
+        a: common_vendor.o(goBack, "a5"),
+        b: common_vendor.o(toMyFeedback, "97"),
+        c: `${_ctx.u_s_b_h}px`,
+        d: common_vendor.p({
           title: "问题反馈",
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
@@ -138,22 +139,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isIcon: false,
           rightText: "我的反馈",
           rightActionBackgroundColor: "#f0fdf4",
-          class: "data-v-3bd4e23f"
+          class: "data-v-3bd4e23f",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        d: common_vendor.t(rechargeNo.value),
-        e: orderNo.value
+        e: common_vendor.t(rechargeNo.value),
+        f: orderNo.value
       }, orderNo.value ? {
-        f: common_vendor.t(orderNo.value)
+        g: common_vendor.t(orderNo.value)
       } : {}, {
-        g: pkgName.value
+        h: pkgName.value
       }, pkgName.value ? {
-        h: common_vendor.t(pkgName.value)
+        i: common_vendor.t(pkgName.value)
       } : {}, {
-        i: feedbackContent.value,
-        j: common_vendor.o(($event) => {
+        j: feedbackContent.value,
+        k: common_vendor.o(($event) => {
           return feedbackContent.value = $event.detail.value;
-        }, "83"),
-        k: common_vendor.f(images.value, (img, index, i0) => {
+        }, "5d"),
+        l: common_vendor.f(images.value, (img, index, i0) => {
           return {
             a: img,
             b: common_vendor.o(($event) => {
@@ -165,16 +169,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: index
           };
         }),
-        l: images.value.length < 3
+        m: images.value.length < 3
       }, images.value.length < 3 ? {
-        m: common_vendor.o(chooseImage, "5b")
+        n: common_vendor.o(chooseImage, "61")
       } : {}, {
-        n: userPhone.value,
-        o: common_vendor.o(($event) => {
+        o: userPhone.value,
+        p: common_vendor.o(($event) => {
           return userPhone.value = $event.detail.value;
-        }, "f9"),
-        p: common_vendor.o(handleSubmit, "93"),
-        q: common_vendor.p({
+        }, "0c"),
+        q: common_vendor.o(handleSubmit, "0f"),
+        r: common_vendor.p({
           type: "primary",
           text: "提交",
           loading: submitLoading.value,
@@ -183,8 +187,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           },
           class: "data-v-3bd4e23f"
         }),
-        r: `${_ctx.u_s_b_h}px`,
-        s: `${_ctx.u_s_a_i_b}px`
+        s: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

@@ -294,51 +294,54 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent(Object.assign({
       a: _ctx.overlay
     }, _ctx.overlay ? {
       b: common_vendor.o(overlayClick, "3e"),
-      c: common_vendor.p({
+      c: `${_ctx.u_s_b_h}px`,
+      d: common_vendor.p({
         show: show.value,
         ["z-index"]: _ctx.zIndex - 1,
         ["close-on-click-overlay"]: false,
         ["bg-color"]: _ctx.overlayBgColor,
-        class: "data-v-759854fa"
+        class: "data-v-759854fa",
+        style: common_vendor.normalizeStyle({
+          "--status-bar-height": `${_ctx.u_s_b_h}px`
+        })
       })
     } : {}, {
-      d: common_vendor.unref(realShow)
+      e: common_vendor.unref(realShow)
     }, common_vendor.unref(realShow) ? common_vendor.e({
-      e: _ctx.closeable
+      f: _ctx.closeable
     }, _ctx.closeable ? {
-      f: common_vendor.p({
+      g: common_vendor.p({
         name: _ctx.closeIcon,
         size: "20px",
         class: "data-v-759854fa"
       }),
-      g: common_vendor.n(`rice-popup__close--${_ctx.closeIconPosition}`),
-      h: common_vendor.s(common_vendor.unref(closeStyle)),
-      i: common_vendor.o(handleClose, "81")
+      h: common_vendor.n(`rice-popup__close--${_ctx.closeIconPosition}`),
+      i: common_vendor.s(common_vendor.unref(closeStyle)),
+      j: common_vendor.o(handleClose, "81")
     } : {}, {
-      j: _ctx.showDragBar == true && _ctx.position == "bottom"
+      k: _ctx.showDragBar == true && _ctx.position == "bottom"
     }, _ctx.showDragBar == true && _ctx.position == "bottom" ? {
-      k: common_vendor.n(_ctx.dragBarClass),
-      l: common_vendor.n(_ctx.dragWrapClass),
-      m: common_vendor.o(onDragstart, "d8"),
-      n: common_vendor.o(onDragmove, "9f"),
-      o: common_vendor.o(onDragend, "16"),
-      p: common_vendor.o(onDragend, "10")
+      l: common_vendor.n(_ctx.dragBarClass),
+      m: common_vendor.n(_ctx.dragWrapClass),
+      n: common_vendor.o(onDragstart, "d8"),
+      o: common_vendor.o(onDragmove, "9f"),
+      p: common_vendor.o(onDragend, "16"),
+      q: common_vendor.o(onDragend, "10")
     } : {}, {
-      q: common_vendor.sei("r0-759854fa", "view", popupRef, {
+      r: common_vendor.sei("r0-759854fa", "view", popupRef, {
         "k": "popupRef"
       }),
-      r: common_vendor.n(_ctx.popupClass),
-      s: common_vendor.n(common_vendor.unref(rootClass)),
-      t: common_vendor.s(common_vendor.unref(popupStyle)),
-      v: common_vendor.s(_ctx.customStyle),
-      w: common_vendor.s({
-        "--status-bar-height": `${_ctx.u_s_b_h}px`,
-        "--uni-safe-area-inset-bottom": `${_ctx.u_s_a_i_b}px`
+      s: common_vendor.n(_ctx.popupClass),
+      t: common_vendor.n(common_vendor.unref(rootClass)),
+      v: common_vendor.s(common_vendor.unref(popupStyle)),
+      w: common_vendor.s(_ctx.customStyle),
+      x: common_vendor.s({
+        "--status-bar-height": `${_ctx.u_s_b_h}px`
       }),
-      x: common_vendor.o(onContentstart, "c5"),
-      y: common_vendor.o(onContentmove, "7b"),
-      z: common_vendor.o(onContentend, "2b"),
-      A: common_vendor.o(onContentend, "f1")
+      y: common_vendor.o(onContentstart, "c5"),
+      z: common_vendor.o(onContentmove, "7b"),
+      A: common_vendor.o(onContentend, "2b"),
+      B: common_vendor.o(onContentend, "f1")
     }) : {});
     return __returned__;
   };

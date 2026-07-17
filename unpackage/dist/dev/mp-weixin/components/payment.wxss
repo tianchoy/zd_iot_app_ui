@@ -1,5 +1,5 @@
 :host{display:flex;flex-direction:column}
-
+@import "/uvue.wxss";
 .payment-content.data-v-0c94e3a5 {
 	background-color: #fff;
 	padding: 32rpx 32rpx 48rpx;

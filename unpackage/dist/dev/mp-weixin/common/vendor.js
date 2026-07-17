@@ -208,7 +208,6 @@ const VIRTUAL_HOST_CLASS = "virtualHostClass";
 const VIRTUAL_HOST_HIDDEN = "virtualHostHidden";
 const VIRTUAL_HOST_ID = "virtualHostId";
 const UNI_STATUS_BAR_HEIGHT = "u_s_b_h";
-const UNI_SAFE_AREA_INSET_BOTTOM = "u_s_a_i_b";
 function arrayPop(array) {
   if (array.length === 0) {
     return null;
@@ -1099,120 +1098,6 @@ E.prototype = {
   }
 };
 var E$1 = E;
-class UniDOMStringMap extends Map {
-  constructor(options) {
-    super();
-    this._options = options;
-  }
-  get(key) {
-    const normalizedKey = normalizeDatasetKey(String(key));
-    return super.has(normalizedKey) ? super.get(normalizedKey) : null;
-  }
-  set(key, value) {
-    var _a, _b;
-    const normalizedKey = normalizeDatasetKey(String(key));
-    super.set(normalizedKey, value);
-    (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onSet) === null || _b === void 0 ? void 0 : _b.call(_a, normalizedKey, value);
-    return this;
-  }
-  has(key) {
-    return super.has(normalizeDatasetKey(String(key)));
-  }
-  delete(key) {
-    var _a, _b;
-    const normalizedKey = normalizeDatasetKey(String(key));
-    const deleted = super.delete(normalizedKey);
-    if (deleted) {
-      (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onDelete) === null || _b === void 0 ? void 0 : _b.call(_a, normalizedKey);
-    }
-    return deleted;
-  }
-  clear() {
-    const keys = Array.from(super.keys());
-    super.clear();
-    keys.forEach((key) => {
-      var _a, _b;
-      return (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onDelete) === null || _b === void 0 ? void 0 : _b.call(_a, key);
-    });
-  }
-}
-function normalizeDatasetKey(key) {
-  const normalizedKey = key.replace(/[A-Z]/g, (char) => char.toLowerCase());
-  if (normalizedKey.indexOf("data-") !== 0) {
-    return key;
-  }
-  return normalizedKey.slice(5).replace(/-([a-z])/g, (_, char) => char.toUpperCase());
-}
-function isReservedDatasetKey(target, key) {
-  return key in target;
-}
-function setDatasetValue(dataset, key, value) {
-  Map.prototype.set.call(dataset, normalizeDatasetKey(String(key)), value);
-}
-function initDataset(dataset, source) {
-  if (!source) {
-    return;
-  }
-  if (source instanceof Map) {
-    source.forEach((value, key) => setDatasetValue(dataset, key, value));
-    return;
-  }
-  Object.keys(source).forEach((key) => setDatasetValue(dataset, key, source[key]));
-}
-function createUniDOMStringMap(source, options) {
-  const target = new UniDOMStringMap(options);
-  initDataset(target, source);
-  return new Proxy(target, {
-    get(target2, key, receiver) {
-      if (typeof key === "string") {
-        if (!isReservedDatasetKey(target2, key)) {
-          return target2.has(key) ? target2.get(key) : null;
-        }
-      }
-      const value = Reflect.get(target2, key, target2);
-      if (typeof value === "function") {
-        return (...args) => {
-          const result = value.apply(target2, args);
-          return result === target2 ? receiver : result;
-        };
-      }
-      return value;
-    },
-    set(target2, key, value, receiver) {
-      if (typeof key === "string" && !isReservedDatasetKey(target2, key)) {
-        target2.set(key, value);
-        return true;
-      }
-      return Reflect.set(target2, key, value, receiver);
-    },
-    deleteProperty(target2, key) {
-      if (typeof key === "string" && !isReservedDatasetKey(target2, key) && target2.has(key)) {
-        return target2.delete(key);
-      }
-      return Reflect.deleteProperty(target2, key);
-    },
-    has(target2, key) {
-      if (typeof key === "string" && target2.has(key)) {
-        return true;
-      }
-      return Reflect.has(target2, key);
-    },
-    ownKeys(target2) {
-      return Array.from(target2.keys()).filter((key) => !isReservedDatasetKey(target2, key));
-    },
-    getOwnPropertyDescriptor(target2, key) {
-      if (typeof key === "string" && !isReservedDatasetKey(target2, key) && target2.has(key)) {
-        return {
-          configurable: true,
-          enumerable: true,
-          value: target2.get(key),
-          writable: true
-        };
-      }
-      return Reflect.getOwnPropertyDescriptor(target2, key);
-    }
-  });
-}
 const LOCALE_ZH_HANS = "zh-Hans";
 const LOCALE_ZH_HANT = "zh-Hant";
 const LOCALE_EN = "en";
@@ -6125,16 +6010,22 @@ function findComponentPropsData(up) {
   }
   return propsCaches[uid2][parseInt(propsId)];
 }
+function getStatusBarHeight() {
+  if (typeof wx$1 !== "undefined") {
+    return wx$1.getWindowInfo().statusBarHeight;
+  } else if (typeof my !== "undefined") {
+    return my.getWindowInfo().statusBarHeight;
+  }
+}
 var plugin = {
   install(app) {
     initApp(app);
     app.config.globalProperties.pruneComponentPropsCache = pruneComponentPropsCache;
+    app.config.globalProperties[UNI_STATUS_BAR_HEIGHT] = getStatusBarHeight();
     const oldMount = app.mount;
-    app.mount = function mount(rootContainer, subpackageRoot, options) {
-      const hasSubpackageRoot = typeof subpackageRoot === "string";
-      const root = hasSubpackageRoot ? subpackageRoot : void 0;
-      const instance = hasSubpackageRoot ? oldMount.call(app, rootContainer) : oldMount.apply(app, arguments);
-      const createApp2 = getCreateApp(root, options);
+    app.mount = function mount(rootContainer) {
+      const instance = oldMount.call(app, rootContainer);
+      const createApp2 = getCreateApp();
       if (createApp2) {
         createApp2(instance);
       } else {
@@ -6146,24 +6037,13 @@ var plugin = {
     };
   }
 };
-function getCreateApp(subpackageRoot, options) {
-  const root = normalizeSubpackageRoot$1(subpackageRoot);
-  const method = root && (options === null || options === void 0 ? void 0 : options.independent) ? "createIndependentSubpackageApp" : root || "" ? "createSubpackageApp" : "createApp";
-  const createApp2 = method === "createIndependentSubpackageApp" && (options === null || options === void 0 ? void 0 : options.createApp) ? options.createApp : getGlobalCreateApp(method);
-  if (createApp2 && root && (method === "createSubpackageApp" || method === "createIndependentSubpackageApp")) {
-    return (instance) => createApp2(instance, root);
-  }
-  return createApp2;
-}
-function getGlobalCreateApp(method) {
+function getCreateApp() {
+  const method = "createApp";
   if (typeof global !== "undefined" && typeof global[method] !== "undefined") {
     return global[method];
   } else if (typeof my !== "undefined") {
     return my[method];
   }
-}
-function normalizeSubpackageRoot$1(root) {
-  return typeof root === "string" ? root.replace(/^\/+|\/+$/g, "") : void 0;
 }
 class UniCSSStyleDeclaration {
   constructor() {
@@ -6223,7 +6103,7 @@ function hyphenateCssProperty(str) {
 class UniAnimation {
   constructor(id, scope, keyframes, options = {}) {
     var _a;
-    this._playState = "idle";
+    this._playState = "";
     this.parsedKeyframes = [];
     this.options = {};
     this.onfinish = null;
@@ -6247,20 +6127,14 @@ class UniAnimation {
     throw new Error("currentTime not implemented.");
   }
   cancel() {
-    var _a;
-    const shouldDispatchCancel = this._playState !== "idle";
     toRaw(this.scope).setData({
       ["$eA." + this.id]: JSON.stringify({
         id: this.id,
-        playState: "idle",
+        playState: "cancel",
         keyframes: this.parsedKeyframes,
         options: this.options
       })
     });
-    this._playState = "idle";
-    if (shouldDispatchCancel) {
-      (_a = this.oncancel) === null || _a === void 0 ? void 0 : _a.call(this, createUniAnimationPlaybackEvent("cancel"));
-    }
   }
   finish() {
     throw new Error("finish not implemented.");
@@ -6277,16 +6151,7 @@ class UniAnimation {
         options: this.options
       })
     });
-    this._playState = "running";
   }
-}
-function createUniAnimationPlaybackEvent(type) {
-  return {
-    type,
-    timeStamp: Date.now(),
-    currentTime: null,
-    timelineTime: null
-  };
 }
 function handleDirection(keyframes, direction) {
   if (direction === "reverse") {
@@ -6393,22 +6258,12 @@ class UniElement {
   constructor(id = "", name = "") {
     this.__v_skip = true;
     this.style = new UniCSSStyleDeclaration();
-    this._dataset = createUniDOMStringMap();
+    this.dataset = {};
     this.offsetTop = NaN;
     this.offsetLeft = NaN;
-    this.scrollTop = NaN;
-    this.scrollLeft = NaN;
-    this.scrollHeight = NaN;
-    this.scrollWidth = NaN;
     this.id = id;
     this.tagName = name.toUpperCase();
     this.nodeName = this.tagName;
-  }
-  get dataset() {
-    return this._dataset;
-  }
-  set dataset(value) {
-    this._dataset = createUniDOMStringMap(value || {});
   }
   scrollTo(options) {
     if (this.$vm.$mpPlatform !== "mp-weixin") {
@@ -6577,11 +6432,8 @@ function createUniElement(id, tagName, ins) {
   }
   const uniElement = new (customElements.get(tagName) || UniElement)(id, tagName);
   uniElement.$vm = ins.proxy;
-  const mpPlatform = ins.proxy.$mpPlatform;
-  if (mpPlatform === "mp-weixin") {
+  if (ins.proxy.$mpPlatform === "mp-weixin") {
     initMiniProgramNode(uniElement, ins);
-  } else if (mpPlatform === "mp-alipay") {
-    syncUniElementScrollOffset(uniElement);
   }
   uniElement.$onStyleChange((styles) => {
     var _a;
@@ -6653,7 +6505,7 @@ function initMiniProgramNode(uniElement, ins) {
   if (uniElement.tagName === "SCROLL-VIEW") {
     uniElement.$node = new Promise((resolve2) => {
       setTimeout(() => {
-        index.createSelectorQuery().in(ins.proxy).select("#" + uniElement.id).fields({ node: true, scrollOffset: true }, (res) => {
+        index.createSelectorQuery().in(ins.proxy).select("#" + uniElement.id).fields({ node: true }, (res) => {
           const node = res.node;
           resolve2(node);
           uniElement.$node = {
@@ -6661,31 +6513,10 @@ function initMiniProgramNode(uniElement, ins) {
               fn(node);
             }
           };
-          setUniElementScrollOffset(uniElement, res);
         }).exec();
       }, 2);
     });
   }
-}
-function syncUniElementScrollOffset(uniElement) {
-  if (uniElement.tagName === "SCROLL-VIEW") {
-    index.createSelectorQuery().select("#" + uniElement.id).fields({ scrollOffset: true }, (res) => {
-      setUniElementScrollOffset(uniElement, res);
-    }).exec();
-  }
-}
-function setUniElementScrollOffset(uniElement, res) {
-  const properties = [
-    "scrollTop",
-    "scrollLeft",
-    "scrollHeight",
-    "scrollWidth"
-  ];
-  properties.forEach((prop) => {
-    if (res[prop] !== void 0) {
-      uniElement[prop] = res[prop];
-    }
-  });
 }
 function vOn(value, key) {
   const instance = getCurrentInstance();
@@ -6760,7 +6591,7 @@ function normalizeAlipayTapEventPosition(event) {
   event.pageX = event.detail.pageX;
   event.pageY = event.detail.pageY;
 }
-function normalizeXEvent(event, instance, originalTarget = event.target, originalCurrentTarget = event.currentTarget) {
+function normalizeXEvent(event, instance) {
   if (isMPTapEvent(event)) {
     const ctx = instance === null || instance === void 0 ? void 0 : instance.ctx;
     if ((ctx === null || ctx === void 0 ? void 0 : ctx.$mpPlatform) === "mp-alipay") {
@@ -6779,8 +6610,8 @@ function normalizeXEvent(event, instance, originalTarget = event.target, origina
       }
     }
   }
-  if (originalTarget) {
-    const oldTarget = originalTarget;
+  if (event.target) {
+    const oldTarget = event.target;
     Object.defineProperty(event, "target", {
       get() {
         if (!event._target) {
@@ -6790,8 +6621,8 @@ function normalizeXEvent(event, instance, originalTarget = event.target, origina
       }
     });
   }
-  if (originalCurrentTarget) {
-    const oldCurrentTarget = originalCurrentTarget;
+  if (event.currentTarget) {
+    const oldCurrentTarget = event.currentTarget;
     Object.defineProperty(event, "currentTarget", {
       get() {
         if (!event._currentTarget) {
@@ -6804,8 +6635,6 @@ function normalizeXEvent(event, instance, originalTarget = event.target, origina
 }
 function patchMPEvent(event, instance) {
   if (event.type && event.target) {
-    const originalTarget = event.target;
-    const originalCurrentTarget = event.currentTarget;
     event.preventDefault = NOOP;
     event.stopPropagation = NOOP;
     event.stopImmediatePropagation = NOOP;
@@ -6823,7 +6652,7 @@ function patchMPEvent(event, instance) {
       event.target = extend({}, event.target, event.detail);
     }
     {
-      normalizeXEvent(event, instance, originalTarget, originalCurrentTarget);
+      normalizeXEvent(event, instance);
     }
   }
 }
@@ -7513,98 +7342,6 @@ const createCanvasContextAsync = defineAsyncApi(API_CREATE_CANVAS_CONTEXT_ASYNC,
     });
   }
 });
-const API_CREATE_EDITOR_CONTEXT_ASYNC = "createEditorContextAsync";
-const createEditorContextAsync = defineAsyncApi(API_CREATE_EDITOR_CONTEXT_ASYNC, (options, { resolve: resolve2, reject }) => {
-  const { id, component } = options;
-  const pages = getCurrentPages();
-  const page = pages[pages.length - 1];
-  if (!page || !page.$vm) {
-    reject("current page invalid.");
-  } else {
-    const query = wx.createSelectorQuery();
-    const baseQuery = component ? query.in(component) : query;
-    baseQuery.select("#" + id).context((res) => {
-      if (res && res.context) {
-        resolve2(res.context);
-      } else {
-        reject("editor id or component invalid.");
-      }
-    }).exec();
-  }
-});
-function normalizeDatasetResult(result) {
-  if (result && result.dataset) {
-    result.dataset = createUniDOMStringMap(result.dataset);
-  }
-  return result;
-}
-function normalizeDatasetCallback(callback) {
-  if (!isFunction(callback)) {
-    return callback;
-  }
-  return function datasetCallback(result) {
-    if (Array.isArray(result)) {
-      result.forEach(normalizeDatasetResult);
-    } else {
-      normalizeDatasetResult(result);
-    }
-    return callback.call(this, result);
-  };
-}
-function normalizeSelectorQueryDataset(query) {
-  if (!query) {
-    return query;
-  }
-  const oldExec = query.exec;
-  if (isFunction(oldExec)) {
-    query.exec = function exec(callback) {
-      return oldExec.call(this, normalizeDatasetCallback(callback));
-    };
-  }
-  ["boundingClientRect", "scrollOffset"].forEach((name) => {
-    const method = query[name];
-    if (isFunction(method)) {
-      query[name] = function datasetMethod(callback) {
-        return method.call(this, normalizeDatasetCallback(callback));
-      };
-    }
-  });
-  const oldFields = query.fields;
-  if (isFunction(oldFields)) {
-    query.fields = function fields(fields, callback) {
-      return oldFields.call(this, fields, normalizeDatasetCallback(callback));
-    };
-  }
-  return query;
-}
-function normalizeIntersectionObserverDataset(observer) {
-  if (!observer) {
-    return observer;
-  }
-  const oldObserve = observer.observe;
-  if (isFunction(oldObserve)) {
-    observer.observe = function observe(selector, callback) {
-      return oldObserve.call(this, selector, normalizeDatasetCallback(callback));
-    };
-  }
-  return observer;
-}
-function normalizeDatasetApi(name, api) {
-  if (!isFunction(api)) {
-    return api;
-  }
-  if (name === "createSelectorQuery") {
-    return function createSelectorQuery2(...args) {
-      return normalizeSelectorQueryDataset(api.apply(this, args));
-    };
-  }
-  if (name === "createIntersectionObserver") {
-    return function createIntersectionObserver(...args) {
-      return normalizeIntersectionObserverDataset(api.apply(this, args));
-    };
-  }
-  return api;
-}
 const API_UPX2PX = "upx2px";
 const Upx2pxProtocol = [
   {
@@ -7962,9 +7699,6 @@ var protocols$1 = /* @__PURE__ */ Object.freeze({
   request
 });
 function parseXReturnValue(methodName, res) {
-  if (isObject(res) && hasOwn(res, "errno")) {
-    res.errCode = res.errno;
-  }
   const protocol = protocols$1[methodName];
   if (protocol && isFunction(protocol.returnValue)) {
     return protocol.returnValue(res);
@@ -8127,18 +7861,14 @@ function getOSInfo(system, platform) {
   if (platform && false) {
     osName = platform;
     osVersion = system;
-    system = `${osName} ${osVersion}`;
   } else {
-    {
-      osName = platform;
-    }
+    osName = system.split(" ")[0] || platform;
     osVersion = system.split(" ")[1] || "";
   }
   osName = osName.toLowerCase();
   switch (osName) {
     case "harmony":
     case "ohos":
-    case "openharmonyos":
     case "openharmony":
       osName = "harmonyos";
       break;
@@ -8155,22 +7885,12 @@ function getOSInfo(system, platform) {
   }
   return {
     osName,
-    osVersion,
-    system
+    osVersion
   };
-}
-function getPlatform(platform) {
-  platform = platform.toLowerCase();
-  {
-    if (platform === "ohos") {
-      platform = "harmonyos";
-    }
-  }
-  return platform;
 }
 function populateParameters(fromRes, toRes) {
   const { brand = "", model = "", system = "", language = "", theme, version: version2, platform, fontSizeSetting, SDKVersion, pixelRatio, deviceOrientation } = fromRes;
-  const { osName, osVersion, system: updatedSystem } = getOSInfo(system, platform);
+  const { osName, osVersion } = getOSInfo(system, platform);
   let hostVersion = version2;
   let deviceType = getGetDeviceType(fromRes, model);
   let deviceBrand = getDeviceBrand(brand);
@@ -8185,9 +7905,9 @@ function populateParameters(fromRes, toRes) {
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "5.21",
-    uniCompilerVersion: "5.21",
-    uniRuntimeVersion: "5.21",
+    uniCompileVersion: "5.06",
+    uniCompilerVersion: "5.06",
+    uniRuntimeVersion: "5.06",
     uniPlatform: "mp-weixin",
     deviceBrand,
     deviceModel: model,
@@ -8204,8 +7924,6 @@ function populateParameters(fromRes, toRes) {
     hostFontSizeSetting: fontSizeSetting,
     windowTop: 0,
     windowBottom: 0,
-    platform: getPlatform(platform),
-    system: updatedSystem,
     // TODO
     osLanguage: void 0,
     osTheme: void 0,
@@ -8217,23 +7935,20 @@ function populateParameters(fromRes, toRes) {
   };
   {
     try {
-      parameters.uniCompilerVersionCode = parseFloat("5.21");
-      parameters.uniRuntimeVersionCode = parseFloat("5.21");
+      parameters.uniCompilerVersionCode = parseFloat("5.06");
+      parameters.uniRuntimeVersionCode = parseFloat("5.06");
     } catch (error) {
     }
   }
   extend(toRes, parameters);
 }
 function getGetDeviceType(fromRes, model) {
-  const platform = fromRes.platform || "";
   let deviceType = fromRes.deviceType || "phone";
   {
     const deviceTypeMaps = {
       ipad: "pad",
       windows: "pc",
-      mac: "pc",
-      linux: "pc",
-      pc: "pc"
+      mac: "pc"
     };
     const deviceTypeMapsKeys = Object.keys(deviceTypeMaps);
     const _model = model.toLowerCase();
@@ -8243,11 +7958,6 @@ function getGetDeviceType(fromRes, model) {
         deviceType = deviceTypeMaps[_m];
         break;
       }
-    }
-  }
-  {
-    if (platform === "ohos_pc") {
-      deviceType = "pc";
     }
   }
   return deviceType;
@@ -8331,8 +8041,7 @@ const getDeviceInfo = {
       deviceBrand,
       deviceModel: model,
       osName,
-      osVersion,
-      platform: getPlatform(platform)
+      osVersion
     });
   }
 };
@@ -8354,20 +8063,14 @@ const getAppBaseInfo = {
       hostTheme: theme,
       isUniAppX: true,
       uniPlatform: "mp-weixin",
-      uniCompileVersion: "5.21",
-      uniCompilerVersion: "5.21",
-      uniRuntimeVersion: "5.21"
+      uniCompileVersion: "5.06",
+      uniCompilerVersion: "5.06",
+      uniRuntimeVersion: "5.06"
     };
-    try {
-      if (typeof wx.getAccountInfoSync === "function") {
-        parameters.packagename = wx.getAccountInfoSync().miniProgram.appId;
-      }
-    } catch (error) {
-    }
     {
       try {
-        parameters.uniCompilerVersionCode = parseFloat("5.21");
-        parameters.uniRuntimeVersionCode = parseFloat("5.21");
+        parameters.uniCompilerVersionCode = parseFloat("5.06");
+        parameters.uniRuntimeVersionCode = parseFloat("5.06");
       } catch (error) {
       }
     }
@@ -8462,14 +8165,8 @@ const baseApis = {
   invokePushCallback,
   __f__,
   getElementById,
-  createCanvasContextAsync,
-  createEditorContextAsync
+  createCanvasContextAsync
 };
-function normalizeApi(name, api) {
-  {
-    return normalizeDatasetApi(name, api);
-  }
-}
 function initUni(api, protocols2, platform = wx) {
   const wrapper = initWrapper(protocols2);
   const UniProxyHandlers = {
@@ -8478,12 +8175,12 @@ function initUni(api, protocols2, platform = wx) {
         return target[key];
       }
       if (hasOwn(api, key)) {
-        return normalizeApi(key, promisify(key, api[key]));
+        return promisify(key, api[key]);
       }
       if (hasOwn(baseApis, key)) {
-        return normalizeApi(key, promisify(key, baseApis[key]));
+        return promisify(key, baseApis[key]);
       }
-      return normalizeApi(key, promisify(key, wrapper(key, platform[key])));
+      return promisify(key, wrapper(key, platform[key]));
     }
   };
   return new Proxy({}, UniProxyHandlers);
@@ -9204,34 +8901,10 @@ function isConsoleWritable() {
   console.log = value;
   return isWritable;
 }
-const UNI_CONSOLE_RUNTIME_PROMISE = "__uni_console_runtime_promise__";
 function initRuntimeSocketService() {
-  const hosts = "127.0.0.1,192.168.1.19";
+  const hosts = "192.168.248.1,192.168.163.1,10.147.20.3,192.168.1.222,127.0.0.1";
   const port = "8090";
-  const id = "mp-weixin_a8OOzt";
-  const runtimeGlobal = getRuntimeGlobal();
-  const existingPromise = runtimeGlobal === null || runtimeGlobal === void 0 ? void 0 : runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
-  if (existingPromise) {
-    return existingPromise;
-  }
-  let runtimePromise = initRuntimeSocketServiceOnce(hosts, port, id);
-  if (runtimeGlobal) {
-    runtimePromise = runtimePromise.then((success) => {
-      if (!success && runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE] === runtimePromise) {
-        delete runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
-      }
-      return success;
-    }, (error) => {
-      if (runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE] === runtimePromise) {
-        delete runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE];
-      }
-      throw error;
-    });
-    runtimeGlobal[UNI_CONSOLE_RUNTIME_PROMISE] = runtimePromise;
-  }
-  return runtimePromise;
-}
-function initRuntimeSocketServiceOnce(hosts, port, id) {
+  const id = "mp-weixin_ksZGts";
   const lazy = typeof swan !== "undefined";
   let restoreError = lazy ? () => {
   } : initOnError();
@@ -9281,42 +8954,27 @@ const ERROR_CHAR = "‌";
 function wrapError(error) {
   return `${ERROR_CHAR}${error}${ERROR_CHAR}`;
 }
-function getRuntimeGlobal() {
-  const miniProgramGlobal = getMiniProgramGlobal();
-  if (miniProgramGlobal) {
-    return miniProgramGlobal;
-  }
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-}
-function getMiniProgramGlobal() {
-  if (typeof wx$1 !== "undefined") {
-    return wx$1;
-  } else if (typeof my !== "undefined") {
-    return my;
-  } else if (typeof tt !== "undefined") {
-    return tt;
-  } else if (typeof swan !== "undefined") {
-    return swan;
-  } else if (typeof qq !== "undefined") {
-    return qq;
-  } else if (typeof ks !== "undefined") {
-    return ks;
-  } else if (typeof jd !== "undefined") {
-    return jd;
-  } else if (typeof xhs !== "undefined") {
-    return xhs;
-  } else if (typeof has !== "undefined") {
-    return has;
-  } else if (typeof qa !== "undefined") {
-    return qa;
-  }
-}
 function initMiniProgramGlobalFlag() {
-  const miniProgramGlobal = getMiniProgramGlobal();
-  if (miniProgramGlobal) {
-    miniProgramGlobal.__uni_console__ = true;
+  if (typeof wx$1 !== "undefined") {
+    wx$1.__uni_console__ = true;
+  } else if (typeof my !== "undefined") {
+    my.__uni_console__ = true;
+  } else if (typeof tt !== "undefined") {
+    tt.__uni_console__ = true;
+  } else if (typeof swan !== "undefined") {
+    swan.__uni_console__ = true;
+  } else if (typeof qq !== "undefined") {
+    qq.__uni_console__ = true;
+  } else if (typeof ks !== "undefined") {
+    ks.__uni_console__ = true;
+  } else if (typeof jd !== "undefined") {
+    jd.__uni_console__ = true;
+  } else if (typeof xhs !== "undefined") {
+    xhs.__uni_console__ = true;
+  } else if (typeof has !== "undefined") {
+    has.__uni_console__ = true;
+  } else if (typeof qa !== "undefined") {
+    qa.__uni_console__ = true;
   }
 }
 initRuntimeSocketService();
@@ -9630,45 +9288,6 @@ const findMixinRuntimeHooks = /* @__PURE__ */ once(() => {
 function initMixinRuntimeHooks(mpOptions) {
   initHooks(mpOptions, findMixinRuntimeHooks());
 }
-let runtimeSubpackageRoot;
-const runtimeSubpackages = /* @__PURE__ */ Object.create(null);
-function resolveSubpackageRoot(root) {
-  return normalizeSubpackageRoot(root) || normalizeSubpackageRoot("");
-}
-function setRuntimeSubpackageRoot(root) {
-  runtimeSubpackageRoot = normalizeSubpackageRoot(root);
-}
-function getRuntimeSubpackageRoot() {
-  return runtimeSubpackageRoot;
-}
-function setSubpackageAppVm(root, vm, independent) {
-  const subpackageRoot = normalizeSubpackageRoot(root);
-  if (!subpackageRoot) {
-    return;
-  }
-  setRuntimeSubpackageRoot(subpackageRoot);
-  if (independent) {
-    runtimeSubpackages[subpackageRoot] = {
-      $vm: vm
-    };
-  } else {
-    const globalObject = wx;
-    (globalObject.$subpackages || (globalObject.$subpackages = {}))[subpackageRoot] = {
-      $vm: vm
-    };
-  }
-}
-function getSubpackageAppVm() {
-  var _a, _b, _c;
-  const subpackageRoot = getRuntimeSubpackageRoot();
-  if (!subpackageRoot) {
-    return;
-  }
-  return ((_a = runtimeSubpackages[subpackageRoot]) === null || _a === void 0 ? void 0 : _a.$vm) || ((_c = (_b = wx.$subpackages) === null || _b === void 0 ? void 0 : _b[subpackageRoot]) === null || _c === void 0 ? void 0 : _c.$vm);
-}
-function normalizeSubpackageRoot(root) {
-  return typeof root === "string" ? root.replace(/^\/+|\/+$/g, "") : void 0;
-}
 const HOOKS = [
   ON_SHOW,
   ON_HIDE,
@@ -9724,7 +9343,7 @@ function initCreateApp(parseAppOptions) {
   };
 }
 function initCreateSubpackageApp(parseAppOptions) {
-  return function createApp2(vm, root) {
+  return function createApp2(vm) {
     const appOptions = parseApp(vm);
     const app = isFunction(getApp) && getApp({
       allowDefault: true
@@ -9746,12 +9365,6 @@ function initCreateSubpackageApp(parseAppOptions) {
       }
     });
     initAppLifecycle(appOptions, vm);
-    setSubpackageAppVm(resolveSubpackageRoot(root), vm);
-  };
-}
-function initCreateIndependentSubpackageApp() {
-  return function createApp2(vm, root) {
-    setSubpackageAppVm(resolveSubpackageRoot(root), vm, true);
   };
 }
 function initAppLifecycle(appOptions, vm) {
@@ -9956,28 +9569,13 @@ function initPropsObserver(componentOptions) {
       updateComponentProps(resolvePropValue(up), this.$vm.$);
     } else if (resolvePropValue(this.properties.uT) === "m") {
       updateMiniProgramComponentProperties(resolvePropValue(up), this);
-    } else
-      ;
+    }
   };
   {
     if (!componentOptions.observers) {
       componentOptions.observers = {};
     }
     componentOptions.observers.uP = observe;
-    if (componentOptions.options && componentOptions.options.virtualHost && componentOptions.properties && componentOptions.properties[VIRTUAL_HOST_CLASS]) {
-      const observeVirtualHostClass = function observeVirtualHostClass2() {
-        if (!this.$vm) {
-          return;
-        }
-        const instance = this.$vm.$;
-        instance.effect.dirty = true;
-        if (hasQueueJob(instance.update)) {
-          invalidateJob(instance.update);
-        }
-        instance.update();
-      };
-      componentOptions.observers[VIRTUAL_HOST_CLASS] = observeVirtualHostClass;
-    }
   }
 }
 function updateMiniProgramComponentProperties(up, mpInstance) {
@@ -10137,44 +9735,21 @@ function initCreateComponent(parseOptions2) {
 }
 let $createComponentFn;
 let $destroyComponentFn;
-let $createComponentAppVm;
-let $destroyComponentAppVm;
-const componentAppVmMap = /* @__PURE__ */ new WeakMap();
-function getAppVm$1() {
-  const subpackageAppVm = getSubpackageAppVm();
-  if (subpackageAppVm) {
-    return subpackageAppVm;
-  }
+function getAppVm() {
   return getApp().$vm;
 }
 function $createComponent(initialVNode, options) {
-  const appVm = getAppVm$1();
-  if (!$createComponentFn || $createComponentAppVm !== appVm) {
-    $createComponentAppVm = appVm;
-    $createComponentFn = appVm.$createComponent;
+  if (!$createComponentFn) {
+    $createComponentFn = getAppVm().$createComponent;
   }
   const proxy = $createComponentFn(initialVNode, options);
-  const exposeProxy = getComponentExposeProxy(proxy);
-  componentAppVmMap.set(proxy, appVm);
-  if (exposeProxy && typeof exposeProxy === "object") {
-    componentAppVmMap.set(exposeProxy, appVm);
-  }
-  return exposeProxy || proxy;
+  return getExposeProxy(proxy.$) || proxy;
 }
 function $destroyComponent(instance) {
-  const appVm = componentAppVmMap.get(instance) || getAppVm$1();
-  if (!$destroyComponentFn || $destroyComponentAppVm !== appVm) {
-    $destroyComponentAppVm = appVm;
-    $destroyComponentFn = appVm.$destroyComponent;
+  if (!$destroyComponentFn) {
+    $destroyComponentFn = getAppVm().$destroyComponent;
   }
-  try {
-    return $destroyComponentFn(instance);
-  } finally {
-    componentAppVmMap.delete(instance);
-  }
-}
-function getComponentExposeProxy(proxy) {
-  return typeof getExposeProxy === "function" ? getExposeProxy(proxy.$) : void 0;
+  return $destroyComponentFn(instance);
 }
 function parsePage(vueOptions, parseOptions2) {
   const { parse, mocks: mocks2, isPage: isPage2, initRelation: initRelation2, handleLink: handleLink2, initLifetimes: initLifetimes2 } = parseOptions2;
@@ -10250,18 +9825,6 @@ function initPageInstance(mpPageInstance) {
     });
   }
 }
-function updateCssVariables() {
-  var _a, _b, _c;
-  const globalProperties = (_c = (_b = (_a = getAppVm$1()) === null || _a === void 0 ? void 0 : _a.$) === null || _b === void 0 ? void 0 : _b.appContext) === null || _c === void 0 ? void 0 : _c.config.globalProperties;
-  if (!globalProperties) {
-    return;
-  }
-  const windowInfo = wx.getWindowInfo();
-  const screenBottom = windowInfo.screenHeight - windowInfo.screenTop - windowInfo.windowHeight;
-  const safeAreaBottom = windowInfo.screenHeight - windowInfo.safeArea.bottom;
-  globalProperties[UNI_STATUS_BAR_HEIGHT] = windowInfo.statusBarHeight;
-  globalProperties[UNI_SAFE_AREA_INSET_BOTTOM] = Math.max(0, safeAreaBottom - screenBottom);
-}
 function initCreatePluginApp(parseAppOptions) {
   return function createApp2(vm) {
     initAppLifecycle(parseApp(vm), vm);
@@ -10320,9 +9883,6 @@ function initLifetimes({ mocks: mocks2, isPage: isPage2, initRelation: initRelat
       initRelation2(this, relationOptions);
       const mpInstance = this;
       const isMiniProgramPage = isPage2(mpInstance);
-      if (isMiniProgramPage) {
-        updateCssVariables();
-      }
       let propsData = properties;
       this.$vm = $createComponent({
         type: vueOptions,
@@ -10395,17 +9955,12 @@ const createPage = initCreatePage(parseOptions);
 const createComponent = initCreateComponent(parseOptions);
 const createPluginApp = initCreatePluginApp();
 const createSubpackageApp = initCreateSubpackageApp();
-const createIndependentSubpackageApp = initCreateIndependentSubpackageApp();
-const isIndependentRuntime = typeof __UNI_MP_INDEPENDENT_RUNTIME__ !== "undefined" && __UNI_MP_INDEPENDENT_RUNTIME__ === true;
 {
-  if (!isIndependentRuntime) {
-    wx.createApp = global.createApp = createApp;
-    wx.createPage = createPage;
-    wx.createComponent = createComponent;
-    wx.createPluginApp = global.createPluginApp = createPluginApp;
-    wx.createSubpackageApp = global.createSubpackageApp = createSubpackageApp;
-    wx.createIndependentSubpackageApp = global.createIndependentSubpackageApp = createIndependentSubpackageApp;
-  }
+  wx.createApp = global.createApp = createApp;
+  wx.createPage = createPage;
+  wx.createComponent = createComponent;
+  wx.createPluginApp = global.createPluginApp = createPluginApp;
+  wx.createSubpackageApp = global.createSubpackageApp = createSubpackageApp;
 }
 function __awaiter(thisArg, _arguments, P, generator) {
   function adopt(value) {
@@ -10459,97 +10014,17 @@ typeof SuppressedError === "function" ? SuppressedError : function(error, suppre
   var e2 = new Error(message);
   return e2.name = "SuppressedError", e2.error = error, e2.suppressed = suppressed, e2;
 };
-function isUniApp(target) {
-  const proxy = target === null || target === void 0 ? void 0 : target.proxy;
-  const ctx = target === null || target === void 0 ? void 0 : target.ctx;
-  const type = target === null || target === void 0 ? void 0 : target.type;
-  return (proxy === null || proxy === void 0 ? void 0 : proxy.$mpType) === "app" || (ctx === null || ctx === void 0 ? void 0 : ctx.$mpType) === "app" || (type === null || type === void 0 ? void 0 : type.mpType) === "app";
-}
-function getAppVm() {
-  const app = getApp({ allowDefault: true });
-  return app === null || app === void 0 ? void 0 : app.$vm;
-}
-function removeAppHook(vm, name, hook, originalHook, target) {
-  const hooks = vm.$[name];
-  if (!isArray(hooks)) {
-    return;
-  }
-  for (let i = hooks.length - 1; i >= 0; i--) {
-    const appHook = hooks[i];
-    if (appHook === hook || originalHook && appHook.__uni_app_hook === originalHook && appHook.__uni_app_target === target) {
-      hooks.splice(i, 1);
-    }
-  }
-}
-function isTargetInvalid(target) {
-  var _a;
-  return (target === null || target === void 0 ? void 0 : target.isUnmounted) || (target === null || target === void 0 ? void 0 : target.__isUnload) || ((_a = target === null || target === void 0 ? void 0 : target.root) === null || _a === void 0 ? void 0 : _a.__isUnload);
-}
-function queueRemoveAppHook(removeHook) {
-  Promise.resolve().then(removeHook);
-}
-function injectAppHook(lifecycle, hook, target) {
-  const isAppInstance = isUniApp(target);
-  const appVm = getAppVm();
-  const appInstance = isAppInstance ? target : appVm === null || appVm === void 0 ? void 0 : appVm.$;
-  if (appInstance) {
-    if (isAppInstance) {
-      injectHook(lifecycle, hook, appInstance);
-      return;
-    }
-    let isRemoved = false;
-    let wrappedHook;
-    const removeHook = () => {
-      if (isRemoved || !wrappedHook) {
-        return;
-      }
-      isRemoved = true;
-      const appVm2 = getAppVm();
-      appVm2 && removeAppHook(appVm2, lifecycle, wrappedHook, hook, target);
-    };
-    const appHook = (...args) => {
-      if (isRemoved || isTargetInvalid(target)) {
-        queueRemoveAppHook(removeHook);
-        return;
-      }
-      return hook(...args);
-    };
-    wrappedHook = injectHook(lifecycle, appHook, appInstance);
-    if (wrappedHook) {
-      wrappedHook.__uni_app_hook = hook;
-      wrappedHook.__uni_app_target = target;
-      if (isTargetInvalid(target)) {
-        removeHook();
-      }
-    }
-    if (target && wrappedHook) {
-      onBeforeUnmount(() => removeHook(), target);
-      injectHook(ON_UNLOAD, () => removeHook(), target);
-    }
-  }
-}
 const createLifeCycleHook = (lifecycle, flag = 0) => (hook, target = getCurrentInstance()) => {
-  if (isInSSRComponentSetup)
-    return;
-  if (flag === 1) {
-    injectAppHook(lifecycle, hook, target);
-    return;
-  }
-  injectHook(lifecycle, hook, target);
+  !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
 };
-const onAppShow = /* @__PURE__ */ createLifeCycleHook(
-  ON_SHOW,
-  1
-  /* HookFlags.APP */
-);
-const onAppHide = /* @__PURE__ */ createLifeCycleHook(
-  ON_HIDE,
-  1
-  /* HookFlags.APP */
-);
 const onShow = /* @__PURE__ */ createLifeCycleHook(
   ON_SHOW,
-  2
+  1 | 2
+  /* HookFlags.PAGE */
+);
+const onHide = /* @__PURE__ */ createLifeCycleHook(
+  ON_HIDE,
+  1 | 2
   /* HookFlags.PAGE */
 );
 const onLaunch = /* @__PURE__ */ createLifeCycleHook(
@@ -10577,6 +10052,8 @@ const onBackPress = /* @__PURE__ */ createLifeCycleHook(
   2
   /* HookFlags.PAGE */
 );
+const onAppHide = onHide;
+const onAppShow = onShow;
 exports.UTS = UTS;
 exports.UTSJSONObject = UTSJSONObject;
 exports.__awaiter = __awaiter;

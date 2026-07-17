@@ -168,9 +168,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       "raw js";
       const __returned__ = common_vendor.e({
-        a: common_vendor.o(handleBack, "1a"),
-        b: common_vendor.o(handleMyFeedback, "ef"),
-        c: common_vendor.p({
+        a: common_vendor.o(handleBack, "f0"),
+        b: common_vendor.o(handleMyFeedback, "99"),
+        c: `${_ctx.u_s_b_h}px`,
+        d: common_vendor.p({
           title: "我的订单",
           ["show-back"]: true,
           backgroundColor: "#f4f7fb",
@@ -179,13 +180,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           isIcon: false,
           rightTextFontSize: "26rpx",
           rightText: "我的反馈",
-          class: "data-v-a151b594"
+          class: "data-v-a151b594",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        d: common_vendor.o(handleTabClick, "b3"),
-        e: common_vendor.o(($event) => {
+        e: common_vendor.o(handleTabClick, "e4"),
+        f: common_vendor.o(($event) => {
           return current.value = $event;
-        }, "48"),
-        f: common_vendor.p({
+        }, "b0"),
+        g: common_vendor.p({
           ["line-color"]: "#ffffff",
           list: tabs.value,
           ["line-width"]: 0,
@@ -199,9 +203,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           modelValue: current.value,
           class: "data-v-a151b594"
         }),
-        g: orderList.value.length === 0
+        h: orderList.value.length === 0
       }, orderList.value.length === 0 ? {} : {
-        h: common_vendor.f(orderList.value, (order, index, i0) => {
+        i: common_vendor.f(orderList.value, (order, index, i0) => {
           return common_vendor.e({
             a: order.pkgName
           }, order.pkgName ? {
@@ -223,9 +227,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, order.orderNo ? {
             g: common_vendor.t(order.orderNo)
           } : {}, {
-            h: order.cardNo
-          }, order.cardNo ? {
-            i: common_vendor.t(order.cardNo)
+            h: order.rechargeNo
+          }, order.rechargeNo ? {
+            i: common_vendor.t(order.rechargeNo)
           } : {}, {
             j: order.iccid
           }, order.iccid ? {
@@ -245,18 +249,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               return handlePay(order);
             }, index)
           } : {}, {
-            r: common_vendor.o(($event) => {
+            r: order.status === "1"
+          }, order.status === "1" ? {
+            s: common_vendor.o(($event) => {
               return handleFeedback(order);
-            }, index),
-            s: index,
-            t: common_vendor.o(($event) => {
+            }, index)
+          } : {}, {
+            t: index,
+            v: common_vendor.o(($event) => {
               return handleOrderClick(order);
             }, index)
           });
         })
       }, {
-        i: `${_ctx.u_s_b_h}px`,
-        j: `${_ctx.u_s_a_i_b}px`
+        j: `${_ctx.u_s_b_h}px`
       });
       return __returned__;
     };

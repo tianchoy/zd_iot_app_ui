@@ -23,8 +23,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const __returned__ = {
         a: common_assets._imports_0$1,
         b: common_vendor.gei(_ctx, ""),
-        c: common_vendor.o(handleClick, "a5"),
-        d: common_vendor.p({
+        c: common_vendor.o(handleClick, "f2"),
+        d: `${_ctx.u_s_b_h}px`,
+        e: common_vendor.p({
           ["default-position"]: "bottom-right",
           customStyle: {
             backgroundColor: "#fff",
@@ -36,9 +37,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["gap-bottom"]: "700rpx",
           ["gap-right"]: "20rpx",
           id: common_vendor.gei(_ctx, ""),
-          class: "data-v-97c7e0f7"
+          class: "data-v-97c7e0f7",
+          style: common_vendor.normalizeStyle({
+            "--status-bar-height": `${_ctx.u_s_b_h}px`
+          })
         }),
-        e: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
+        f: common_vendor.pvhc(_ctx.$scope.data.virtualHostClass)
       };
       return __returned__;
     };
