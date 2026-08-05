@@ -1,6 +1,6 @@
 <template>
 <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" rightTextFontSize="26rpx" rightText="我的反馈" @capsuleClick="handleMyFeedback"></topNavBar>
- 
+
  <!-- <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" @capsuleClick="handleMyFeedback"></topNavBar> -->
  <view class="container">
   <view class="card-box">
@@ -52,7 +52,7 @@
       <view class="detail-row last">
        <text class="detail-value" v-if="order.createTime">{{ order.createTime }}</text>
        <view class="order-footer">
-        <text class="price" v-if="order.payCurrencyAmount">¥{{ order.payCurrencyAmount }}</text>
+        <text class="price" v-if="order.payCurrencyAmount">{{ AmountUtil.format(order.payCurrencyAmount) }}</text>
         <view class="footer-actions">
          <text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
         </view>
@@ -74,6 +74,7 @@
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref } from 'vue'
 	import { isWechat,isH5 } from '@/common/config.uts'
+	import {AmountUtil} from '@/utils/amount.uts'
 
 	// 跳转到问题反馈列表
 	const handleMyFeedback = () => {
@@ -91,28 +92,28 @@
 	}
 
 	const rechargeNo = ref<string>('')
-	
+
 	// 订单状态映射
 	type OrderStatus = '全部' | '待支付' | '已完成' | '已退款' | '已取消'
-	
+
 	// Tab 列表
 	type OrderStatusTab = {
 		name: OrderStatus,
 		value: string
 	}
 	const tabs = ref<OrderStatusTab[]>([
-		{name: '全部',value: ''}, 
-		{name: '待支付',value: '0'}, 
-		{name: '已完成',value: '1'}, 
-		{name: '已退款',value: '5'}, 
+		{name: '全部',value: ''},
+		{name: '待支付',value: '0'},
+		{name: '已完成',value: '1'},
+		{name: '已退款',value: '5'},
 		{name: '已取消',value: '2'}
 	])
 	const current = ref<number>(0)
 	const card_number = ref<string>('')
-	
+
 	// 订单数据
 	const orderList = ref<OrderListXcxItem[]>([])
-	
+
 	// 状态码映射
 	const getStatusText = (status: string): string => {
 		switch (status) {
@@ -132,7 +133,7 @@
 				return '未知状态'
 		}
 	}
-	
+
 	// 获取订单列表
 	const getOrderList = async (status: string) => {
 		try {
@@ -252,21 +253,21 @@
 		// #endif
 		display: flex;
 		flex-direction: column;
-		
+
 		.card-box {
 			margin: 0 24rpx;
 			background-color: #ffffff;
 			border: 1rpx solid #e7edf5;
 			border-radius: 24rpx;
 			padding: 24rpx;
-			
+
 			.search-value {
 				display: flex;
 				flex-direction: row;
 				border: 1rpx solid #dbe5f0;
 				border-radius: 24rpx;
 				margin-bottom: 24rpx;
-				
+
 				.search-input {
 					flex: 1;
 					padding: 0 25rpx;
@@ -276,30 +277,30 @@
 					color: #0f172a;
 					font-size: 30rpx;
 				}
-				
+
 				.scan-btn {
 					border-left: 1px solid #eef2f7;
 				}
 			}
 		}
-		
+
 		.order-list {
 			flex: 1;
 			padding: 24rpx 24rpx 40rpx 24rpx;
 			min-height: 700rpx;
-			
+
 			.empty-state {
 				display: flex;
 				justify-content: center;
 				align-items: center;
 				padding-top: 200rpx;
-				
+
 				.empty-text {
 					font-size: 28rpx;
 					color: #999999;
 				}
 			}
-			
+
 			.orders-container {
 				.order-card {
 					background-color: #ffffff;
@@ -307,7 +308,7 @@
 					padding: 28rpx;
 					margin-bottom: 24rpx;
 					box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
-					
+
 					.order-header {
 						display: flex;
 						flex-direction: row;
@@ -316,29 +317,29 @@
 						padding-bottom: 20rpx;
 						border-bottom: 1rpx solid #f0f2f6;
 						margin-bottom: 20rpx;
-						
+
 						.package-name {
 							font-size: 32rpx;
 							font-weight: 600;
 							color: #1f2937;
 						}
 					}
-					
+
 					.order-details {
-						
+
 						.detail-row {
 							display: flex;
 							flex-direction: row;
 							align-items: center;
 							margin-bottom: 16rpx;
-							
+
 							.detail-label {
 								width: 100rpx;
 								font-size: 26rpx;
 								color: #9ca3af;
 								flex-shrink: 0;
 							}
-							
+
 							.detail-value {
 								flex: 1;
 								font-size: 26rpx;
@@ -349,7 +350,7 @@
 							margin-bottom: 0;
 						}
 					}
-					
+
 					.order-footer {
 						display: flex;
 						flex-direction: row;

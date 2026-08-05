@@ -6,11 +6,11 @@
 			<view class="package-card">
 				<view class="package-header" v-if="d('pkgName')">
 					<text class="package-name">{{ d('pkgName') }}</text>
-					<rice-tag 
-						:type="getOrderStatusType(ds('status'))" 
-						:text="getOrderStatusText(ds('status'))" 
-						:round="true" 
-						plain-fill 
+					<rice-tag
+						:type="getOrderStatusType(ds('status'))"
+						:text="getOrderStatusText(ds('status'))"
+						:round="true"
+						plain-fill
 						size="small"
 					></rice-tag>
 				</view>
@@ -19,7 +19,7 @@
 					<text class="card-number">{{ d('rechargeNo') }}</text>
 				</view>
 			</view>
-			
+
 			<!-- 订单信息卡片 -->
 			<view class="info-card">
 				<view class="info-row" v-if="d('orderNo')">
@@ -32,7 +32,7 @@
 				</view>
 				<view class="info-row" v-if="d('orderAmount')">
 					<text class="info-label">支付金额</text>
-				<text class="info-value price">¥{{ getDisplayAmount() }}</text>
+				<text class="info-value price">{{ AmountUtil.format(getDisplayAmount()) }}</text>
 				</view>
 				<view class="info-row" v-if="d('orderStatus')">
 					<text class="info-label">订单状态</text>
@@ -61,7 +61,7 @@
 				</view>
 				<view class="info-row" v-if="d('pkgFlow')">
 					<text class="info-label">套餐流量</text>
-					<text class="info-value">{{ d('pkgFlow') }} GB</text>
+					<text class="info-value">{{ DataFormat.formatTraffic(d('pkgFlow')) }} </text>
 				</view>
 				<view class="info-row" v-if="d('validityPeriod')">
 					<text class="info-label">有效期</text>
@@ -87,16 +87,16 @@
 					</view>
 				</view>
 			</view>
-			
+
 			<!-- 底部占位 -->
 			<view class="bottom-placeholder"></view>
 		</scroll-view>
-		
+
 		<!-- 底部支付栏（仅待支付状态显示） -->
 		<view v-if="d('status') === '0'" class="bottom-bar">
 			<view class="amount-section">
 				<text class="amount-label">待支付金额</text>
-				<text class="amount-value">¥{{ getDisplayAmount() }}</text>
+				<text class="amount-value">{{ AmountUtil.format(getDisplayAmount()) }}</text>
 			</view>
 			<view class="amount-time">
 				<text class="amount-label">支付剩余时间</text>
@@ -113,8 +113,8 @@
 		position="bottom"
 		@close="onPopupClose"
 	>
-		<Payment 
-			:amount="currentPrice" 
+		<Payment
+			:amount="currentPrice"
 			@cancel="handleCancelPayment"
 			@confirm="handleConfirmPayment"
 			:cardNumber="ds('rechargeNo')"
@@ -131,7 +131,9 @@
 	import { goPayXcx , queryOrderDetail,login,getTenantInfo } from '@/api/http';
 	import { config,getTenantId,isWechat,setToken,isH5,setStorageSync,getToken} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
-	
+	import {AmountUtil} from '@/utils/amount.uts'
+	import {DataFormat} from '@/utils/dataFormat.uts'
+
 	const showPopup = ref(false);
 	const currentPrice = ref(0);
 	const orderId = ref('');
@@ -245,7 +247,7 @@
 				return category || '-'
 		}
 	}
-	
+
 	// 选择支付方式
 	const choosePayment = () => {
 		const detail = orderDetail.value as UTSJSONObject
@@ -307,7 +309,7 @@
 		// 设置正在支付流程中 - 所有支付方式统一处理
 		isInPaymentProcess.value = true
 		const payWxType = data['payWxType'] as string
-		
+
 		console.log('支付成功页面orderNos.value:', orderNos.value, 'payChannelId.value:', payChannelId.value)
 		if(payWxType == 'wechat_pay'){
 			uni.requestPayment({
@@ -445,7 +447,7 @@
 	const onPopupClose = () => {
 		showPopup.value = false
 	}
-	
+
 	// 返回上一页或首页
 	const handleBack = () => {
 		const pages = getCurrentPages();
@@ -474,7 +476,7 @@
 			xcxCode: codes,
 			isLogin: '1',
 		})
-		
+
 		console.log('userLoginByOpenid登录成功:', res)
 		if(res.code == 200){
 			userId.value = '' + res.data.id
@@ -527,9 +529,9 @@
 		if (isWechat()) {
 			if (!checkToken()) {
 				await getTenantInfos()
-				
+
 				const loginSuccess = await getCode()
-				
+
 				// 登录失败时，不加载数据
 				if (!loginSuccess) {
 					console.log('登录失败，跳过数据加载')
@@ -546,7 +548,7 @@
 			getOrderDetail()
 		}
 	}
-	
+
 	onLoad((options) => {
 		const orderNo = options?.orderNo as string | null
 		if (orderNo != null) {
@@ -561,19 +563,19 @@
 	})
 
 	onShow(() => {
-		
+
 		// 如果是从支付成功页面返回的，跳过支付回调处理
 		if (isFromPaySuccess.value) {
 			// 重置标记，避免下次进入时再次跳过
 			isFromPaySuccess.value = false
 			return
 		}
-		
+
 		// 只有在支付流程中才处理支付回调
 		if (!isInPaymentProcess.value) {
 			return
 		}
-		
+
 		let options = uni.getEnterOptionsSync();
 		// 1011扫描二维码  1012长按图片识别二维码  1013相册选择二维码 1037小程序打开小程序 1038 从另一个小程序返回
 		if(options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037|| options.scene == 1038|| options.scene == 1065){
@@ -644,65 +646,65 @@
 		padding: 24rpx;
 		box-sizing: border-box;
 	}
-	
+
 	// 套餐名称卡片
 	.package-card {
 		background-color: #ffffff;
 		border-radius: 24rpx;
 		padding: 32rpx;
 		margin-bottom: 24rpx;
-		
+
 		.package-header {
 			display: flex;
-			flex-direction: row; 
+			flex-direction: row;
 			justify-content: space-between;
 			align-items: center;
 			margin-bottom: 16rpx;
-			
+
 			.package-name {
 				font-size: 36rpx;
 				font-weight: 600;
 				color: #1f2937;
 			}
-			
+
 			.status-tag {
 				font-size: 24rpx;
 				padding: 6rpx 16rpx;
 				border-radius: 20rpx;
 				font-weight: 500;
-				
+
 				&.status-pending {
 					background-color: #fff3e0;
 					color: #ed6c02;
 				}
-				
+
 				&.status-completed {
 					background-color: #e8f5e9;
 					color: #2e7d32;
 				}
-				
+
 				&.status-refunded {
 					background-color: #fce4ec;
 					color: #c62828;
 				}
-				
+
 				&.status-cancelled {
 					background-color: #eeeeee;
 					color: #757575;
 				}
 			}
 		}
-		
+
 		.card-number-row {
 			display: flex;
-			flex-direction: row; 
+			flex-direction: row;
 			align-items: center;
-			
+
 			.card-number-label {
 				font-size: 28rpx;
 				color: #9ca3af;
 			}
-			
+
 			.card-number {
 				font-size: 28rpx;
 				color: #374151;
@@ -710,49 +712,49 @@
 			}
 		}
 	}
-	
+
 	// 信息卡片通用样式
 	.info-card {
 		background-color: #ffffff;
 		border-radius: 24rpx;
 		padding: 32rpx;
 		margin-bottom: 24rpx;
-		
+
 		.section-header {
 			margin-bottom: 24rpx;
 			padding-bottom: 20rpx;
 			border-bottom: 1rpx solid #f0f2f6;
-			
+
 			.section-title {
 				font-size: 32rpx;
 				font-weight: 600;
 				color: #1f2937;
 			}
 		}
-		
+
 		.info-row {
 			display: flex;
-			flex-direction: row; 
+			flex-direction: row;
 			justify-content: space-between;
 			align-items: center;
 			padding: 20rpx 0;
-			
+
 			.info-label {
 				font-size: 28rpx;
 				color: #64748b;
 			}
-			
+
 			.info-value {
 				font-size: 28rpx;
 				color: #374151;
 				text-align: right;
-				
+
 				&.price {
 					font-size: 36rpx;
 					font-weight: bold;
 					color: #ef4444;
 				}
-				
+
 				&.status-fail {
 					color: #ef4444;
 				}
@@ -760,12 +762,12 @@
 		}
 		.info-refunds{
 			display: flex;
-			flex-direction: column; 
+			flex-direction: column;
 			padding: 20rpx 0;
 			.times,
 			.money{
 				display: flex;
-				flex-direction: row; 
+				flex-direction: row;
 				align-items: center;
 				justify-content: space-between;
 				margin:10rpx 0;
@@ -774,13 +776,13 @@
 			}
 		}
 	}
-	
-	
+
+
 	// 底部占位
 	.bottom-placeholder {
 		height: 140rpx;
 	}
-	
+
 	// 底部支付栏
 	.bottom-bar {
 		position: fixed;
@@ -789,23 +791,23 @@
 		right: 0;
 		background-color: #ffffff;
 		display: flex;
-		flex-direction: row; 
+		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
 		padding: 24rpx 32rpx;
 		box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
-		
+
 		.amount-section {
 			display: flex;
-			flex-direction: column; 
+			flex-direction: column;
 			align-items: flex-start;
-			
+
 			.amount-label {
 				font-size: 24rpx;
 				color: #64748b;
 				margin-right: 16rpx;
 			}
-			
+
 			.amount-value {
 				font-size: 48rpx;
 				font-weight: bold;
@@ -819,7 +821,7 @@
 		}
 		.amount-time{
 			display: flex;
-			flex-direction: row; 
+			flex-direction: row;
 			align-items: center;
 			justify-content: flex-end;
 			.amount-label{
@@ -828,12 +830,12 @@
 				margin-right: 16rpx;
 			}
 		}
-		
+
 		.pay-button {
 			background-color: #2563eb;
 			padding: 20rpx 40rpx;
 			border-radius: 24rpx;
-			
+
 			.pay-button-text {
 				color: #ffffff;
 				font-size: 30rpx;

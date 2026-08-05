@@ -14,25 +14,25 @@
 			</view>
 			<rice-tabs
 				v-model="current"
-				line-color="#ffffff" 
-				:list="tabs" 
-				:line-width="0" 
-				:title-active-color="'#2563eb'" 
+				line-color="#ffffff"
+				:list="tabs"
+				:line-width="0"
+				:title-active-color="'#2563eb'"
 				:title-inactive-color="'#334155'"
-				@change="handleTabClick" 
+				@change="handleTabClick"
 				:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
 			>
 			</rice-tabs>
 		</view>
-		
+
 		<!-- 订单列表 -->
 		<scroll-view class="order-list" scroll-y :enhanced="true" :show-scrollbar="false">
 			<view v-if="orderList.length === 0" class="empty-state">
 				<text class="empty-text">暂无订单</text>
 			</view>
 			<view v-else class="orders-container">
-				<view 
-					v-for="(order, index) in orderList" 
+				<view
+					v-for="(order, index) in orderList"
 					:key="index"
 					class="order-card"
 					@click="handleOrderClick(order)"
@@ -42,7 +42,7 @@
 						<text class="package-name" v-if="order.pkgName">{{ order.pkgName || '套餐名称' }}</text>
 						<rice-tag v-if="order.status" :text="getStatusText(order.status) " :round="true" plain-fill size="small" :type="getStatusClass(order.status)"></rice-tag>
 					</view>
-					
+
 					<!-- 订单详情 -->
 					<view class="order-details">
 						<view class="detail-row" v-if="order.orderNo">
@@ -60,7 +60,7 @@
 						<view class="detail-row last">
 							<text class="detail-value">{{ order.createTime || '-' }}</text>
 							<view class="order-footer">
-								<text class="price">¥{{ order.payCurrencyAmount || '0.00' }}</text>
+								<text class="price">{{ AmountUtil.format(order.payCurrencyAmount) }}</text>
 								<view class="footer-actions">
 									<text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
 								</view>
@@ -70,7 +70,7 @@
 							<text class="feedback-btn" @click.stop="handleFeedback(order)">问题反馈</text>
 						</view>
 					</view>
-					
+
 				</view>
 			</view>
 		</scroll-view>
@@ -82,6 +82,7 @@
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref, computed, onMounted } from 'vue'
 	import {isWechat,isH5} from '@/common/config.uts'
+	import {AmountUtil} from '@/utils/amount.uts'
 
 	// 问题反馈开关
 	const feedbackEnabled = ref<boolean>(true)
@@ -92,31 +93,31 @@
 			url: `/pages/questionFeedback/list`
 		})
 	}
-	
+
 	// 订单状态映射
 	type OrderStatus = '全部' | '待支付' | '已完成' | '已退款' | '已取消'
-	
+
 	// Tab 列表
 	type OrderStatusTab = {
 		name: OrderStatus,
 		value: string
 	}
 	const tabs = ref<OrderStatusTab[]>([
-		{name: '全部',value: ''}, 
-		{name: '待支付',value: '0'}, 
-		{name: '已完成',value: '1'}, 
-		{name: '已退款',value: '5'}, 
+		{name: '全部',value: ''},
+		{name: '待支付',value: '0'},
+		{name: '已完成',value: '1'},
+		{name: '已退款',value: '5'},
 		{name: '已取消',value: '2'}
 	])
 	const current = ref<number>(0)
 	const card_number = ref<string>('')
-	
+
 	// 订单数据
 	const orderList = ref<OrderListXcxItem[]>([])
-	
+
 	// 查询状态标志
 	const isSearching = ref<boolean>(false)
-	
+
 	// 状态码映射
 	const getStatusText = (status: string): string => {
 		switch (status) {
@@ -136,7 +137,7 @@
 				return '未知状态'
 		}
 	}
-	
+
 	// 获取状态对应的tab索引
 	const getTabIndexByStatus = (status: string): number => {
 		if (status === '' || status === null) {
@@ -243,7 +244,7 @@
 			getOrderList(status, false)
 		}
 	}
-	
+
 	// 获取状态样式类
 	const getStatusClass = (status: string): string => {
 		switch (status) {
@@ -263,7 +264,7 @@
 				return ''
 		}
 	}
-	
+
 	// 处理订单点击
 	const handleOrderClick = (order: OrderListXcxItem) => {
 		console.log(order)
@@ -271,20 +272,20 @@
 			url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
 		})
 	}
-	
+
 	// 处理返回
 	const handleBack = () => {
 		uni.navigateBack({
 			delta: 1
 		})
 	}
-	
+
 	const scanCode = () => {
 		uni.navigateTo({
 			url: '/pages/scanCode/scanCode'
 		})
 	}
-	
+
 	// 查询订单
 	const handleQuery = () => {
 		const keyword = card_number.value.trim()
@@ -299,7 +300,7 @@
 		isSearching.value = true
 		getOrderList('', true)
 	}
-	
+
 	// 接收扫码结果
 	const onScanResult = async (data: UTSJSONObject) => {
 		const result = data.getString('result') ?? ''
@@ -314,7 +315,7 @@
 			await handleQuery()
 		}
 	}
-	
+
 	// 跳转到问题反馈
 	const handleFeedback = (order: OrderListXcxItem) => {
 		console.log("order",order)
@@ -350,11 +351,11 @@
 		current.value = 0
 		getOrderList('', false)
 	})
-	
+
 	onMounted(() => {
 		uni.$on('scanResult', onScanResult)
 	})
-	
+
 	onUnload(() => {
 		// 移除事件监听
 		uni.$off('scanResult', onScanResult)
@@ -369,21 +370,21 @@
 		// #endif
 		display: flex;
 		flex-direction: column;
-		
+
 		.card-box {
 			margin: 0 24rpx;
 			background-color: #ffffff;
 			border: 1rpx solid #e7edf5;
 			border-radius: 24rpx;
 			padding: 24rpx;
-			
+
 			.search-value {
 				display: flex;
 				flex-direction: row;
 				border: 1rpx solid #dbe5f0;
 				border-radius: 24rpx;
 				margin-bottom: 24rpx;
-				
+
 				.search-input {
 					flex: 1;
 					padding: 0 25rpx;
@@ -393,30 +394,30 @@
 					color: #0f172a;
 					font-size: 30rpx;
 				}
-				
+
 				.scan-btn {
 					border-left: 1px solid #eef2f7;
 				}
 			}
 		}
-		
+
 		.order-list {
 			flex: 1;
 			padding: 24rpx 24rpx 40rpx 24rpx;
 			min-height: 700rpx;
-			
+
 			.empty-state {
 				display: flex;
 				justify-content: center;
 				align-items: center;
 				padding-top: 200rpx;
-				
+
 				.empty-text {
 					font-size: 28rpx;
 					color: #999999;
 				}
 			}
-			
+
 			.orders-container {
 				.order-card {
 					background-color: #ffffff;
@@ -424,7 +425,7 @@
 					padding: 28rpx;
 					margin-bottom: 24rpx;
 					box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
-					
+
 					.order-header {
 						display: flex;
 						flex-direction: row;
@@ -433,29 +434,29 @@
 						padding-bottom: 20rpx;
 						border-bottom: 1rpx solid #f0f2f6;
 						margin-bottom: 20rpx;
-						
+
 						.package-name {
 							font-size: 32rpx;
 							font-weight: 600;
 							color: #1f2937;
 						}
 					}
-					
+
 					.order-details {
-						
+
 						.detail-row {
 							display: flex;
 							flex-direction: row;
 							align-items: center;
 							margin-bottom: 16rpx;
-							
+
 							.detail-label {
 								width: 100rpx;
 								font-size: 26rpx;
 								color: #9ca3af;
 								flex-shrink: 0;
 							}
-							
+
 							.detail-value {
 								flex: 1;
 								font-size: 26rpx;
@@ -466,7 +467,7 @@
 							margin-bottom: 0;
 						}
 					}
-					
+
 					.order-footer {
 						display: flex;
 						flex-direction: row;

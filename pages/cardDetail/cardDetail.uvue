@@ -106,7 +106,7 @@
 								<view class="item-sub-title">订单号: {{ order.orderNo || '未知' }}</view>
 								<view class="item-data">
 									<text class="date-label">{{ order.createTime}}</text>
-									<text class="total-value">¥{{ order.payCurrencyAmount }}</text>
+									<text class="total-value">{{ AmountUtil.format(order.payCurrencyAmount) }}</text>
 								</view>
 							</view>
 						</view>
@@ -133,6 +133,7 @@
 	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderList,userUnBindCard} from '@/api/http'
 	import type {BindCard,OrderListXcxItem,PkgInfoItem,RechargeData} from '@/api/types'
 	import {isH5,isWechat} from '@/common/config.uts'
+	import {AmountUtil} from '@/utils/amount.uts'
 
 	type CardDetailTabItem = {
 		name: string

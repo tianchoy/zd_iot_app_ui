@@ -1,0 +1,351 @@
+/**
+ * 数据格式化工具类
+ * 提供数值四舍五入、数字格式化、流量/文件大小格式化、百分比格式化等方法
+ * 与 AmountUtil（金额专用）互补，此工具用于通用数据展示格式化
+ */
+
+export class DataFormat {
+
+	/**
+	 * 安全解析数字
+	 * 处理 null、undefined、空字符串、NaN、Infinity 等边界情况
+	 * @param value 待解析的值
+	 * @param fallback 解析失败时的默认值，默认 0
+	 */
+	static parseNumber(value: any, fallback: number = 0): number {
+		if (value == null || value === '') return fallback
+		const num = parseFloat(String(value))
+		if (isNaN(num) || !isFinite(num)) return fallback
+		return num
+	}
+
+	/**
+	 * 四舍五入到指定小数位
+	 * @param value 数值
+	 * @param decimal 保留小数位数，默认 2
+	 * @returns 四舍五入后的数值
+	 *
+	 * 例：round(3.14159, 2) → 3.14
+	 *     round(3.14159, 0) → 3
+	 *     round(3.5, 0)     → 4
+	 *     round(0, 2)       → 0
+	 */
+	static round(value: any, decimal: number = 2): number {
+		const num = DataFormat.parseNumber(value)
+		if (num === 0) return 0
+
+		const factor = Math.pow(10, decimal)
+		return Math.round(num * factor) / factor
+	}
+
+	/**
+	 * 向下取整（截断）到指定小数位
+	 * @param value 数值
+	 * @param decimal 保留小数位数，默认 2
+	 */
+	static floor(value: any, decimal: number = 2): number {
+		const num = DataFormat.parseNumber(value)
+		const factor = Math.pow(10, decimal)
+		return Math.floor(num * factor) / factor
+	}
+
+	/**
+	 * 向上取整到指定小数位
+	 * @param value 数值
+	 * @param decimal 保留小数位数，默认 2
+	 */
+	static ceil(value: any, decimal: number = 2): number {
+		const num = DataFormat.parseNumber(value)
+		const factor = Math.pow(10, decimal)
+		return Math.ceil(num * factor) / factor
+	}
+
+	/**
+	 * 格式化数字（带千分位分隔符和小数位控制）
+	 * @param value 数值
+	 * @param decimal 小数位数，默认 2；传 -1 保留原小数位
+	 * @param separator 千分位分隔符，默认 ","
+	 * @returns 格式化后的字符串
+	 *
+	 * 例：formatNumber(1234567.89, 2) → "1,234,567.89"
+	 *     formatNumber(1234, 0)       → "1,234"
+	 *     formatNumber(1234.5, -1)    → "1,234.5"
+	 */
+	static formatNumber(value: any, decimal: number = 2, separator: string = ','): string {
+		const num = DataFormat.parseNumber(value)
+
+		// 处理负数
+		const isNegative = num < 0
+		const absNum = Math.abs(num)
+
+		// 确定小数位数
+		let fixed: string
+		if (decimal === -1) {
+			// 保留原始小数位
+			fixed = absNum.toString()
+		} else {
+			fixed = absNum.toFixed(decimal)
+		}
+
+		const parts = fixed.split('.')
+		const intPart = parts[0]
+		const decPart = parts.length > 1 ? parts[1] : ''
+
+		// 添加千分位分隔符
+		let formattedInt = ''
+		const len = intPart.length
+		for (let i = 0; i < len; i++) {
+			if (i > 0 && (len - i) % 3 === 0) {
+				formattedInt += separator
+			}
+			formattedInt += intPart.charAt(i)
+		}
+
+		let result = formattedInt
+		if (decimal === -1 && decPart.length > 0) {
+			result += '.' + decPart
+		} else if (decimal > 0) {
+			result += '.' + decPart
+		}
+
+		if (isNegative) {
+			result = '-' + result
+		}
+
+		return result
+	}
+
+	/**
+	 * 格式化流量数据（自动选择合适单位）
+	 * @param value 流量值（默认单位为 GB）
+	 * @param unit 当前单位：'GB' | 'MB' | 'KB' | 'B'，默认 'GB'
+	 * @param decimal 小数位数，默认 2
+	 * @returns 格式化字符串，如 "1.5 GB"、"512 MB"
+	 *
+	 * 例：formatTraffic(1.5)          → "1.5 GB"
+	 *     formatTraffic(0.5)          → "512 MB"    （自动降级为 MB）
+	 *     formatTraffic(0.0005)       → "512 KB"    （自动降级为 KB）
+	 *     formatTraffic(2048, 'MB')   → "2 GB"      （自动升级为 GB）
+	 *     formatTraffic(1024, 'KB')   → "1 MB"      （自动升级为 MB）
+	 *     formatTraffic(1500, 'MB', 1)→ "1.5 GB"    （指定小数位）
+	 */
+	static formatTraffic(value: any, unit: string = 'MB', decimal: number = 2): string {
+		const num = DataFormat.parseNumber(value)
+		if (num === 0) return '0 GB'
+
+		// 统一转为 GB 再进行判断
+		let valueInGB: number
+		const u = unit.toUpperCase()
+		switch (u) {
+			case 'B':
+				valueInGB = num / (1024 * 1024 * 1024)
+				break
+			case 'KB':
+				valueInGB = num / (1024 * 1024)
+				break
+			case 'MB':
+				valueInGB = num / 1024
+				break
+			default: // GB
+				valueInGB = num
+				break
+		}
+
+		// 自动选择最合适的单位
+		if (valueInGB >= 1) {
+			return DataFormat.round(valueInGB, decimal) + ' GB'
+		} else if (valueInGB >= 0.001) {
+			const valueInMB = valueInGB * 1024
+			return DataFormat.round(valueInMB, decimal) + ' MB'
+		} else if (valueInGB >= 0.000001) {
+			const valueInKB = valueInGB * 1024 * 1024
+			return DataFormat.round(valueInKB, decimal) + ' KB'
+		} else {
+			const valueInB = valueInGB * 1024 * 1024 * 1024
+			return DataFormat.round(valueInB, decimal) + ' B'
+		}
+	}
+
+	/**
+	 * 格式化流量数据（指定单位，不自动选择）
+	 * @param value 流量值
+	 * @param unit 目标单位：'GB' | 'MB' | 'KB' | 'B'
+	 * @param decimal 小数位数，默认 2
+	 * @returns 格式化字符串，如 "1.50 GB"
+	 */
+	static formatTrafficAs(value: any, unit: string = 'GB', decimal: number = 2): string {
+		const num = DataFormat.parseNumber(value)
+		const u = unit.toUpperCase()
+		let converted: number
+
+		switch (u) {
+			case 'B':
+				converted = num * 1024 * 1024 * 1024
+				break
+			case 'KB':
+				converted = num * 1024 * 1024
+				break
+			case 'MB':
+				converted = num * 1024
+				break
+			default:
+				converted = num
+				break
+		}
+
+		return DataFormat.round(converted, decimal) + ' ' + u
+	}
+
+	/**
+	 * 文件大小格式化（字节 → 可读字符串）
+	 * @param bytes 字节数
+	 * @param decimal 小数位数，默认 2
+	 * @returns 格式化字符串，如 "1.5 MB"
+	 *
+	 * 例：formatFileSize(1024)        → "1 KB"
+	 *     formatFileSize(1048576)     → "1 MB"
+	 *     formatFileSize(1572864)     → "1.5 MB"
+	 *     formatFileSize(1073741824)  → "1 GB"
+	 */
+	static formatFileSize(bytes: any, decimal: number = 2): string {
+		const num = DataFormat.parseNumber(bytes)
+		if (num === 0) return '0 B'
+		if (num < 0) return '-' + DataFormat.formatFileSize(-num, decimal)
+
+		const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+		let unitIndex = 0
+		let size = num
+
+		while (size >= 1024 && unitIndex < units.length - 1) {
+			size = size / 1024
+			unitIndex++
+		}
+
+		return DataFormat.round(size, decimal) + ' ' + units[unitIndex]
+	}
+
+	/**
+	 * 格式化百分比
+	 * @param value 百分比值（如 0.8532 表示 85.32%，85.32 表示 85.32%）
+	 * @param decimal 小数位数，默认 2
+	 * @param showSymbol 是否显示 % 符号，默认 true
+	 * @param isFraction 是否为小数形式（true: 0.85→85%；false: 85→85%），默认 true
+	 * @returns 格式化字符串
+	 *
+	 * 例：formatPercentage(0.8532, 2)      → "85.32%"
+	 *     formatPercentage(0.8532, 0)      → "85%"
+	 *     formatPercentage(85.32, 2, true, false) → "85.32%"
+	 *     formatPercentage(0.5, 0, false)   → "50"
+	 */
+	static formatPercentage(
+		value: any,
+		decimal: number = 2,
+		showSymbol: boolean = true,
+		isFraction: boolean = true
+	): string {
+		const num = DataFormat.parseNumber(value)
+
+		// 如果是小数形式（0~1），转换为百分比数值
+		const percentValue = isFraction ? num * 100 : num
+
+		const rounded = DataFormat.round(percentValue, decimal)
+		const result = rounded.toString()
+
+		return showSymbol ? result + '%' : result
+	}
+
+	/**
+	 * 计算并格式化百分比
+	 * @param part 部分值
+	 * @param total 总值
+	 * @param decimal 小数位数，默认 2
+	 * @param showSymbol 是否显示 % 符号，默认 true
+	 * @returns 格式化字符串；如果 total 为 0，返回 "0%"
+	 *
+	 * 例：calcPercentage(30, 100, 0)  → "30%"
+	 *     calcPercentage(1, 3, 2)     → "33.33%"
+	 *     calcPercentage(0, 100)      → "0%"
+	 */
+	static calcPercentage(part: any, total: any, decimal: number = 2, showSymbol: boolean = true): string {
+		const partNum = DataFormat.parseNumber(part)
+		const totalNum = DataFormat.parseNumber(total)
+
+		if (totalNum === 0) return showSymbol ? '0%' : '0'
+		if (partNum === 0) return showSymbol ? '0%' : '0'
+
+		const percent = (partNum / totalNum) * 100
+		return DataFormat.formatPercentage(percent, decimal, showSymbol, false)
+	}
+
+	/**
+	 * 取整数值的百分比（钳制在 0~100）
+	 * @param part 部分值
+	 * @param total 总值
+	 * @returns 0~100 之间的数值
+	 */
+	static calcPercentageValue(part: any, total: any): number {
+		const partNum = DataFormat.parseNumber(part)
+		const totalNum = DataFormat.parseNumber(total)
+
+		if (totalNum <= 0) return 0
+		if (partNum <= 0) return 0
+
+		const percent = (partNum / totalNum) * 100
+		return Math.min(Math.max(DataFormat.round(percent, 0), 0), 100)
+	}
+
+	/**
+	 * 格式化时长（秒 → 可读字符串）
+	 * @param seconds 秒数
+	 * @returns 格式化字符串
+	 *
+	 * 例：formatDuration(3661) → "1小时1分1秒"
+	 *     formatDuration(65)   → "1分5秒"
+	 *     formatDuration(30)   → "30秒"
+	 */
+	static formatDuration(seconds: any): string {
+		const totalSecs = DataFormat.parseNumber(seconds)
+		if (totalSecs <= 0) return '0秒'
+
+		const h = Math.floor(totalSecs / 3600)
+		const m = Math.floor((totalSecs % 3600) / 60)
+		const s = Math.floor(totalSecs % 60)
+
+		let result = ''
+		if (h > 0) result += h + '小时'
+		if (m > 0) result += m + '分'
+		if (s > 0) result += s + '秒'
+		if (result === '') result = '0秒'
+
+		return result
+	}
+
+	/**
+	 * 补零到指定位数
+	 * @param value 数值
+	 * @param length 目标长度，默认 2
+	 * @returns 补零后的字符串
+	 *
+	 * 例：padZero(5, 3) → "005"
+	 *     padZero(12, 2) → "12"
+	 */
+	static padZero(value: any, length: number = 2): string {
+		let str = String(DataFormat.parseNumber(value))
+		while (str.length < length) {
+			str = '0' + str
+		}
+		return str
+	}
+
+	/**
+	 * 比较两个数字是否近似相等（解决浮点数精度问题）
+	 * @param a 数值a
+	 * @param b 数值b
+	 * @param epsilon 允许误差，默认 1e-10
+	 */
+	static approxEqual(a: any, b: any, epsilon: number = 1e-10): boolean {
+		const numA = DataFormat.parseNumber(a)
+		const numB = DataFormat.parseNumber(b)
+		return Math.abs(numA - numB) < epsilon
+	}
+}

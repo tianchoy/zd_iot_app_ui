@@ -47,7 +47,7 @@ const API_CONFIG: UTSJSONObject = {
     timeout: 30000
   },
   prod: {
-    baseUrl: 'https://cmpapp.zdiot.cn/prod-api',
+    baseUrl: 'http://localhost:8081',
     timeout: 30000
   }
 }
@@ -59,8 +59,8 @@ export const config: ProjectConfig = {
   baseUrl: currentConfig['baseUrl'] as string,
   timeout: currentConfig['timeout'] as number,
   env: ENV,
-  
-  
+
+
   api: {
     auth: {
       tenantId: '000000', // 租户ID
@@ -69,12 +69,12 @@ export const config: ProjectConfig = {
       appID: 'wxef277996acc166c3'
     },
   },
-  
+
   storage: {
     token: 'access_token',
     refreshToken: 'refresh_token',
   },
-  
+
   configInfo: {
     name: '中导云卡',
     versionCode: 1,
@@ -134,7 +134,7 @@ export function isWechat(): boolean {
   // #ifdef MP-WEIXIN
   return true
   // #endif
-  
+
   return false
 }
 
