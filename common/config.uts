@@ -47,7 +47,7 @@ const API_CONFIG: UTSJSONObject = {
     timeout: 30000
   },
   prod: {
-    baseUrl: 'http://localhost:8081',
+    baseUrl: 'https://cmpapp.zdiot.cn/prod-api',
     timeout: 30000
   }
 }

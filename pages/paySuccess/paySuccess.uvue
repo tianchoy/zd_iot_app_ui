@@ -36,9 +36,9 @@
 			</view>
 
 			<!-- 套餐类型 -->
-			<view class="info-row" v-if="d('pkgType')">
-				<text class="label">套餐类型</text>
-				<text class="value">{{ d('pkgType') }}</text>
+			<view class="info-row" v-if="d('pkgCategory')">
+				<text class="label">套餐分类</text>
+				<text class="value">{{ d('pkgCategory') }}</text>
 			</view>
 
 			<!-- 支付方式 -->
