@@ -16,7 +16,7 @@
 
 			<view class="info-item" v-if="props.traffic">
 				<text class="item-label">流量</text>
-				<text class="item-value">{{ props.traffic }}GB</text>
+				<text class="item-value">{{ DataFormat.formatTraffic(props.traffic) }}</text>
 			</view>
 
 			<view class="info-item" v-if="props.validityPeriod">
@@ -34,17 +34,17 @@
 				<!-- #ifndef MP-WEIXIN -->
 				<view class="method-section">
 					<text class="section-title">选择支付方式</text>
-					<view class="method-option" 
-							v-for="method in sortedPayMethods" 
+					<view class="method-option"
+							v-for="method in sortedPayMethods"
 							:key="method.merchantConfigId"
 							:class="{ 'method-selected': selectedMethodId === method.merchantConfigId }"
 							@click="selectPaymentMethod(method.merchantConfigId)">
 						<view class="method-left">
 							<view class="method-header">
 								<!-- 支付方式图标 -->
-								<image 
-									class="method-icon" 
-									:src="getPayIcon(method.payType)" 
+								<image
+									class="method-icon"
+									:src="getPayIcon(method.payType)"
 									mode="aspectFit"
 								/>
 								<text class="method-label">{{ getPayLabel(method.payType) }}</text>
@@ -69,115 +69,117 @@
 </template>
 
 <script setup lang="uts">
+import {DataFormat} from '@/utils/dataFormat.uts';
+import {AmountUtil} from '@/utils/amount.uts';
 // 定义组件属性 (props)
 const props = defineProps<{
-	// 卡号（可选）
-	cardNumber?: string;
-	// 商品名称（可选）
-	productName?: string;
-	// 流量大小（可选）
-	traffic?: string;
-	// 有效期描述（可选）
-	validityPeriod?: string;
-	// 应付金额（必填）
-	amount: string | number;
-	// 套餐类型：1-天，其他-月
-	pkgType?: string;
-	// 支付方式列表
-	payMethod?: PaymentMethod[];
+// 卡号（可选）
+cardNumber?: string;
+// 商品名称（可选）
+productName?: string;
+// 流量大小（可选）
+traffic?: string;
+// 有效期描述（可选）
+validityPeriod?: string;
+// 应付金额（必填）
+amount: string | number;
+// 套餐类型：1-天，其他-月
+pkgType?: string;
+// 支付方式列表
+payMethod?: PaymentMethod[];
 }>();
 
 // 定义组件事件
 const emit = defineEmits<{
-	(e: 'cancel'): void;
-	(e: 'confirm', paymentMethodId: string): void;
+(e: 'cancel'): void;
+(e: 'confirm', paymentMethodId: string): void;
 }>();
 
 // 支付方式类型定义
 type PaymentMethod = {
-	merchantConfigId: string
-	payType: string
-	desc?: string
+merchantConfigId: string
+payType: string
+desc?: string
 }
 
 // 获取格式化后的金额显示
 const formattedAmount = computed(() => {
-	return `￥${props.amount}`;
+return `${ AmountUtil.format(props.amount)}`;
 });
 
 // 支付方式排序（微信支付在前，支付宝在后）
 const sortedPayMethods = computed(() => {
-	const methods = props.payMethod || [];
-	const priority: Record<string, number> = {
-		'wechat_pay': 0,
-		'ali_pay': 1
-	};
-	return [...methods].sort((a, b) => {
-		const priorityA = priority[a.payType] ?? 99;
-		const priorityB = priority[b.payType] ?? 99;
-		return priorityA - priorityB;
-	});
+const methods = props.payMethod || [];
+const priority: Record<string, number> = {
+  'wechat_pay': 0,
+  'ali_pay': 1
+};
+return [...methods].sort((a, b) => {
+  const priorityA = priority[a.payType] ?? 99;
+  const priorityB = priority[b.payType] ?? 99;
+  return priorityA - priorityB;
+});
 });
 
 // 当前选中的支付方式ID（默认选中第一个）
 const selectedMethodId = ref<string>(sortedPayMethods.value[0]?.merchantConfigId);
 
 /**
- * 获取支付方式图标路径
- * @param payType 支付类型：wechat_pay | ali_pay
- * @returns 图标路径
- */
+* 获取支付方式图标路径
+* @param payType 支付类型：wechat_pay | ali_pay
+* @returns 图标路径
+*/
 const getPayIcon = (payType: string): string => {
-	const iconMap: Record<string, string> = {
-		'wechat_pay': '/static/wx-pay.png',
-		'ali_pay': '/static/ali-pay.png'
-	};
-	// 如果找不到对应图标，返回默认图标
-	return iconMap[payType] || '/static/default-pay.png';
+const iconMap: Record<string, string> = {
+  'wechat_pay': '/static/wx-pay.png',
+  'ali_pay': '/static/ali-pay.png'
+};
+// 如果找不到对应图标，返回默认图标
+return iconMap[payType] || '/static/default-pay.png';
 };
 
 /**
- * 获取支付方式显示名称
- * @param payType 支付类型
- * @returns 显示名称
- */
+* 获取支付方式显示名称
+* @param payType 支付类型
+* @returns 显示名称
+*/
 const getPayLabel = (payType: string): string => {
-	const labelMap: Record<string, string> = {
-		'wechat_pay': '微信支付',
-		'ali_pay': '支付宝支付'
-	};
-	return labelMap[payType] || payType;
+const labelMap: Record<string, string> = {
+  'wechat_pay': '微信支付',
+  'ali_pay': '支付宝支付'
+};
+return labelMap[payType] || payType;
 };
 
 
 /**
- * 选择支付方式
- * @param methodId 支付方式ID
- */
+* 选择支付方式
+* @param methodId 支付方式ID
+*/
 const selectPaymentMethod = (methodId: string) => {
-	selectedMethodId.value = methodId;
+selectedMethodId.value = methodId;
 };
 
 /**
- * 取消支付
- */
+* 取消支付
+*/
 const handleCancel = () => {
-	emit('cancel');
+emit('cancel');
 };
 
 /**
- * 确认支付
- */
+* 确认支付
+*/
 const handleConfirm = () => {
-	// #ifdef MP-WEIXIN
-	// 微信小程序环境：固定支付方式标识符
-	emit('confirm', 'wechat_miniprogram');
-	// #endif
+// #ifdef MP-WEIXIN
+// 微信小程序环境：固定支付方式标识符
+emit('confirm', 'wechat_miniprogram');
+// #endif
 
-	// #ifndef MP-WEIXIN
-	// H5等环境：使用当前选中的支付方式
-	emit('confirm', selectedMethodId.value);
-	// #endif
+// #ifndef MP-WEIXIN
+// H5等环境：使用当前选中的支付方式
+emit('confirm', selectedMethodId.value);
+// #endif
 };
 </script>
 

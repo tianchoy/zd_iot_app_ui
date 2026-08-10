@@ -208,7 +208,11 @@ const onScanResult = async (data: UTSJSONObject) => {
 
 const getCardList = async (state: string): Promise<RechargeData[]> => {
 	try {
+    if(!card_number.value){
+      return
+    }
 		const res = await queryCardList({
+      rechargeNo: card_number.value,
 			status: state,
 			isSort: true
 		})
@@ -259,7 +263,7 @@ const getCode = async (): Promise<boolean> => {
 			},
 			fail: (err) => {
 				console.error('登录失败:', err)
-				resolve(false) 
+				resolve(false)
 			}
 		})
 	})
@@ -298,7 +302,7 @@ const platform = async () => {
 			cardList.value = []
 			cardCounts.value = [0, 0, 0]
 			const loginSuccess = await getCode()
-		
+
 			// 登录失败时，不加载数据
 			if (!loginSuccess) {
 				console.log('登录失败，跳过数据加载')
@@ -323,7 +327,10 @@ const handleClick = (e: UTSJSONObject) => {
 	if (e.index != null) {
 		current.value = e.index as number
 		getCardList(current.value.toString()).then((list) => {
-			cardList.value = list
+      if(list){
+        cardList.value = list
+        cardCounts.value[current.value] = list.length
+      }
 		})
 	}
 }
@@ -337,7 +344,7 @@ onLoad(() => {
 })
 
 onShow(() => {
-	
+
 })
 
 onUnload(() => {
@@ -356,7 +363,7 @@ onUnload(() => {
 		// #ifdef MP-WEIXIN || H5
 		min-height: 100%;
 		// #endif
-		
+
 		.card-box{
 			display: flex;
 			flex-direction: column;
@@ -370,13 +377,13 @@ onUnload(() => {
 				margin:24rpx;
 				margin-bottom: 0;
 			}
-			
+
 			.search-value{
 				display: flex;
 				flex-direction: row;
 				border:1rpx solid #dbe5f0;
 				border-radius: 24rpx;
-				
+
 				.search-input{
 					flex:1;
 					padding: 0 25rpx;
@@ -390,21 +397,21 @@ onUnload(() => {
 					border-left: 1px solid #eef2f7;
 				}
 			}
-			
+
 			.card-item{
 				display: flex;
 				flex-direction: column;
 				border-bottom: 1px solid #e7edf5;
 				padding: 24rpx 24rpx 30rpx 24rpx;
 				margin-bottom: 30rpx;
-				
+
 				.item-head{
 					display: flex;
 					flex-direction: row;
 					align-items: flex-start;
 					justify-content: space-between;
 					margin-bottom: 18rpx;
-					
+
 					.card-item-title{
 						font-size: 32rpx;
 						font-weight: 800;
@@ -428,7 +435,7 @@ onUnload(() => {
 						color: #07c160;
 						border: 1rpx solid #07c160;
 					}
-					
+
 					.status-pending {
 						background: #fff2f0;
 						color: #f56c6c;
@@ -446,7 +453,7 @@ onUnload(() => {
 					flex-direction: row;
 					align-items: center;
 					min-width: 0;
-					
+
 					.package-label{
 						font-size: 12px;
 						color: #64748b;
@@ -469,7 +476,7 @@ onUnload(() => {
 					flex-wrap: wrap;
 					margin: 20rpx 0;
 					gap: 24rpx;
-					
+
 					.metric-box{
 						flex:1;
 						box-sizing: border-box;
@@ -478,7 +485,7 @@ onUnload(() => {
 						border-radius: 25rpx;
 						padding: 20rpx 20rpx 10rpx;
 						min-width: 0;
-						
+
 						.metric-label{
 							font-size: 25rpx;
 							color: #94a3b8;
@@ -498,12 +505,12 @@ onUnload(() => {
 					flex-direction: row;
 					align-items: center;
 					justify-content: space-between;
-					
+
 					.card-cycle-text{
 						display: flex;
 						flex-direction: row;
 						align-items: center;
-						
+
 						.cycle-label{
 							font-size: 25rpx;
 							color: #64748b;
@@ -527,13 +534,13 @@ onUnload(() => {
 		.card-list-box{
 			padding:0;
 		}
-		
+
 		.card-list {
 			flex: 1;
 			width: 100%;
 			overflow: auto;
 		}
-		
+
 		.empty-state {
 			display: flex;
 			flex-direction: column;
@@ -543,7 +550,7 @@ onUnload(() => {
 			background-color: #ffffff;
 			margin: 0 24rpx;
 			border-radius: 24rpx;
-			
+
 			.empty-text {
 				font-size: 28rpx;
 				color: #9ca3af;

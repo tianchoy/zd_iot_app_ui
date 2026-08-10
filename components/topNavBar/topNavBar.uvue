@@ -11,7 +11,8 @@
 		</view>
 		<view class="capsule">
 			<view class="capsule-item">
-				<view v-if="showCapsule" :class="{ 'capsule-text-action': !isIcon && rightActionBackgroundColor !== 'transparent' }" :style="!isIcon ? { backgroundColor: rightActionBackgroundColor } : {}" @click="emit('capsuleClick', 'menu')">
+				<view v-if="showCapsule" :class="{ 'capsule-text-action': !isIcon && rightActionBackgroundColor !== 'transparent' }"
+            :style="!isIcon ? { backgroundColor: rightActionBackgroundColor } : {}" @click="emit('capsuleClick', 'menu')">
 					<rice-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></rice-icon>
 					<text v-else :style="{ fontSize: rightTextFontSize }">{{rightText}}</text>
 				</view>
@@ -31,7 +32,8 @@
 			</view>
 			<view class="capsule">
 				<view class="capsule-item">
-					<view v-if="showCapsule" :class="{ 'capsule-text-action': !isIcon && rightActionBackgroundColor !== 'transparent' }" :style="!isIcon ? { backgroundColor: rightActionBackgroundColor } : {}" @click="emit('capsuleClick', 'menu')">
+					<view v-if="showCapsule" :class="{ 'capsule-text-action': !isIcon && rightActionBackgroundColor !== 'transparent' }"
+              :style="!isIcon ? { backgroundColor: rightActionBackgroundColor } : {}" @click="emit('capsuleClick', 'menu')">
 						<rice-icon v-if="isIcon" :name="Icon" size="26" :color="iconColor"></rice-icon>
 						<text v-else :style="{ fontSize: rightTextFontSize }">{{rightText}}</text>
 					</view>
@@ -39,7 +41,7 @@
 			</view>
 		</view>
 	</template>
-	
+
 	<!-- 固定定位模式下的占位元素（防止内容被遮挡） -->
 	<view v-if="isShowStyle" :style="{ height: totalNavHeight + 'px' }"></view>
 </template>
@@ -99,7 +101,7 @@ const getNavBarInfo = () => {
 	try {
 		const systemInfo = uni.getSystemInfoSync();
 		statusBarHeight.value = systemInfo.statusBarHeight || 20;
-		
+
 		const menuButtonInfo = uni.getMenuButtonBoundingClientRect();
 		if (menuButtonInfo) {
 			const navHeight = (menuButtonInfo.top - statusBarHeight.value) * 2 + menuButtonInfo.height;
@@ -109,7 +111,7 @@ const getNavBarInfo = () => {
 		console.error('获取导航栏信息失败', e);
 	}
 	// #endif
-	
+
 	// #ifdef H5
 	statusBarHeight.value = 0;
 	navBarHeight.value = 44;
@@ -168,6 +170,7 @@ onMounted(() => {
 	justify-content: flex-end;
 	flex-shrink: 0;
 	min-width: 70rpx;
+  margin-right: 20rpx;
 }
 
 .capsule-item {

@@ -35,21 +35,21 @@
 		<view class="pkg-box">
 			<rice-tabs
 				v-model="active"
-				line-color="#ffffff" 
-				:list="tabs" 
-				:line-width="0" 
-				:title-active-color="'#2563eb'" 
+				line-color="#ffffff"
+				:list="tabs"
+				:line-width="0"
+				:title-active-color="'#2563eb'"
 				:title-inactive-color="'#64748b'"
-				@change="changeTab" 
+				@change="changeTab"
 				:customStyle="{height:'85rpx',padding:'10rpx',border:'1rpx solid #e5edf6'}"
 			>
 			</rice-tabs>
 			<view class="pkg-content">
 				<!-- 套餐包列表 -->
 				<block v-if="active === 0">
-					<view 
-						v-for="(item, index) in packageList" 
-						:key="item.pkgId || index" 
+					<view
+						v-for="(item, index) in packageList"
+						:key="item.pkgId || index"
 						class="pkg-card"
 						:class="{ 'pkg-card-selected': selectedPackageIndex === index }"
 						@click="selectPackage(index,item)"
@@ -60,17 +60,17 @@
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ item.pkgFlow }}GB</text>
+								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ DataFormat.formatTraffic(item.pkgFlow) }}</text>
 								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod }}{{ item?.pkgType == '1' ? '天' : '个月' }}</text>
 							</view>
 						</view>
 						<view class="pkg-price">
 							<view class="price-wrapper">
 								<text class="price-symbol">¥</text>
-								<text class="price-number">{{ item.sellingPrice }}</text>
+								<text class="price-number">{{ AmountUtil.format(item.sellingPrice, {showSymbol: false}) }}</text>
 							</view>
 							<view class="price-original" v-if="item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice">
-								¥{{ item.crossedOutPrice }}
+								¥{{ AmountUtil.format(item.crossedOutPrice, {showSymbol: false}) }}
 							</view>
 						</view>
 					</view>
@@ -78,9 +78,9 @@
 				</block>
 				<!-- 加油包列表 -->
 				<block v-else>
-					<view 
-						v-for="(item, index) in refillList" 
-						:key="item.pkgId || index" 
+					<view
+						v-for="(item, index) in refillList"
+						:key="item.pkgId || index"
 						class="pkg-card"
 						:class="{ 'pkg-card-selected': selectedRefillIndex == index }"
 						@click="selectRefill(index)"
@@ -91,17 +91,17 @@
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ item.pkgFlow }}GB</text>
+								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ DataFormat.formatTraffic(item.pkgFlow) }}</text>
 								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod }}{{ item?.pkgType == '1' ? '天' : '个月' }}</text>
 							</view>
 						</view>
 						<view class="pkg-price">
 							<view class="price-wrapper">
 								<text class="price-symbol">¥</text>
-								<text class="price-number">{{ item.sellingPrice }}</text>
+								<text class="price-number">{{ AmountUtil.format(item.sellingPrice, {showSymbol: false}) }}</text>
 							</view>
 							<view class="price-original" v-if="item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice">
-								¥{{ item.crossedOutPrice }}
+								¥{{ AmountUtil.format(item.crossedOutPrice, {showSymbol: false}) }}
 							</view>
 						</view>
 					</view>
@@ -115,8 +115,8 @@
 		position="bottom"
 		@close="onPopupClose"
 	>
-		<Payment 
-			:amount="currentPrice" 
+		<Payment
+			:amount="currentPrice"
 			@cancel="handleCancelPayment"
 			@confirm="handleConfirmPayment"
 			:cardNumber="cardDetail?.rechargeNo"
@@ -138,7 +138,7 @@
 		<view class="pay-content">
 			<view class="price-box">
 				<text class="price-label">当前套餐金额</text>
-				<text class="price-value">¥{{ currentPrice }}</text>
+				<text class="price-value">{{ AmountUtil.format(currentPrice) }}</text>
 			</view>
 			<rice-button type="primary" width="300rpx" height="110rpx" @click="choosePayment" class="btn">去支付</rice-button>
 		</view>
@@ -180,6 +180,8 @@
 	import { config , getTenantId,isWechat,isH5,setToken,setStorageSync,getToken} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	import tousu from '@/components/tousu.uvue';
+	import {DataFormat} from '@/utils/dataFormat.uts';
+	import {AmountUtil} from '@/utils/amount.uts';
 	defineOptions({
 		inheritAttrs: false
 	})
@@ -189,13 +191,13 @@
 	const closeTips = () => {
 		showTips.value = false;
 	}
-	
+
 	const showPopup = ref<boolean>(false);
 	// 添加标记：是否正在支付流程中
 	const isInPaymentProcess = ref<boolean>(false);
 	// 是否显示返回按钮
 	const showBack = ref<boolean>(true);
-	
+
 	/** 卡详情 */
 	const cardDetail = ref<RechargeData | null>(null)
 
@@ -203,32 +205,32 @@
 	const percentage = computed<number>((): number => {
 		const detail = cardDetail.value
 		if (detail == null) return 0
-		
+
 		const usedFlow = detail.usedPeriod
 		const totalFlow = detail.pkgFlow
-		
+
 		// 如果没有数据，返回0
 		if (usedFlow == null || totalFlow == null) {
 			return 0;
 		}
-		
+
 		const used = Number.parseFloat(usedFlow);
 		const total = Number.parseFloat(totalFlow);
-		
+
 		// 避免除以0
 		if (total === 0) {
 			return 0;
 		}
-		
+
 		// 计算百分比，保留整数
 		let percent = (used / total) * 100;
-		
+
 		// 限制百分比在0-100之间
 		percent = Math.min(100, Math.max(0, percent));
-		
+
 		return Math.round(percent);
 	});
-	
+
 	const active = ref<number>(0);
 	const tabs = ref<any[]>([
 		{
@@ -238,22 +240,22 @@
 			name: '加油包'
 		}
 	]);
-	
+
 	// 套餐包列表
 	const packageList = ref<Array<PkgXcxVo>>([]);
 	// 加油包列表
 	const refillList = ref<Array<PkgXcxVo>>([]);
-	
+
 	// 选中的套餐包索引
 	const selectedPackageIndex = ref<number>(0);
 	// 选中的加油包索引
 	const selectedRefillIndex = ref<number>(0);
 	// 选中的套餐包
 	const selectedPackage = ref<PkgXcxVo | null>(null);
-	
+
 	// 从URL参数中获取的默认pkgId
 	const defaultPkgId = ref<string>('');
-	
+
 	// 当前选中的套餐/加油包
 	const currentPackage = computed<PkgXcxVo | null>((): PkgXcxVo | null => {
 		if (active.value === 0) {
@@ -261,7 +263,7 @@
 		}
 		return refillList.value[selectedRefillIndex.value] ?? null;
 	});
-	
+
 	// 当前价格（根据选中的套餐/加油包计算）
 	const currentPrice = computed<string>((): string => {
 		if (active.value === 0) {
@@ -272,12 +274,12 @@
 			return item ? item.sellingPrice : '0.00';
 		}
 	});
-	
+
 	// 根据 pkgCategory 分类套餐和加油包，并按 pkgSort 排序
 	const classifyPackages = (packages: Array<PkgXcxVo>) => {
 		const packagesList: Array<PkgXcxVo> = [];
 		const refillsList: Array<PkgXcxVo> = [];
-		
+
 		packages.forEach((item, index) => {
 			// pkgCategory: 3为套餐，4为加油包
 			if (item.pkgCategory == '3') {
@@ -286,7 +288,7 @@
 				refillsList.push(item);
 			}
 		});
-		
+
 		// 按 pkgSort 排序（升序，数值越小越靠前）
 		// pkgSort 为 null 或 undefined 的排到最后
 		const sortByPkgSort = (a: PkgXcxVo, b: PkgXcxVo) => {
@@ -294,20 +296,20 @@
 			const sortB = b.pkgSort ?? Number.MAX_SAFE_INTEGER;
 			return sortA - sortB;
 		};
-		
+
 		packageList.value = packagesList.sort(sortByPkgSort);
 		refillList.value = refillsList.sort(sortByPkgSort);
-		
+
 		// 根据URL参数中的pkgId设置默认选中
 		setDefaultSelection();
 	};
-	
+
 	// 设置默认选中的套餐/加油包
 	const setDefaultSelection = () => {
 		const packagesList = packageList.value;
 		const refillsList = refillList.value;
 		const defaultId = defaultPkgId.value;
-		
+
 		// 如果有默认pkgId，尝试匹配
 		if (defaultId) {
 			// 先在套餐包中查找
@@ -317,7 +319,7 @@
 				active.value = 0;
 				return;
 			}
-			
+
 			// 再在加油包中查找
 			const refillIndex = refillsList.findIndex(item => item.pkgId === defaultId);
 			if (refillIndex !== -1) {
@@ -326,7 +328,7 @@
 				return;
 			}
 		}
-		
+
 		// 如果没有默认pkgId或未匹配到，优先选中第一个套餐，没有套餐则选中第一个加油包
 		if (packagesList.length > 0) {
 			selectedPackageIndex.value = 0;
@@ -347,7 +349,7 @@
 		typeMap.set('停机', 'error')
 		return typeMap.get(status) ?? 'warning'
 	}
-	
+
 	interface TabEvent {
 		index: number
 	}
@@ -355,16 +357,16 @@
 	const changeTab = (e: TabEvent) => {
 		active.value = e.index;
 	}
-	
+
 	const selectPackage = (index: number, item: PkgXcxVo) => {
 		selectedPackageIndex.value = index;
 		selectedPackage.value = item;
 	}
-	
+
 	const selectRefill = (index: number) => {
 		selectedRefillIndex.value = index;
 	}
-	
+
 	// 选择支付方式
 	const choosePayment = () => {
 		if (active.value === 0 && packageList.value.length === 0) {
@@ -383,7 +385,7 @@
 		}
 		showPopup.value = true;
 	}
-	
+
 	// 取消支付
 	const handleCancelPayment = () => {
 		showPopup.value = false;
@@ -398,7 +400,7 @@
 		payChannelId.value = res.payChannelId
 		// 设置正在支付流程中
 		isInPaymentProcess.value = true
-		
+
 		if(res.payWxType == 'wechat_pay'){
 			uni.requestPayment({
 				provider: 'wxpay',
@@ -482,7 +484,7 @@
 				wx.navigateToMiniProgram({
 					appId: config.api.auth.appID,
 					extraData: param,
-					success(res) { 
+					success(res) {
 						console.log('支付成功:', res);
 					},
 					fail(res) {
@@ -506,7 +508,7 @@
 			console.error('未找到支付表单');
 		}
 	};
-	
+
 	// 确认支付
 	const handleConfirmPayment =  async (e: any) => {
 		console.log('确认支付:', e)
@@ -517,7 +519,7 @@
 
 		showPopup.value = false;
 		// 获取当前选中的套餐信息
-		const currentItem = active.value === 0 
+		const currentItem = active.value === 0
 			? packageList.value[selectedPackageIndex.value]
 			: refillList.value[selectedRefillIndex.value];
 
@@ -530,7 +532,7 @@
 				rechargeNo: cardNumber.value,
 			}
 		}
-		
+
 		if(isH5()){
 			params = {
 				pkgId: currentItem.pkgId,
@@ -540,13 +542,13 @@
 		}
 
 		console.log('params:', params)
-		
+
 		// 处理确认逻辑
 		try {
 			const res = await addOrder(params)
 			if(res.code == 200){
 				console.log('添加订单成功:', res)
-				
+
 				if(isWechat()){
 					toPay(res.data)
 				}
@@ -574,24 +576,24 @@
 			})
 		}
 	}
-	
+
 	const onPopupClose = () => {
 		console.log('弹窗关闭');
 	}
-	
+
 	const goBack = () => {
 		uni.navigateBack({
 			delta: 1
 		})
 	}
-	
+
 	// 跳转我的套餐
 	const toMyPackage = () => {
 		uni.navigateTo({
 			url: '/pages/myPkg/myPkg?card_number=' + cardNumber.value
 		})
 	}
-	
+
 	// 跳转订单记录
 	const toOrderRecord = () => {
 		uni.navigateTo({
@@ -630,7 +632,7 @@
 		const phoneStr = cardDetail.value?.objectMap?.servicePhone || ''
 		return phoneStr ? phoneStr.split(',').map(item => item.trim()) : []
 	})
-	
+
 	const handleConnectService = () => {
 		if(cardDetail.value?.objectMap.serviceJumpUrl){
 			window.open(cardDetail.value?.objectMap.serviceJumpUrl,'_blank')
@@ -639,7 +641,7 @@
 				showCustomService.value = true;
 			}, 100);
 		}
-		
+
 	}
 
 	const checkToken = (): boolean => {
@@ -669,12 +671,12 @@
 		const countryValue = opt.country
 		const from = opt.from
 		const pkgId = opt.pkgId
-		
+
 		// 保存默认的pkgId
 		if (pkgId) {
 			defaultPkgId.value = pkgId
 		}
-		
+
 		handleBack()
 		if (cardNumberValue) {
 			cardNumber.value = cardNumberValue
@@ -741,7 +743,7 @@
 		}
 	}
 
-	
+
 
 	onShow(() => {
 		let options = uni.getEnterOptionsSync();
@@ -935,7 +937,7 @@
 			padding: 28rpx 24rpx;
 			margin-bottom: 20rpx;
 			transition: all 0.2s ease;
-			
+
 			.pkg-info {
 				flex: 1;
 				.pkg-name {
@@ -1033,12 +1035,12 @@
 			margin: 24rpx;
 			position: relative;
 			overflow: visible;
-			
+
 			.tips-text {
 				display: block;
 				line-height: 1.6;
 			}
-			
+
 			.tips-close {
 				position: absolute;
 				right: -5rpx;

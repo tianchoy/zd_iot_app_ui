@@ -8,7 +8,7 @@
 			<!-- 头部：套餐名称和状态 -->
 			<view class="card-header">
 				<text class="package-name" v-if="d('pkgName')">{{ d('pkgName') }}</text>
-				<rice-tag v-if="d('status')" :text="d('status')" :round="true" plain-fill size="small" type="success"></rice-tag>
+				<rice-tag v-if="d('status')" :text="getPackageStatusText(d('status'))" :round="true" plain-fill size="small" :type="getPackageStatusType(d('status'))"></rice-tag>
 			</view>
 
 			<!-- 卡号 -->
@@ -24,9 +24,9 @@
 						<text class="traffic-title">流量使用</text>
 					</view>
 					<view class="traffic-progress">
-						<text class="used-text">已用{{ d('usedFlow') }} GB</text>
+						<text class="used-text">已用{{DataFormat.formatTraffic(d('usedFlow')) }} </text>
 						<text class="divider">/</text>
-						<text class="total-text">剩余{{ d('unUsedFlow') }} GB</text>
+						<text class="total-text">剩余{{ DataFormat.formatTraffic(d('unUsedFlow')) }} </text>
 					</view>
 				</view>
 
@@ -39,7 +39,7 @@
 			<view class="info-grid">
 				<view class="info-item" v-if="d('pkgFlow')">
 					<text class="info-label">套餐流量</text>
-					<text class="info-value">{{ d('pkgFlow') }} GB</text>
+					<text class="info-value">{{ DataFormat.formatTraffic(d('pkgFlow')) }} </text>
 				</view>
 				<view class="info-item" v-if="d('startDate')">
 					<text class="info-label">生效时间</text>
@@ -72,7 +72,7 @@
 				</view>
 				<view class="order-row" v-if="d('payAmount')">
 					<text class="order-label">支付金额</text>
-					<text class="order-value price">￥{{ d('payAmount') }}</text>
+					<text class="order-value price">{{ AmountUtil.format(d('payAmount')) }}</text>
 				</view>
 				<view class="order-row" v-if="d('orderCreateTime')">
 					<text class="order-label">下单时间</text>
@@ -86,6 +86,8 @@
 <script setup lang="uts">
 	import {queryPkgInfoXcx} from '@/api/http';
 	import {ref, computed} from 'vue';
+	import {DataFormat} from '@/utils/dataFormat.uts';
+  import {AmountUtil} from '@/utils/amount.uts';
 
 	const showLoading = ref(false)
 	const pkgId = ref<string>('')
@@ -100,15 +102,15 @@
 
 	const flowPercentage = computed(() => {
 		if (!pkgInfo.value) return 0
-		
+
 		const info = pkgInfo.value as UTSJSONObject
 		const usedFlowStr = info['usedFlow'] as string
 		const pkgFlowStr = info['pkgFlow'] as string
 		const usedFlow = usedFlowStr != null && usedFlowStr != '' ? Number.parseInt(usedFlowStr) : 0
 		const pkgFlow = pkgFlowStr != null && pkgFlowStr != '' ? Number.parseInt(pkgFlowStr) : 0
-		
+
 		if (pkgFlow <= 0) return 0
-		
+
 		return Math.min((usedFlow / pkgFlow) * 100, 100)
 	})
 	// 初始化查询套餐信息详情
@@ -139,6 +141,24 @@
 	const handleBack = () => {
 		// 处理返回逻辑
 		uni.navigateBack()
+	}
+
+	// 获取套餐状态对应的文本
+	const getPackageStatusText = (status: string): string => {
+		const statusMap = new Map<string, string>()
+		statusMap.set('0', '未生效')
+		statusMap.set('1', '生效中')
+		statusMap.set('2', '已失效')
+		return statusMap.get(status) ?? status ?? '未知'
+	}
+
+	// 获取套餐状态对应的标签类型
+	const getPackageStatusType = (status: string): string => {
+		const typeMap = new Map<string, string>()
+		typeMap.set('0', 'success')
+		typeMap.set('1', 'primary')
+		typeMap.set('2', 'error')
+		return typeMap.get(status) ?? 'primary'
 	}
 
 	onLoad((options: UTSJSONObject) => {
