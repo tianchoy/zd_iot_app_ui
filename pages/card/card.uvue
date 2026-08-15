@@ -207,15 +207,17 @@ const onScanResult = async (data: UTSJSONObject) => {
 
 
 const getCardList = async (state: string): Promise<RechargeData[]> => {
+	console.log('查询卡片列表state', state)
 	try {
-    if(!card_number.value){
-      return
-    }
+		if (!card_number.value) {
+			return [] as RechargeData[]
+		}
 		const res = await queryCardList({
       rechargeNo: card_number.value,
 			status: state,
 			isSort: true
 		})
+		console.log('查询卡片列表', res)
 		if (res.code == 200) {
 			return Array.isArray(res.data) ? res.data : [] as RechargeData[]
 		}
@@ -324,13 +326,16 @@ const handleClick = (e: UTSJSONObject) => {
 		if (!checkToken()) return;
 	}
 
+	console.log('点击了', e.index)
+
 	if (e.index != null) {
 		current.value = e.index as number
 		getCardList(current.value.toString()).then((list) => {
-      if(list){
-        cardList.value = list
-        cardCounts.value[current.value] = list.length
-      }
+			console.log('查询卡片列表', list)
+			if(list){
+				cardList.value = list
+				cardCounts.value[current.value] = list.length
+			}
 		})
 	}
 }
