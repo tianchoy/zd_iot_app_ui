@@ -15,15 +15,14 @@
 				<view class="info-item">
 					<text class="label">有效期</text>
 					<view class="value" style="display: flex; flex-direction: row; align-items: center; flex-wrap: nowrap; white-space: nowrap;">
-						<text v-if="cardDetail?.effectiveTime">{{ cardDetail?.effectiveTime }} </text>
-						<text v-if="!cardDetail?.expirationTime">~ {{ cardDetail?.effectiveTime }}</text>
+						<text style="font-size: 22rpx;" v-if="cardDetail?.effectiveTime">{{ cardDetail?.effectiveTime }} </text>
+						<text style="font-size: 22rpx;" v-if="cardDetail?.expirationTime">~ {{ cardDetail?.expirationTime }}</text>
 					</view>
 				</view>
 			</view>
 			<view class="flow-box" v-if="cardDetail?.pkgFlow">
 				<view class="flow-label">
-					<text class="label">流量信息</text>
-					<text class="value">已用 {{ cardDetail?.usedFlow || 0 }}GB / 剩余 {{ cardDetail?.unUsedFlow || 0 }}GB / 总流量 {{ cardDetail?.pkgFlow || 0 }}GB</text>
+					<text class="value" style="font-size: 22rpx;">已用 {{ DataFormat.formatTraffic(cardDetail?.usedFlow) }} / 剩余 {{ DataFormat.formatTraffic(cardDetail?.unUsedFlow) }} / 总流量 {{ DataFormat.formatTraffic(cardDetail?.pkgFlow) }}</text>
 				</view>
 				<rice-progress :percentage="percentage" show-text />
 			</view>
@@ -205,8 +204,7 @@
 	const percentage = computed<number>((): number => {
 		const detail = cardDetail.value
 		if (detail == null) return 0
-
-		const usedFlow = detail.usedPeriod
+		const usedFlow = detail.usedFlow
 		const totalFlow = detail.pkgFlow
 
 		// 如果没有数据，返回0

@@ -41,9 +41,9 @@
 							</view>
 							<view class="section-title" v-if="cardDetail?.pkgFlow">流量使用</view>
 							<view class="data-total" v-if="cardDetail?.pkgFlow">
-								<view class="total-item"><text class="total-label">本期已用</text><text class="total-value">{{cardDetail?.usedFlow != null && cardDetail?.usedFlow !== '' ? cardDetail?.usedFlow : '0'}}GB</text></view>
-								<view class="total-item"><text class="total-label">本期剩余</text><text class="total-value">{{cardDetail?.unUsedFlow != null && cardDetail?.unUsedFlow !== '' ? cardDetail?.unUsedFlow : '0'}}GB</text></view>
-								<view class="total-item"><text class="total-label">总流量</text><text class="total-value">{{cardDetail?.pkgFlow != null && cardDetail?.pkgFlow !== '' ? cardDetail?.pkgFlow : '0'}}GB</text></view>
+								<view class="total-item"><text class="total-label">本期已用</text><text class="total-value">{{ DataFormat.formatTraffic(cardDetail?.usedFlow) }}</text></view>
+								<view class="total-item"><text class="total-label">本期剩余</text><text class="total-value">{{ DataFormat.formatTraffic(cardDetail?.unUsedFlow) }}</text></view>
+								<view class="total-item"><text class="total-label">总流量</text><text class="total-value">{{ DataFormat.formatTraffic(cardDetail?.pkgFlow) }}</text></view>
 							</view>
 						</view>
 
