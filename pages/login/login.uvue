@@ -3,10 +3,10 @@
 	<view class="container">
 		<image src="/static/defaultAvator.png" class="logo"></image>
 		<view class="login-btn">
-			<button 
-			open-type="getPhoneNumber" 
-			type="primary" 
-			plain="true"	
+			<button
+			open-type="getPhoneNumber"
+			type="primary"
+			plain="true"
 			@getphonenumber="handleGetPhoneNumber">
 			个人用户登录
 			</button>
@@ -79,10 +79,9 @@
 			})
 			return
 		}
-		console.log('handleGetPhoneNumber:', res)
 		const detail = res['detail'] as UTSJSONObject
-		
-		getLogin(detail['code'] as string)
+		const phoneCode = detail['code'] as string
+		getLogin(phoneCode)
 	}
 
 	//暂不登录
@@ -111,9 +110,9 @@
 		userId.value = getStorageSync('userId') as string || options['userId'] as string
 		from.value = options['from'] as string
 		rechargeNo.value = options['rechargeNo'] as string
-		
+
 	})
-	
+
 </script>
 
 <style lang="scss" scoped>
