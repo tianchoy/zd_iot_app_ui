@@ -47,7 +47,7 @@ const API_CONFIG: UTSJSONObject = {
     timeout: 30000
   },
   prod: {
-    baseUrl: 'https://cmpapp.zdiot.cn/prod-api',
+    baseUrl: 'https://cmph5.zdiot.cn/prod-api',
     timeout: 30000
   }
 }
@@ -66,7 +66,7 @@ export const config: ProjectConfig = {
       tenantId: '000000', // 租户ID
       clientId: '12353d4772a25656d6d2a67d53353cc3',
       grantType: 'xcx',
-      appID: 'wx2ebcdca9a6dfc8f0'
+      appID: 'wxf451813ad3364a12'
     },
   },
 
