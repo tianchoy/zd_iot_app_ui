@@ -1,5 +1,8 @@
 <template>
+	<!-- 微信半屏小程序由微信提供顶部导航栏，不能再叠加自定义导航栏；H5 等端继续使用项目自定义导航。 -->
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar title="充值首页" :show-back="showBack" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
 	<view class="container">
 		<view class="card-info">
 			<view class="card-title">
@@ -143,8 +146,8 @@
 		</view>
 	</view>
 	<view ref="formContainer" class="form-container"></view>
-	<customService @connect_service="handleConnectService"></customService>
-	<tousu @connect_tousu="handleConnectTousu"></tousu>
+	<customService v-if="cardDetail?.objectMap?.serviceJumpUrl" @connect_service="handleConnectService"></customService>
+	<tousu v-if="false" @connect_tousu="handleConnectTousu"></tousu>
 	<rice-popup v-model:show="showCustomService" position="bottom">
 		<view class="popup-center">
 			<view class="cs-list" v-if="cardDetail?.objectMap?.serviceQrcode">
@@ -527,14 +530,14 @@
 		if(isWechat()){
 			params = {
 				pkgId: currentItem.pkgId,
-				rechargeNo: cardNumber.value,
+				rechargeNo: cardDetail.value.rechargeNo,
 			}
 		}
 
 		if(isH5()){
 			params = {
 				pkgId: currentItem.pkgId,
-				rechargeNo: cardNumber.value,
+				rechargeNo: cardDetail.value.rechargeNo,
 				merchantConfigId
 			}
 		}

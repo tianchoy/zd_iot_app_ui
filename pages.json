@@ -10,7 +10,8 @@
 		{
 			"path": "pages/recharge/recharge",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "充值首页",
+				"navigationStyle": "default"
 			}
 		},
 		// #endif
