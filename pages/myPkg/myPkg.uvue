@@ -1,5 +1,7 @@
 <template>
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar title="我的套餐" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
 	<view class="container">
 		<view class="card-info">
 			<view class="info-title">当前卡号</view>

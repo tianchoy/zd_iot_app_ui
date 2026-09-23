@@ -1,7 +1,9 @@
 <template>
+<!-- #ifndef MP-WEIXIN -->
 <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" rightTextFontSize="26rpx" rightText="我的反馈" @capsuleClick="handleMyFeedback"></topNavBar>
 
  <!-- <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" @capsuleClick="handleMyFeedback"></topNavBar> -->
+<!-- #endif -->
  <view class="container">
   <view class="card-box">
    <rice-tabs

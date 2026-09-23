@@ -590,15 +590,16 @@
 
 	// 跳转我的套餐
 	const toMyPackage = () => {
+		console.log('跳转我的套餐:', cardDetail.value.rechargeNo)
 		uni.navigateTo({
-			url: '/pages/myPkg/myPkg?card_number=' + cardNumber.value
+			url: '/pages/myPkg/myPkg?card_number=' + cardDetail.value.rechargeNo
 		})
 	}
 
 	// 跳转订单记录
 	const toOrderRecord = () => {
 		uni.navigateTo({
-			url: '/pages/orderRecord/orderRecord?rechargeNo=' + cardNumber.value
+			url: '/pages/orderRecord/orderRecord?rechargeNo=' + cardDetail.value.rechargeNo
 		})
 	}
 
