@@ -43,7 +43,7 @@ const ENV = 'prod' //  dev | prod
 
 const API_CONFIG: UTSJSONObject = {
   dev: {
-    baseUrl: 'http://192.168.1.222:8081',
+    baseUrl: 'http://127.0.0.1:8081',
     timeout: 30000
   },
   prod: {
@@ -63,10 +63,13 @@ export const config: ProjectConfig = {
 
   api: {
     auth: {
+      // 打包说明：多个小程序共用同一套代码时，tenantId 一般相同（同一租户），
+      // 而 appID 必须改成目标小程序的 appid，并与 manifest.json 的 mp-weixin.appid 保持一致。
+      // 服务端按 appID 反查所属租户与 appSecret，填错会导致登录/支付失败。
       tenantId: '000000', // 租户ID
       clientId: '12353d4772a25656d6d2a67d53353cc3',
       grantType: 'xcx',
-      appID: 'wxf451813ad3364a12'
+      appID: 'wxf451813ad3364a12' // 当前小程序 appid
     },
   },
 
@@ -86,9 +89,31 @@ export const config: ProjectConfig = {
   loginRequiredPaths: []
 }
 
-//获取租户ID
+// 运行时租户号存储键：服务端按 appId 反查到的真实租户。
+// 打包常量 tenantId 只是兜底值，多小程序/多租户场景下会与后台实际配置的租户不一致，
+// 因此服务端反查结果需要落库并优先使用。
+const RUNTIME_TENANT_ID_KEY = 'runtime_tenant_id'
+
+// 获取租户ID：优先用运行时落库的租户号，取不到才回退打包常量
 export function getTenantId(): string {
+  const runtime = uni.getStorageSync(RUNTIME_TENANT_ID_KEY)
+  if (runtime != null && (runtime as string).length > 0) {
+    return runtime as string
+  }
   return config.api.auth.tenantId
+}
+
+// 落库服务端反查到的租户号（页面配置是匿名接口，登录前也能拿到）
+export function setTenantId(tenantId: string) {
+  if (tenantId == null || tenantId.length == 0) {
+    return
+  }
+  uni.setStorageSync(RUNTIME_TENANT_ID_KEY, tenantId)
+}
+
+//获取当前小程序 appid（多小程序识别：登录/拉取配置时上报给服务端）
+export function getAppId(): string {
+  return config.api.auth.appID
 }
 
 // 获取当前登录用户的 token

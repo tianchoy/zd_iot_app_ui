@@ -1,7 +1,12 @@
 <template>
-	<topNavBar title="中导云卡登录" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- 背景层：登录页内容不足一屏，用固定层把整屏铺成统一底色。
+	     两条弯路都别走 —— 容器写 min-height:100% 会把页面撑出「导航栏高度」的滚动条；
+	     只靠页面窗口背景色（pages.json 的 backgroundColor）在小程序端不保证生效，
+	     结果就是上半屏一个底色、下半屏另一个底色。 -->
+	<view class="page-bg"></view>
+	<topNavBar :title="loginTitle" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<view class="container">
-		<image src="/static/defaultAvator.png" class="logo"></image>
+		<image :src="loginLogo" class="logo"></image>
 		<view class="login-btn">
 			<button
 			open-type="getPhoneNumber"
@@ -25,7 +30,7 @@
 </template>
 
 <script setup lang="uts">
-	import {login} from '@/api/http.uts'
+	import {login, getPlatformInfo} from '@/api/http.uts'
 	import {setToken,setStorageSync,getStorageSync} from '@/common/config.uts'
 	import {userAgreement,privacyPolicy} from '@/utils/doc.uts'
 	const wxGetPhoneLogin = ref<string>('')
@@ -36,6 +41,29 @@
 	const from = ref<string>('')
 	const rechargeNo = ref<string>('')
 	const orderId = ref<string>('')
+
+	// 登录页品牌信息：读后台平台信息接口（匿名，登录前可用）。
+	// 服务端按上报的 appId 反查，优先返回当前小程序 / 公众号自己的 logo 与名称，
+	// 未配置则逐项回退租户级平台配置；接口失败或未配置时保留内置名称与图标，不出现空白标题/空白图
+	const loginTitle = ref<string>('中导云卡登录')
+	const loginLogo = ref<string>('/static/defaultAvator.png')
+	const loadPlatformBrand = async () => {
+		try {
+			const res = await getPlatformInfo()
+			if (res != null && res.code == 200 && res.data != null) {
+				const name = res.data.platformName
+				if (name != null && name.length > 0) {
+					loginTitle.value = name + '登录'
+				}
+				const logo = res.data.platformLogoUrl
+				if (logo != null && logo.length > 0) {
+					loginLogo.value = logo
+				}
+			}
+		} catch (e) {
+			console.log('读取平台品牌信息失败，登录页保留内置名称与图标')
+		}
+	}
 
 	const isDocState = () => {
 		docState.value = !docState.value
@@ -110,21 +138,34 @@
 		userId.value = getStorageSync('userId') as string || options['userId'] as string
 		from.value = options['from'] as string
 		rechargeNo.value = options['rechargeNo'] as string
-
+		loadPlatformBrand()
 	})
 
 </script>
 
 <style lang="scss" scoped>
+	/* 固定背景层：把整屏铺成同一底色。它与 .container 都是定位元素，
+	   靠 DOM 顺序保证内容绘制在它之上（所以 .container 必须 position: relative）。 */
+	.page-bg{
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #f4f7fb;
+	}
+
 	.container{
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		background-color: #f4f7fb;
 		padding-bottom: 40rpx;
-		// #ifdef MP-WEIXIN || H5
-		min-height: 100%;
-		// #endif
+		/* 不能再写 min-height: 100%：本页在 topNavBar 之下，而 topNavBar 会在文档流里
+		   渲染一个「状态栏 + 导航栏」高度的占位 view；容器再按整屏高度撑满，页面总高就
+		   比视口多出一个导航栏高度 —— 内容不足一屏的登录页因此平白多出滚动条。
+		   铺满整屏交给上面的 .page-bg。 */
 		.logo{
 			width: 200rpx;
 			height: 200rpx;

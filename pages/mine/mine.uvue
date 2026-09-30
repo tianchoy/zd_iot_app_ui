@@ -36,13 +36,21 @@
 			<rice-button v-if="isLoginState" type="primary" width="100%" shape="round" @click="handleLogin">登录</rice-button>
 			<rice-button v-else-if="getStorageSync('usePhoneNumber')" type="error" width="100%" shape="round"  @click="handleLogout">退出登录</rice-button>
 		</view>
+		<!-- 页脚备案号：合规展示项，匿名接口未登录也可查看。
+		     logo 与小程序名称改由登录页 / 导航栏展示，本页不再重复；
+		     网安备案小程序与公众号不需要，故不展示。
+		     备案号为空时整块隐藏（有则展示、没有就不占位）。 -->
+		<view class="icp-footer" v-if="platformInfo?.icpNo">
+			<text class="icp-label">ICP备案</text>
+			<text class="icp-value">{{ platformInfo.icpNo }}</text>
+		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { ref, computed } from 'vue'
-	import { login,getTenantInfo,queryCardListSum} from '@/api/http.uts'
-	import type { CardListSumData } from '@/api/types.uts'
+	import { login,getTenantInfo,queryCardListSum,getPlatformInfo} from '@/api/http.uts'
+	import type { CardListSumData, PlatformInfoData } from '@/api/types.uts'
 	import { getStorageSync,getTenantId,getToken ,clearToken,removeStorageSync,isWechat,config,setToken,setStorageSync} from '@/common/config.uts'
 
 
@@ -110,7 +118,8 @@
 					login(params).then((res) => {
 						if(res.code == 200){
 							console.log('登录成功:', res.data.access_token)
-							// setToken(res.data.access_token, res.data.refreshToken)
+							// 小程序静默登录成功后必须落库 token，否则后续接口仍以游客身份请求
+							setToken(res.data.access_token, res.data.refreshToken)
 							uni.reLaunch({
 								url: '/pages/card/card'
 							})
@@ -169,7 +178,29 @@
 		}
 	}
 
+	// 平台品牌与备案信息：匿名接口，未登录也要展示（备案号属合规展示项）
+	const platformInfo = ref<PlatformInfoData>({
+		tenantId: '',
+		platformName: '',
+		platformLogoUrl: '',
+		platformCopyright: '',
+		icpNo: '',
+		cybersecurityNo: ''
+	})
+	const getPlatformInfoData = async () => {
+		try {
+			const res = await getPlatformInfo(getTenantId())
+			if (res.code === 200 && res.data != null) {
+				platformInfo.value = res.data
+			}
+		} catch (error) {
+			console.error('查询平台信息异常:', error)
+		}
+	}
+
 	onShow(() => {
+		// 平台信息先加载：与登录态无关
+		getPlatformInfoData()
 		if (isWechat()) {
 			if (!checkToken()) return;
 		}
@@ -181,10 +212,14 @@
 .container{
 	display: flex;
 	flex-direction: column;
+	// 只占「导航栏占位之后」的剩余空间：flex:1 由父级（页面根）按剩余高度分配。
+	// 原来写的是 min-height: 100%，而 100% 是【整页高度】——topNavBar 已经额外占位了
+	// 状态栏 + 导航栏（默认 20 + 44px），两者相加必然比可视区高出一个导航栏，
+	// 于是无论内容多少都会出现纵向滚动条。
+	flex: 1;
 	background-color: #f4f7fb;
-	// #ifdef MP-WEIXIN || H5
-	min-height: 100%;
-	// #endif
+	// 给固定在底部的备案号留出位置，长内容滚动时不会被它盖住
+	padding-bottom: 60rpx;
 	.card-info{
 		display: flex;
 		flex-direction: column;
@@ -252,6 +287,34 @@
 		justify-content: center;
 		margin: 30rpx 24rpx 0 24rpx;
 	}
-	
+	// 页脚备案号：固定在 tabBar 上方 20rpx（有备案号才渲染，没有则整块不占位）。
+	// 用 fixed 而不是流式布局：本页 .container 带 min-height:100% 且位于 topNavBar 之下，
+	// 流式放置会被推到「导航栏高度 + 一整屏」处，首屏看不到。
+	.icp-footer{
+		position: fixed;
+		left: 0;
+		right: 0;
+		// #ifdef MP-WEIXIN
+		// 微信原生 tabBar 在页面视口之外，bottom 相对页面区域，故 20rpx 即「tabBar 上方 20rpx」
+		bottom: 20rpx;
+		// #endif
+		// #ifdef H5
+		// H5 的 tabBar 由 uni-app 渲染在窗口底部（默认高度 50px），需额外让开它的高度
+		bottom: calc(50px + 20rpx);
+		// #endif
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		.icp-label{
+			margin-right: 8rpx;
+			font-size: 22rpx;
+			color: #9ca3af;
+		}
+		.icp-value{
+			font-size: 22rpx;
+			color: #9ca3af;
+		}
+	}
 }
 </style>

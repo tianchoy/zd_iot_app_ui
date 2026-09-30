@@ -7,7 +7,7 @@
 			<rice-icon v-if="showBack" name="arrow-left" size="35rpx" color="#333" class="icon" @click="handleBack"></rice-icon>
 		</view>
 		<view class="title" :style="{ color: textColor, 'line-height': navBarHeight + 'px' }">
-			<slot name="title">{{ title }}</slot>
+			<slot name="title">{{ displayTitle }}</slot>
 		</view>
 		<view class="capsule">
 			<view class="capsule-item">
@@ -28,7 +28,7 @@
 				<rice-icon v-if="showBack" name="arrow-left" size="40rpx" class="icon" @click="handleBack"></rice-icon>
 			</view>
 			<view class="title" :style="{ color: textColor, 'line-height': navBarHeight + 'px' }">
-				<slot name="title">{{ title }}</slot>
+				<slot name="title">{{ displayTitle }}</slot>
 			</view>
 			<view class="capsule">
 				<view class="capsule-item">
@@ -48,6 +48,7 @@
 
 <script setup lang="uts">
 import { onMounted, computed } from 'vue'
+import { getPlatformInfo } from '@/api/http.uts'
 
 const props = defineProps({
 	title: String,
@@ -66,6 +67,34 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['back', 'capsuleClick']);
+
+// 页面未显式传 title 时，用后台平台信息接口返回的名称兜底，避免导航栏出现空白。
+// 服务端按上报的 appId 反查，优先取当前小程序 / 公众号自己的名称，未配置则回退租户级平台名称。
+// 各业务页传的都是页面名（「我的」「卡片」…），这里只兜底「没传标题」的情况，不覆盖页面名。
+const platformName = ref<string>('')
+onMounted(() => {
+	if (props.title != null && props.title.length > 0) {
+		return
+	}
+	getPlatformInfo()
+		.then((res) => {
+			if (res != null && res.code == 200 && res.data != null) {
+				const name = res.data.platformName
+				if (name != null && name.length > 0) {
+					platformName.value = name
+				}
+			}
+		})
+		.catch(() => {
+			console.log('读取平台品牌信息失败，导航栏保持空白')
+		})
+})
+const displayTitle = computed(() => {
+	if (props.title != null && props.title.length > 0) {
+		return props.title
+	}
+	return platformName.value
+})
 
 const statusBarHeight = ref(20);
 const navBarHeight = ref(44);

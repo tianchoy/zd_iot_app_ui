@@ -487,28 +487,47 @@
 		}
 	}
 
-	const getCode = async () => {
-		uni.login({
-			success: (res) => {
-				code.value = res.code
-				console.log('wxGetPhoneLogin:', wxGetPhoneLogin.value)
-				if( wxGetPhoneLogin.value == '1'){
-					const params = {
-						isLogin: "1",
-						xcxCode: code.value,
-					}
-					login(params).then((res) => {
-						if(res.code == 200){
-							setToken(res.data.access_token, res.data.refreshToken)
-							uni.reLaunch({
-								url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
-							})
+	/**
+	 * 获取 code 并完成静默登录。
+	 *
+	 * 契约：resolve(true) 表示 token 已写入、调用方可继续加载订单；resolve(false)
+	 * 表示登录未完成（失败，或已跳转手机号授权登录页由登录页接管）。
+	 * 返回 undefined 会让调用方 `if (!loginSuccess)` 永远为真，导致登录成功后不加载数据。
+	 */
+	const getCode = async (): Promise<boolean> => {
+		return new Promise((resolve) => {
+			uni.login({
+				success: (res) => {
+					code.value = res.code
+					console.log('wxGetPhoneLogin:', wxGetPhoneLogin.value)
+					if( wxGetPhoneLogin.value == '1'){
+						const params = {
+							isLogin: "1",
+							xcxCode: code.value,
 						}
-					})
-				}else{
-					userLoginByOpenid(res.code);
+						login(params).then((loginRes) => {
+							if(loginRes.code == 200){
+								// 登录成功后必须落库 token，否则后续请求仍是游客身份
+								setToken(loginRes.data.access_token, loginRes.data.refreshToken)
+								resolve(true)
+							}else{
+								resolve(false)
+							}
+						}).catch((error) => {
+							console.error('静默登录失败:', error)
+							resolve(false)
+						})
+					}else{
+						// 需要手机号授权：跳登录页接管，页面会离开当前上下文
+						userLoginByOpenid(res.code);
+						resolve(false)
+					}
+				},
+				fail: (error) => {
+					console.error('uni.login 失败:', error)
+					resolve(false)
 				}
-			}
+			})
 		})
 	}
 	const getTenantInfos = async () => {
@@ -534,19 +553,17 @@
 
 				// 登录失败时，不加载数据
 				if (!loginSuccess) {
-					console.log('登录失败，跳过数据加载')
+					console.log('登录未完成，跳过数据加载')
 					uni.showToast({
 						title: '登录失败，请重试',
 						icon: 'none'
 					})
 					return
 				}
-			}else{
-				getOrderDetail()
 			}
-		}else{
-			getOrderDetail()
 		}
+		// 已有 token 或刚完成静默登录，统一在此加载订单详情
+		getOrderDetail()
 	}
 
 	onLoad((options) => {

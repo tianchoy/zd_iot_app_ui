@@ -1,7 +1,7 @@
 // api/http.uts
 import { ApiUrl } from './url'
 import { request, type ApiResponse } from './Request.uts'
-import { config } from '@/common/config.uts'
+import { config, getTenantId, setTenantId } from '@/common/config.uts'
 import type {
   LoginData,
   CountryData,
@@ -16,8 +16,31 @@ import type {
   QueryOrderSuccessParams,
   RechargeData,
   FeedbackItem,
-  FeedbackDetail
+  FeedbackDetail,
+  PlatformInfoData
 } from './types'
+
+// 查询平台品牌与备案信息（匿名接口，登录前也可展示品牌）
+export async function getPlatformInfo(tenantId: string = ''): Promise<ApiResponse<PlatformInfoData>> {
+	// AppID 是客户端唯一可信的租户识别线索；路径 tenantId 只作兼容旧包的兜底。
+	const effectiveTenantId = tenantId.length > 0 ? tenantId : getTenantId()
+	const baseUrl = ApiUrl.platformInfo as string
+	const url = effectiveTenantId.length > 0
+		? baseUrl + '/' + effectiveTenantId + '?appId=' + config.api.auth.appID
+		: baseUrl + '?appId=' + config.api.auth.appID
+	const res = await request<PlatformInfoData>({
+		url,
+		method: 'GET',
+		withToken: false
+	})
+	if (res != null && res.code == 200 && res.data != null) {
+		const resolved = (res.data as UTSJSONObject)['tenantId'] as string
+		if (resolved != null && resolved.length > 0) {
+			setTenantId(resolved)
+		}
+	}
+	return res
+}
 
 // 查询国家列表
 export function getCountryList(withToken: boolean = false): Promise<ApiResponse<CountryData[]>> {
@@ -41,37 +64,52 @@ export function login(data: UTSJSONObject, withToken: boolean = true): Promise<A
     method: 'POST',
     data: {
       ...data,
-      tenantId: config.api.auth.tenantId,
+      tenantId: getTenantId(),
       clientId: config.api.auth.clientId,
       grantType: config.api.auth.grantType,
+      // 多小程序识别：C端上报自身 appid，服务端据此反查所属租户与 appSecret
+      appId: config.api.auth.appID,
     },
     withToken
   })
 }
 
 // 获取租户页面配置（自动适配平台）
-export function getTenantInfo(tenantId: string, withToken: boolean = true): Promise<ApiResponse<TenantInfoData>> {
+// tenantId 为兜底值；同时携带 appId，服务端以 appId 反查到的租户为准
+export async function getTenantInfo(tenantId: string, withToken: boolean = true): Promise<ApiResponse<TenantInfoData>> {
+	const appIdQuery = '?appId=' + config.api.auth.appID
+	const effectiveTenantId = tenantId.length > 0 ? tenantId : getTenantId()
+
 	// #ifdef MP-WEIXIN
-	const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + config.api.auth.tenantId
+	const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + effectiveTenantId + appIdQuery
   const token = true
 	// #endif
 
 	// #ifdef H5
-	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
+	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + effectiveTenantId + appIdQuery
   const token = false
 	// #endif
 
 	// #ifndef MP-WEIXIN || H5
 	// 其他平台默认使用H5配置
-	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + config.api.auth.tenantId
+	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + effectiveTenantId + appIdQuery
   const token = false
 	// #endif
 
-	return request<TenantInfoData>({
+	const res = await request<TenantInfoData>({
 		url: url,
 		method: 'GET',
 		withToken: token
 	})
+	// 落库服务端按 appId 反查到的租户号：后续「平台信息」等请求都按它取，
+	// 否则会出现「后台改的是 A 租户、客户端读的是打包常量 B 租户」。取不到时保持原行为。
+	if (res != null && res.code == 200 && res.data != null) {
+		const resolved = (res.data as UTSJSONObject)['tenantId'] as string
+		if (resolved != null && resolved.length > 0) {
+			setTenantId(resolved)
+		}
+	}
+	return res
 }
 
 // 查询卡列表

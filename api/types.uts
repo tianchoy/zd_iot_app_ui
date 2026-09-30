@@ -16,6 +16,8 @@ export type CountryData = {
 
 /** 租户配置数据 */
 export type TenantInfoData = {
+  /** 服务端按 appId 反查到的生效租户号；客户端应优先使用它，而不是打包常量 */
+  tenantId: string
   rechargeTip: string
   servicePhone: string
   serviceQrcode: string
@@ -81,6 +83,25 @@ export type objectMapType = {
   rechargeTip: string;
   servicePhone: string;
   serviceQrcode: string;
+  serviceJumpUrl?: string;
+  /** 第三方 H5 裸地址（兼容字段，建议优先用 externalH5RedirectUrl） */
+  externalH5Url?: string;
+  /** 后端已拼好卡标识、可直接跳转的第三方 H5 地址（含开关与防自跳判定） */
+  externalH5RedirectUrl?: string;
+}
+
+/**
+ * 平台品牌与备案信息：匿名可访问，只含对外公开内容
+ * （不含手续费、支付方式、邮箱账号密码等内部配置）
+ */
+export type PlatformInfoData = {
+  tenantId: string;
+  platformName: string;
+  /** 由 platformLogoOssId 解析，解析失败为空串 */
+  platformLogoUrl: string;
+  platformCopyright: string;
+  icpNo: string;
+  cybersecurityNo: string;
 }
 
 export type RechargeData = {
@@ -99,6 +120,7 @@ export type RechargeData = {
   currentPeriodEndTime: string | null;
   isBind: boolean;
   pkgXcxVos: PkgXcxVo[];
+  objectMap?: objectMapType;
 };
 
 export type CardDetail = {

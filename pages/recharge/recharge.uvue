@@ -531,6 +531,7 @@
 			params = {
 				pkgId: currentItem.pkgId,
 				rechargeNo: cardDetail.value.rechargeNo,
+				appId: config.api.auth.appID,
 			}
 		}
 
@@ -603,14 +604,67 @@
 		})
 	}
 
+	/**
+	 * 兼容老后端：只拿到裸地址时，在前端补拼卡标识。
+	 * 新后端会直接下发已拼好的 externalH5RedirectUrl（含开关与防自跳判定），优先使用它。
+	 */
+	const buildExternalH5UrlFromRaw = (detail: RechargeData): string => {
+		const rawUrl = detail.objectMap?.externalH5Url
+		const rechargeNo = detail.rechargeNo || cardNumber.value
+		if (!rawUrl || !rechargeNo) {
+			return ''
+		}
+		try {
+			const target = new URL(rawUrl)
+			if (target.protocol !== 'http:' && target.protocol !== 'https:') {
+				return ''
+			}
+			if (!target.searchParams.has('rechargeNo')) {
+				target.searchParams.set('rechargeNo', rechargeNo)
+			}
+			return target.toString()
+		} catch (error) {
+			console.error('第三方H5地址无效:', error)
+			return ''
+		}
+	}
+
+	const redirectToExternalH5 = (detail: RechargeData) => {
+		// #ifdef H5
+		// 由后端统一拼参并做开关/防自跳判定，前端只负责跳转，保证各端口径一致
+		const redirectUrl = detail.objectMap?.externalH5RedirectUrl || buildExternalH5UrlFromRaw(detail)
+		if (!redirectUrl) {
+			return
+		}
+		try {
+			const target = new URL(redirectUrl)
+			if (target.protocol !== 'http:' && target.protocol !== 'https:') {
+				console.error('第三方H5地址协议不受支持')
+				return
+			}
+			const rechargeNo = detail.rechargeNo || cardNumber.value
+			const redirectKey = `external-h5-redirect:${target.origin}${target.pathname}:${rechargeNo}`
+			if (sessionStorage.getItem(redirectKey) != null) {
+				return
+			}
+			sessionStorage.setItem(redirectKey, '1')
+			window.location.replace(target.toString())
+		} catch (error) {
+			console.error('第三方H5地址无效:', error)
+		}
+		// #endif
+	}
+
 	const getCardDetail = async (cardNumber: string,country: string) => {
 		try {
 			const res = await queryCardDetail(cardNumber, country,'0')
 			if(res.code == 200){
-				cardDetail.value = res.data as any
-				if (res.data?.pkgXcxVos && res.data.pkgXcxVos.length > 0) {
-					classifyPackages(res.data.pkgXcxVos as Array<PkgXcxVo>)
+				const detail = res.data as RechargeData
+				cardDetail.value = detail
+				if (detail.pkgXcxVos && detail.pkgXcxVos.length > 0) {
+					classifyPackages(detail.pkgXcxVos as Array<PkgXcxVo>)
 				}
+				redirectToExternalH5(detail)
 			}
 		} catch (error) {
 			console.error('获取卡片详情失败:', error)

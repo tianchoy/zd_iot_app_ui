@@ -1,6 +1,7 @@
 export const ApiUrl = {
     getTenantPageConfigXcx: '/system/tenantPageConfig/getTenantPageConfigXcx', // 查询租户页面配置小程序
     getTenantPageConfigH: '/system/tenantPageConfig/getTenantPageConfigH',// 查询租户页面配置H5
+    platformInfo: '/system/platformInfo', // 查询平台品牌与备案信息（支持按 appId 或租户ID 查询）
     login: '/auth/login', // 登录
     
     //H5接口
