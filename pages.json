@@ -1,10 +1,13 @@
 {
 	"pages": [
 		// #ifdef MP-WEIXIN
+		// 微信小程序端：统一使用微信原生标题栏（navigationBarTitleText）。
+		// 对应页面模板里的 topNavBar 已用 #ifndef MP-WEIXIN 排除，避免双导航栏。
 		{
 			"path": "pages/card/card",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "卡片",
+				"navigationStyle": "default"
 			}
 		},
 		{
@@ -28,8 +31,107 @@
 				"navigationStyle": "default"
 			}
 		},
+		{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationStyle": "default"
+			}
+		},
+		{
+			"path": "pages/cardDetail/cardDetail",
+			"style": {
+				"navigationBarTitleText": "卡片详情",
+				"navigationStyle": "default"
+			}
+		},
+		{
+			"path": "pages/paySuccess/paySuccess",
+			"style": {
+				"navigationBarTitleText": "支付结果",
+				"navigationStyle": "default"
+			}
+		},
+		{
+			"path": "pages/payFailed/payFailed",
+			"style": {
+				"navigationBarTitleText": "支付结果",
+				"navigationStyle": "default"
+			}
+		},
+		{
+			"path": "pages/myOrder/myOrder",
+			"style": {
+				"navigationBarTitleText": "我的订单",
+				"navigationStyle": "default"
+			}
+		},
+		{
+			"path": "pages/orderDetail/orderDetail",
+			"style": {
+				"navigationBarTitleText": "订单详情",
+				"navigationStyle": "default"
+			}
+		},
+		{
+			"path": "pages/h5Search/h5Search",
+			"style": {
+				"navigationBarTitleText": "查询卡号",
+				"navigationStyle": "default"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"navigationStyle": "default",
+				"backgroundColor": "#f4f7fb"
+			}
+		},
+		{
+			"path": "pages/pkgDetail/pkgDetail",
+			"style": {
+				"navigationBarTitleText": "套餐详情",
+				"navigationStyle": "default"
+			}
+		},
+		{
+			"path": "pages/questionFeedback/list",
+			"style": {
+				"navigationBarTitleText": "我的反馈",
+				"navigationStyle": "default"
+			}
+		},
+		{
+			"path": "pages/questionFeedback/detail",
+			"style": {
+				"navigationBarTitleText": "反馈详情",
+				"navigationStyle": "default"
+			}
+		},
+		{
+			"path": "pages/questionFeedback/submit",
+			"style": {
+				"navigationBarTitleText": "问题反馈",
+				"navigationStyle": "default"
+			}
+		},
+		// 扫码页是全屏扫码界面（无 topNavBar），保留自定义导航，避免原生标题栏压住扫码框
+		{
+			"path": "pages/scanCode/scanCode",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "uni_modules/rice-ui/pages/action-sheet/action-sheet"
+		},
+		{
+			"path": "uni_modules/rice-ui/pages/dialog/dialog"
+		},
 		// #endif
-		// #ifdef H5
+		// #ifndef MP-WEIXIN
+		// H5 及其他端：继续使用项目自定义导航（页面内 topNavBar）
 		{
 			"path": "pages/recharge/recharge",
 			"style": {
@@ -42,7 +144,6 @@
 				"navigationBarTitleText": ""
 			}
 		},
-		// #endif
 		{
 			"path": "pages/mine/mine",
 			"style": {
@@ -91,7 +192,6 @@
 				"navigationBarTitleText": ""
 			}
 		},
-		// #ifndef MP-WEIXIN
 		{
 			"path": "pages/orderRecord/orderRecord",
 			"style": {
@@ -104,7 +204,6 @@
 				"navigationBarTitleText": ""
 			}
 		},
-		// #endif
 		{
 			"path": "pages/login/login",
 			"style": {
@@ -142,6 +241,7 @@
 				"navigationBarTitleText": ""
 			}
 		}
+		// #endif
 	],
 	"tabBar": {
 		"color": "#64748b",

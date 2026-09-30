@@ -1,12 +1,14 @@
 <template>
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar title="支付结果" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
 	<view class="container">
-		<!-- 成功状态区域 -->
+		<!-- 状态区域：以订单查询结果为准，避免接口失败时误报成功 -->
 		<view class="status-section">
-			<view class="success-icon">
+			<view class="success-icon" v-if="isConfirmed">
 				<text class="checkmark">✓</text>
 			</view>
-			<text class="status-text">支付成功</text>
+			<text class="status-text">{{ statusText }}</text>
 		</view>
 
 		<!-- 卡片详情区域 -->
@@ -61,6 +63,7 @@
 
 		<!-- 按钮区域 -->
 		<view class="button-section">
+			<button v-if="!isConfirmed" class="action-btn primary-btn mb-24" @click="getOrderDetail">重新查询支付结果</button>
 			<button class="action-btn primary-btn mb-24" @click="handleViewOrder">查看订单</button>
 			<button class="action-btn secondary-btn" @click="handleBackCard">返回卡片详情</button>
 		</view>
@@ -74,6 +77,18 @@
 	const orderId = ref<string>('')
 	const payChannelId = ref<string>('')
 	const orderDetail = ref<any>({})
+	// 支付结果确认状态：confirming 确认中 / success 已确认 / failed 确认失败
+	const status = ref<string>('confirming')
+	const isConfirmed = computed<boolean>(() => status.value === 'success')
+	const statusText = computed<string>(() => {
+		if (status.value === 'success') {
+			return '支付成功'
+		}
+		if (status.value === 'confirming') {
+			return '支付结果确认中...'
+		}
+		return '支付结果待确认'
+	})
 
 	/** 模板中安全访问 orderDetail 属性 */
 	function d(key: string): any {
@@ -89,6 +104,13 @@
 
 	// 查看订单点击处理
 	const handleViewOrder = () => {
+		if (!orderId.value) {
+			uni.showToast({
+				title: '订单号缺失，请到订单列表查看',
+				icon: 'none'
+			})
+			return
+		}
 		uni.redirectTo({
 			url: `/pages/orderDetail/orderDetail?orderNo=${orderId.value}&from=paySuccess`
 		})
@@ -97,17 +119,50 @@
 
 	// 返回卡片详情点击处理
 	const handleBackCard = () => {
-		const detail = orderDetail.value as UTSJSONObject
+		const rechargeNo = ds('rechargeNo')
+		if (rechargeNo === '') {
+			uni.showToast({
+				title: '卡号信息缺失，请到订单列表查看',
+				icon: 'none'
+			})
+			return
+		}
 		uni.reLaunch({
-			url: `/pages/cardDetail/cardDetail?cardNumber=${detail['rechargeNo'] as string}`
+			url: `/pages/cardDetail/cardDetail?cardNumber=${rechargeNo}`
 		})
 	}
 
+	// 查询订单，用返回结果确认支付状态；失败时不再直接展示"支付成功"
 	const getOrderDetail = async () => {
-		const res = await queryOrderSuccess(orderId.value,payChannelId.value)
-		if(res.code == 200){
-			console.log('订单详情:',res)
-			orderDetail.value = res.data
+		if (!orderId.value || !payChannelId.value) {
+			status.value = 'failed'
+			uni.showToast({
+				title: '订单参数缺失，请到订单列表查看',
+				icon: 'none'
+			})
+			return
+		}
+		status.value = 'confirming'
+		try {
+			const res = await queryOrderSuccess(orderId.value,payChannelId.value)
+			if(res.code == 200 && res.data != null){
+				console.log('订单详情:',res)
+				orderDetail.value = res.data
+				status.value = 'success'
+				return
+			}
+			status.value = 'failed'
+			uni.showToast({
+				title: res.msg || '支付结果确认失败，请稍后重试',
+				icon: 'none'
+			})
+		} catch (error) {
+			console.error('查询支付结果失败:', error)
+			status.value = 'failed'
+			uni.showToast({
+				title: '支付结果确认失败，请稍后重试',
+				icon: 'none'
+			})
 		}
 	}
 

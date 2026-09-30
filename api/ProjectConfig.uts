@@ -343,3 +343,30 @@ export function getHostProjectConfig(): MUnixHostProjectConfig {
 	}
 	return BUILTIN_DEFAULT
 }
+
+/** 取地址的“协议 + 域名”部分（用于同源比较） */
+export function getUrlOrigin(url: string): string {
+	const idx = url.indexOf('://')
+	if (idx < 0) {
+		return ''
+	}
+	const rest = url.substring(idx + 3)
+	const slash = rest.indexOf('/')
+	const host = slash >= 0 ? rest.substring(0, slash) : rest
+	return url.substring(0, idx + 3) + host
+}
+
+/**
+ * 目标地址是否属于受信任的接口域名
+ * 相对地址恒为受信任；绝对地址必须与 baseUrl 同源，避免把 Token 发往第三方域名
+ */
+export function isTrustedApiUrl(fullUrl: string, baseUrl: string): boolean {
+	if (!(fullUrl.startsWith('http://') || fullUrl.startsWith('https://'))) {
+		return true
+	}
+	const baseOrigin = getUrlOrigin(baseUrl)
+	if (baseOrigin === '') {
+		return false
+	}
+	return getUrlOrigin(fullUrl) === baseOrigin
+}

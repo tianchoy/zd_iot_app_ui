@@ -15,7 +15,7 @@
 					<text class="label">当前套餐</text>
 					<text class="value">{{ cardDetail?.pkgName || '未知' }}</text>
 				</view>
-				<view class="info-item">
+				<view class="info-item"  v-if="cardDetail?.effectiveTime || cardDetail?.expirationTime">
 					<text class="label">有效期</text>
 					<view class="value" style="display: flex; flex-direction: row; align-items: center; flex-wrap: nowrap; white-space: nowrap;">
 						<text style="font-size: 22rpx;" v-if="cardDetail?.effectiveTime">{{ cardDetail?.effectiveTime }} </text>
@@ -179,7 +179,7 @@
 	import { ref, computed } from 'vue';
 	import { queryCardDetail, addOrder,login,getTenantInfo} from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
-	import { config , getTenantId,isWechat,isH5,setToken,setStorageSync,getToken} from '@/common/config.uts';
+	import { config , getTenantId,isWechat,isH5,setToken,setStorageSync,getToken,setWxGetPhoneLogin,isPhoneLoginRequired} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	import tousu from '@/components/tousu.uvue';
 	import {DataFormat} from '@/utils/dataFormat.uts';
@@ -394,11 +394,24 @@
 
 	const orderNo = ref<string>('')
 	const payChannelId = ref<string>('')
+	// 支付失败/未知状态统一收尾：清理加载态与支付流程标记
+	const handlePayFailed = (message: string) => {
+		uni.hideLoading()
+		uni.showToast({
+			title: message,
+			icon: 'none',
+			duration: 1000
+		})
+		isInPaymentProcess.value = false
+	}
 	const toPay = (data:any) => {
-		if(!data) return
+		if(!data){
+			handlePayFailed('支付参数缺失，请稍后重试')
+			return
+		}
 		const res = data as any
-		orderNo.value = res.orderNo
-		payChannelId.value = res.payChannelId
+		if(res.orderNo) orderNo.value = res.orderNo
+		if(res.payChannelId) payChannelId.value = res.payChannelId
 		// 设置正在支付流程中
 		isInPaymentProcess.value = true
 
@@ -411,31 +424,28 @@
 				paySign: res.paySign,
 				signType: res.signType,
 
-				success: (res) => {
-					console.log('微信支付成功',res)
+				success: (payRes) => {
+					console.log('微信支付成功',payRes)
 					uni.hideLoading()
+					isInPaymentProcess.value = false
 					uni.redirectTo({
 						url: '/pages/paySuccess/paySuccess?orderId=' + orderNo.value + '&payChannelId=' + payChannelId.value
 					})
 				},
-				fail: (res) => {
-					uni.hideLoading()
-					uni.showToast({
-						title: "微信支付失败，请您重新支付",
-						icon: 'none',
-						duration: 1000
-					});
+				fail: (payErr) => {
+					console.error('微信支付失败:', payErr)
+					handlePayFailed('微信支付失败，请您重新支付')
 					setTimeout(() => {
 						uni.reLaunch({
 							url: '/pages/orderDetail/orderDetail?orderNo=' + orderNo.value
 						});
 					}, 1000);
-					// 支付失败，重置标记
-					isInPaymentProcess.value = false
 				},
 			})
+			return
 		}
-		else if(res.payWxType == 'allin_pay'){
+
+		if(res.payWxType == 'allin_pay'){
 			if(res.payWxClass == '0'){
 				uni.requestPayment({
 					timeStamp: res.timeStamp,
@@ -443,60 +453,59 @@
 					package: res.package,
 					paySign: res.paySign,
 					signType: res.signType,
-					success: function (res) {
+					success: (payRes) => {
 						uni.hideLoading()
+						isInPaymentProcess.value = false
 						uni.redirectTo({
 							url: '/pages/paySuccess/paySuccess?orderId=' + orderNo.value + '&payChannelId=' + payChannelId.value
 						})
 					},
-					fail: function (err) {
-						uni.hideLoading()
-						uni.showToast({
-							title: "通联支付失败，请您重新支付",
-							icon: 'none',
-							duration: 1000
-						});
+					fail: (payErr) => {
+						console.error('通联支付失败:', payErr)
+						handlePayFailed('通联支付失败，请您重新支付')
 						setTimeout(() => {
 							uni.reLaunch({
 								url: '/pages/orderDetail/orderDetail?orderNo=' + orderNo.value
 							});
 						}, 1000);
-						// 支付失败，重置标记
-						isInPaymentProcess.value = false
 					},
 				});
-			}else{
-				let param = {
-					cusid: res.cusid,
-					appid: res.appid,
-					orgid: res.orgid,
-					version: res.version,
-					trxamt: res.trxamt,
-					reqsn: res.reqsn,
-					notify_url: res.notify_url,
-					body: res.body,
-					remark: res.remark,
-					randomstr: res.randomstr,
-					paytype: res.paytype,
-					signtype: res.signtype,
-					sign: res.sign,
-				}
-
-				wx.navigateToMiniProgram({
-					appId: config.api.auth.appID,
-					extraData: param,
-					success(res) {
-						console.log('支付成功:', res);
-					},
-					fail(res) {
-						console.log('支付失败:', res);
-						uni.hideLoading()
-						// 支付失败，重置标记
-						isInPaymentProcess.value = false
-					},
-				})
+				return
 			}
+
+			// 跳转收银台小程序，支付结果由 onShow 的 1038 场景回调处理
+			const param = {
+				cusid: res.cusid,
+				appid: res.appid,
+				orgid: res.orgid,
+				version: res.version,
+				trxamt: res.trxamt,
+				reqsn: res.reqsn,
+				notify_url: res.notify_url,
+				body: res.body,
+				remark: res.remark,
+				randomstr: res.randomstr,
+				paytype: res.paytype,
+				signtype: res.signtype,
+				sign: res.sign,
+			}
+
+			uni.navigateToMiniProgram({
+				appId: config.api.auth.appID,
+				extraData: param,
+				success: () => {
+					console.log('打开收银台小程序成功，等待支付结果回调')
+				},
+				fail: (payErr) => {
+					console.error('打开收银台小程序失败:', payErr)
+					handlePayFailed('打开支付小程序失败，请重试')
+				},
+			})
+			return
 		}
+
+		// 未知支付方式：避免 loading 与支付标记残留
+		handlePayFailed('暂不支持该支付方式，请重新选择')
 	}
 	const formContainer = ref<HTMLDivElement | null>(null);
 	const handleAlipayForm = (formHtml: string) => {
@@ -510,19 +519,55 @@
 		}
 	};
 
+	// 下单请求进行中标记，避免快速重复触发产生重复订单
+	const isSubmittingOrder = ref<boolean>(false)
+
 	// 确认支付
 	const handleConfirmPayment =  async (e: any) => {
 		console.log('确认支付:', e)
-		const merchantConfigId = e
+		// 防重复提交
+		if (isSubmittingOrder.value) {
+			return
+		}
+		const merchantConfigId = e as string
+
+		// 支付前校验：卡片详情与所选套餐必须已就绪，避免空指针与无效下单
+		const detail = cardDetail.value
+		const list = active.value === 0 ? packageList.value : refillList.value
+		const index = active.value === 0 ? selectedPackageIndex.value : selectedRefillIndex.value
+		const currentItem = (index >= 0 && index < list.length) ? list[index] : null
+
+		if (detail == null) {
+			showPopup.value = false
+			uni.showToast({
+				title: '卡片信息未加载完成，请稍后重试',
+				icon: 'none'
+			})
+			return
+		}
+
+		if (currentItem == null) {
+			showPopup.value = false
+			uni.showToast({
+				title: '请先选择套餐',
+				icon: 'none'
+			})
+			return
+		}
+
+		if (isH5() && !merchantConfigId) {
+			uni.showToast({
+				title: '请先选择支付方式',
+				icon: 'none'
+			})
+			return
+		}
+
 		uni.showLoading({
 			title: '支付中...'
 		})
 
 		showPopup.value = false;
-		// 获取当前选中的套餐信息
-		const currentItem = active.value === 0
-			? packageList.value[selectedPackageIndex.value]
-			: refillList.value[selectedRefillIndex.value];
 
 		console.log('currentItem:', currentItem,currentItem.pkgId)
 
@@ -546,6 +591,7 @@
 		console.log('params:', params)
 
 		// 处理确认逻辑
+		isSubmittingOrder.value = true
 		try {
 			const res = await addOrder(params)
 			if(res.code == 200){
@@ -571,11 +617,14 @@
 				})
 			}
 		} catch (error) {
+			console.error('创建订单失败:', error)
 			uni.hideLoading()
 			uni.showToast({
-				title: error.msg,
+				title: error.msg || '支付失败，请稍后重试',
 				icon: 'none'
 			})
+		} finally {
+			isSubmittingOrder.value = false
 		}
 	}
 
@@ -709,7 +758,29 @@
 		if (isWechat()) {
 			if (!checkToken()) {
 				await getTenantInfos()
-				await getCode()
+
+				// '0' = 需要授权手机号：跳转登录页授权，本页不再继续
+				if (isPhoneLoginRequired()) {
+					uni.login({
+						provider: 'weixin',
+						success: (res) => {
+							userLoginByOpenid(res.code)
+						},
+						fail: (err) => {
+							console.error('微信登录失败:', err)
+						}
+					})
+					return
+				}
+
+				// '1' = 免手机号：静默登录（成功后内部 reLaunch 回本页）
+				const loggedIn = await getCode()
+				if (!loggedIn) {
+					uni.showToast({
+						title: '登录失败，请重试',
+						icon: 'none'
+					})
+				}
 			}else{
 				getCardDetail(cardNumber.value, country.value)
 			}
@@ -747,76 +818,125 @@
 		}
 	})
 
-	const wxGetPhoneLogin = ref<string>('')
 	const code = ref<string>('')
-	//登录
+	//需要手机号模式：先用 openid 换 userId，再跳转手机号授权登录页
 	const userId = ref<string>('')
 	const userLoginByOpenid = async (codes: string) => {
 		console.log('recharge,,userLoginByOpenid:', codes)
-		const res = await login({
-			xcxCode: codes,
-			isLogin: '1',
-		})
-		console.log('recharge,,userLoginByOpenid登录:', res)
-		if(res.code == 200){
-			userId.value = '' + res.data.id
-			setStorageSync('userId', userId.value)
-			uni.navigateTo({
-				url: '/pages/login/login?wxGetPhoneLogin=' + wxGetPhoneLogin.value + '&userId=' + userId.value + '&from=recharge' + '&rechargeNo=' + cardNumber.value
+		try {
+			const res = await login({
+				xcxCode: codes,
+				isLogin: '1',
 			})
+			console.log('recharge,,userLoginByOpenid登录:', res)
+			if(res.code == 200){
+				userId.value = '' + res.data.id
+				setStorageSync('userId', userId.value)
+				uni.navigateTo({
+					url: '/pages/login/login?userId=' + userId.value + '&from=recharge' + '&rechargeNo=' + cardNumber.value
+				})
+			}
+		} catch (error) {
+			console.error('获取用户信息失败:', error)
 		}
 	}
-	const getCode = async () => {
-		uni.login({
-			success: (res) => {
-				code.value = res.code
-				if( wxGetPhoneLogin.value == '1'){
-					const params = {
-						isLogin: "1",
+	//免手机号模式：openid 静默登录
+	const getCode = async (): Promise<boolean> => {
+		return new Promise((resolve) => {
+			uni.login({
+				provider: 'weixin',
+				success: (res) => {
+					code.value = res.code
+					login({
+						isLogin: '1',
 						xcxCode: code.value,
-					}
-					login(params).then((res) => {
-						if(res.code == 200){
-							console.log('登录成功:', res.data.access_token)
-							setToken(res.data.access_token, res.data.refreshToken)
+					}).then((loginRes) => {
+						if(loginRes.code == 200){
+							console.log('登录成功:', loginRes.data.access_token)
+							setToken(loginRes.data.access_token, loginRes.data.refreshToken)
+							resolve(true)
 							uni.reLaunch({
 								url: '/pages/recharge/recharge?rechargeNo=' + cardNumber.value
 							})
+						} else {
+							resolve(false)
 						}
+					}).catch(() => {
+						resolve(false)
 					})
-				}else{
-					userLoginByOpenid(res.code);
+				},
+				fail: (err) => {
+					console.error('微信登录失败:', err)
+					resolve(false)
 				}
-			}
+			})
 		})
 	}
+	// 获取租户页面配置（含手机号登录开关）
 	const getTenantInfos = async () => {
-		const res = await getTenantInfo(getTenantId(),false)
-		if(res.code == 200){
-			const tenantInfo = res.data
-			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
-			setStorageSync('wxGetPhoneLogin', tenantInfo.wxGetPhoneLogin)
+		try {
+			const res = await getTenantInfo(getTenantId(),false)
+			if(res.code == 200){
+				// 约定：'1' = 免手机号；'0' = 需要授权手机号
+				setWxGetPhoneLogin(res.data.wxGetPhoneLogin)
+			}
+		} catch (error) {
+			// 请求失败时沿用本地缓存，避免被误判为“需要手机号”
+			console.error('获取租户配置失败，沿用本地缓存:', error)
 		}
 	}
 
 
 
 	onShow(() => {
-		let options = uni.getEnterOptionsSync();
+		const options = uni.getEnterOptionsSync();
 		console.log('options.scene:', options.scene)
 		// 1011扫描二维码  1012长按图片识别二维码  1013相册选择二维码 1037小程序打开小程序 1038 从另一个小程序返回
-		// if(options.scene == 1011 || options.scene == 1012 || options.scene == 1013 || options.scene == 1037|| options.scene == 1038|| options.scene == 1065){
-		// 	platform()
-		// }
 		// 只有在支付流程中才处理支付回调
 		if (!isInPaymentProcess.value) {
 			return
 		}
-		if (options.scene == '1038' &&
-			options.referrerInfo.appId == config.api.auth.appID) {
-			// 代表从收银台小程序返回
-			let extraData = options.referrerInfo.extraData;
-			if (!extraData) {
+		// scene 为数字类型，必须统一按数字比较，否则回调分支永远不会执行
+		if (Number(options.scene) != 1038) {
+			return
+		}
+		// 从收银台小程序返回时，来源小程序 appId 应与配置的收银台 appId 一致
+		const referrerInfo = options.referrerInfo
+		if (referrerInfo == null) {
+			return
+		}
+		if (referrerInfo.appId != config.api.auth.appID) {
+			return
+		}
+		// 代表从收银台小程序返回
+		let extraData = referrerInfo.extraData;
+		if (!extraData) {
+			uni.hideLoading()
+			uni.showToast({
+				title: "支付取消，请您重新支付",
+				icon: 'none',
+				duration: 1000
+			});
+			// 重置支付流程标记
+			isInPaymentProcess.value = false
+			return
+		} else {
+			if (extraData.code == 'success') {
+				uni.hideLoading()
+				uni.showToast({
+					title: "支付成功",
+					icon: 'success',
+					duration: 1000,
+					success() {
+						// 重置支付流程标记
+						isInPaymentProcess.value = false
+						// 使用 redirectTo 替换当前页面，避免页面栈累积
+						uni.redirectTo({
+							url: '/pages/paySuccess/paySuccess?orderId=' + orderNo.value + '&payChannelId=' + payChannelId.value
+						})
+					}
+				});
+			} else if (extraData.code == 'cancel') {
 				uni.hideLoading()
 				uni.showToast({
 					title: "支付取消，请您重新支付",
@@ -824,50 +944,23 @@
 					duration: 1000
 				});
 				// 重置支付流程标记
+				setTimeout(() => {
+					uni.reLaunch({
+						url: '/pages/orderDetail/orderDetail?orderNo=' + orderNo.value
+					});
+				}, 1000);
 				isInPaymentProcess.value = false
 				return
 			} else {
-				if (extraData.code == 'success') {
-					uni.hideLoading()
-					uni.showToast({
-						title: "支付成功",
-						icon: 'success',
-						duration: 1000,
-						success() {
-							// 重置支付流程标记
-							isInPaymentProcess.value = false
-							// 使用 redirectTo 替换当前页面，避免页面栈累积
-							uni.redirectTo({
-								url: '/pages/paySuccess/paySuccess?orderId=' + orderNo.value + '&payChannelId=' + payChannelId.value
-							})
-						}
-					});
-				} else if (extraData.code == 'cancel') {
-					uni.hideLoading()
-					uni.showToast({
-						title: "支付取消，请您重新支付",
-						icon: 'none',
-						duration: 1000
-					});
-					// 重置支付流程标记
-					setTimeout(() => {
-						uni.reLaunch({
-							url: '/pages/orderDetail/orderDetail?orderNo=' + orderNo.value
-						});
-					}, 1000);
-					isInPaymentProcess.value = false
-					return
-				} else {
-					uni.hideLoading()
-					uni.showToast({
-						title: "支付失败，请您重新支付",
-						icon: 'none',
-						duration: 1000
-					});
-					// 重置支付流程标记
-					isInPaymentProcess.value = false
-					return
-				}
+				uni.hideLoading()
+				uni.showToast({
+					title: "支付失败，请您重新支付",
+					icon: 'none',
+					duration: 1000
+				});
+				// 重置支付流程标记
+				isInPaymentProcess.value = false
+				return
 			}
 		}
 	})

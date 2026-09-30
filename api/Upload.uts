@@ -1,7 +1,7 @@
 /**
  * 图片压缩与 multipart 上传（与 Request 共用 getHostProjectConfig().baseUrl 与 Storage，不依赖 request()）
  */
-import { getHostProjectConfig } from './ProjectConfig.uts'
+import { getHostProjectConfig, isTrustedApiUrl } from './ProjectConfig.uts'
 import { storage } from './Storage.uts'
 
 export type UploadApiResponse<T = any> = {
@@ -118,10 +118,18 @@ export function uploadFileRequest<T = any>(options: UploadFileOptions): Promise<
 		uni.showLoading({ title: loadingText, mask: true })
 	}
 
-	const reqHeader: UTSJSONObject = header
+	// 拷贝调用方 header，避免把 Authorization 写回调用方对象造成污染
+	const reqHeader: UTSJSONObject = {}
+	for (const key in header) {
+		const value = header[key]
+		if (value != null) {
+			reqHeader[key] = value
+		}
+	}
 	if (withToken) {
 		const token = storage.getToken()
-		if (token !== '') {
+		// 仅对受信任地址携带 Token，避免绝对 URL 把 Token 发往第三方域名
+		if (token !== '' && isTrustedApiUrl(fullUrl, resolveUploadBase(baseUrl))) {
 			reqHeader['Authorization'] = token
 		}
 	}
@@ -137,6 +145,19 @@ export function uploadFileRequest<T = any>(options: UploadFileOptions): Promise<
 			success: (res) => {
 				if (showLoading) {
 					uni.hideLoading()
+				}
+				// 先校验 HTTP 状态，避免网关错误页被当成上传成功
+				const statusCode = res.statusCode
+				if (typeof statusCode === 'number' && (statusCode < 200 || statusCode >= 300)) {
+					if (showError) {
+						uni.showToast({ title: '上传失败（HTTP ' + statusCode + '）', icon: 'none' })
+					}
+					reject({
+						code: statusCode,
+						msg: 'HTTP ' + statusCode,
+						data: null
+					} as UploadApiResponse<T>)
+					return
 				}
 				let parsed: UploadApiResponse<T>
 				try {
@@ -156,8 +177,9 @@ export function uploadFileRequest<T = any>(options: UploadFileOptions): Promise<
 				}
 				const code = parsed.code
 				let ok = false
+				// 与 Request 保持一致：按字符串比较，兼容后端返回字符串业务码
 				for (let j = 0; j < successCodes.length; j++) {
-					if (successCodes[j] === code) {
+					if (('' + successCodes[j]) === ('' + code)) {
 						ok = true
 						break
 					}

@@ -1,5 +1,7 @@
 <template>
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar title="支付结果" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
 	<view class="container">
 		<!-- 失败状态区域 -->
 		<view class="status-section">
@@ -7,57 +9,62 @@
 				<text class="close-icon">✕</text>
 			</view>
 			<text class="status-text">支付失败</text>
-			<text class="fail-tip">订单尚未支付，请重新尝试</text>
+			<text class="fail-tip">{{ tipText }}</text>
 		</view>
 
-		<!-- 卡片详情区域 -->
+		<!-- 卡片详情区域：仅展示实际传入的字段，避免展示假数据 -->
 		<view class="card-container">
 			<!-- 卡号 -->
-			<view class="info-row">
+			<view class="info-row" v-if="ds('rechargeNo')">
 				<text class="label">卡号</text>
-				<text class="value">1064916585160</text>
+				<text class="value">{{ ds('rechargeNo') }}</text>
 			</view>
 			
 			<!-- ICCID -->
-			<view class="info-row">
+			<view class="info-row" v-if="ds('iccid')">
 				<text class="label">ICCID</text>
-				<text class="value">89860421123456789012</text>
+				<text class="value">{{ ds('iccid') }}</text>
 			</view>
 			
 			<!-- 订单编号 -->
-			<view class="info-row">
+			<view class="info-row" v-if="ds('orderNo')">
 				<text class="label">订单编号</text>
-				<text class="value">0202604280001</text>
+				<text class="value">{{ ds('orderNo') }}</text>
 			</view>
 			
 			<!-- 套餐名称 -->
-			<view class="info-row">
+			<view class="info-row" v-if="ds('pkgName')">
 				<text class="label">套餐名称</text>
-				<text class="value">车联网月包20G</text>
+				<text class="value">{{ ds('pkgName') }}</text>
 			</view>
 			
 			<!-- 套餐类型 -->
-			<view class="info-row">
+			<view class="info-row" v-if="ds('pkgCategory')">
 				<text class="label">套餐类型</text>
-				<text class="value">套餐包</text>
+				<text class="value">{{ ds('pkgCategory') }}</text>
 			</view>
 			
 			<!-- 支付方式 -->
-			<view class="info-row">
+			<view class="info-row" v-if="ds('payType')">
 				<text class="label">支付方式</text>
-				<text class="value">微信小程序支付</text>
+				<text class="value">{{ ds('payType') }}</text>
 			</view>
 			
 			<!-- 支付金额 -->
-			<view class="info-row">
+			<view class="info-row" v-if="ds('payAmount')">
 				<text class="label">支付金额</text>
-				<text class="value amount">￥90</text>
+				<text class="value amount">￥{{ ds('payAmount') }}</text>
 			</view>
 			
 			<!-- 失败原因 -->
-			<view class="info-row fail-reason">
+			<view class="info-row fail-reason" v-if="ds('reason')">
 				<text class="label">失败原因</text>
-				<text class="value fail-reason-text">支付超时，请重新支付</text>
+				<text class="value fail-reason-text">{{ ds('reason') }}</text>
+			</view>
+
+			<!-- 无订单信息时的兜底提示 -->
+			<view class="info-row" v-if="!hasDetail">
+				<text class="value fail-reason-text">暂无可展示的订单信息，请到订单列表查看</text>
 			</view>
 		</view>
 		
@@ -70,33 +77,71 @@
 </template>
 
 <script setup lang="uts">
-	// 重新支付点击处理
+	const orderId = ref<string>('')
+	const rechargeNo = ref<string>('')
+	const detail = ref<any>({})
+
+	/** 模板中安全访问订单属性 */
+	function ds(key: string): string {
+		const val = (detail.value as UTSJSONObject)[key]
+		return val != null ? '' + val : ''
+	}
+
+	// 失败提示：优先使用传入的失败原因
+	const tipText = computed<string>(() => {
+		const reason = ds('reason')
+		return reason !== '' ? reason : '订单尚未支付，请重新尝试'
+	})
+
+	// 是否拿到可展示的订单信息
+	const hasDetail = computed<boolean>(() => ds('orderNo') !== '' || ds('rechargeNo') !== '')
+
+	// 重新支付：回到订单详情，由用户再次发起支付
 	const handleRetryPay = () => {
-		// 平台兼容处理
-		// #ifdef APP
-		console.log('重新支付');
-		// #endif
-		// #ifdef MP-WEIXIN
-		console.log('重新支付');
-		// #endif
-		// #ifdef H5
-		console.log('重新支付');
-		// #endif
+		if (!orderId.value) {
+			uni.showToast({
+				title: '订单号缺失，请到订单列表重试',
+				icon: 'none'
+			})
+			return
+		}
+		uni.redirectTo({
+			url: '/pages/orderDetail/orderDetail?orderNo=' + orderId.value
+		})
 	}
 	
 	// 返回卡片详情点击处理
 	const handleBackCard = () => {
-		// 平台兼容处理
-		// #ifdef APP
-		console.log('返回卡片详情');
-		// #endif
-		// #ifdef MP-WEIXIN
-		console.log('返回卡片详情');
-		// #endif
-		// #ifdef H5
-		console.log('返回卡片详情');
-		// #endif
+		if (!rechargeNo.value) {
+			uni.showToast({
+				title: '卡号缺失，请返回首页查看',
+				icon: 'none'
+			})
+			return
+		}
+		uni.reLaunch({
+			url: '/pages/cardDetail/cardDetail?cardNumber=' + rechargeNo.value
+		})
 	}
+
+	onLoad((options: UTSJSONObject) => {
+		const oid = options['orderNo'] as string
+		orderId.value = oid != null ? oid : ''
+		const rn = options['rechargeNo'] as string
+		rechargeNo.value = rn != null ? rn : ''
+
+		// 仅收集实际传入的字段，未传的字段不展示
+		const params: UTSJSONObject = {}
+		const keys = ['orderNo', 'rechargeNo', 'iccid', 'pkgName', 'pkgCategory', 'payType', 'payAmount', 'reason']
+		for (let i = 0; i < keys.length; i++) {
+			const key = keys[i]
+			const value = options[key]
+			if (value != null && '' + value !== '') {
+				params[key] = value
+			}
+		}
+		detail.value = params
+	})
 </script>
 
 <style lang="scss" scoped>

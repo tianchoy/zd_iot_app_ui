@@ -1,5 +1,7 @@
 <template>
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar :title="card_number" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
 	<view class="page-container">
 		<view v-if="cardDetail">
 			<view class="card-box fixed-tabs" :style="fixedTabsStyle">
@@ -158,7 +160,14 @@
 
 	const fixedTabsStyle = computed(() => {
 		const css = new Map<string, string>()
+		// #ifdef MP-WEIXIN
+		// 微信端使用原生标题栏，页面内容区已在原生导航栏之下，固定 tab 从顶部开始
+		css.set('top', '0px')
+		// #endif
+		// #ifndef MP-WEIXIN
+		// 其他端由自定义导航栏占位，固定 tab 需让出状态栏 + 导航栏高度
 		css.set('top', statusBarHeight.value + navBarHeight.value + 'px')
+		// #endif
 		return css
 	})
 
@@ -414,6 +423,12 @@
 	onLoad((options) => {
 		const cardNumber = options.cardNumber ?? ''
 		card_number.value = cardNumber
+		// #ifdef MP-WEIXIN
+		// 微信端使用原生标题栏，用卡号作为标题（H5 端由 topNavBar 的 :title 承载）
+		if (cardNumber != '') {
+			uni.setNavigationBarTitle({ title: cardNumber })
+		}
+		// #endif
 		getCardDetail()
 	})
 </script>

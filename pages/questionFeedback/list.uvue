@@ -1,5 +1,7 @@
 <template>
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar title="我的反馈" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
 	<view class="page-container">
 		<!-- 反馈列表 -->
 		<view class="feedback-list" v-if="feedbackList.length > 0">

@@ -1,5 +1,7 @@
 <template>
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar title="反馈详情" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
 	<view class="page-container">
 		<!-- 反馈基本信息 -->
 		<view class="info-card">
@@ -186,6 +188,10 @@
 	}
 
 	const getImageUrls = (urls: string): string[] => {
+		// 后端可能返回空值，先兜底，避免 split 抛异常
+		if (urls == null || urls === '') {
+			return []
+		}
 		return urls.split(',').map((url) => url.trim()).filter((url) => url.length > 0)
 	}
 
@@ -321,6 +327,11 @@
 
 	onLoad((options) => {
 		feedbackId.value = options.feedbackId as string ?? ''
+		// 反馈ID缺失时不再发起请求，避免请求到无效地址
+		if (!feedbackId.value) {
+			uni.showToast({ title: '缺少反馈ID，无法查看详情', icon: 'none' })
+			return
+		}
 		loadDetail()
 	})
 </script>

@@ -37,12 +37,13 @@
 					<view class="method-option"
 							v-for="method in sortedPayMethods"
 							:key="method.merchantConfigId"
-							:class="{ 'method-selected': selectedMethodId === method.merchantConfigId }"
+							:class="{ 'method-selected': effectiveMethodId === method.merchantConfigId }"
 							@click="selectPaymentMethod(method.merchantConfigId)">
 						<view class="method-left">
 							<view class="method-header">
-								<!-- 支付方式图标 -->
+								<!-- 支付方式图标（未知类型不渲染，避免图片加载失败） -->
 								<image
+									v-if="getPayIcon(method.payType)"
 									class="method-icon"
 									:src="getPayIcon(method.payType)"
 									mode="aspectFit"
@@ -52,7 +53,7 @@
 							<text v-if="method.desc" class="method-desc">{{ method.desc }}</text>
 						</view>
 						<view class="method-right">
-							<view :class="['radio', { 'radio-selected': selectedMethodId === method.merchantConfigId }]"></view>
+							<view :class="['radio', { 'radio-selected': effectiveMethodId === method.merchantConfigId }]"></view>
 						</view>
 					</view>
 				</view>
@@ -121,8 +122,20 @@ return [...methods].sort((a, b) => {
 });
 });
 
-// 当前选中的支付方式ID（默认选中第一个）
-const selectedMethodId = ref<string>(sortedPayMethods.value[0]?.merchantConfigId);
+// 用户手动选中的支付方式ID
+const selectedMethodId = ref<string>('');
+
+// 实际生效的支付方式ID：支付方式异步加载后，保证始终有一个有效选中项
+const effectiveMethodId = computed<string>(() => {
+const methods = sortedPayMethods.value;
+const current = selectedMethodId.value;
+for (let i = 0; i < methods.length; i++) {
+  if (methods[i].merchantConfigId === current) {
+    return current;
+  }
+}
+return methods.length > 0 ? methods[0].merchantConfigId : '';
+});
 
 /**
 * 获取支付方式图标路径
@@ -134,8 +147,8 @@ const iconMap: Record<string, string> = {
   'wechat_pay': '/static/wx-pay.png',
   'ali_pay': '/static/ali-pay.png'
 };
-// 如果找不到对应图标，返回默认图标
-return iconMap[payType] || '/static/default-pay.png';
+// 未匹配到图标时返回空串，由模板跳过渲染，避免加载不存在的图片
+return iconMap[payType] ?? '';
 };
 
 /**
@@ -177,8 +190,8 @@ emit('confirm', 'wechat_miniprogram');
 // #endif
 
 // #ifndef MP-WEIXIN
-// H5等环境：使用当前选中的支付方式
-emit('confirm', selectedMethodId.value);
+// H5等环境：使用实际生效的支付方式，避免支付方式异步加载后提交空值
+emit('confirm', effectiveMethodId.value);
 // #endif
 };
 </script>

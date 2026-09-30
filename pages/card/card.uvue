@@ -1,5 +1,7 @@
 <template>
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar title="卡片" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
 	<view class="container">
 		<view class="card-box mb-24">
 			<view class="card-label">卡片查询</view>
@@ -80,7 +82,7 @@
 import { ref, computed, onMounted } from 'vue'
 import tousu from '@/components/tousu.uvue'
 import { queryCardList, login, getTenantInfo, queryVerify } from '@/api/http.uts'
-import { getToken, getTenantId, isWechat, setToken, setStorageSync } from '@/common/config.uts'
+import { getToken, getTenantId, isWechat, setToken, setStorageSync, setWxGetPhoneLogin, isPhoneLoginRequired } from '@/common/config.uts'
 import type { RechargeData } from '@/api/types.uts'
 
 const card_number = ref('')
@@ -269,14 +271,37 @@ const getCode = async (): Promise<boolean> => {
 	})
 }
 
-// 获取租户页面配置
-const wxGetPhoneLogin = ref<string>('')
+// 获取租户页面配置（含手机号登录开关）
 const getTenantInfos = async () => {
-	const res = await getTenantInfo(getTenantId(), false)
-	if (res.code == 200) {
-		const tenantInfo = res.data
-		wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
-		setStorageSync('wxGetPhoneLogin', tenantInfo.wxGetPhoneLogin)
+	try {
+		const res = await getTenantInfo(getTenantId(), false)
+		if (res.code == 200) {
+			// 约定：'1' = 免手机号；'0' = 需要授权手机号
+			setWxGetPhoneLogin(res.data.wxGetPhoneLogin)
+		}
+	} catch (error) {
+		// 请求失败时沿用本地缓存，避免被误判为“需要手机号”
+		console.error('获取租户配置失败，沿用本地缓存:', error)
+	}
+}
+
+// 需要手机号模式：先用 openid 换 userId，再跳转手机号授权登录页
+const userId = ref<string>('')
+const userLoginByOpenid = async (codes: string) => {
+	try {
+		const res = await login({
+			xcxCode: codes,
+			isLogin: '1',
+		})
+		if (res.code == 200) {
+			userId.value = '' + res.data.id
+			setStorageSync('userId', userId.value)
+			uni.navigateTo({
+				url: '/pages/login/login?userId=' + userId.value
+			})
+		}
+	} catch (error) {
+		console.error('获取用户信息失败:', error)
 	}
 }
 
@@ -296,11 +321,25 @@ const platform = async () => {
 	// 1. 微信环境且无token时，先完成登录
 	if (isWechat()) {
 		await getTenantInfos()
-		// 如果不需要手机号登录，直接跳过数据加载
-		if (wxGetPhoneLogin.value == '1') {
-			// 页面显示空状态
+
+		// '0' = 需要授权手机号：未登录时跳转登录页授权，本页暂不加载数据
+		if (isPhoneLoginRequired() && !checkToken()) {
 			cardList.value = []
 			cardCounts.value = [0, 0, 0]
+			uni.login({
+				provider: 'weixin',
+				success: (res) => {
+					userLoginByOpenid(res.code)
+				},
+				fail: (err) => {
+					console.error('微信登录失败:', err)
+				}
+			})
+			return
+		}
+
+		// '1' = 免手机号：openid 静默登录后加载数据
+		if (!checkToken()) {
 			const loginSuccess = await getCode()
 
 			// 登录失败时，不加载数据
@@ -313,9 +352,7 @@ const platform = async () => {
 				return
 			}
 		}
-		if (checkToken()) {
-			await loadCardData()
-		}
+		await loadCardData()
 	}
 }
 

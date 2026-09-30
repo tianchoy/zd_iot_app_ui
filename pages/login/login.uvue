@@ -4,7 +4,9 @@
 	     只靠页面窗口背景色（pages.json 的 backgroundColor）在小程序端不保证生效，
 	     结果就是上半屏一个底色、下半屏另一个底色。 -->
 	<view class="page-bg"></view>
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar :title="loginTitle" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
 	<view class="container">
 		<image :src="loginLogo" class="logo"></image>
 		<view class="login-btn">
@@ -33,7 +35,6 @@
 	import {login, getPlatformInfo} from '@/api/http.uts'
 	import {setToken,setStorageSync,getStorageSync} from '@/common/config.uts'
 	import {userAgreement,privacyPolicy} from '@/utils/doc.uts'
-	const wxGetPhoneLogin = ref<string>('')
 	const userId = ref<string>('')
 	const docState = ref(false)
 	const showTitle = ref(false)
@@ -54,6 +55,10 @@
 				const name = res.data.platformName
 				if (name != null && name.length > 0) {
 					loginTitle.value = name + '登录'
+					// #ifdef MP-WEIXIN
+					// 微信端使用原生标题栏，品牌名拿到后同步更新标题
+					uni.setNavigationBarTitle({ title: loginTitle.value })
+					// #endif
 				}
 				const logo = res.data.platformLogoUrl
 				if (logo != null && logo.length > 0) {
@@ -74,7 +79,8 @@
 		const res = await login({
 			xcxCode: code,
 			userId: userId.value,
-			isLogin: wxGetPhoneLogin.value,
+			// 本页即手机号授权登录，接口约定 '0' = 需要手机号
+			isLogin: '0',
 		})
 		if(res.code == 200){
 			orderId.value = getStorageSync('orderId') as string || ''
@@ -134,7 +140,6 @@
 	}
 
 	onLoad((options: OnLoadOptions) => {
-		wxGetPhoneLogin.value = getStorageSync('wxGetPhoneLogin') as string || options['wxGetPhoneLogin'] as string
 		userId.value = getStorageSync('userId') as string || options['userId'] as string
 		from.value = options['from'] as string
 		rechargeNo.value = options['rechargeNo'] as string

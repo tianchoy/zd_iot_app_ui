@@ -2,7 +2,7 @@
  * 统一请求工具
  * 支持灵活配置：响应码、错误提示、Token、登录跳转等
  */
-import { getHostProjectConfig } from './ProjectConfig.uts'
+import { getHostProjectConfig, isTrustedApiUrl } from './ProjectConfig.uts'
 import { storage } from './Storage.uts'
 import { uploadFileRequest, type UploadApiResponse, type UploadFileOptions } from './Upload.uts'
 import { config, getToken, setToken, clearToken, setStorageSync,isWechat } from '@/common/config'
@@ -244,21 +244,35 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 		requestData = {}
 	}
 	
-	// 构建请求头
+	// 构建请求头：默认头 → 调用方自定义头 → 认证相关字段由请求层统一生成
 	const reqHeader: UTSJSONObject = {
 		'Content-Type': 'application/json',
 		'Accept': 'application/json',
 		'Content-Language': DEFAULT_LANGUAGE,
-		'clientId': config.api.auth.clientId,
 	}
+	if (header != null) {
+		for (const key in header) {
+			const value = header[key]
+			if (value != null) {
+				reqHeader[key] = value
+			}
+		}
+	}
+	// clientId 与 authorization 由请求层统一控制，禁止调用方覆盖
+	reqHeader['clientId'] = config.api.auth.clientId
 
 	// 如果 withToken 为 true，检查 token 是否存在
 	let hasToken = false
 	if (withToken) {
 		const token = getToken()
 		if (token != '') {
-			reqHeader['authorization'] = 'Bearer ' + token
-			hasToken = true
+			// 仅对受信任地址携带 Token，避免绝对 URL 把 Token 发往第三方域名
+			if (isTrustedApiUrl(fullUrl, base)) {
+				reqHeader['authorization'] = 'Bearer ' + token
+				hasToken = true
+			} else {
+				console.warn('目标地址不在受信任域名内，已跳过携带 Token:', fullUrl)
+			}
 		}
 	}
 
@@ -281,14 +295,43 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 					hideLoadingModal()
 				}
 
+				// 先校验 HTTP 状态，避免网关错误页被当成业务成功
+				const statusCode = res.statusCode
+				if (typeof statusCode === 'number' && (statusCode < 200 || statusCode >= 300)) {
+					const httpResult = {
+						code: statusCode,
+						msg: '请求失败（HTTP ' + statusCode + '）',
+						data: null
+					} as ApiResponse<T>
+					if (showError) {
+						showErrorToast(httpResult.msg)
+					}
+					reject(httpResult)
+					return
+				}
+
 				const raw = res.data as UTSJSONObject
+				if (raw == null) {
+					const emptyResult = {
+						code: -1,
+						msg: '响应数据格式异常',
+						data: null
+					} as ApiResponse<T>
+					if (showError) {
+						showErrorToast(emptyResult.msg)
+					}
+					reject(emptyResult)
+					return
+				}
+
 				const rawCode = raw['code']
-				let code = 0
+				// 缺少业务码时不再默认成功，统一按失败处理
+				let code = -1
 				if (typeof rawCode === 'number') {
 					code = rawCode as number
 				} else if (rawCode != null) {
 					const parsedCode = parseInt('' + rawCode)
-					code = isNaN(parsedCode) ? 0 : parsedCode
+					code = isNaN(parsedCode) ? -1 : parsedCode
 				}
 				const rawMsg = raw['msg'] ?? raw['message']
 				const result = {
@@ -313,26 +356,28 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 					return
 				}
 
-				// 微信环境里，检查是否为未授权状态码
-				if(isWechat()){
-					let isUnauthorizedCode = false
-					for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
-						if (('' + finalUnauthorizedCodes[i]) == ('' + code)) {
-							isUnauthorizedCode = true
-							break
-						}
+				// 未授权（401/403）：所有平台统一清理失效登录态，微信端再跳转登录页
+				let isUnauthorizedCode = false
+				for (let i = 0; i < finalUnauthorizedCodes.length; i++) {
+					if (('' + finalUnauthorizedCodes[i]) == ('' + code)) {
+						isUnauthorizedCode = true
+						break
 					}
-					if (isUnauthorizedCode && redirectOnUnauthorized) {
-						// 显示错误提示
-						if (showError) {
-							showErrorToast(msg || '登录已过期，请重新登录')
-						}
-						// 跳转登录页
+				}
+				if (isUnauthorizedCode) {
+					if (redirectOnUnauthorized) {
+						// 清理失效 token，避免后续请求继续携带
+						clearToken()
+						storage.clearAuth()
+					}
+					if (redirectOnUnauthorized && isWechat()) {
+						// 内部会再次清理登录态并提示，随后 reLaunch 到登录页
 						navigateToLogin(finalLoginPage)
-						
-						reject(result)
-						return
+					} else if (showError) {
+						showErrorToast(msg != '' ? msg : '登录已过期，请重新登录')
 					}
+					reject(result)
+					return
 				}
 
 				// 自定义错误码处理

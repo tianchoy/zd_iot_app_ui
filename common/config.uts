@@ -139,6 +139,27 @@ export function clearToken() {
   uni.removeStorageSync(config.storage.refreshToken)
 }
 
+// 微信手机号登录开关（租户页面配置接口下发）
+// 约定：'1' = 免手机号（openid 静默登录）；'0' = 需要用户授权手机号
+const WX_GET_PHONE_LOGIN_KEY = 'wxGetPhoneLogin'
+
+// 缓存接口下发的手机号登录开关
+// 只有明确为 '0' 才记为需要手机号，其余（含缺失、null、异常值）一律归一化为 '1'
+export function setWxGetPhoneLogin(value: any) {
+  const raw = value == null ? '' : '' + value
+  uni.setStorageSync(WX_GET_PHONE_LOGIN_KEY, raw === '0' ? '0' : '1')
+}
+
+// 是否需要用户授权手机号
+// 兜底策略：配置尚未取到或取值异常时按免手机号处理，避免误跳授权登录页
+export function isPhoneLoginRequired(): boolean {
+  const value = uni.getStorageSync(WX_GET_PHONE_LOGIN_KEY)
+  if (value == null) {
+    return false
+  }
+  return ('' + value) === '0'
+}
+
 // 本地存储操作
 export function setStorageSync(key: string, value: any) {
   uni.setStorageSync(key, value)

@@ -1,7 +1,9 @@
 <template>
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar title="问题反馈" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true"
       :isIcon="false" rightText="我的反馈" rightActionBackgroundColor="#f0fdf4" @capsuleClick="toMyFeedback"
   ></topNavBar>
+	<!-- #endif -->
 	<view class="page-container">
 		<view class="info-card">
 			<view class="info-row">

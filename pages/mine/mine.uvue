@@ -1,5 +1,7 @@
 <template>
+	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar title="我的" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
 	<view class="container">
 		
 		<view class="card-info mb-24">
@@ -23,6 +25,13 @@
 				<text class="order-label">我的订单</text>
 				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
 			</view>
+			<!-- #ifdef MP-WEIXIN -->
+			<!-- 微信端使用原生标题栏，导航栏放不下自定义右侧入口，反馈入口移到页面内 -->
+			<view class="item" @click="toMyFeedback">
+				<text class="order-label">我的反馈</text>
+				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
+			</view>
+			<!-- #endif -->
 			<view class="item" v-if="false">
 				<text class="order-label">绑定卡片</text>
 				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
@@ -34,7 +43,7 @@
 		</view>
 		<view class="btn-box" v-if="isWechatEnv">
 			<rice-button v-if="isLoginState" type="primary" width="100%" shape="round" @click="handleLogin">登录</rice-button>
-			<rice-button v-else-if="getStorageSync('usePhoneNumber')" type="error" width="100%" shape="round"  @click="handleLogout">退出登录</rice-button>
+			<rice-button v-else type="error" width="100%" shape="round"  @click="handleLogout">退出登录</rice-button>
 		</view>
 		<!-- 页脚备案号：合规展示项，匿名接口未登录也可查看。
 		     logo 与小程序名称改由登录页 / 导航栏展示，本页不再重复；
@@ -51,7 +60,7 @@
 	import { ref, computed } from 'vue'
 	import { login,getTenantInfo,queryCardListSum,getPlatformInfo} from '@/api/http.uts'
 	import type { CardListSumData, PlatformInfoData } from '@/api/types.uts'
-	import { getStorageSync,getTenantId,getToken ,clearToken,removeStorageSync,isWechat,config,setToken,setStorageSync} from '@/common/config.uts'
+	import { getTenantId,getToken ,clearToken,removeStorageSync,isWechat,config,setToken,setStorageSync} from '@/common/config.uts'
 
 
 	const title = ref('用户');
@@ -82,6 +91,14 @@
 		if (!isLogin()) return
 		uni.navigateTo({
 			url: '/pages/myOrder/myOrder'
+		})
+	}
+
+	// 跳转我的反馈（微信端原生标题栏无法承载导航右侧入口）
+	const toMyFeedback = () => {
+		if (!isLogin()) return
+		uni.navigateTo({
+			url: '/pages/questionFeedback/list'
 		})
 	}
 
