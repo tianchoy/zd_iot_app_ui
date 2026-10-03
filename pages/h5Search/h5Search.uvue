@@ -3,6 +3,9 @@
 	<topNavBar title="查询卡号" :show-back="false" textColor="#333" :showCapsule="false"></topNavBar>
 	<!-- #endif -->
 	<view class="container">
+		<!-- 候选展开时的全屏遮罩：点空白处收起。刻意不用 blur 收起，避免与候选点击抢时序。
+		     必须带上 visibleHistory.length 判断：模糊联想无匹配时不显示遮罩，否则会凭空挡住整页点击 -->
+		<view v-if="showHistory && visibleHistory.length > 0" class="history-mask" @click="closeHistory"></view>
 		<view class="main-content">
 			<!-- 标题区域 -->
 			<view class="title-section">
@@ -21,9 +24,24 @@
 						v-model="cardNumber"
 						placeholder="请输入卡号,或扫描图标识别卡号"
 						class="search-input"
+						@input="handleInput"
+						@focus="handleInputFocus"
 					/>
 					<view class="scan-btn" @click="handleScan">
 						<rice-icon name="scan" size="40rpx" color="#666"></rice-icon>
+					</view>
+					<!-- 历史卡号候选：点选只填入，不自动查询。
+					     刻意不用 scroll-view + 动态 rpx 高度：H5 端 :style 里的 rpx 不参与编译转换会失效，
+					     整块高度变 0 就看不见了；这里直接按行铺开，最多展示前 5 条 -->
+					<view class="history-panel" v-if="showHistory && visibleHistory.length > 0">
+						<view
+							v-for="(item, index) in visibleHistory"
+							:key="index"
+							class="history-item"
+							@click="handleHistorySelect(item)"
+						>
+							<text class="history-text">{{ item }}</text>
+						</view>
 					</view>
 				</view>
 				
@@ -82,8 +100,20 @@
 	import { getCountryList,queryVerify } from '@/api/http.uts'
 	import type { CountryData } from '@/api/types.uts'
 	import {isINT,isCN} from '@/common/config.uts'
+	import { CardNoHistory } from '@/utils/cardNoHistory.uts'
 	
 	const cardNumber = ref<string>('')
+	
+	// 卡号历史（最新在前）与候选面板显隐
+	const historyList = ref<string[]>([])
+	const showHistory = ref(false)
+
+	// 候选最多展示条数（历史本身最多 10 条，下拉只列最近 5 条，避免浮层过高）
+	const MAX_VISIBLE_HISTORY: number = 5
+	// 模糊联想：按输入内容从历史里挑出匹配项（前缀优先，其次包含），输入为空则不联想
+	const visibleHistory = computed<string[]>(() => {
+		return CardNoHistory.match(historyList.value, cardNumber.value, MAX_VISIBLE_HISTORY)
+	})
 	
 	// 国家/地区相关
 	const showCountryPopup = ref<boolean>(false)
@@ -161,10 +191,53 @@
 			url: '/pages/scanCode/scanCode'
 		})
 	}
+
+	// 输入框内容变化：清空时收起候选；有内容时（且存在历史）展开
+	const handleInput = () => {
+		if (cardNumber.value.trim().length === 0) {
+			showHistory.value = false
+			return
+		}
+		if (historyList.value.length === 0) {
+			historyList.value = CardNoHistory.list()
+		}
+		if (historyList.value.length > 0) {
+			showHistory.value = true
+		}
+	}
+
+	// 输入框获得焦点：只在「输入框有内容」且「有历史」时才展开候选
+	const handleInputFocus = () => {
+		const list = CardNoHistory.list()
+		historyList.value = list
+		const inputLength = cardNumber.value.trim().length
+		showHistory.value = inputLength > 0 && list.length > 0
+	}
+
+	// 点选历史卡号：只填入并收起，不自动查询/跳转（跳转不可逆，保留用户手动点「查询缴费」）
+	const handleHistorySelect = (cardNo: string) => {
+		cardNumber.value = cardNo
+		showHistory.value = false
+	}
+
+	// 收起候选（点遮罩时触发）
+	const closeHistory = () => {
+		showHistory.value = false
+	}
+
+	// 回填最近一次查询过的卡号：仅在输入框为空时填，避免覆盖用户正在输入的内容
+	const fillLatestCardNo = () => {
+		const list = CardNoHistory.list()
+		historyList.value = list
+		if (cardNumber.value.trim().length > 0) return
+		if (list.length === 0) return
+		cardNumber.value = list[0]
+	}
 	
 	// 查询缴费
 	const handleQuery = async () => {
-		if (!cardNumber.value) {
+		const keyword = cardNumber.value.trim()
+		if (!keyword) {
 			uni.showToast({
 				title: '请输入卡号',
 				icon: 'none'
@@ -182,16 +255,22 @@
 			title: '查询中...',
 			icon: 'loading'
 		})
-		const isValid = await CardVerify(cardNumber.value)
+		const isValid = await CardVerify(keyword)
+		if (isValid) {
+			// 只在校验通过、即将跳转时写入历史，输错的卡号不会被记住
+			CardNoHistory.record(keyword)
+			historyList.value = CardNoHistory.list()
+			showHistory.value = false
+		}
 		// 跳转到充值页面
 		if(isCN() && isValid){
 			uni.navigateTo({
-				url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&from=h5Search`
+				url: `/pages/recharge/recharge?rechargeNo=${keyword}&from=h5Search`
 			})
 		}
 		if(isINT() && isValid){
 			uni.navigateTo({
-				url: `/pages/recharge/recharge?rechargeNo=${cardNumber.value}&country=${selectedCountry.value}&from=h5Search`
+				url: `/pages/recharge/recharge?rechargeNo=${keyword}&country=${selectedCountry.value}&from=h5Search`
 			})
 		}
 		
@@ -202,6 +281,7 @@
 		const result = data.getString('result') ?? ''
 		if (result.length > 0) {
 			cardNumber.value = result
+			showHistory.value = false
 			uni.showToast({
 				title: '扫码成功',
 				icon: 'success'
@@ -230,6 +310,11 @@
 		uni.$on('scanResult', onScanResult)
 	})
 	
+	// 每次显示都回填一次：从充值页返回时同样生效（仅在输入框为空时填，不会覆盖用户输入）
+	onShow(() => {
+		fillLatestCardNo()
+	})
+	
 	onUnmounted(() => {
 		uni.$off('scanResult', onScanResult)
 	})
@@ -243,12 +328,28 @@
 		min-height: 100%;
 		// #endif
 		background-color: #f5f7fa;
+		// uni-app x 给 view 的默认样式是 overflow:hidden，会把溢出父盒子的历史候选浮层整个裁掉
+		// （DOM 有、尺寸也对，就是看不见）。这里连同 .main-content / .card-box / .search-value 一起放开
+		overflow: visible;
+
+		// 历史候选展开时的全屏透明遮罩：承载「点浮层外部收起」。
+		// z-index 低于候选浮层(200)、高于页面内容，不依赖 blur 事件
+		.history-mask {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			z-index: 90;
+		}
 	}
 	
 	.main-content {
 		display: flex;
 		flex-direction: column;
 		padding:0 24rpx;
+		// 同上：候选浮层会穿过本层，禁止裁剪
+		overflow: visible;
 	}
 	
 	// 标题区域
@@ -288,6 +389,8 @@
 		padding: 32rpx;
 		margin-bottom: 48rpx;
 		box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+		// 同上：候选浮层挂在搜索行下方，会溢出本卡片，禁止裁剪
+		overflow: visible;
 		
 		.card-label {
 			font-size: 32rpx;
@@ -303,6 +406,12 @@
 		}
 		
 		.search-value {
+			position: relative;
+			// z-index 低于候选浮层(200)、高于全屏遮罩(90)：遮罩只负责「点空白收起」，不能盖住输入行
+			z-index: 91;
+			// 关键：候选浮层用 position:absolute + top:100% 挂在本行盒子之外，
+			// 本行若沿用 uni-view 默认的 overflow:hidden，浮层会被整块裁掉（有 DOM 但看不见）
+			overflow: visible;
 			display: flex;
 			flex-direction: row;
 			align-items: center;
@@ -330,6 +439,46 @@
 				height: 88rpx;
 				border-left: 2rpx solid #e5e7eb;
 
+			}
+
+			// 历史卡号候选浮层：挂在整个搜索行下方，宽度与搜索行对齐
+			.history-panel {
+				position: absolute;
+				left: 0;
+				right: 0;
+				top: 100%;
+				margin-top: 8rpx;
+				z-index: 200;
+				background-color: #ffffff;
+				border: 2rpx solid #e5e7eb;
+				border-radius: 16rpx;
+				box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.12);
+				overflow: hidden;
+
+				.history-item {
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					height: 96rpx;
+					padding: 0 28rpx;
+					box-sizing: border-box;
+					border-bottom: 2rpx solid #f1f5f9;
+
+					&:active {
+						background-color: #f5f7fa;
+					}
+
+					&:last-child {
+						border-bottom: none;
+					}
+
+					.history-text {
+						flex: 1;
+						font-size: 28rpx;
+						color: #334155;
+						line-height: 1.4;
+					}
+				}
 			}
 		}
 		

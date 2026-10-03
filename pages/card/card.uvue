@@ -11,12 +11,29 @@
 					placeholder="请输入卡号"
 					class="search-input"
 					@input="handleInput"
+					@focus="handleInputFocus"
 				>
 				</rice-input>
 				<rice-button class="scan-btn" height="100%" icon="scan" @click="scanCode"></rice-button>
 				<rice-button type="primary" color="#1989fa" textColor="#ffffff" height="100%" @click="handleQuery">查询</rice-button>
+				<!-- 历史卡号候选：点选只填入，不自动查询。
+				     刻意不用 scroll-view + 动态 rpx 高度：H5 端 :style 里的 rpx 不参与编译转换会失效，
+				     整块高度变 0 就看不见了；这里直接按行铺开，最多展示前 5 条 -->
+				<view class="history-panel" v-if="showHistory && visibleHistory.length > 0">
+					<view
+						v-for="(item, index) in visibleHistory"
+						:key="index"
+						class="history-item"
+						@click="handleHistorySelect(item)"
+					>
+						<text class="history-text">{{ item }}</text>
+					</view>
+				</view>
 			</view>
 		</view>
+		<!-- 候选展开时的全屏遮罩：点空白处收起。刻意不用 blur 收起 —— rice-input 的 blur 延迟 100ms 才触发，会抢掉候选点击。
+		     必须带上 visibleHistory.length 判断：模糊联想无匹配时不显示遮罩，否则会凭空挡住整页点击 -->
+		<view v-if="showHistory && visibleHistory.length > 0" class="history-mask" @click="closeHistory"></view>
 		<!-- <rice-button type="primary" color="#1989fa" textColor="#ffffff"  @click="toMyTest">test</rice-button> -->
 		<view class="card-box card-list-box">
 			<view class="card-tabs">
@@ -83,9 +100,21 @@ import { ref, computed, onMounted } from 'vue'
 import tousu from '@/components/tousu.uvue'
 import { queryCardList, login, getTenantInfo, queryVerify } from '@/api/http.uts'
 import { getToken, getTenantId, isWechat, setToken, setStorageSync, setWxGetPhoneLogin, isPhoneLoginRequired } from '@/common/config.uts'
+import { CardNoHistory } from '@/utils/cardNoHistory.uts'
 import type { RechargeData } from '@/api/types.uts'
 
 const card_number = ref('')
+
+// 卡号历史（最新在前）与候选面板显隐
+const historyList = ref<string[]>([])
+const showHistory = ref(false)
+
+// 候选最多展示条数（历史本身最多 10 条，下拉只列最近 5 条，避免浮层过高）
+const MAX_VISIBLE_HISTORY: number = 5
+// 模糊联想：按输入内容从历史里挑出匹配项（前缀优先，其次包含），输入为空则不联想
+const visibleHistory = computed<string[]>(() => {
+	return CardNoHistory.match(historyList.value, card_number.value, MAX_VISIBLE_HISTORY)
+})
 const queryKeyword = ref('')
 const current = ref(0)
 const scrollViewHeight = ref(0)
@@ -146,7 +175,45 @@ const scanCode = () => {
 const handleInput = () => {
 	if (card_number.value.trim() === '') {
 		queryKeyword.value = ''
+		// 输入框被清空：收起候选，且之后不再展开（空框不弹候选）
+		showHistory.value = false
+		return
 	}
+	// 有内容时才允许展开候选；首次输入时补一次历史读取
+	if (historyList.value.length === 0) {
+		historyList.value = CardNoHistory.list()
+	}
+	if (historyList.value.length > 0) {
+		showHistory.value = true
+	}
+}
+
+// 输入框获得焦点：只在「输入框有内容」且「有历史」时才展开候选
+const handleInputFocus = () => {
+	const list = CardNoHistory.list()
+	historyList.value = list
+	const inputLength = card_number.value.trim().length
+	showHistory.value = inputLength > 0 && list.length > 0
+}
+
+// 点选历史卡号：只填入并收起，不自动查询/跳转（跳转不可逆，保留用户手动点「查询」）
+const handleHistorySelect = (cardNo: string) => {
+	card_number.value = cardNo
+	showHistory.value = false
+}
+
+// 收起候选（点遮罩时触发）
+const closeHistory = () => {
+	showHistory.value = false
+}
+
+// 回填最近一次查询过的卡号：仅在输入框为空时填，避免覆盖用户正在输入的内容
+const fillLatestCardNo = () => {
+	const list = CardNoHistory.list()
+	historyList.value = list
+	if (card_number.value.trim().length > 0) return
+	if (list.length === 0) return
+	card_number.value = list[0]
 }
 
 // 验证卡片是否有效
@@ -191,6 +258,10 @@ const handleQuery = async () => {
 	queryKeyword.value = keyword
 	const isValid = await CardVerify(keyword)
 	if (isValid) {
+		// 只在校验通过、即将跳转时写入历史，输错的卡号不会被记住
+		CardNoHistory.record(keyword)
+		historyList.value = CardNoHistory.list()
+		showHistory.value = false
 		uni.navigateTo({
 			url: '/pages/cardDetail/cardDetail?cardNumber=' + keyword
 		})
@@ -201,6 +272,7 @@ const onScanResult = async (data: UTSJSONObject) => {
 	const result = data.getString('result') ?? ''
 	if (result.length > 0) {
 		card_number.value = result
+		showHistory.value = false
 		uni.showToast({
 			title: '扫码成功',
 			icon: 'success'
@@ -321,6 +393,10 @@ const platform = async () => {
 	// 1. 微信环境且无token时，先完成登录
 	if (isWechat()) {
 		await getTenantInfos()
+		// 租户号是接口反查后才落库的（见 api/http.uts 的 setTenantId），
+		// 首次启动的 onShow 可能还在用打包常量；这里等租户确定后再补一次回填，
+		// 避免存储 key 前缀变化导致历史"看起来丢了"
+		fillLatestCardNo()
 
 		// '0' = 需要授权手机号：未登录时跳转登录页授权，本页暂不加载数据
 		if (isPhoneLoginRequired() && !checkToken()) {
@@ -384,7 +460,8 @@ onLoad(() => {
 })
 
 onShow(() => {
-
+	// tabBar 首页每次切回都会触发；只在输入框为空时回填最近一次卡号，避免覆盖用户输入
+	fillLatestCardNo()
 })
 
 onUnload(() => {
@@ -399,10 +476,24 @@ onUnload(() => {
 		flex-direction: column;
 		background-color: #f4f7fb;
 		padding-bottom: 40rpx;
+		// uni-app x 给 view 的默认样式是 overflow:hidden，会把溢出父盒子的历史候选浮层整个裁掉
+		// （DOM 有、尺寸也对，就是看不见）。这里连同下面的 .card-box / .search-value 一起放开
+		overflow: visible;
 
 		// #ifdef MP-WEIXIN || H5
 		min-height: 100%;
 		// #endif
+
+		// 历史候选展开时的全屏透明遮罩：承载「点浮层外部收起」。
+		// z-index 低于候选浮层(200)、高于页面内容，避免依赖 rice-input 延迟 100ms 的 blur 事件
+		.history-mask{
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			z-index: 90;
+		}
 
 		.card-box{
 			display: flex;
@@ -412,6 +503,8 @@ onUnload(() => {
 			border:1rpx solid #e7edf5;
 			border-radius: 24rpx;
 			padding: 24rpx;
+			// 同上：候选浮层挂在搜索行下方，会溢出本卡片，禁止裁剪
+			overflow: visible;
 
 			.card-tabs{
 				margin:24rpx;
@@ -419,6 +512,13 @@ onUnload(() => {
 			}
 
 			.search-value{
+				position: relative;
+				// z-index 低于候选浮层(200)、高于全屏遮罩(90)：遮罩只负责「点空白收起」，不能盖住输入行
+				z-index: 91;
+				// 关键：候选浮层用 position:absolute + top:100% 挂在本行盒子之外，
+				// 本行若沿用 uni-view 默认的 overflow:hidden，浮层会被整块裁掉（有 DOM 但看不见）
+				overflow: visible;
+
 				display: flex;
 				flex-direction: row;
 				border:1rpx solid #dbe5f0;
@@ -435,6 +535,45 @@ onUnload(() => {
 				}
 				.scan-btn{
 					border-left: 1px solid #eef2f7;
+				}
+				// 历史卡号候选浮层：挂在整个搜索行下方，宽度与搜索行对齐
+				.history-panel{
+					position: absolute;
+					left: 0;
+					right: 0;
+					top: 100%;
+					margin-top: 8rpx;
+					z-index: 200;
+					background-color: #ffffff;
+					border: 1rpx solid #dbe5f0;
+					border-radius: 16rpx;
+					box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.12);
+					overflow: hidden;
+
+					.history-item{
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						height: 96rpx;
+						padding: 0 28rpx;
+						box-sizing: border-box;
+						border-bottom: 1rpx solid #f1f5f9;
+
+						&:active{
+							background-color: #f5f7fa;
+						}
+
+						&:last-child{
+							border-bottom: none;
+						}
+
+						.history-text{
+							flex: 1;
+							font-size: 28rpx;
+							color: #334155;
+							line-height: 1.4;
+						}
+					}
 				}
 			}
 

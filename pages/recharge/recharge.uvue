@@ -3,7 +3,11 @@
 	<!-- #ifndef MP-WEIXIN -->
 	<topNavBar title="充值首页" :show-back="showBack" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<!-- #endif -->
-	<view class="container">
+	<!-- 外跳优先级高于渲染：判定期间不渲染充值页内容，避免「先渲染再跳」的闪烁 -->
+	<view v-if="h5RedirectPending" style="display: flex; align-items: center; justify-content: center; height: 60vh;">
+		<text style="font-size: 26rpx; color: #999999;">正在打开…</text>
+	</view>
+	<view class="container" v-if="!h5RedirectPending">
 		<view class="card-info">
 			<view class="card-title">
 				<text class="title">卡片信息</text>
@@ -189,6 +193,8 @@
 	})
 	const showTips = ref<boolean>(true);
 	const showCustomService = ref<boolean>(false);
+	// 外跳优先级高于渲染：判定期间不渲染页面内容，避免「先渲染再跳」的闪烁
+	const h5RedirectPending = ref<boolean>(true);
 
 	const closeTips = () => {
 		showTips.value = false;
@@ -654,54 +660,43 @@
 	}
 
 	/**
-	 * 兼容老后端：只拿到裸地址时，在前端补拼卡标识。
-	 * 新后端会直接下发已拼好的 externalH5RedirectUrl（含开关与防自跳判定），优先使用它。
+	 * 尝试跳到第三方 H5。
+	 *
+	 * 地址只取后端下发的 {@code externalH5RedirectUrl}（后端已做完开关判定、
+	 * 协议白名单、防自跳与卡号拼接）：前端一旦自行用裸地址拼参，
+	 * 就会绕过「启用外跳」开关，导致停用后仍在跳转。
+	 *
+	 * 由后端统一拼参并做开关/防自跳判定，前端只负责跳转，保证各端口径一致。
+	 *
+	 * @returns 已发起跳转返回 true；未配置或不可跳返回 false
+	 *          （调用方据此判断本页是否需要渲染：跳转优先于渲染）
 	 */
-	const buildExternalH5UrlFromRaw = (detail: RechargeData): string => {
-		const rawUrl = detail.objectMap?.externalH5Url
-		const rechargeNo = detail.rechargeNo || cardNumber.value
-		if (!rawUrl || !rechargeNo) {
-			return ''
-		}
-		try {
-			const target = new URL(rawUrl)
-			if (target.protocol !== 'http:' && target.protocol !== 'https:') {
-				return ''
-			}
-			if (!target.searchParams.has('rechargeNo')) {
-				target.searchParams.set('rechargeNo', rechargeNo)
-			}
-			return target.toString()
-		} catch (error) {
-			console.error('第三方H5地址无效:', error)
-			return ''
-		}
-	}
-
-	const redirectToExternalH5 = (detail: RechargeData) => {
+	const redirectToExternalH5 = (detail: RechargeData): boolean => {
+		let redirected = false
 		// #ifdef H5
-		// 由后端统一拼参并做开关/防自跳判定，前端只负责跳转，保证各端口径一致
-		const redirectUrl = detail.objectMap?.externalH5RedirectUrl || buildExternalH5UrlFromRaw(detail)
+		// 只认后端拼好的地址：开关停用、协议非法、防自跳被拦时后端一律不下发，
+		// 前端不得再用裸地址自行拼参，否则会绕过「启用外跳」开关继续跳转
+		const redirectUrl = detail.objectMap?.externalH5RedirectUrl
 		if (!redirectUrl) {
-			return
+			console.log('[externalH5] 后端未下发可跳转地址，按正常页面渲染；裸地址=', detail.objectMap?.externalH5Url)
+			return false
 		}
 		try {
 			const target = new URL(redirectUrl)
 			if (target.protocol !== 'http:' && target.protocol !== 'https:') {
 				console.error('第三方H5地址协议不受支持')
-				return
+				return false
 			}
-			const rechargeNo = detail.rechargeNo || cardNumber.value
-			const redirectKey = `external-h5-redirect:${target.origin}${target.pathname}:${rechargeNo}`
-			if (sessionStorage.getItem(redirectKey) != null) {
-				return
-			}
-			sessionStorage.setItem(redirectKey, '1')
+			// 查到卡详情即跳转（与老系统一致）；replace 不保留本页历史，
+			// 从第三方页面返回不会再次落回本页，因此无需再做去重
+			console.log('[externalH5] 准备跳转：', target.toString())
 			window.location.replace(target.toString())
+			redirected = true
 		} catch (error) {
 			console.error('第三方H5地址无效:', error)
 		}
 		// #endif
+		return redirected
 	}
 
 	const getCardDetail = async (cardNumber: string,country: string) => {
@@ -713,9 +708,15 @@
 				if (detail.pkgXcxVos && detail.pkgXcxVos.length > 0) {
 					classifyPackages(detail.pkgXcxVos as Array<PkgXcxVo>)
 				}
-				redirectToExternalH5(detail)
+				// 跳转优先于渲染：配了第三方 H5 就跳走（本页内容始终不渲染），否则放开渲染
+				if (!redirectToExternalH5(detail)) {
+					h5RedirectPending.value = false
+				}
+			}else{
+				h5RedirectPending.value = false
 			}
 		} catch (error) {
+			h5RedirectPending.value = false
 			console.error('获取卡片详情失败:', error)
 			uni.showToast({
 				title: '获取卡片信息失败',
@@ -768,6 +769,8 @@
 						},
 						fail: (err) => {
 							console.error('微信登录失败:', err)
+							// 登录无法继续时兜底放开渲染，避免停在空白判定态
+							h5RedirectPending.value = false
 						}
 					})
 					return
@@ -776,6 +779,7 @@
 				// '1' = 免手机号：静默登录（成功后内部 reLaunch 回本页）
 				const loggedIn = await getCode()
 				if (!loggedIn) {
+					h5RedirectPending.value = false
 					uni.showToast({
 						title: '登录失败，请重试',
 						icon: 'none'
@@ -787,6 +791,27 @@
 		}else{
 			getCardDetail(cardNumber.value, country.value)
 		}
+	}
+
+	/**
+	 * 外跳优先级高于渲染：进页先探一次卡详情，只要配了第三方 H5 地址就直接跳走 ——
+	 * 既不渲染本页内容，也不再走后续登录流程（外跳本身不需要登录）。
+	 *
+	 * 未配置（或探测失败）才放开渲染，并继续原有 platform() 登录/渲染流程。
+	 */
+	const redirectIfExternalH5Configured = async () => {
+		// #ifdef H5
+		try {
+			const res = await queryCardDetail(cardNumber.value, country.value, '0')
+			if (res.code == 200 && redirectToExternalH5(res.data as RechargeData)) {
+				return
+			}
+		} catch (error) {
+			console.error('[externalH5] 外跳探测失败，按正常页面渲染:', error)
+		}
+		// #endif
+		h5RedirectPending.value = false
+		platform()
 	}
 
 	const cardNumber = ref<string>('')
@@ -808,8 +833,10 @@
 		if (cardNumberValue) {
 			cardNumber.value = cardNumberValue
 			country.value = countryValue ?? ''
-			platform()
+			// 跳转优先于渲染：先判外跳，配了就直接跳走，不再渲染本页内容
+			redirectIfExternalH5Configured()
 		} else {
+			h5RedirectPending.value = false
 			console.error('未获取到卡片号码')
 			uni.showToast({
 				title: '卡片号码不存在',
