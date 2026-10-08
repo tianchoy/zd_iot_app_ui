@@ -105,6 +105,13 @@
 	import { ApiUrl } from '@/api/url.uts'
 	import { http } from '@/api/Request.uts'
 
+	// H5 下页面参数（query）会被当作组件 attrs 透传，而本页根节点是
+	// 「条件编译的 topNavBar + 容器」这种多根结构，Vue 无法自动继承 → 控制台刷警告。
+	// 这里显式关闭属性继承消除该警告；页面参数仍由 onLoad(options) 读取，行为不变。
+	defineOptions({
+		inheritAttrs: false
+	})
+
 	type FeedbackDetail = {
 		id: number,
 		feedbackNo: string,
@@ -129,6 +136,7 @@
 	}
 
 	const feedbackId = ref('')
+	const rechargeNo = ref('')
 	const feedbackData = ref<FeedbackDetail>({
 		id: 0,
 		feedbackNo: '',
@@ -173,7 +181,7 @@
 	// 获取详情
 	const loadDetail = async () => {
 		try {
-			const res = await getFeedbackDetail(feedbackId.value, false)
+			const res = await getFeedbackDetail(feedbackId.value, rechargeNo.value, false)
 			if (res.code == 200) {
 				const data = res.data as FeedbackDetail
 				if (data != null) {
@@ -273,11 +281,14 @@
 			const formData = new UTSJSONObject()
 			formData['id'] = feedbackId.value
 			formData['feedbackContent'] = content
+			// 后端以充值号校验归属，匿名接口缺该字段会被拒绝
+			formData['rechargeNo'] = rechargeNo.value
 			if (uploadedIds.length > 0) {
 				formData['imgOssIds'] = uploadedIds.join(',')
 			}
 
-			const res = await replyFeedback(formData, false)
+			// 带 token 回复：与提交口径一致，便于后续按提交人追溯
+			const res = await replyFeedback(formData, true)
 			if (res.code == 200) {
 				uni.showToast({ title: '提交成功', icon: 'success' })
 				showReplyPopup.value = false
@@ -308,7 +319,7 @@
 
 	const doClose = async () => {
 		try {
-			const res = await closeFeedback(feedbackId.value, false)
+			const res = await closeFeedback(feedbackId.value, rechargeNo.value, false)
 			if (res.code == 200) {
 				uni.showToast({ title: '已关闭', icon: 'success' })
 				loadDetail()
@@ -327,9 +338,15 @@
 
 	onLoad((options) => {
 		feedbackId.value = options.feedbackId as string ?? ''
+		// 匿名接口以充值号作为归属凭据，缺失时后端会拒绝请求
+		rechargeNo.value = options.rechargeNo as string ?? ''
 		// 反馈ID缺失时不再发起请求，避免请求到无效地址
 		if (!feedbackId.value) {
 			uni.showToast({ title: '缺少反馈ID，无法查看详情', icon: 'none' })
+			return
+		}
+		if (!rechargeNo.value) {
+			uni.showToast({ title: '缺少充值号，无法查看详情', icon: 'none' })
 			return
 		}
 		loadDetail()
