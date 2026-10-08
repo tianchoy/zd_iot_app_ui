@@ -387,9 +387,15 @@ export function queryVerify(id: string, withToken: boolean = true): Promise<ApiR
 }
 
 // 查询反馈列表（H5）
-export function getFeedbackList(rechargeNo: string, withToken: boolean = false): Promise<ApiResponse<FeedbackItem[]>> {
+//
+// 必须携带 appId；默认带 token，后端据此返回「当前用户提交的反馈」。
+// 传了 rechargeNo 则只查该卡的反馈（用于查没有提交人归属的历史数据）。
+export function getFeedbackList(rechargeNo: string = '', withToken: boolean = true): Promise<ApiResponse<FeedbackItem[]>> {
   const data: UTSJSONObject = {
-    rechargeNo: rechargeNo
+    appId: config.api.auth.appID
+  }
+  if (rechargeNo.length > 0) {
+    data['rechargeNo'] = rechargeNo
   }
   return request<FeedbackItem[]>({
     url: ApiUrl.feedbackList as string,
@@ -399,11 +405,15 @@ export function getFeedbackList(rechargeNo: string, withToken: boolean = false):
   })
 }
 
-// 查询反馈详情（H5）
-export function getFeedbackDetail(id: string, withToken: boolean = false): Promise<ApiResponse<FeedbackDetail>> {
+// 查询反馈详情（H5，需携带充值号作为匿名接口的归属凭据）
+export function getFeedbackDetail(id: string, rechargeNo: string, withToken: boolean = false): Promise<ApiResponse<FeedbackDetail>> {
+  const data: UTSJSONObject = {
+    rechargeNo: rechargeNo
+  }
   return request<FeedbackDetail>({
     url: (ApiUrl.feedbackDetail as string) + id,
     method: 'GET',
+    data: data,
     withToken: withToken
   })
 }
@@ -428,10 +438,11 @@ export function replyFeedback(data: UTSJSONObject, withToken: boolean = false): 
   })
 }
 
-// 关闭反馈（H5）
-export function closeFeedback(id: string, withToken: boolean = false): Promise<ApiResponse<any>> {
+// 关闭反馈（H5，需携带充值号作为匿名接口的归属凭据）
+// 注意：POST 的 data 会作为 JSON body 发送，后端按 @RequestParam 接收，故这里必须拼到 URL 上
+export function closeFeedback(id: string, rechargeNo: string, withToken: boolean = false): Promise<ApiResponse<any>> {
   return request<any>({
-    url: (ApiUrl.feedbackClose as string) + id,
+    url: (ApiUrl.feedbackClose as string) + id + '?rechargeNo=' + encodeURIComponent(rechargeNo),
     method: 'POST',
     withToken: withToken
   })

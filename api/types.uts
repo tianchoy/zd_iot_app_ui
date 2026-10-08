@@ -84,10 +84,12 @@ export type objectMapType = {
   servicePhone: string;
   serviceQrcode: string;
   serviceJumpUrl?: string;
-  /** 第三方 H5 裸地址（兼容字段，建议优先用 externalH5RedirectUrl） */
+  /** 第三方 H5 裸地址（仅供排查，跳转一律以后端下发的 externalH5RedirectUrl 为准） */
   externalH5Url?: string;
-  /** 后端已拼好卡标识、可直接跳转的第三方 H5 地址（含开关与防自跳判定） */
+  /** 后端已拼好卡标识、可直接跳转的第三方 H5 地址（含开关与防自跳判定；为空即不跳转） */
   externalH5RedirectUrl?: string;
+  /** 卡号 iccid：页面展示/排查用，不参与外跳拼参 */
+  iccid?: string;
 }
 
 /**

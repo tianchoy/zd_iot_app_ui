@@ -33,7 +33,7 @@
 						<image class="preview-image" :src="img" mode="aspectFill" @click="previewImage(index)"></image>
 						<view class="delete-btn" @click="removeImage(index)">×</view>
 					</view>
-					<view class="upload-btn" v-if="images.length < 3" @click="chooseImage">
+					<view class="upload-btn" v-if="canAddImage" @click="chooseImage">
 						<text class="plus">+</text>
 					</view>
 				</view>
@@ -52,10 +52,20 @@
 </template>
 
 <script setup lang="uts">
-	import { ref } from 'vue'
+	import { ref, computed } from 'vue'
 	import { submitFeedback } from '@/api/http.uts'
 	import { ApiUrl } from '@/api/url.uts'
 	import { http } from '@/api/Request.uts'
+
+	// H5 下页面参数（query）会被当作组件 attrs 透传，而本页根节点是
+	// 「条件编译的 topNavBar + 容器」这种多根结构，Vue 无法自动继承 → 控制台刷警告。
+	// 这里显式关闭属性继承消除该警告；页面参数仍由 onLoad(options) 读取，行为不变。
+	defineOptions({
+		inheritAttrs: false
+	})
+
+	// 问题截图上限（与页面文案「最多 3 张」保持一致）
+	const MAX_IMAGE_COUNT: number = 3
 
 	const rechargeNo = ref('')
 	const orderNo = ref('')
@@ -64,6 +74,7 @@
 	const userPhone = ref('')
 	const images = ref<string[]>([])
 	const submitLoading = ref(false)
+	const canAddImage = computed<boolean>(() => images.value.length < MAX_IMAGE_COUNT)
 
 	onLoad((options) => {
 		rechargeNo.value = options.rechargeNo ?? ''
@@ -72,18 +83,31 @@
 	})
 
 	// 选择图片
+	//
+	// uni.chooseImage 的 count 在各端不保证生效（H5/小程序均出现过返回张数多于请求张数的情况），
+	// 因此这里必须按剩余张数自行截断，否则「最多 3 张」的文案形同虚设。
 	const chooseImage = () => {
-		const maxCount = 3 - images.value.length
+		const remainCount = MAX_IMAGE_COUNT - images.value.length
+		if (remainCount <= 0) {
+			uni.showToast({ title: `最多上传 ${MAX_IMAGE_COUNT} 张图片`, icon: 'none' })
+			return
+		}
 		uni.chooseImage({
-			count: maxCount,
+			count: remainCount,
 			sizeType: ['compressed'],
 			sourceType: ['album', 'camera'],
 			success: (res) => {
 				const tempFilePaths = res.tempFilePaths
-				if (tempFilePaths != null) {
-					for (let i = 0; i < tempFilePaths.length; i++) {
-						images.value.push(tempFilePaths[i])
-					}
+				if (tempFilePaths == null) return
+				let added = 0
+				for (let i = 0; i < tempFilePaths.length; i++) {
+					if (images.value.length >= MAX_IMAGE_COUNT) break
+					images.value.push(tempFilePaths[i])
+					added++
+				}
+				// 超出部分被截断时明确告知，避免用户以为图片已全部选上
+				if (added < tempFilePaths.length) {
+					uni.showToast({ title: `最多上传 ${MAX_IMAGE_COUNT} 张图片，超出部分已忽略`, icon: 'none' })
 				}
 			}
 		})
@@ -118,10 +142,12 @@
 		submitLoading.value = true
 		try {
 			const uploadedIds: string[] = []
-			for (let i = 0; i < images.value.length; i++) {
+			// 兜底：即使选图环节被绕过，也只提交前 MAX_IMAGE_COUNT 张
+			const uploadImages = images.value.slice(0, MAX_IMAGE_COUNT)
+			for (let i = 0; i < uploadImages.length; i++) {
 				const uploadResult = await http.upload({
 					url: ApiUrl.feedbackUploadImage as string,
-					filePath: images.value[i],
+					filePath: uploadImages[i],
 					name: 'image',
 					withToken: false,
 					showLoading: false
@@ -151,7 +177,8 @@
 				formData['imgOssIds'] = uploadedIds.join(',')
 			}
 
-			const res = await submitFeedback(formData, false)
+			// 带 token 提交：后端据此把当前 app 用户写入 create_by，列表才能按「我的反馈」查出这条
+			const res = await submitFeedback(formData, true)
 			if (res.code == 200) {
 				uni.showToast({ title: '提交成功', icon: 'success' })
 				uni.redirectTo({

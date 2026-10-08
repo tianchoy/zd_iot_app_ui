@@ -1,0 +1,188 @@
+/**
+ * 卡号历史记忆工具类
+ *
+ * 用途：C 端「卡号查询 / 卡片查询」输入框的记忆能力 —— 查询成功后把卡号记在本地，
+ * 下次进入页面回填最近一次，输入框有内容时可在其下方展开最近的历史卡号直接点选。
+ *
+ * 设计要点：
+ * 1. 存储键按租户隔离（card_no_history_<tenantId>）。同一浏览器/同域名可能服务多个租户，
+ *    卡号属租户数据，串号会让用户看到别的租户查过的卡号。
+ * 2. 读取一律容错：数据缺失、类型不对、含脏项都只丢该项，绝不抛错。
+ *    该工具会在 tabBar 首页的 onShow 里被调用，抛错会直接把首页搞崩。
+ * 3. 不用 Array.filter / map 等回调式写法，按 components/selectCountry.uvue 里的既有约定
+ *    改用手写 for 循环，降低 UTS 跨端编译风险。
+ */
+
+import { getTenantId } from '@/common/config.uts'
+
+export class CardNoHistory {
+
+	/** 历史最多保留条数（超出后丢弃最旧的） */
+	static MAX: number = 10
+
+	/** 存储键前缀 */
+	static KEY_PREFIX: string = 'card_no_history_'
+
+	/** 租户号取不到时使用的兜底后缀，保证仍能读写同一份历史 */
+	static KEY_FALLBACK: string = 'default'
+
+	/**
+	 * 存储键：按租户隔离，形如 card_no_history_000000
+	 */
+	static storageKey(): string {
+		let tenantId = ''
+		try {
+			tenantId = getTenantId()
+		} catch (e) {
+			// 租户号读取异常不阻断历史功能，走兜底键
+			console.error('[卡号记忆] 读取租户号失败，改用兜底键:', e)
+			tenantId = ''
+		}
+		if (tenantId == null || tenantId.trim().length == 0) {
+			tenantId = CardNoHistory.KEY_FALLBACK
+		}
+		return CardNoHistory.KEY_PREFIX + tenantId.trim()
+	}
+
+	/**
+	 * 读取历史卡号列表（最新在前）
+	 *
+	 * 任何异常（存储读取失败、内容不是数组等）都返回空数组，绝不抛错。
+	 * 各端 setStorageSync 存数组本身就能原样取回，因此非数组内容一律视为「没有历史」。
+	 *
+	 * @returns 历史卡号，最多 {@link CardNoHistory.MAX} 条；没有历史时为空数组
+	 */
+	static list(): string[] {
+		const result: string[] = []
+		try {
+			const key = CardNoHistory.storageKey()
+			const raw: any = uni.getStorageSync(key)
+			if (raw == null) return result
+			if (!Array.isArray(raw)) return result
+
+			const source = raw as any[]
+			for (let i = 0; i < source.length; i++) {
+				const item = source[i]
+				// 脏数据逐项丢弃：null、非字符串、空串一律跳过
+				if (item == null) continue
+				if (typeof item !== 'string') continue
+				const text = (item as string).trim()
+				if (text.length == 0) continue
+				// 历史里可能自带重复项，读的时候也去一次重
+				if (CardNoHistory.hasValue(result, text)) continue
+				result.push(text)
+				if (result.length >= CardNoHistory.MAX) break
+			}
+		} catch (e) {
+			console.error('[卡号记忆] 读取失败，按无历史处理:', e)
+			return result
+		}
+		return result
+	}
+
+	/**
+	 * 记录一次卡号
+	 *
+	 * 处理顺序：trim → 空串直接忽略 → 去重（已存在则先移除）→ 插到队首 → 截断到 MAX 条。
+	 *
+	 * @param cardNo 卡号（允许带首尾空白）
+	 */
+	static record(cardNo: string): void {
+		if (cardNo == null) return
+		const value = cardNo.trim()
+		if (value.length == 0) return
+		try {
+			const key = CardNoHistory.storageKey()
+			const history = CardNoHistory.list()
+			const next: string[] = [value]
+			for (let i = 0; i < history.length; i++) {
+				const item = history[i]
+				if (item === value) continue
+				if (next.length >= CardNoHistory.MAX) break
+				next.push(item)
+			}
+			uni.setStorageSync(key, next)
+		} catch (e) {
+			// 记录失败不影响查询主流程，但要能在控制台看到
+			console.error('[卡号记忆] 写入失败:', e)
+		}
+	}
+
+	/**
+	 * 取最近一次查询过的卡号
+	 *
+	 * @returns 最近一次卡号；没有历史时返回空串
+	 */
+	static latest(): string {
+		const history = CardNoHistory.list()
+		if (history.length == 0) return ''
+		return history[0]
+	}
+
+	/**
+	 * 按输入内容做模糊联想：从历史里挑出与关键词匹配的卡号
+	 *
+	 * 匹配口径：
+	 * 1. 关键词为空 → 返回空数组（输入框为空时不弹联想）。
+	 * 2. 与关键词完全相同的项跳过：它没有补充信息，弹出来只会挡住输入。
+	 * 3. 前缀命中的排前面（更接近用户正在输入的完整卡号），其次才是包含命中的。
+	 * 4. 顺序沿用历史本身的最新在前。
+	 *
+	 * @param list 历史卡号（最新在前）
+	 * @param keyword 输入框里的关键词（允许带首尾空白）
+	 * @param limit 最多返回条数
+	 * @returns 匹配到的卡号；无匹配时为空数组
+	 */
+	static match(list: string[], keyword: string, limit: number): string[] {
+		const result: string[] = []
+		if (keyword == null) return result
+		if (limit <= 0) return result
+		const key = keyword.trim()
+		if (key.length == 0) return result
+
+		// 第一轮：前缀命中优先
+		for (let i = 0; i < list.length; i++) {
+			const item = list[i]
+			if (item === key) continue
+			if (item.indexOf(key) != 0) continue
+			result.push(item)
+			if (result.length >= limit) return result
+		}
+
+		// 第二轮：包含命中（indexOf 为 0 的前缀项已在第一轮收录，这里跳过）
+		for (let i = 0; i < list.length; i++) {
+			const item = list[i]
+			if (item === key) continue
+			if (item.indexOf(key) <= 0) continue
+			result.push(item)
+			if (result.length >= limit) break
+		}
+		return result
+	}
+
+	/**
+	 * 清空历史
+	 *
+	 * 当前页面未暴露入口（用户未要求删除功能），保留给后续需要时调用。
+	 */
+	static clear(): void {
+		try {
+			uni.removeStorageSync(CardNoHistory.storageKey())
+		} catch (e) {
+			console.error('[卡号记忆] 清空失败:', e)
+		}
+	}
+
+	/**
+	 * 列表中是否已存在某个卡号
+	 *
+	 * @param list 待检查列表
+	 * @param value 目标卡号
+	 */
+	static hasValue(list: string[], value: string): boolean {
+		for (let i = 0; i < list.length; i++) {
+			if (list[i] === value) return true
+		}
+		return false
+	}
+}

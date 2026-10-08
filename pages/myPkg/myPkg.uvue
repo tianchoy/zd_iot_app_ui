@@ -69,6 +69,13 @@
 	import { ref, computed } from 'vue'
 	import {queryPkgInfoList} from '@/api/http'
 	import type {PkgInfoItem} from '@/api/types'
+
+	// H5 下页面参数（query）会被当作组件 attrs 透传，而本页根节点是
+	// 「条件编译的 topNavBar + 容器」这种多根结构，Vue 无法自动继承 → 控制台刷警告。
+	// 这里显式关闭属性继承消除该警告；页面参数仍由 onLoad(options) 读取，行为不变。
+	defineOptions({
+		inheritAttrs: false
+	})
 	
 	// 套餐状态类型
 	type PackageStatus = '全部' | '在用套餐' | '待生效' | '已失效'

@@ -35,6 +35,14 @@
 	import {login, getPlatformInfo} from '@/api/http.uts'
 	import {setToken,setStorageSync,getStorageSync} from '@/common/config.uts'
 	import {userAgreement,privacyPolicy} from '@/utils/doc.uts'
+
+	// H5 下页面参数（query）会被当作组件 attrs 透传，而本页根节点是
+	// 「条件编译的 topNavBar + 容器」这种多根结构，Vue 无法自动继承 → 控制台刷警告。
+	// 这里显式关闭属性继承消除该警告；页面参数仍由 onLoad(options) 读取，行为不变。
+	defineOptions({
+		inheritAttrs: false
+	})
+
 	const userId = ref<string>('')
 	const docState = ref(false)
 	const showTitle = ref(false)

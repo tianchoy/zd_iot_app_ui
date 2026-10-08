@@ -3,9 +3,23 @@
 	<topNavBar title="我的反馈" :show-back="true" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<!-- #endif -->
 	<view class="page-container">
+		<!-- 卡号筛选入口：默认展示「我提交的反馈」，输入卡号可查该卡的历史反馈（老数据没有提交人归属） -->
+		<view class="card-box">
+			<view class="search-value">
+				<rice-input
+					v-model="inputCardNo"
+					placeholder="按卡号筛选（留空看我的反馈）"
+					class="search-input"
+				></rice-input>
+				<rice-button type="primary" color="#1989fa" textColor="#ffffff" height="100%" @click="handleQuery">查询</rice-button>
+				<rice-button type="default" textColor="#606266" height="100%" @click="handleReset">全部</rice-button>
+			</view>
+			<view class="search-tip" v-if="filterCardNo.length > 0">当前筛选卡号：{{ filterCardNo }}</view>
+		</view>
+
 		<!-- 反馈列表 -->
 		<view class="feedback-list" v-if="feedbackList.length > 0">
-			<view class="feedback-item" v-for="(item, index) in feedbackList" :key="index" @click="handleDetail(item.id)">
+			<view class="feedback-item" v-for="(item, index) in feedbackList" :key="index" @click="handleDetail(item)">
 				<view class="item-header">
 					<text class="feedback-no">{{ item.feedbackNo }}</text>
 				</view>
@@ -25,14 +39,21 @@
 
 		<!-- 空状态 -->
 		<view class="empty-state" v-else-if="!loading">
-			<text class="empty-text">暂无反馈记录</text>
+			<text class="empty-text">{{ emptyText }}</text>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { ref } from 'vue'
+	import { ref, computed } from 'vue'
 	import { getFeedbackList } from '@/api/http.uts'
+
+	// H5 下页面参数（query）会被当作组件 attrs 透传，而本页根节点是
+	// 「条件编译的 topNavBar + 容器」这种多根结构，Vue 无法自动继承 → 控制台刷警告。
+	// 这里显式关闭属性继承消除该警告；页面参数仍由 onLoad(options) 读取，行为不变。
+	defineOptions({
+		inheritAttrs: false
+	})
 
 	type FeedbackItem = {
 		id: number,
@@ -46,12 +67,19 @@
 		msisdn: string,
 		orderNo: string,
 		packageName: string,
-		replyContent: string
+		replyContent: string,
+		rechargeNo: string
 	}
 
-	const rechargeNo = ref('')
 	const loading = ref(true)
 	const feedbackList = ref<FeedbackItem[]>([])
+	const inputCardNo = ref('')
+	// 当前生效的卡号筛选值：空串表示「我提交的反馈」（后端按登录态取 create_by）
+	const filterCardNo = ref('')
+
+	const emptyText = computed<string>(() => filterCardNo.value.length > 0
+		? '未查询到该卡号的反馈，请确认卡号是否正确'
+		: '暂无反馈记录')
 
 	// 获取状态标签类型
 	const getStatusType = (status: string): string => {
@@ -73,18 +101,15 @@
 		return textMap.get(status) ?? status
 	}
 
-	// 查询反馈列表
+	// 查询反馈列表：filterCardNo 为空时后端按当前登录用户返回「我提交的反馈」
 	const loadFeedbackList = async () => {
 		loading.value = true
 		try {
-			const res = await getFeedbackList(rechargeNo.value, false)
+			const res = await getFeedbackList(filterCardNo.value)
 			if (res.code == 200) {
 				const rows = res.data as FeedbackItem[]
-				if (rows != null && Array.isArray(rows)) {
-					feedbackList.value = rows
-				} else {
-					feedbackList.value = []
-				}
+				// 不用 Array.isArray：uni-app x 各端对 JSON 数组的运行时表示不一致，用长度判定更稳
+				feedbackList.value = rows != null && rows.length >= 0 ? rows : []
 			} else {
 				uni.showToast({ title: res.msg ?? '查询失败', icon: 'none' })
 			}
@@ -95,10 +120,28 @@
 		}
 	}
 
-	// 查看详情
-	const handleDetail = (id: number) => {
+	// 按卡号筛选（查历史反馈）
+	const handleQuery = async () => {
+		const cardNo = inputCardNo.value.trim()
+		if (cardNo.length === 0) {
+			uni.showToast({ title: '请输入卡号', icon: 'none' })
+			return
+		}
+		filterCardNo.value = cardNo
+		await loadFeedbackList()
+	}
+
+	// 清除筛选，回到「我的反馈」
+	const handleReset = async () => {
+		inputCardNo.value = ''
+		filterCardNo.value = ''
+		await loadFeedbackList()
+	}
+
+	// 查看详情：归属凭据用该条反馈自身的充值号，而不是筛选值
+	const handleDetail = (item: FeedbackItem) => {
 		uni.navigateTo({
-			url: `/pages/questionFeedback/detail?feedbackId=${id}`
+			url: `/pages/questionFeedback/detail?feedbackId=${item.id}&rechargeNo=${encodeURIComponent(item.rechargeNo ?? '')}`
 		})
 	}
 
@@ -106,8 +149,7 @@
 		uni.navigateBack({ delta: 1 })
 	}
 
-	onLoad((options) => {
-		rechargeNo.value = options.rechargeNo ?? ''
+	onLoad(() => {
 		loadFeedbackList()
 	})
 </script>
@@ -121,6 +163,39 @@
 	// #endif
 	background-color: #f5f7fa;
 	padding-bottom: 48rpx;
+
+	.card-box {
+		display: flex;
+		flex-direction: column;
+		margin: 20rpx 20rpx 0 20rpx;
+		background-color: #ffffff;
+		border: 1rpx solid #e7edf5;
+		border-radius: 24rpx;
+		padding: 24rpx;
+
+		.search-value {
+			display: flex;
+			flex-direction: row;
+			border: 1rpx solid #dbe5f0;
+			border-radius: 24rpx;
+
+			.search-input {
+				flex: 1;
+				padding: 0 25rpx;
+				height: 95rpx;
+				border: none;
+				background: transparent;
+				color: #0f172a;
+				font-size: 30rpx;
+			}
+		}
+
+		.search-tip {
+			margin-top: 16rpx;
+			font-size: 24rpx;
+			color: #909399;
+		}
+	}
 }
 
 .feedback-list {
