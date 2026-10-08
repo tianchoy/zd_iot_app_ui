@@ -184,7 +184,7 @@
 	// 查询卡详情
 	const getCardDetail = async () => {
 		const res = await queryCardDetail(card_number.value,'','1')
-		console.log(res)
+		console.log('查询卡详情:',res)
 		if(res.code == 200){
 			cardDetail.value = res.data
 		}
@@ -194,7 +194,7 @@
 	const getOrderList = async () => {
 		try {
 			const resp = await queryOrderList({
-				rechargeNo: card_number.value,
+				rechargeNo: cardDetail.value?.rechargeNo || '',
 			})
 			if (resp.code == 200) {
 				const rows = resp.rows as OrderListXcxItem[]
@@ -218,7 +218,7 @@
 		console.log('查询套餐列表:',state)
 		try {
 			const res = await queryPkgInfoList({
-				rechargeNo: card_number.value,
+				rechargeNo: cardDetail.value?.rechargeNo || '',
 				status: state,
 			})
 			if (res.code == 200) {
