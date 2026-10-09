@@ -5,7 +5,7 @@
 import { getHostProjectConfig, isTrustedApiUrl } from './ProjectConfig.uts'
 import { storage } from './Storage.uts'
 import { uploadFileRequest, type UploadApiResponse, type UploadFileOptions } from './Upload.uts'
-import { config, getToken, setToken, clearToken, setStorageSync,isWechat } from '@/common/config'
+import { config, getToken, setToken, clearToken, setStorageSync, isWechat, isPhoneLoginRequired } from '@/common/config'
 
 // ========== 类型定义 ==========
 
@@ -370,7 +370,9 @@ export function request<T = any>(options: RequestOptions): Promise<ApiResponse<T
 						clearToken()
 						storage.clearAuth()
 					}
-					if (redirectOnUnauthorized && isWechat()) {
+					// 仅「需要授权手机号」（wxGetPhoneLogin==0）才跳转登录页；
+					// 静默登录（==1 或配置缺失）不跳转，避免误进手机号授权页
+					if (redirectOnUnauthorized && isWechat() && isPhoneLoginRequired()) {
 						// 内部会再次清理登录态并提示，随后 reLaunch 到登录页
 						navigateToLogin(finalLoginPage)
 					} else if (showError) {

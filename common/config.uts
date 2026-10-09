@@ -43,7 +43,7 @@ const ENV = 'prod' //  dev | prod
 
 const API_CONFIG: UTSJSONObject = {
   dev: {
-    baseUrl: 'http://127.0.0.1:8081',
+    baseUrl: 'http://192.168.1.243:8081',
     timeout: 30000
   },
   prod: {

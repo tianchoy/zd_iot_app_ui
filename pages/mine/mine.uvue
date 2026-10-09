@@ -42,8 +42,10 @@
 			</view>
 		</view>
 		<view class="btn-box" v-if="isWechatEnv">
-			<rice-button v-if="isLoginState" type="primary" width="100%" shape="round" @click="handleLogin">登录</rice-button>
-			<rice-button v-else type="error" width="100%" shape="round"  @click="handleLogout">退出登录</rice-button>
+			<!-- 仅在需要手机号授权（wxGetPhoneLogin==0）且未登录时展示登录按钮 -->
+			<rice-button v-if="!checkToken() && isNeedPhoneLogin" type="primary" width="100%" shape="round" @click="handleLogin">登录</rice-button>
+			<!-- 仅手机号登录模式（wxGetPhoneLogin==0）且已登录时展示退出登录按钮；静默登录（==1）不展示 -->
+			<rice-button v-if="checkToken() && isNeedPhoneLogin" type="error" width="100%" shape="round"  @click="handleLogout">退出登录</rice-button>
 		</view>
 		<!-- 页脚备案号：合规展示项，匿名接口未登录也可查看。
 		     logo 与小程序名称改由登录页 / 导航栏展示，本页不再重复；
@@ -60,11 +62,12 @@
 	import { ref, computed } from 'vue'
 	import { login,getTenantInfo,queryCardListSum,getPlatformInfo} from '@/api/http.uts'
 	import type { CardListSumData, PlatformInfoData } from '@/api/types.uts'
-	import { getTenantId,getToken ,clearToken,removeStorageSync,isWechat,config,setToken,setStorageSync} from '@/common/config.uts'
+	import { getTenantId,getToken ,clearToken,removeStorageSync,isWechat,config,setToken,setStorageSync,getStorageSync} from '@/common/config.uts'
 
 
 	const title = ref('用户');
-	const wxGetPhoneLogin = ref<string>('')
+	// 初始值取自缓存，避免首屏（配置未拉取前）无法判断登录模式
+	const wxGetPhoneLogin = ref<string>((getStorageSync('wxGetPhoneLogin') as string) || '')
 	const isWechatEnv = computed<boolean>(() => isWechat())
 	
 
@@ -72,7 +75,10 @@
 		const token = getToken()
 		return !!token
 	}
-	const isLoginState = computed<boolean>(() => !checkToken())
+
+	// 是否需要手机号授权登录：仅当配置明确为 '0' 时才展示登录按钮。
+	// '1'（免手机号）由静默登录处理，不需要登录按钮。
+	const isNeedPhoneLogin = computed<boolean>(() => wxGetPhoneLogin.value === '0')
 
 	// 检查是否登录
 	const isLogin = (): boolean => {
@@ -127,7 +133,9 @@
 			success: (res) => {
 				code.value = res.code
 				console.log('wxGetPhoneLogin:', wxGetPhoneLogin.value)
-				if( wxGetPhoneLogin.value == '1'){
+				// 仅 wxGetPhoneLogin=='0'（需要授权手机号）才走手机号登录分支；
+			// '1'/配置缺失统一按静默登录处理，不跳转登录页
+			if( wxGetPhoneLogin.value !== '0'){
 					const params = {
 						isLogin: "1",
 						xcxCode: code.value,
