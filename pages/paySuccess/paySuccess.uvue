@@ -139,6 +139,26 @@
 		})
 	}
 
+	/**
+	 * 通知原生 App：支付已成功，可关闭 WebView 回到原生页。
+	 *
+	 * 只有「App 内 WebView 打开的续费流程」（recharge 页带 source=app）才回跳；
+	 * 普通浏览器 / 微信里没有 window.ZdiotApp 通道，会继续停留在本结果页。
+	 */
+	const notifyAppIfFromApp = () => {
+		const source = (uni.getStorageSync('h5EntrySource') as string | null) ?? ''
+		if (source !== 'app') return
+		const w : any = window
+		if (w == null) return
+		const bridge : any = w.ZdiotApp
+		if (bridge == null || bridge.postMessage == null) return
+		const payload : UTSJSONObject = {
+			type: 'paySuccess',
+			orderId: orderId.value,
+		}
+		bridge.postMessage(JSON.stringify(payload))
+	}
+
 	// 查询订单，用返回结果确认支付状态；失败时不再直接展示"支付成功"
 	const getOrderDetail = async () => {
 		if (!orderId.value || !payChannelId.value) {
@@ -156,6 +176,8 @@
 				console.log('订单详情:',res)
 				orderDetail.value = res.data
 				status.value = 'success'
+				// 服务端已确认支付成功后再通知 App 回跳，避免未确认就跳走。
+				notifyAppIfFromApp()
 				return
 			}
 			status.value = 'failed'

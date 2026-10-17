@@ -160,6 +160,7 @@
 	// 获取租户页面配置
 	const getTenantInfos = async () => {
 		const res = await getTenantInfo(getTenantId(),false)
+		console.log('[mine] getTenantInfo 返回:', res)
 		if(res.code == 200){
 			const tenantInfo = res.data
 			console.log('tenantInfo:', tenantInfo)
@@ -195,6 +196,7 @@
 	const getCardListSum = async () => {
 		try {
 			const res = await queryCardListSum()
+			console.log('[mine] queryCardListSum 返回:', res)
 			if (res.code === 200) {
 				cardListSum.value = res.data
 			}
@@ -215,6 +217,7 @@
 	const getPlatformInfoData = async () => {
 		try {
 			const res = await getPlatformInfo(getTenantId())
+			console.log('[mine] getPlatformInfo 返回:', res)
 			if (res.code === 200 && res.data != null) {
 				platformInfo.value = res.data
 			}
