@@ -1,8 +1,9 @@
 <template>
 	<!-- 微信半屏小程序由微信提供顶部导航栏，不能再叠加自定义导航栏；H5 等端继续使用项目自定义导航。 -->
 	<!-- #ifndef MP-WEIXIN -->
-	<!-- App 内 WebView 打开时，App 自身已提供标题栏与返回，隐藏 H5 顶部导航 -->
-	<topNavBar v-if="!isFromApp" title="充值首页" :show-back="showBack" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- 测试版：取消 App 内隐藏 H5 标题的做法，统一由 H5 自带「充值首页」栏作为唯一标题；
+	     对应的 App 端已隐藏其原生导航栏（见 App 侧 WebContent 的 hideAppBar）。 -->
+	<topNavBar title="充值首页" :show-back="showBack" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<!-- #endif -->
 	<!-- 外跳优先级高于渲染：判定期间不渲染充值页内容，避免「先渲染再跳」的闪烁 -->
 	<view v-if="h5RedirectPending" style="display: flex; align-items: center; justify-content: center; height: 60vh;">
@@ -206,7 +207,7 @@
 	const isInPaymentProcess = ref<boolean>(false);
 	// 是否显示返回按钮
 	const showBack = ref<boolean>(true);
-	// 是否由 App 内 WebView 打开（source=app）：隐藏 H5 顶部导航栏
+	// 是否由 App 内 WebView 打开（source=app）：决定返回按钮走原生关闭通道
 	const isFromApp = ref<boolean>(false);
 	// H5 端「支付中」加载态兜底定时器
 	let payLoadingTimer: number | null = null
@@ -663,6 +664,18 @@
 	}
 
 	const goBack = () => {
+		// App 内 WebView 打开时，uni.navigateBack 无法关闭原生页面；
+		// 改经 window.ZdiotApp 通道通知原生关闭 WebView，回到平台续费页。
+		// 浏览器 / 微信等无该通道的环境，继续用 uni.navigateBack。
+		const source = (uni.getStorageSync('h5EntrySource') as string | null) ?? ''
+		if (source === 'app') {
+			const w: any = window
+			const bridge: any = w?.ZdiotApp
+			if (bridge != null && bridge.postMessage != null) {
+				bridge.postMessage(JSON.stringify({ type: 'close' }))
+				return
+			}
+		}
 		uni.navigateBack({
 			delta: 1
 		})
@@ -750,6 +763,13 @@
 	}
 
 	const handleBack = () => {
+		// App 内 WebView 打开时页面栈只有一页，但 App 侧已隐藏原生导航栏，
+		// 返回按钮由 H5 提供（点击经 window.ZdiotApp 通道关闭 WebView 回续费页），
+		// 因此这里必须强制显示，不能按页面栈判断。
+		if (isFromApp.value) {
+			showBack.value = true
+			return
+		}
 		const pages = getCurrentPages();
 		if (pages.length > 1) {
 			showBack.value = true
@@ -857,7 +877,8 @@
 		} else {
 			uni.removeStorageSync('h5EntrySource')
 		}
-		// App 来源：隐藏 H5 顶部导航栏（App 自带标题栏/返回）；刷新丢参数时用本地标记兜底
+		// App 来源：H5 顶部栏与返回按钮由本页提供（App 原生栏已隐藏）；
+		// 刷新丢参数时用本地标记兜底
 		const storedSource = (uni.getStorageSync('h5EntrySource') as string | null) ?? ''
 		isFromApp.value = entrySource === 'app' || storedSource === 'app'
 
