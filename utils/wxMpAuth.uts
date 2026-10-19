@@ -1,0 +1,359 @@
+/**
+ * 微信内 H5 公众号支付：静默授权 + JSBridge 调起。
+ *
+ * 适用前提：用户已经在微信客户端里打开本页面（公众号菜单、文章、二维码、分享链接）。
+ * 外部浏览器无法唤起微信打开指定公众号网页，因此这里判断到非微信环境会直接返回 false，
+ * 不做任何跳转，由调用方继续走 H5 支付或小程序。
+ *
+ * 流程：
+ * 1. 页面发现没有 mpToken 时，向后端要授权地址并跳转（snsapi_base，用户无感）；
+ * 2. 后端用 code 换 openid 后 302 回来，URL 带上一次性 mpToken；
+ * 3. 页面把 mpToken 存本地并抹掉地址栏参数，下单时回传。
+ */
+import { getTenantId, setStorageSync, getStorageSync, removeStorageSync } from '@/common/config.uts'
+import { getWxMpH5AuthUrl } from '@/api/http.uts'
+
+const MP_TOKEN_KEY = 'h5MpToken'
+const MP_TOKEN_AT_KEY = 'h5MpTokenAt'
+const MP_AUTH_AT_KEY = 'h5MpAuthAt'
+// 防止「授权失败→回到本页→再次跳授权」形成死循环
+const AUTH_LOOP_GUARD_MS = 15000
+// 等待 WeixinJSBridge 注入的上限：部分安卓微信注入较慢，超过这个时间通常也不会再有回调
+const BRIDGE_READY_TIMEOUT_MS = 10000
+// 已调起支付面板后的结果确认上限：用户输密码、切换银行卡都可能超过 1 分钟，
+// 这里必须给足时间，否则会在支付面板仍打开时就把结果判成失败
+const PAY_RESULT_TIMEOUT_MS = 5 * 60 * 1000
+
+/** 调起结果状态码：成功后由调用方跳转，其余按各自文案提示 */
+export const PAY_STATUS_OK: string = 'ok'
+export const PAY_STATUS_CANCEL: string = 'cancel'
+export const PAY_STATUS_TIMEOUT: string = 'timeout'
+export const PAY_STATUS_FAIL: string = 'fail'
+export const PAY_STATUS_NO_BRIDGE: string = 'no_bridge'
+export const PAY_STATUS_NOT_WECHAT: string = 'not_wechat'
+// 后端凭证 TTL 30 分钟（滑动续期），这里留 5 分钟余量：过期后主动重授权
+const MP_TOKEN_MAX_AGE_MS = 25 * 60 * 1000
+
+/**
+ * 是否在微信客户端内打开（含 PC 微信）。
+ *
+ * 用于 UI 层判断"微信里打不开的东西"（如支付宝、通联支付宝小程序跳转）：
+ * PC 微信同样打不开，所以这里不排除 WindowsWechat / MacWechat。
+ */
+export function isWechatEnv(): boolean {
+	// #ifdef H5
+	const ua = (navigator.userAgent as string).toLowerCase()
+	return ua.indexOf('micromessenger') >= 0
+	// #endif
+	return false
+}
+
+/**
+ * 是否移动端微信内置浏览器（H5 端判断，小程序恒为 false）。
+ *
+ * PC 微信 UA 同样包含 MicroMessenger，但 JSBridge 不支持支付，必须排除。
+ */
+export function isWechatBrowser(): boolean {
+	// #ifdef H5
+	const ua = (navigator.userAgent as string).toLowerCase()
+	return ua.indexOf('micromessenger') >= 0
+		&& ua.indexOf('windowswechat') < 0
+		&& ua.indexOf('macwechat') < 0
+	// #endif
+	return false
+}
+
+/**
+ * 保存一次性凭证
+ */
+export function saveMpToken(token: string) {
+	if (token != null && token.length > 0) {
+		setStorageSync(MP_TOKEN_KEY, token)
+		setStorageSync(MP_TOKEN_AT_KEY, '' + Date.now())
+	}
+}
+
+/**
+ * 读取一次性凭证，空串表示未授权或已过期
+ *
+ * 后端凭证 TTL 30 分钟（滑动续期，总时长不超过 2 小时），本地按 25 分钟提前作废：
+ * 否则会拿着死 token 下单，后端只能回退成 4601「授权已失效」。
+ */
+export function getMpToken(): string {
+	const token = (getStorageSync(MP_TOKEN_KEY) as string | null) ?? ''
+	if (token.length == 0) {
+		return ''
+	}
+	const atText = (getStorageSync(MP_TOKEN_AT_KEY) as string | null) ?? ''
+	const at = atText.length > 0 ? parseInt(atText) : 0
+	// 老版本可能只存了 token 没存时间：无法判断新鲜度，直接作废重新授权，
+	// 避免拿着一张早已被后端删除的凭证反复下单、反复 4601
+	if (at <= 0) {
+		clearMpToken()
+		return ''
+	}
+	if (Date.now() - at > MP_TOKEN_MAX_AGE_MS) {
+		clearMpToken()
+		return ''
+	}
+	return token
+}
+
+/**
+ * 清理一次性凭证（下单成功后被消费、支付完成或本地过期时调用）
+ */
+export function clearMpToken() {
+	removeStorageSync(MP_TOKEN_KEY)
+	removeStorageSync(MP_TOKEN_AT_KEY)
+}
+
+// 授权跳转前记下待续付的订单与支付渠道，回跳后自动重放一次
+const PAY_RESUME_KEY = 'h5MpPayResume'
+
+/**
+ * 记录「授权回来后要自动续付」的订单与渠道。
+ *
+ * <p>只应在确定要跳转授权前调用，否则会残留标记导致下次进入页面自动拉起支付。</p>
+ */
+export function markPayResume(orderNo: string, merchantConfigId: string) {
+	if (orderNo == null || orderNo.length == 0) {
+		return
+	}
+	setStorageSync(PAY_RESUME_KEY, orderNo + '|' + (merchantConfigId ?? ''))
+}
+
+/**
+ * 取出并清除续付标记，返回 [orderNo, merchantConfigId]；无标记返回空数组。
+ */
+export function consumePayResume(): string[] {
+	const empty: string[] = []
+	const raw = (getStorageSync(PAY_RESUME_KEY) as string | null) ?? ''
+	if (raw.length == 0) {
+		return empty
+	}
+	removeStorageSync(PAY_RESUME_KEY)
+	const idx = raw.indexOf('|')
+	if (idx < 0) {
+		const single: string[] = [raw, '']
+		return single
+	}
+	const pair: string[] = [raw.substring(0, idx), raw.substring(idx + 1)]
+	return pair
+}
+
+/**
+ * 收取授权回调下发的 mpToken，并把地址栏里的参数抹掉
+ *
+ * 不抹掉的话，用户复制/分享链接会把别人的一次性凭证一起带走。
+ *
+ * 页面参数（onLoad options）在部分 H5 场景取不到 hash 里的自定义参数，
+ * 因此参数为空时再从地址栏兜底解析一次——否则会一直沿用上一次的旧 token。
+ */
+export function consumeMpTokenFromQuery(token: string | null) {
+	// #ifdef H5
+	let value = token
+	if (value == null || value.length == 0) {
+		value = readMpTokenFromLocation()
+	}
+	if (value != null && value.length > 0) {
+		saveMpToken(value)
+	}
+	stripMpTokenFromUrl()
+	// #endif
+}
+
+/**
+ * 从地址栏读取 mpToken（hash 路由下参数位于 # 之后）
+ */
+function readMpTokenFromLocation(): string {
+	// #ifdef H5
+	const href = window.location.href as string
+	const key = 'mpToken='
+	const index = href.indexOf(key)
+	if (index < 0) {
+		return ''
+	}
+	const start = index + key.length
+	const end = href.indexOf('&', start)
+	const raw = end < 0 ? href.substring(start) : href.substring(start, end)
+	if (raw.length == 0) {
+		return ''
+	}
+	try {
+		return decodeURIComponent(raw)
+	} catch (e) {
+		return raw
+	}
+	// #endif
+	return ''
+}
+
+function stripMpTokenFromUrl() {
+	// #ifdef H5
+	const href = window.location.href as string
+	if (href.indexOf('mpToken=') < 0) {
+		return
+	}
+	const hashIndex = href.indexOf('#')
+	if (hashIndex < 0) {
+		return
+	}
+	const head = href.substring(0, hashIndex)
+	const tail = href.substring(hashIndex)
+	const queryIndex = tail.indexOf('?')
+	if (queryIndex < 0) {
+		return
+	}
+	const path = tail.substring(0, queryIndex)
+	const pairs = tail.substring(queryIndex + 1).split('&')
+	const kept: string[] = []
+	pairs.forEach((pair: string) => {
+		if (pair.indexOf('mpToken=') != 0) {
+			kept.push(pair)
+		}
+	})
+	const rebuilt = kept.length > 0 ? path + '?' + kept.join('&') : path
+	window.history.replaceState(null, '', head + rebuilt)
+	// #endif
+}
+
+/**
+ * 确保已具备公众号授权，需要跳转时返回 true（页面应停止后续渲染/支付）。
+ *
+ * @param cardNo 当前页面的卡号（iccid / 接入号 / 充值号均可）。传了后端才能按卡所属租户
+ *               生成授权——租户用 000000 域名打开 H5 时，前端租户恒为 000000，
+ *               不传卡号会导致授权租户与订单租户不一致、JSAPI 静默降级。
+ * @param force  忽略"已有凭证"和防循环判断。后端返回凭证失效时用它强制重新授权。
+ */
+export async function ensureWxMpAuth(cardNo: string = '', force: boolean = false): Promise<boolean> {
+	// #ifdef H5
+	if (!isWechatBrowser()) {
+		// 外部浏览器：微信不支持跳转到公众号网页，直接走 H5 支付/小程序
+		return false
+	}
+	if (!force && getMpToken().length > 0) {
+		return false
+	}
+	const lastAtText = (getStorageSync(MP_AUTH_AT_KEY) as string | null) ?? ''
+	const lastAt = lastAtText.length > 0 ? parseInt(lastAtText) : 0
+	if (!force && Date.now() - lastAt < AUTH_LOOP_GUARD_MS) {
+		console.warn('[wxMpAuth] 刚发起过授权，跳过以避免循环跳转')
+		return false
+	}
+	const returnUrl = window.location.href as string
+	try {
+		const res = await getWxMpH5AuthUrl(getTenantId(), returnUrl, cardNo)
+		const data = res.data as any
+		const url = data != null ? ((data['url'] as string | null) ?? '') : ''
+		if (res.code != 200 || url.length == 0) {
+			const msg = (res.msg as string | null) ?? ''
+			// 「未配置公众号」是正常情况（租户没开公众号支付），静默走 H5 支付；
+			// 其它失败给出提示，否则用户只会看到后续支付失败而不知道原因
+			if (msg.length > 0 && msg.indexOf('未配置') < 0) {
+				uni.showToast({ title: msg, icon: 'none' })
+			}
+			console.log('[wxMpAuth] 无法发起公众号授权，继续H5支付：', msg)
+			return false
+		}
+		setStorageSync(MP_AUTH_AT_KEY, '' + Date.now())
+		window.location.replace(url)
+		return true
+	} catch (error) {
+		console.error('[wxMpAuth] 获取授权地址失败，按H5支付继续:', error)
+		return false
+	}
+	// #endif
+	return false
+}
+
+/**
+ * 调起微信内公众号 JSAPI 支付（getBrandWCPayRequest）。
+ *
+ * <p>超时拆成两段：等 JSBridge 注入 10 秒；已进入调起环节后给 5 分钟确认结果。
+ * 早期实现用一个 15 秒定时器覆盖全程，用户输密码稍慢就会被判失败。</p>
+ *
+ * @param param 后端返回的 appId / timeStamp / nonceStr / package / signType / paySign
+ * @return 状态码，见 PAY_STATUS_* 常量
+ */
+export function invokeMpJsapiPay(param: any): Promise<string> {
+	return new Promise<string>((resolve) => {
+		// #ifdef H5
+		if (!isWechatBrowser()) {
+			console.warn('[wxMpAuth] 非移动端微信环境，跳过公众号支付调起')
+			resolve(PAY_STATUS_NOT_WECHAT)
+			return
+		}
+		let settled = false
+		let timer: number = 0
+		const finish = (status: string) => {
+			if (settled) {
+				return
+			}
+			settled = true
+			if (timer != 0) {
+				clearTimeout(timer)
+				timer = 0
+			}
+			resolve(status)
+		}
+		// 桥未注入的兜底：只在真正拿到 bridge 之前生效
+		timer = setTimeout(() => {
+			console.warn('[wxMpAuth] WeixinJSBridge 未就绪')
+			finish(PAY_STATUS_NO_BRIDGE)
+		}, BRIDGE_READY_TIMEOUT_MS)
+		// 已调起支付面板：换成结果确认计时，不再限制用户操作时长
+		const startResultTimer = () => {
+			if (timer != 0) {
+				clearTimeout(timer)
+			}
+			timer = setTimeout(() => {
+				console.warn('[wxMpAuth] 等待支付结果超时，请以订单状态为准')
+				finish(PAY_STATUS_TIMEOUT)
+			}, PAY_RESULT_TIMEOUT_MS)
+		}
+		const invoke = () => {
+			// 监听只应生效一次：否则反复点击会累积回调，bridge 就绪后同时触发多次支付
+			document.removeEventListener('WeixinJSBridgeReady', invoke, false)
+			const bridge = (window as any)['WeixinJSBridge']
+			if (bridge == null) {
+				finish(PAY_STATUS_NO_BRIDGE)
+				return
+			}
+			startResultTimer()
+			bridge.invoke('getBrandWCPayRequest', {
+				// 必传：缺 appId 微信会提示「调用支付JSAPI缺少参数：appId」
+				appId: param.appId as string,
+				timeStamp: param.timeStamp as string,
+				nonceStr: param.nonceStr as string,
+				'package': param.package as string,
+				signType: param.signType as string,
+				paySign: param.paySign as string
+			}, (res: any) => {
+				const errMsg = res != null ? ((res['err_msg'] as string | null) ?? '') : ''
+				console.log('[wxMpAuth] 支付回调:', errMsg)
+				// 精确判定成功，避免 :fail 文案里带 ok 被误判
+				if (errMsg == 'get_brand_wcpay_request:ok') {
+					finish(PAY_STATUS_OK)
+					return
+				}
+				// 用户主动取消不是故障，单独区分，避免给出"支付失败，请重试"的误导
+				if (errMsg.indexOf(':cancel') >= 0) {
+					finish(PAY_STATUS_CANCEL)
+					return
+				}
+				console.error('[wxMpAuth] 调起失败:', errMsg)
+				finish(PAY_STATUS_FAIL)
+			})
+		}
+		if ((window as any)['WeixinJSBridge'] == null) {
+			// 部分安卓微信需要等 JSBridge 注入完成
+			document.addEventListener('WeixinJSBridgeReady', invoke, false)
+		} else {
+			invoke()
+		}
+		// #endif
+		// #ifndef H5
+		resolve(PAY_STATUS_NOT_WECHAT)
+		// #endif
+	})
+}

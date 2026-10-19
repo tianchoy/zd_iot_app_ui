@@ -34,6 +34,9 @@
 				<!-- #ifndef MP-WEIXIN -->
 				<view class="method-section">
 					<text class="section-title">选择支付方式</text>
+					<view v-if="sortedPayMethods.length === 0" class="method-empty">
+						<text class="method-desc">当前商户未开通微信支付，微信内暂无法支付，请联系客服</text>
+					</view>
 					<view class="method-option"
 							v-for="method in sortedPayMethods"
 							:key="method.merchantConfigId"
@@ -72,6 +75,7 @@
 <script setup lang="uts">
 import {DataFormat} from '@/utils/dataFormat.uts';
 import {AmountUtil} from '@/utils/amount.uts';
+import {isWechatEnv} from '@/utils/wxMpAuth.uts';
 // 定义组件属性 (props)
 const props = defineProps<{
 // 卡号（可选）
@@ -110,7 +114,11 @@ return `${ AmountUtil.format(props.amount)}`;
 
 // 支付方式排序（微信支付在前，支付宝在后）
 const sortedPayMethods = computed(() => {
-const methods = props.payMethod || [];
+const raw = props.payMethod || [];
+// 微信客户端内支付宝/通联支付宝小程序跳转都会被拦截，直接不展示，避免用户选了必失败
+const methods = isWechatEnv()
+  ? raw.filter((item: PaymentMethod) => item.payType !== 'ali_pay' && item.payType !== 'allin_pay')
+  : raw;
 const priority: Record<string, number> = {
   'wechat_pay': 0,
   'ali_pay': 1
@@ -190,6 +198,14 @@ emit('confirm', 'wechat_miniprogram');
 // #endif
 
 // #ifndef MP-WEIXIN
+// 微信内支付宝被过滤后可能没有可选方式，此时不能提交空值
+if (effectiveMethodId.value.length === 0) {
+  uni.showToast({
+    title: '暂无可用的支付方式，请联系客服',
+    icon: 'none'
+  });
+  return;
+}
 // H5等环境：使用实际生效的支付方式，避免支付方式异步加载后提交空值
 emit('confirm', effectiveMethodId.value);
 // #endif
@@ -249,6 +265,10 @@ emit('confirm', effectiveMethodId.value);
 
 .method-section {
 	margin-top: 8rpx;
+}
+
+.method-empty {
+	padding: 24rpx 0;
 }
 
 .section-title {

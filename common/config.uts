@@ -39,11 +39,11 @@ export type ProjectConfig = {
 }
 
 // 环境配置
-const ENV = 'prod' //  dev | prod
+const ENV = 'prod' //  dev | prod test
 
 const API_CONFIG: UTSJSONObject = {
   dev: {
-    baseUrl: 'http://192.168.1.243:8081',
+    baseUrl: 'http://127.0.0.1:8081',
     timeout: 30000
   },
   prod: {
@@ -188,6 +188,19 @@ export function isWechat(): boolean {
 export function isH5(): boolean {
   // #ifdef H5
   return true
+  // #endif
+  return false
+}
+
+/**
+ * 是否在微信内置浏览器里打开（H5 专用；小程序恒为 false）。
+ *
+ * 用于区分「公众号 H5」与「外部浏览器 H5」两类订单来源：前者 4，后者 2。
+ */
+export function isWechatWebView(): boolean {
+  // #ifdef H5
+  const ua = (navigator.userAgent as string).toLowerCase()
+  return ua.indexOf('micromessenger') >= 0
   // #endif
   return false
 }

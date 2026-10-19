@@ -190,6 +190,8 @@
 	import tousu from '@/components/tousu.uvue';
 	import {DataFormat} from '@/utils/dataFormat.uts';
 	import {AmountUtil} from '@/utils/amount.uts';
+	import { ensureWxMpAuth, consumeMpTokenFromQuery, getMpToken, clearMpToken, invokeMpJsapiPay,
+		PAY_STATUS_OK, PAY_STATUS_CANCEL, PAY_STATUS_TIMEOUT, PAY_STATUS_NOT_WECHAT } from '@/utils/wxMpAuth.uts';
 	defineOptions({
 		inheritAttrs: false
 	})
@@ -585,6 +587,11 @@
 			return
 		}
 
+		// 微信内下单前确保凭证有效：过期/已被上次下单消费时会重新静默授权
+		if (isH5() && (await ensureWxMpAuth(cardDetail.value.rechargeNo))) {
+			return
+		}
+
 		uni.showLoading({
 			title: '支付中...'
 		})
@@ -615,7 +622,9 @@
 			params = {
 				pkgId: currentItem.pkgId,
 				rechargeNo: cardDetail.value.rechargeNo,
-				merchantConfigId
+				merchantConfigId,
+				// 公众号授权凭证：为空时后端自动回退微信H5支付
+				mpToken: getMpToken()
 			}
 		}
 
@@ -634,12 +643,60 @@
 				if(isH5()){
 					console.log('H5支付:', res.data)
 
+					if(res.data.payWxType == 'wechat_jsapi'){
+						// 后端下单成功不再消费凭证（TTL 内可复用），支付成功后本地才清理
+						const payResult = await invokeMpJsapiPay(res.data)
+						if (payResult == PAY_STATUS_OK) {
+							clearMpToken()
+							uni.hideLoading()
+							uni.redirectTo({
+								url: '/pages/paySuccess/paySuccess?orderId=' + res.data.orderNo + '&payChannelId=' + res.data.payChannelId
+							})
+						} else if (payResult == PAY_STATUS_CANCEL) {
+							// 用户主动取消：订单已落库（待支付），跳到订单详情让用户继续付
+							uni.hideLoading()
+							isInPaymentProcess.value = false
+							uni.showToast({ title: '已取消支付', icon: 'none', duration: 1000 })
+							setTimeout(() => {
+								uni.redirectTo({
+									url: '/pages/orderDetail/orderDetail?orderNo=' + res.data.orderNo
+								})
+							}, 800)
+						} else if (payResult == PAY_STATUS_TIMEOUT) {
+							// 可能已付款但未拿到回调：不判失败，引导去订单列表确认
+							uni.hideLoading()
+							isInPaymentProcess.value = false
+							uni.showToast({ title: '支付结果确认中，请稍后在订单列表查看', icon: 'none', duration: 2000 })
+							setTimeout(() => {
+								uni.redirectTo({
+									url: '/pages/orderDetail/orderDetail?orderNo=' + res.data.orderNo
+								})
+							}, 2000)
+						} else if (payResult == PAY_STATUS_NOT_WECHAT) {
+							handlePayFailed('请在手机微信中打开后支付')
+						} else {
+							handlePayFailed('支付调起失败，请重试')
+						}
+						return
+					}
 					if(res.data.payWxType == 'wechat_pay' || res.data.payWxType == 'allin_pay'){
 						window.location.href = res.data.url
 					}else{
 						handleAlipayForm(res.data.url)
 					}
 				}
+			} else if (res.code == 4601) {
+				// 公众号凭证失效：清本地 token，强制重新静默授权（会跳转并回到本页）
+				console.warn('[wxMpAuth] 后端判定凭证失效(4601)，重新静默授权')
+				hidePayLoading()
+				clearMpToken()
+				if (await ensureWxMpAuth(cardDetail.value.rechargeNo, true)) {
+					return
+				}
+				uni.showToast({
+					title: res.msg || '公众号支付授权已失效，请重新进入页面',
+					icon: 'none'
+				})
 			} else {
 				hidePayLoading()
 				uni.showToast({
@@ -856,6 +913,11 @@
 		} catch (error) {
 			console.error('[externalH5] 外跳探测失败，按正常页面渲染:', error)
 		}
+		// 第三方外跳未命中才需要公众号授权：外跳站点不归我们管，不能先授权再跳走。
+		// 非微信浏览器会直接返回 false（微信不支持外部跳转到公众号网页）
+		if (await ensureWxMpAuth(cardNumber.value)) {
+			return
+		}
 		// #endif
 		h5RedirectPending.value = false
 		platform()
@@ -870,6 +932,8 @@
 		const countryValue = opt.country
 		const from = opt.from
 		const pkgId = opt.pkgId
+		// 公众号授权回调带回的一次性凭证：存本地并抹掉地址栏参数
+		consumeMpTokenFromQuery((opt.mpToken as string | null) ?? '')
 
 		// 记录入口来源：App 内 WebView 打开时带 source=app。
 		// 支付流程会 redirectTo 到 paySuccess，URL 参数会丢失，故存本地；

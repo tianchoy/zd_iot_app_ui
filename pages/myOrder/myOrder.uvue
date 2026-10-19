@@ -30,7 +30,7 @@
 		<!-- 订单列表 -->
 		<scroll-view class="order-list" scroll-y :enhanced="true" :show-scrollbar="false">
 			<view v-if="orderList.length === 0" class="empty-state">
-				<text class="empty-text">暂无订单</text>
+				<text class="empty-text">{{ emptyHint }}</text>
 			</view>
 			<view v-else class="orders-container">
 				<view
@@ -83,7 +83,7 @@
 	import {queryOrderList} from '@/api/http'
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref, computed, onMounted } from 'vue'
-	import {isWechat,isH5} from '@/common/config.uts'
+	import {isWechat,isH5,isWechatWebView,getStorageSync} from '@/common/config.uts'
 	import {AmountUtil} from '@/utils/amount.uts'
 
 	// 问题反馈开关
@@ -91,8 +91,14 @@
 
 	// 跳转到问题反馈
 	const handleMyFeedback = () => {
+		// 无登录态时必须带卡号，否则后端返回「请提供rechargeNo」
+		const lastCard = (getStorageSync(LAST_CARD_KEY) as string | null) ?? ''
+		if (lastCard.length == 0) {
+			uni.showToast({ title: '请先进入卡详情再反馈', icon: 'none' })
+			return
+		}
 		uni.navigateTo({
-			url: `/pages/questionFeedback/list`
+			url: `/pages/questionFeedback/list?rechargeNo=${lastCard}`
 		})
 	}
 
@@ -113,6 +119,10 @@
 	])
 	const current = ref<number>(0)
 	const card_number = ref<string>('')
+	// 空态文案：默认「暂无订单」，未关联卡号时提示先查询，避免误解为没有订单
+	const emptyHint = ref<string>('暂无订单')
+	// 最近一次查看的卡号（卡详情页写入），作为「我的订单」的默认查询条件
+	const LAST_CARD_KEY = 'lastRechargeNo'
 
 	// 订单数据
 	const orderList = ref<OrderListXcxItem[]>([])
@@ -160,9 +170,23 @@
 			if (status !== '') {
 				params['status'] = status
 			}
-			// 只有查询操作才传递查询参数
+			// 按渠道取来源：公众号=4，外部浏览器=2；小程序走 xcxList 不受影响
+			if (isH5()) {
+				params['orderSources'] = isWechatWebView() ? '4' : '2'
+			}
+			// 只有查询操作才传关键字；默认列表按最近一次查看的卡号过滤，
+			// 没有卡号时不发请求，避免接口返回全量订单
 			if (isSearch && card_number.value.trim()) {
 				params['rechargeNoAndOrderNo'] = card_number.value.trim()
+			} else {
+				const lastCard = (getStorageSync(LAST_CARD_KEY) as string | null) ?? ''
+				if (lastCard.length == 0) {
+					orderList.value = []
+					emptyHint.value = '请输入卡号或订单号查询'
+					return
+				}
+				params['rechargeNo'] = lastCard
+				emptyHint.value = '暂无订单'
 			}
 			const resp = await queryOrderList(params)
 			if (resp.code == 200) {
@@ -326,30 +350,17 @@
 		})
 	}
 
-	// 去支付
+	// 去支付：统一进入订单详情（待支付页），由详情页负责调起支付
 	const handlePay = (order: OrderListXcxItem) => {
-		if(isWechat()){
-			uni.showToast({
-				title: `支付订单 ${order.id}`,
-				icon: 'none'
-			})
-			uni.navigateTo({
-				url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
-			})
-		}
-
-		if(isH5()){
-			uni.showToast({
-				title: `支付订单 ${order.orderNo}`,
-				icon: 'none'
-			})
-		}
+		uni.navigateTo({
+			url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
+		})
 	}
 
 	onShow(() => {
-		// 页面显示时重置所有状态
+		// 页面显示时重置状态；默认带出最近查看的卡号，保证列表有明确查询范围
 		isSearching.value = false
-		card_number.value = ''
+		card_number.value = (getStorageSync(LAST_CARD_KEY) as string | null) ?? ''
 		current.value = 0
 		getOrderList('', false)
 	})
