@@ -134,7 +134,7 @@
 	import { ref, computed } from 'vue'
 	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderList,userUnBindCard} from '@/api/http'
 	import type {BindCard,OrderListXcxItem,PkgInfoItem,RechargeData} from '@/api/types'
-	import {isH5,isWechat} from '@/common/config.uts'
+	import {isH5,isWechat,isWechatWebView,setStorageSync} from '@/common/config.uts'
 	import {AmountUtil} from '@/utils/amount.uts';
 	import {DataFormat} from '@/utils/dataFormat.uts'
 
@@ -194,15 +194,26 @@
 		console.log('查询卡详情:',res)
 		if(res.code == 200){
 			cardDetail.value = res.data
+			// 记住最近查看的卡号，「我的订单」默认按它查询，避免无参拉全量订单
+			const rechargeNo = (res.data as UTSJSONObject).getString('rechargeNo') ?? ''
+			const lastCard = rechargeNo.length > 0 ? rechargeNo : card_number.value
+			if (lastCard != null && lastCard.length > 0) {
+				setStorageSync('lastRechargeNo', lastCard)
+			}
 		}
 	}
 
 	// 查询订单列表Xcx
 	const getOrderList = async () => {
 		try {
-			const resp = await queryOrderList({
+			const params: UTSJSONObject = {
 				rechargeNo: cardDetail.value?.rechargeNo || '',
-			})
+			}
+			// 按渠道取来源：公众号=4，外部浏览器=2
+			if (isH5()) {
+				params['orderSources'] = isWechatWebView() ? '4' : '2'
+			}
+			const resp = await queryOrderList(params)
 			if (resp.code == 200) {
 				const rows = resp.rows as OrderListXcxItem[]
 				if (rows != null && Array.isArray(rows)) {

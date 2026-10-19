@@ -75,7 +75,7 @@
 	import {queryOrderList} from '@/api/http'
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref } from 'vue'
-	import { isWechat,isH5 } from '@/common/config.uts'
+	import { isWechat,isH5,isWechatWebView,getStorageSync } from '@/common/config.uts'
 	import {AmountUtil} from '@/utils/amount.uts'
 
 	// H5 下页面参数（query）会被当作组件 attrs 透传，而本页根节点是
@@ -85,10 +85,16 @@
 		inheritAttrs: false
 	})
 
-	// 跳转到问题反馈列表（列表按租户返回，不再要求携带卡号）
+	// 跳转到问题反馈列表：公众号/浏览器无登录态时必须带卡号
 	const handleMyFeedback = () => {
+		const card = rechargeNo.value.length > 0 ? rechargeNo.value
+			: ((getStorageSync('lastRechargeNo') as string | null) ?? '')
+		if (card.length == 0) {
+			uni.showToast({ title: '请先进入卡详情再反馈', icon: 'none' })
+			return
+		}
 		uni.navigateTo({
-			url: `/pages/questionFeedback/list`
+			url: `/pages/questionFeedback/list?rechargeNo=${card}`
 		})
 	}
 
@@ -151,6 +157,10 @@
 			}
 			if (status !== '') {
 				params['status'] = status
+			}
+			// 按渠道取来源：公众号=4，外部浏览器=2
+			if (isH5()) {
+				params['orderSources'] = isWechatWebView() ? '4' : '2'
 			}
 			const resp = await queryOrderList(params)
 			if (resp.code == 200) {

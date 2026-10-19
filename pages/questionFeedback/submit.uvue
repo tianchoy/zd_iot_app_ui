@@ -109,6 +109,20 @@
 				if (added < tempFilePaths.length) {
 					uni.showToast({ title: `最多上传 ${MAX_IMAGE_COUNT} 张图片，超出部分已忽略`, icon: 'none' })
 				}
+			},
+			fail: (err) => {
+				const raw = (err as any).errMsg as string | null
+				const msg = raw != null ? raw : ''
+				// 用户主动取消（H5 与小程序都是 chooseImage:fail cancel）不是错误，静默返回
+				if (msg.toLowerCase().indexOf('cancel') >= 0) {
+					return
+				}
+				// 权限被拒、相册不可用等场景此前是静默失败，用户只会觉得"点不动"
+				console.error('[feedback] 选择图片失败:', msg)
+				uni.showToast({
+					title: msg.length > 0 ? '选择图片失败：' + msg : '选择图片失败，请检查相册权限',
+					icon: 'none'
+				})
 			}
 		})
 	}
@@ -145,18 +159,30 @@
 			// 兜底：即使选图环节被绕过，也只提交前 MAX_IMAGE_COUNT 张
 			const uploadImages = images.value.slice(0, MAX_IMAGE_COUNT)
 			for (let i = 0; i < uploadImages.length; i++) {
-				const uploadResult = await http.upload({
-					url: ApiUrl.feedbackUploadImage as string,
-					filePath: uploadImages[i],
-					name: 'image',
-					withToken: false,
-					showLoading: false
-				})
-				const ossId = uploadResult.code == 200 && uploadResult.data != null
+				let uploadResult: any = null
+				try {
+					uploadResult = await http.upload({
+						url: ApiUrl.feedbackUploadImage as string,
+						filePath: uploadImages[i],
+						name: 'image',
+						withToken: false,
+						showLoading: false
+					})
+				} catch (uploadError) {
+					// 网络中断/小程序未配置上传域名等都会走到这里，必须把原因告诉用户
+					console.error('[feedback] 第 ' + (i + 1) + ' 张图片上传异常:', uploadError)
+					uni.showToast({ title: '第 ' + (i + 1) + ' 张图片上传失败，请重试', icon: 'none' })
+					return
+				}
+				const ossId = uploadResult != null && uploadResult.code == 200 && uploadResult.data != null
 					? String(uploadResult.data).trim()
 					: ''
 				if (!ossId) {
-					uni.showToast({ title: uploadResult.msg ?? '图片上传失败', icon: 'none' })
+					const msg = uploadResult != null ? (uploadResult.msg as string | null) : null
+					uni.showToast({
+						title: msg != null && msg.length > 0 ? msg : '第 ' + (i + 1) + ' 张图片上传失败',
+						icon: 'none'
+					})
 					return
 				}
 				uploadedIds.push(ossId)

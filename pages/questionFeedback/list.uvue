@@ -111,7 +111,14 @@
 				// 不用 Array.isArray：uni-app x 各端对 JSON 数组的运行时表示不一致，用长度判定更稳
 				feedbackList.value = rows != null && rows.length >= 0 ? rows : []
 			} else {
-				uni.showToast({ title: res.msg ?? '查询失败', icon: 'none' })
+				const msg = (res.msg as string | null) ?? ''
+				// 无登录态且未带卡号时后端返回「请提供rechargeNo」，转成用户能理解的引导
+				if (msg.indexOf('rechargeNo') >= 0) {
+					feedbackList.value = []
+					uni.showToast({ title: '请先进入卡详情再查看反馈', icon: 'none' })
+				} else {
+					uni.showToast({ title: msg.length > 0 ? msg : '查询失败', icon: 'none' })
+				}
 			}
 		} catch (error) {
 			console.error('查询反馈列表异常:', error)

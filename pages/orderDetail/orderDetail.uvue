@@ -135,6 +135,9 @@
 	import Payment from '@/components/payment.uvue';
 	import {AmountUtil} from '@/utils/amount.uts'
 	import {DataFormat} from '@/utils/dataFormat.uts'
+	import { ensureWxMpAuth, consumeMpTokenFromQuery, getMpToken, clearMpToken, invokeMpJsapiPay,
+		markPayResume, consumePayResume,
+		PAY_STATUS_OK, PAY_STATUS_CANCEL, PAY_STATUS_TIMEOUT, PAY_STATUS_NOT_WECHAT } from '@/utils/wxMpAuth.uts'
 
 	// H5 下页面参数（query）会被当作组件 attrs 透传，而本页根节点是
 	// 「条件编译的 topNavBar + 容器」这种多根结构，Vue 无法自动继承 → 控制台刷警告。
@@ -260,10 +263,45 @@
 	// 选择支付方式
 	const choosePayment = () => {
 		const detail = orderDetail.value as UTSJSONObject
+		const payInfo = detail['payInfo'] as any[]
+		if (payInfo == null || payInfo.length == 0) {
+			// 租户未配置 h5_pay_type 或渠道全部停用：明确告知，避免弹出空列表
+			uni.showToast({ title: '未配置支付方式，请联系客服', icon: 'none' })
+			return
+		}
 		const payAmount = detail['payAmount'] as number
 		const orderAmount = detail['orderAmount'] as number
 		currentPrice.value = payAmount != null ? payAmount : (orderAmount != null ? orderAmount : 0)
 		showPopup.value = true
+	}
+
+	// 授权回跳后只自动续付一次，失败不循环
+	let resumeTried: boolean = false
+
+	/**
+	 * 授权回跳自动续付：仅当标记的订单号与当前页一致、且已拿到凭证时重放一次支付。
+	 */
+	const tryResumePayment = () => {
+		if (!isH5() || resumeTried) {
+			return
+		}
+		resumeTried = true
+		const resume = consumePayResume()
+		if (resume.length < 2) {
+			return
+		}
+		if (resume[0] != orderId.value) {
+			return
+		}
+		const channel = resume[1]
+		if (channel.length == 0) {
+			return
+		}
+		if (getMpToken().length == 0) {
+			return
+		}
+		console.log('[wxMpAuth] 授权回跳，自动续付，orderNo=', orderId.value)
+		handleConfirmPayment(channel)
 	}
 
 	// 查询订单详情
@@ -279,6 +317,10 @@
 			const res = await queryOrderDetail(orderId.value)
 			if (res.code == 200) {
 				orderDetail.value = res.data
+				// 授权回跳后自动续付一次（仅待支付且拿到凭证时生效）
+				if (ds('status') === '0') {
+					tryResumePayment()
+				}
 			} else {
 				uni.showToast({
 					title: res.msg || '查询订单详情失败',
@@ -460,6 +502,22 @@
 			return
 		}
 
+		// 微信内先补齐公众号授权（会短暂跳微信，非微信浏览器直接跳过）。
+		// 确认要跳转前记下续付标记，回跳后由 tryResumePayment 自动重放；
+		// 若没能跳转（取授权地址失败等），立刻清掉标记避免影响下次进入。
+		if (isH5()) {
+			const needAuth = getMpToken().length == 0
+			if (needAuth) {
+				markPayResume(orderId.value, merchantConfigId)
+			}
+			if (await ensureWxMpAuth(ds('rechargeNo'))) {
+				return
+			}
+			if (needAuth) {
+				consumePayResume()
+			}
+		}
+
 		showPopup.value = false
 		uni.showLoading({
 			title: '支付中...'
@@ -467,7 +525,7 @@
 
 		isPaying.value = true
 		try {
-			const res = await goPayXcx(orderId.value, merchantConfigId)
+			const res = await goPayXcx(orderId.value, merchantConfigId, false, getMpToken())
 			if (res.code == 200) {
 				console.log('获取支付参数成功:', res.data)
 				if(isWechat()){
@@ -476,12 +534,57 @@
 				if(isH5()){
 					console.log('H5支付:', res.data)
 
+					if(res.data.payWxType == 'wechat_jsapi'){
+						// 后端下单成功不再消费凭证（TTL 内可复用），支付成功后本地才清理
+						const payResult = await invokeMpJsapiPay(res.data)
+						if (payResult == PAY_STATUS_OK) {
+							clearMpToken()
+							uni.hideLoading()
+							isInPaymentProcess.value = false
+							isPaying.value = false
+							uni.redirectTo({
+								url: '/pages/paySuccess/paySuccess?orderId=' + res.data.orderNo + '&payChannelId=' + res.data.payChannelId
+							})
+						} else if (payResult == PAY_STATUS_CANCEL) {
+							// 用户主动取消：保留凭证，刷新详情保持待支付态，可直接再次点击
+							handlePayFailed('已取消支付')
+							isPaying.value = false
+							getOrderDetail()
+						} else if (payResult == PAY_STATUS_TIMEOUT) {
+							// 可能已付款但未拿到回调：不判失败，让用户以订单状态为准
+							uni.hideLoading()
+							isInPaymentProcess.value = false
+							isPaying.value = false
+							uni.showToast({ title: '支付结果确认中，请稍后查看订单状态', icon: 'none', duration: 2000 })
+						} else if (payResult == PAY_STATUS_NOT_WECHAT) {
+							handlePayFailed('请在手机微信中打开后支付')
+							isPaying.value = false
+						} else {
+							handlePayFailed('支付调起失败，请重试')
+							isPaying.value = false
+						}
+						return
+					}
 					if(res.data.payWxType == 'wechat_pay' || res.data.payWxType == 'allin_pay'){
 						window.location.href = res.data.url
 					}else{
 						handleAlipayForm(res.data.url)
 					}
 				}
+			} else if (res.code == 4601) {
+				// 公众号凭证失效：清本地 token，强制重新静默授权（会跳转并回到本页）
+				console.warn('[wxMpAuth] 后端判定凭证失效(4601)，重新静默授权')
+				uni.hideLoading()
+				clearMpToken()
+				markPayResume(orderId.value, payChannelId.value)
+				if (await ensureWxMpAuth(ds('rechargeNo'), true)) {
+					return
+				}
+				consumePayResume()
+				uni.showToast({
+					title: res.msg || '公众号支付授权已失效，请重新进入页面',
+					icon: 'none'
+				})
 			} else {
 				uni.hideLoading()
 				uni.showToast({
@@ -626,6 +729,8 @@
 
 	onLoad((options) => {
 		const orderNo = options?.orderNo as string | null
+		// 公众号授权回调带回的一次性凭证：存本地并抹掉地址栏参数
+		consumeMpTokenFromQuery((options?.mpToken as string | null) ?? '')
 		if (orderNo != null) {
 			orderId.value = orderNo
 			setStorageSync('orderId', orderNo)

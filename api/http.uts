@@ -112,6 +112,20 @@ export async function getTenantInfo(tenantId: string, withToken: boolean = true)
 	return res
 }
 
+// 获取公众号H5授权地址（仅微信内置浏览器调用）
+// 传 iccid 时后端按卡所属租户生成授权，避免租户用 000000 域名打开 H5 时租户错配；
+// 未配置公众号时后端返回失败，调用方按原 H5 支付继续
+export function getWxMpH5AuthUrl(tenantId: string, returnUrl: string, iccid: string = ''): Promise<ApiResponse<any>> {
+  const iccidQuery = iccid.length > 0 ? '&iccid=' + encodeURIComponent(iccid) : ''
+  return request<any>({
+    url: (ApiUrl.wxMpH5AuthUrl as string) + '?tenantId=' + encodeURIComponent(tenantId)
+      + '&returnUrl=' + encodeURIComponent(returnUrl) + iccidQuery,
+    method: 'GET',
+    withToken: false,
+    showError: false
+  })
+}
+
 // 查询卡列表
 export function queryCardList(params: QueryCardListParams, withToken: boolean = true): Promise<ApiResponse<RechargeData[]>> {
   const data: UTSJSONObject = {
@@ -315,14 +329,16 @@ export function queryOrderSuccess(id: string, payChannelId: string, withToken: b
 }
 
 // 订单详情里去支付Xcx
-export function goPayXcx(orderId:string, merchantConfigId: string, withToken: boolean = true): Promise<ApiResponse<any>> {
+export function goPayXcx(orderId:string, merchantConfigId: string, withToken: boolean = true, mpToken: string = ''): Promise<ApiResponse<any>> {
   // #ifdef MP-WEIXIN
   const url = (ApiUrl.goPayXcx as string) + orderId
   const token = true
   // #endif
 
   // #ifdef H5
-  const url = (ApiUrl.goPayGnH5 as string) + orderId + '/' + merchantConfigId
+  // mpToken 为空表示未完成公众号授权，后端自动回退微信H5支付
+  const mpTokenQuery = mpToken.length > 0 ? '?mpToken=' + encodeURIComponent(mpToken) : ''
+  const url = (ApiUrl.goPayGnH5 as string) + orderId + '/' + merchantConfigId + mpTokenQuery
   const token = false
   // #endif
   // #ifndef MP-WEIXIN || H5

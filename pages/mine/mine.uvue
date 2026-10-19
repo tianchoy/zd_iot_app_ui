@@ -101,11 +101,22 @@
 	}
 
 	// 跳转我的反馈（微信端原生标题栏无法承载导航右侧入口）
+	// 公众号/浏览器没有登录态，必须带卡号，否则后端只能返回「请提供rechargeNo」
 	const toMyFeedback = () => {
-		if (!isLogin()) return
-		uni.navigateTo({
-			url: '/pages/questionFeedback/list'
-		})
+		const lastCard = (getStorageSync('lastRechargeNo') as string | null) ?? ''
+		if (lastCard.length > 0) {
+			uni.navigateTo({
+				url: `/pages/questionFeedback/list?rechargeNo=${lastCard}`
+			})
+			return
+		}
+		if (isLogin()) {
+			uni.navigateTo({
+				url: '/pages/questionFeedback/list'
+			})
+			return
+		}
+		uni.showToast({ title: '请先进入卡详情再反馈', icon: 'none' })
 	}
 
 	//登录

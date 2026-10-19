@@ -20,6 +20,7 @@ export const ApiUrl = {
     addOrderGnH5: '/order/pkgOrder/gnH5/add', // 添加订单国内 H5
     goPayGnH5: '/pay/orderGn/gn/goPayment/', // 订单详情里去支付 H5
     queryVerifyH5:'/app/card/verifyH5/',
+    wxMpH5AuthUrl:'/app/wxMp/h5/authUrl', // 获取公众号H5授权地址（仅微信内使用）
 
     //H5问题反馈
     feedbackList: '/h5/questionFeedback/list', // 查询反馈列表

@@ -82,10 +82,28 @@
 		docState.value = !docState.value
 	}
 
+	// 取 wx.login 的 code（用于后端换 openid）
+	const fetchLoginCode = (): Promise<string> => {
+		return new Promise<string>((resolve) => {
+			uni.login({
+				provider: 'weixin',
+				success: (res) => resolve((res.code as string | null) ?? ''),
+				fail: () => resolve('')
+			})
+		})
+	}
+
 	//登录
-	const getLogin = async (code: string) => {
+	const getLogin = async (phoneCode: string) => {
+		// 手机号登录同时上报 wx.login code：后端据此换取 openid 并写入账号。
+		// 只传手机号 code 时建出来的账号没有 openid，下单会提示「未绑定微信」。
+		const loginCode = await fetchLoginCode()
+		const dualCode = loginCode.length > 0
 		const res = await login({
-			xcxCode: code,
+			// 新契约：xcxCode=wx.login code、phoneCode=手机号 code；
+			// 取不到 login code 时退回旧口径（xcxCode 仍传手机号 code）
+			xcxCode: dualCode ? loginCode : phoneCode,
+			phoneCode: dualCode ? phoneCode : '',
 			userId: userId.value,
 			// 本页即手机号授权登录，接口约定 '0' = 需要手机号
 			isLogin: '0',

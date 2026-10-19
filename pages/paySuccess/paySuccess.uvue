@@ -63,7 +63,7 @@
 
 		<!-- 按钮区域 -->
 		<view class="button-section">
-			<button v-if="!isConfirmed" class="action-btn primary-btn mb-24" @click="getOrderDetail">重新查询支付结果</button>
+			<button v-if="!isConfirmed" class="action-btn primary-btn mb-24" @click="retryQuery">重新查询支付结果</button>
 			<button class="action-btn primary-btn mb-24" @click="handleViewOrder">查看订单</button>
 			<button class="action-btn secondary-btn" @click="handleBackCard">返回卡片详情</button>
 		</view>
@@ -159,6 +159,29 @@
 		bridge.postMessage(JSON.stringify(payload))
 	}
 
+	// 微信回调通常滞后 1~3 秒：自动重试几次，避免刚付完就显示"待确认"
+	const MAX_CONFIRM_RETRY: number = 3
+	const CONFIRM_RETRY_INTERVAL_MS: number = 1500
+	let confirmRetry: number = 0
+
+	const showFailed = (message: string) => {
+		status.value = 'failed'
+		uni.showToast({ title: message, icon: 'none' })
+	}
+
+	// 未确认时按间隔重试；超过上限才落到"待确认"
+	const scheduleRetry = () => {
+		if (confirmRetry >= MAX_CONFIRM_RETRY) {
+			showFailed('支付结果确认失败，请稍后重试')
+			return
+		}
+		confirmRetry++
+		console.log('[paySuccess] 支付结果未确认，第 ' + confirmRetry + ' 次重试')
+		setTimeout(() => {
+			getOrderDetail()
+		}, CONFIRM_RETRY_INTERVAL_MS)
+	}
+
 	// 查询订单，用返回结果确认支付状态；失败时不再直接展示"支付成功"
 	const getOrderDetail = async () => {
 		if (!orderId.value || !payChannelId.value) {
@@ -173,26 +196,31 @@
 		try {
 			const res = await queryOrderSuccess(orderId.value,payChannelId.value)
 			if(res.code == 200 && res.data != null){
-				console.log('订单详情:',res)
+				const detail = res.data as UTSJSONObject
 				orderDetail.value = res.data
-				status.value = 'success'
-				// 服务端已确认支付成功后再通知 App 回跳，避免未确认就跳走。
-				notifyAppIfFromApp()
+				// 后端在未支付时会返回订单详情但 status 仍为 0/3，不能直接当成功
+				const orderStatus = detail['status'] as string
+				if (orderStatus == '1') {
+					console.log('订单支付成功:',res)
+					status.value = 'success'
+					// 服务端已确认支付成功后再通知 App 回跳，避免未确认就跳走。
+					notifyAppIfFromApp()
+					return
+				}
+				scheduleRetry()
 				return
 			}
-			status.value = 'failed'
-			uni.showToast({
-				title: res.msg || '支付结果确认失败，请稍后重试',
-				icon: 'none'
-			})
+			scheduleRetry()
 		} catch (error) {
 			console.error('查询支付结果失败:', error)
-			status.value = 'failed'
-			uni.showToast({
-				title: '支付结果确认失败，请稍后重试',
-				icon: 'none'
-			})
+			scheduleRetry()
 		}
+	}
+
+	// 手动重新查询：重置重试计数
+	const retryQuery = () => {
+		confirmRetry = 0
+		getOrderDetail()
 	}
 
 	onLoad((options: UTSJSONObject) => {
