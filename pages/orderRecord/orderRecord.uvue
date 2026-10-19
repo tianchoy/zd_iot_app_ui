@@ -1,6 +1,6 @@
 <template>
 <!-- #ifndef MP-WEIXIN -->
-<topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" rightTextFontSize="26rpx" rightText="我的反馈" @capsuleClick="handleMyFeedback"></topNavBar>
+<topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="!isFromApp" :isIcon="false" rightTextFontSize="26rpx" rightText="我的反馈" @capsuleClick="handleMyFeedback"></topNavBar>
 
  <!-- <topNavBar title="我的订单" :show-back="true" @back="handleBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="true" :isIcon="false" @capsuleClick="handleMyFeedback"></topNavBar> -->
 <!-- #endif -->
@@ -101,6 +101,11 @@
 	}
 
 	const rechargeNo = ref<string>('')
+
+// 是否由 App 内 WebView 打开：App 场景不展示右上角「我的反馈」入口。
+// 取值与 recharge / paySuccess 保持一致：优先 URL 参数，其次本地兜底标记
+// （刷新会丢 URL 参数，故用 h5EntrySource 兜底）。
+const isFromApp = ref<boolean>(false)
 
 	// 订单状态映射
 	type OrderStatus = '全部' | '待支付' | '已完成' | '已退款' | '已取消'
@@ -241,6 +246,10 @@
 	}
 
 	onLoad((options: UTSJSONObject) => {
+		const entrySource = (options['source'] as string | null) ?? ''
+		const storedSource = (uni.getStorageSync('h5EntrySource') as string | null) ?? ''
+		isFromApp.value = entrySource === 'app' || storedSource === 'app'
+
 		rechargeNo.value = options['rechargeNo'] as string
 		if(!rechargeNo.value){
 			uni.showToast({

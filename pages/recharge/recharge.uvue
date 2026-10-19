@@ -691,8 +691,11 @@
 
 	// 跳转订单记录
 	const toOrderRecord = () => {
+		// App 内 WebView 打开时把来源带给订单页：订单页据此隐藏右上角「我的反馈」。
+		// 刷新会丢 URL 参数，故订单页同时用本地 h5EntrySource 兜底。
+		const sourceSuffix = isFromApp.value ? '&source=app' : ''
 		uni.navigateTo({
-			url: '/pages/orderRecord/orderRecord?rechargeNo=' + cardDetail.value.rechargeNo
+			url: '/pages/orderRecord/orderRecord?rechargeNo=' + cardDetail.value.rechargeNo + sourceSuffix
 		})
 	}
 
