@@ -99,7 +99,7 @@
 	import SearchSelect from '@/components/selectCountry.uvue'
 	import { getCountryList,queryVerify } from '@/api/http.uts'
 	import type { CountryData } from '@/api/types.uts'
-	import {isINT,isCN} from '@/common/config.uts'
+	import {isINT,isCN,setStorageSync} from '@/common/config.uts'
 	import { CardNoHistory } from '@/utils/cardNoHistory.uts'
 	
 	const cardNumber = ref<string>('')
@@ -269,6 +269,8 @@
 			})
 		}
 		if(isINT() && isValid){
+			// 记录最近卡号，供「我的订单」按卡号过滤（国际版免登录，订单与卡号绑定）
+			setStorageSync('lastRechargeNo', keyword)
 			uni.navigateTo({
 				url: `/pages/recharge/recharge?rechargeNo=${keyword}&country=${selectedCountry.value}&from=h5Search`
 			})

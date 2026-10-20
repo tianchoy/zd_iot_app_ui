@@ -25,6 +25,11 @@
 				<text class="order-label">我的订单</text>
 				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
 			</view>
+			<!-- 国际版：语言切换入口 -->
+			<view class="item" v-if="showLanguageSwitch" @click="switchLanguage">
+				<text class="order-label">{{ $t('language') }}</text>
+				<rice-icon name="arrow-right" size="20rpx"></rice-icon>
+			</view>
 			<!-- #ifdef MP-WEIXIN -->
 			<!-- 微信端使用原生标题栏，导航栏放不下自定义右侧入口，反馈入口移到页面内 -->
 			<view class="item" @click="toMyFeedback">
@@ -62,13 +67,33 @@
 	import { ref, computed } from 'vue'
 	import { login,getTenantInfo,queryCardListSum,getPlatformInfo} from '@/api/http.uts'
 	import type { CardListSumData, PlatformInfoData } from '@/api/types.uts'
-	import { getTenantId,getToken ,clearToken,removeStorageSync,isWechat,config,setToken,setStorageSync,getStorageSync} from '@/common/config.uts'
+	import { getTenantId,getToken ,clearToken,removeStorageSync,isWechat,config,setToken,setStorageSync,getStorageSync,isINT} from '@/common/config.uts'
+	import i18n, { localeList } from '@/i18n'
 
 
 	const title = ref('用户');
 	// 初始值取自缓存，避免首屏（配置未拉取前）无法判断登录模式
 	const wxGetPhoneLogin = ref<string>((getStorageSync('wxGetPhoneLogin') as string) || '')
 	const isWechatEnv = computed<boolean>(() => isWechat())
+
+	// 国际版才展示语言切换入口
+	const showLanguageSwitch = computed<boolean>(() => isINT())
+
+	// 语言切换：弹出 7 国语言列表，选择后即时切换并持久化
+	const switchLanguage = () => {
+		const itemList = localeList.map((item) => item.name)
+		uni.showActionSheet({
+			itemList: itemList,
+			success: (res) => {
+				const chosen = localeList[res.tapIndex]
+				if (chosen != null) {
+					i18n.global.locale.value = chosen.code
+					setStorageSync('uVueI18nLocale', chosen.code)
+					uni.showToast({ title: chosen.name, icon: 'none' })
+				}
+			}
+		})
+	}
 	
 
 	const checkToken = (): boolean => {
@@ -94,6 +119,13 @@
 
 	// 跳转订单记录
 	const toOrder = () => {
+		// 国际版为免登录 H5 快速充值，订单按最近卡号过滤，无需登录态
+		if (isINT()) {
+			uni.navigateTo({
+				url: '/pages/myOrder/myOrder'
+			})
+			return
+		}
 		if (!isLogin()) return
 		uni.navigateTo({
 			url: '/pages/myOrder/myOrder'

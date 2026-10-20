@@ -157,11 +157,18 @@ export function queryCardDetail(id: string,countryCode?: string, isFind?:string,
   const token = true
 	// #endif
 
-  // #ifdef H5
-	const url = (ApiUrl.card_detail as string) + id
+	// #ifdef H5 && VERSION_INT
+	// 国际版：把国家码拼到路径，后端据此返回对应国家/币种的套餐
+	const url = (ApiUrl.card_detail as string) + id + '/' + (countryCode ?? '')
   const token = true
 	// #endif
 
+	// #ifdef H5
+	// #ifndef VERSION_INT
+	const url = (ApiUrl.card_detail as string) + id
+  const token = true
+	// #endif
+	// #endif
 
 	// #ifndef MP-WEIXIN || H5 || VERSION_INT || VERSION_CN
 	// 其他平台默认使用H5配置
@@ -250,15 +257,17 @@ export function queryOrderList(data: UTSJSONObject, withToken: boolean = true): 
   const token = true
   // #endif
 
-  // #ifdef H5
-  const url = (ApiUrl.queryOrderListGn as string)
+  // #ifdef H5 && VERSION_INT
+  // 国际版：订单列表走 queryOrderList（按卡号+国家过滤）
+  const url = (ApiUrl.queryOrderList as string)
   const token = false
   // #endif
 
-  // #ifdef H5 && VERSION_INT
-  // 其他平台默认使用H5配置
-  const url = (ApiUrl.queryOrderList as string)
+  // #ifdef H5
+  // #ifndef VERSION_INT
+  const url = (ApiUrl.queryOrderListGn as string)
   const token = false
+  // #endif
   // #endif
 
   return request<QueryOrderListXcxData>({
@@ -276,9 +285,17 @@ export function addOrder(data: UTSJSONObject, withToken: boolean = true): Promis
   const token = true
   // #endif
 
+  // #ifdef H5 && VERSION_INT
+  // 国际版下单：走 /order/pkgOrder（参数含 msisdn/registerCountry/pkgId 等）
+  const url = (ApiUrl.addOrder as string)
+  const token = false
+  // #endif
+
   // #ifdef H5
+  // #ifndef VERSION_INT
   const url = (ApiUrl.addOrderGnH5 as string)
   const token = false
+  // #endif
   // #endif
 
   // #ifndef MP-WEIXIN || H5
@@ -353,6 +370,40 @@ export function goPayXcx(orderId:string, merchantConfigId: string, withToken: bo
     withToken: token
   })
 }
+
+// ========== 国际版（VERSION_INT）专用接口 ==========
+// #ifdef VERSION_INT
+
+// 国际版：查询订单详情（含支付方式列表 payTypeVos）
+export function queryOrderIntl(id: string, withToken: boolean = false): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: (ApiUrl.queryOrder as string) + id,
+    method: 'GET',
+    withToken: withToken
+  })
+}
+
+// 国际版：去支付
+// PayerMax 渠道后端返回 approval_url（前端跳转收银台）；
+// Stripe 渠道后端返回 clientKey + clientSecret（前端拉起 Stripe Elements）。
+export function goPayIntl(data: UTSJSONObject, withToken: boolean = false): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: (ApiUrl.goPay as string),
+    method: 'POST',
+    data: data,
+    withToken: withToken
+  })
+}
+
+// 国际版：根据成功ID查询订单（PayerMax 跳转回调后校验支付结果）
+export function queryBySuccessIdIntl(id: string, payChannelId: string, withToken: boolean = false): Promise<ApiResponse<any>> {
+  return request<any>({
+    url: (ApiUrl.queryBySuccessId as string) + id + '/' + payChannelId,
+    method: 'GET',
+    withToken: withToken
+  })
+}
+// #endif
 
 // 查询套餐信息详情Xcx  
 export function queryPkgInfoXcx(id: string, withToken: boolean = true): Promise<ApiResponse<any>> {

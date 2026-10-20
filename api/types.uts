@@ -77,6 +77,12 @@ export type PkgXcxVo = {
   crossedOutPrice: string;
   sellingPrice: string;
   objectMap: objectMapType;
+  /** 国际版套餐币种符号（国内版后端不返回，可选） */
+  symbol?: string;
+  /** 国际版币种符号位置：0 前置，1 后置（与原文一致） */
+  signPosition?: string;
+  /** 国际版币种代码 */
+  currency?: string;
 };
 
 export type objectMapType = {

@@ -3,26 +3,26 @@
 	<!-- #ifndef MP-WEIXIN -->
 	<!-- 测试版：取消 App 内隐藏 H5 标题的做法，统一由 H5 自带「充值首页」栏作为唯一标题；
 	     对应的 App 端已隐藏其原生导航栏（见 App 侧 WebContent 的 hideAppBar）。 -->
-	<topNavBar title="充值首页" :show-back="showBack" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<topNavBar :title="$t('rechargeHome')" :show-back="showBack" @back="goBack" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
 	<!-- #endif -->
 	<!-- 外跳优先级高于渲染：判定期间不渲染充值页内容，避免「先渲染再跳」的闪烁 -->
 	<view v-if="h5RedirectPending" style="display: flex; align-items: center; justify-content: center; height: 60vh;">
-		<text style="font-size: 26rpx; color: #999999;">正在打开…</text>
+		<text style="font-size: 26rpx; color: #999999;">{{ $t('opening') }}</text>
 	</view>
 	<view class="container" v-if="!h5RedirectPending">
 		<view class="card-info">
 			<view class="card-title">
-				<text class="title">卡片信息</text>
-				<rice-tag :text="cardDetail?.statusStr || '未知'" :round="true" plain-fill size="small" :type="getOrderStatusType(cardDetail?.statusStr)"></rice-tag>
+				<text class="title">{{ $t('cardInfo') }}</text>
+				<rice-tag :text="cardDetail?.statusStr || t('unknown')" :round="true" plain-fill size="small" :type="getOrderStatusType(cardDetail?.statusStr)"></rice-tag>
 			</view>
-			<view class="card-number" v-if="cardDetail?.rechargeNo">{{ cardDetail?.rechargeNo || '未知' }}</view>
+			<view class="card-number" v-if="cardDetail?.rechargeNo">{{ cardDetail?.rechargeNo || $t('unknown') }}</view>
 			<view class="info-list">
 				<view class="info-item" v-if="cardDetail?.pkgName">
-					<text class="label">当前套餐</text>
-					<text class="value">{{ cardDetail?.pkgName || '未知' }}</text>
+					<text class="label">{{ $t('currentPlan') }}</text>
+					<text class="value">{{ cardDetail?.pkgName || $t('unknown') }}</text>
 				</view>
 				<view class="info-item"  v-if="cardDetail?.effectiveTime || cardDetail?.expirationTime">
-					<text class="label">有效期</text>
+					<text class="label">{{ $t('validityPeriod') }}</text>
 					<view class="value" style="display: flex; flex-direction: row; align-items: center; flex-wrap: nowrap; white-space: nowrap;">
 						<text style="font-size: 22rpx;" v-if="cardDetail?.effectiveTime">{{ cardDetail?.effectiveTime }} </text>
 						<text style="font-size: 22rpx;" v-if="cardDetail?.expirationTime">~ {{ cardDetail?.expirationTime }}</text>
@@ -31,13 +31,13 @@
 			</view>
 			<view class="flow-box" v-if="cardDetail?.pkgFlow">
 				<view class="flow-label">
-					<text class="value" style="font-size: 22rpx;">已用 {{ DataFormat.formatTraffic(cardDetail?.usedFlow) }} / 剩余 {{ DataFormat.formatTraffic(cardDetail?.unUsedFlow) }} / 总流量 {{ DataFormat.formatTraffic(cardDetail?.pkgFlow) }}</text>
+					<text class="value" style="font-size: 22rpx;">{{ $t('used') }} {{ DataFormat.formatTraffic(cardDetail?.usedFlow) }} / {{ $t('remaining') }} {{ DataFormat.formatTraffic(cardDetail?.unUsedFlow) }} / {{ $t('totalFlow') }} {{ DataFormat.formatTraffic(cardDetail?.pkgFlow) }}</text>
 				</view>
 				<rice-progress :percentage="percentage" show-text />
 			</view>
 			<view class="card-bottom">
-				<rice-button class="btn mr-24" @click="toMyPackage">卡片套餐</rice-button>
-				<rice-button class="btn" @click="toOrderRecord">订单记录</rice-button>
+				<rice-button class="btn mr-24" @click="toMyPackage">{{ $t('cardPlans') }}</rice-button>
+				<rice-button class="btn" @click="toOrderRecord">{{ $t('orderRecord') }}</rice-button>
 			</view>
 		</view>
 		<view class="pkg-box">
@@ -68,21 +68,27 @@
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ DataFormat.formatTraffic(item.pkgFlow) }}</text>
-								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod }}{{ item?.pkgType == '1' ? '天' : '个月' }}</text>
+								<text class="pkg-icon" v-if="item.pkgFlow">{{ $t('traffic') }} {{ DataFormat.formatTraffic(item.pkgFlow) }}</text>
+								<text class="pkg-icon" v-if="item.validityPeriod">{{ $t('validityPeriod') }} {{ item.validityPeriod }}{{ item?.pkgType == '1' ? $t('day') : $t('month') }}</text>
 							</view>
 						</view>
 						<view class="pkg-price">
 							<view class="price-wrapper">
-								<text class="price-symbol">¥</text>
-								<text class="price-number">{{ AmountUtil.format(item.sellingPrice, {showSymbol: false}) }}</text>
+								<template v-if="isINT()">
+									<text class="price-number">{{ intlPkgPrice(item.sellingPrice, item.symbol || '', item.signPosition || '') }}</text>
+								</template>
+								<template v-else>
+									<text class="price-symbol">¥</text>
+									<text class="price-number">{{ AmountUtil.format(item.sellingPrice, {showSymbol: false}) }}</text>
+								</template>
 							</view>
 							<view class="price-original" v-if="item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice">
-								¥{{ AmountUtil.format(item.crossedOutPrice, {showSymbol: false}) }}
+								<template v-if="isINT()">{{ intlPkgPrice(item.crossedOutPrice, item.symbol || '', item.signPosition || '') }}</template>
+								<template v-else>¥{{ AmountUtil.format(item.crossedOutPrice, {showSymbol: false}) }}</template>
 							</view>
 						</view>
 					</view>
-					<view v-if="packageList.length == 0" class="empty-state">暂无套餐包</view>
+					<view v-if="packageList.length == 0" class="empty-state">{{ $t('noPkgAvailable') }}</view>
 				</block>
 				<!-- 加油包列表 -->
 				<block v-else>
@@ -99,21 +105,27 @@
 								<text v-if="item.tag" class="pkg-tag">{{ item.tag }}</text>
 							</view>
 							<view class="pkg-desc">
-								<text class="pkg-icon" v-if="item.pkgFlow">流量 {{ DataFormat.formatTraffic(item.pkgFlow) }}</text>
-								<text class="pkg-icon" v-if="item.validityPeriod">有效期 {{ item.validityPeriod }}{{ item?.pkgType == '1' ? '天' : '个月' }}</text>
+								<text class="pkg-icon" v-if="item.pkgFlow">{{ $t('traffic') }} {{ DataFormat.formatTraffic(item.pkgFlow) }}</text>
+								<text class="pkg-icon" v-if="item.validityPeriod">{{ $t('validityPeriod') }} {{ item.validityPeriod }}{{ item?.pkgType == '1' ? $t('day') : $t('month') }}</text>
 							</view>
 						</view>
 						<view class="pkg-price">
 							<view class="price-wrapper">
-								<text class="price-symbol">¥</text>
-								<text class="price-number">{{ AmountUtil.format(item.sellingPrice, {showSymbol: false}) }}</text>
+								<template v-if="isINT()">
+									<text class="price-number">{{ intlPkgPrice(item.sellingPrice, item.symbol || '', item.signPosition || '') }}</text>
+								</template>
+								<template v-else>
+									<text class="price-symbol">¥</text>
+									<text class="price-number">{{ AmountUtil.format(item.sellingPrice, {showSymbol: false}) }}</text>
+								</template>
 							</view>
 							<view class="price-original" v-if="item.crossedOutPrice && item.crossedOutPrice != item.sellingPrice">
-								¥{{ AmountUtil.format(item.crossedOutPrice, {showSymbol: false}) }}
+								<template v-if="isINT()">{{ intlPkgPrice(item.crossedOutPrice, item.symbol || '', item.signPosition || '') }}</template>
+								<template v-else>¥{{ AmountUtil.format(item.crossedOutPrice, {showSymbol: false}) }}</template>
 							</view>
 						</view>
 					</view>
-					<view v-if="refillList.length == 0" class="empty-state">暂无加油包</view>
+					<view v-if="refillList.length == 0" class="empty-state">{{ $t('noRefillAvailable') }}</view>
 				</block>
 			</view>
 		</view>
@@ -145,10 +157,10 @@
 		</view>
 		<view class="pay-content">
 			<view class="price-box">
-				<text class="price-label">当前套餐金额</text>
-				<text class="price-value">{{ AmountUtil.format(currentPrice) }}</text>
+				<text class="price-label">{{ $t('currentAmount') }}</text>
+				<text class="price-value">{{ currentPriceText }}</text>
 			</view>
-			<rice-button type="primary" width="300rpx" height="110rpx" @click="choosePayment" class="btn">去支付</rice-button>
+			<rice-button type="primary" width="300rpx" height="110rpx" @click="choosePayment" class="btn">{{ $t('goPay') }}</rice-button>
 		</view>
 	</view>
 	<view ref="formContainer" class="form-container"></view>
@@ -158,8 +170,8 @@
 		<view class="popup-center">
 			<view class="cs-list" v-if="cardDetail?.objectMap?.serviceQrcode">
 				<view class="label">
-					<text class="cs-label-desc">微信：</text>
-					<text class="cs-label-desc">请添加客服为您服务</text>
+					<text class="cs-label-desc">{{ $t('wechatLabel') }}</text>
+					<text class="cs-label-desc">{{ $t('addWechatTip') }}</text>
 				</view>
 				<view class="value">
 					<image :src="cardDetail?.objectMap?.serviceQrcode" show-menu-by-longpress mode="aspectFill" class="qrcode">
@@ -169,11 +181,11 @@
 			<view v-if="phoneList">
 				<view class="cs-list" v-for="(phone, index) in phoneList" :key="index">
 					<view class="label">
-						<text class="cs-label-desc">客服电话：</text>
+						<text class="cs-label-desc">{{ $t('servicePhone') }}</text>
 						<text>{{ phone }}</text>
 					</view>
 					<view class="value">
-						<rice-button type="primary" icon="phone-call" text="拨打电话" shape="round" size="small" @click="callPhone(phone)"></rice-button>
+						<rice-button type="primary" icon="phone-call" :text="$t('makeCall')" shape="round" size="small" @click="callPhone(phone)"></rice-button>
 					</view>
 				</view>
 			</view>
@@ -185,11 +197,14 @@
 	import { ref, computed } from 'vue';
 	import { queryCardDetail, addOrder,login,getTenantInfo} from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
-	import { config , getTenantId,isWechat,isH5,setToken,setStorageSync,getToken,setWxGetPhoneLogin,isPhoneLoginRequired} from '@/common/config.uts';
+	import { config , getTenantId,isWechat,isH5,setToken,setStorageSync,getToken,setWxGetPhoneLogin,isPhoneLoginRequired,isINT} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	import tousu from '@/components/tousu.uvue';
 	import {DataFormat} from '@/utils/dataFormat.uts';
 	import {AmountUtil} from '@/utils/amount.uts';
+	import i18n from '@/i18n';
+	// 脚本侧翻译助手（与 intlPay/payStripe/feedback 一致）
+	const t = (key: string): string => i18n.global.t(key) as string
 	import { ensureWxMpAuth, consumeMpTokenFromQuery, getMpToken, clearMpToken, invokeMpJsapiPay,
 		PAY_STATUS_OK, PAY_STATUS_CANCEL, PAY_STATUS_TIMEOUT, PAY_STATUS_NOT_WECHAT } from '@/utils/wxMpAuth.uts';
 	defineOptions({
@@ -257,12 +272,13 @@
 	});
 
 	const active = ref<number>(0);
-	const tabs = ref<any[]>([
+	// tab 名称走多语言，切换语言后即时刷新
+	const tabs = computed<any[]>((): any[] => [
 		{
-			name: '套餐包'
+			name: t('pkgTab')
 		},
 		{
-			name: '加油包'
+			name: t('refillTab')
 		}
 	]);
 
@@ -298,6 +314,24 @@
 			const item = refillList.value[selectedRefillIndex.value];
 			return item ? item.sellingPrice : '0.00';
 		}
+	});
+
+	// 国际版：套餐价格按自带币种符号展示（与原文一致，保留两位小数）
+	const intlPkgPrice = (price: string, symbol: string, signPosition: string): string => {
+		const num = Number(price || '0').toFixed(2)
+		if (signPosition == '0') {
+			return (symbol || '') + ' ' + num
+		}
+		return num + ' ' + (symbol || '')
+	}
+
+	// 国际版底部「当前套餐金额」按币种符号展示，国内版沿用 ¥ 格式化
+	const currentPriceText = computed<string>((): string => {
+		if (isINT()) {
+			const pkg = currentPackage.value
+			return intlPkgPrice(currentPrice.value, pkg?.symbol || '', pkg?.signPosition || '')
+		}
+		return AmountUtil.format(currentPrice.value)
 	});
 
 	// 根据 pkgCategory 分类套餐和加油包，并按 pkgSort 排序
@@ -396,19 +430,83 @@
 	const choosePayment = () => {
 		if (active.value === 0 && packageList.value.length === 0) {
 			uni.showToast({
-				title: '暂无套餐包可选',
+				title: t('noPkgSelectable'),
 				icon: 'none'
 			});
 			return;
 		}
 		if (active.value === 1 && refillList.value.length === 0) {
 			uni.showToast({
-				title: '暂无加油包可选',
+				title: t('noRefillSelectable'),
 				icon: 'none'
 			});
 			return;
 		}
+		// 国际版：不走国内微信/支付宝弹窗，直接建单后进入支付方式选择页
+		if (isINT()) {
+			createIntlOrder();
+			return;
+		}
 		showPopup.value = true;
+	}
+
+	// 国际版下单：参数含 msisdn / registerCountry，下单成功后跳转支付方式页
+	const createIntlOrder = async () => {
+		const detail = cardDetail.value
+		const currentItem = currentPackage.value
+		if (detail == null || currentItem == null) {
+			uni.showToast({
+				title: t('selectPkgFirst'),
+				icon: 'none'
+			});
+			return;
+		}
+		uni.showLoading({
+			title: t('paying')
+		});
+		const params = {
+			pkgId: currentItem.pkgId,
+			msisdn: cardNumber.value,
+			registerCountry: country.value,
+			orderSource: '2',
+			operateScope: '1',
+			pkgName: currentItem.pkgName
+		}
+		// 记录最近卡号，供「我的订单」按卡号过滤
+		setStorageSync('lastRechargeNo', cardNumber.value)
+		try {
+			const res = await addOrder(params)
+			if (res.code == 200) {
+				const orderId = (res.data?.id ?? res.data?.orderId) as string
+				if (!orderId) {
+					uni.hideLoading()
+					uni.showToast({
+						title: res.msg || t('orderFailed'),
+						icon: 'none'
+					});
+					return;
+				}
+				uni.hideLoading()
+				uni.navigateTo({
+					url: '/pages/intlPay/intlPay?orderId=' + orderId
+						+ '&msisdn=' + encodeURIComponent(cardNumber.value)
+						+ '&countryCode=' + encodeURIComponent(country.value)
+						+ '&pkgName=' + encodeURIComponent(currentItem.pkgName)
+				})
+			} else {
+				uni.hideLoading()
+				uni.showToast({
+					title: res.msg || t('orderFailed'),
+					icon: 'none'
+				});
+			}
+		} catch (error) {
+			uni.hideLoading()
+			uni.showToast({
+				title: t('orderFailedRetry'),
+				icon: 'none'
+			});
+		}
 	}
 
 	// 取消支付
@@ -564,7 +662,7 @@
 		if (detail == null) {
 			showPopup.value = false
 			uni.showToast({
-				title: '卡片信息未加载完成，请稍后重试',
+				title: t('cardInfoNotLoaded'),
 				icon: 'none'
 			})
 			return
@@ -573,7 +671,7 @@
 		if (currentItem == null) {
 			showPopup.value = false
 			uni.showToast({
-				title: '请先选择套餐',
+				title: t('selectPkgFirst'),
 				icon: 'none'
 			})
 			return
@@ -581,7 +679,7 @@
 
 		if (isH5() && !merchantConfigId) {
 			uni.showToast({
-				title: '请先选择支付方式',
+				title: t('selectPayFirst'),
 				icon: 'none'
 			})
 			return
@@ -593,7 +691,7 @@
 		}
 
 		uni.showLoading({
-			title: '支付中...'
+			title: t('paying')
 		})
 
 		// 仅 H5 端：支付会跳转/拉起外部应用，加载态可能无人关闭，10s 后兜底自动隐藏
@@ -656,7 +754,7 @@
 							// 用户主动取消：订单已落库（待支付），跳到订单详情让用户继续付
 							uni.hideLoading()
 							isInPaymentProcess.value = false
-							uni.showToast({ title: '已取消支付', icon: 'none', duration: 1000 })
+							uni.showToast({ title: t('payCanceled'), icon: 'none', duration: 1000 })
 							setTimeout(() => {
 								uni.redirectTo({
 									url: '/pages/orderDetail/orderDetail?orderNo=' + res.data.orderNo
@@ -666,7 +764,7 @@
 							// 可能已付款但未拿到回调：不判失败，引导去订单列表确认
 							uni.hideLoading()
 							isInPaymentProcess.value = false
-							uni.showToast({ title: '支付结果确认中，请稍后在订单列表查看', icon: 'none', duration: 2000 })
+							uni.showToast({ title: t('payConfirming'), icon: 'none', duration: 2000 })
 							setTimeout(() => {
 								uni.redirectTo({
 									url: '/pages/orderDetail/orderDetail?orderNo=' + res.data.orderNo
@@ -816,7 +914,7 @@
 			h5RedirectPending.value = false
 			console.error('获取卡片详情失败:', error)
 			uni.showToast({
-				title: '获取卡片信息失败',
+				title: t('cardInfoFailed'),
 				icon: 'none'
 			})
 		}
@@ -885,7 +983,7 @@
 				if (!loggedIn) {
 					h5RedirectPending.value = false
 					uni.showToast({
-						title: '登录失败，请重试',
+						title: t('loginFailed'),
 						icon: 'none'
 					})
 				}
@@ -964,7 +1062,7 @@
 			h5RedirectPending.value = false
 			console.error('未获取到卡片号码')
 			uni.showToast({
-				title: '卡片号码不存在',
+				title: t('cardNotExist'),
 				icon: 'none'
 			})
 		}
@@ -1065,7 +1163,7 @@
 		if (!extraData) {
 			uni.hideLoading()
 			uni.showToast({
-				title: "支付取消，请您重新支付",
+				title: t('payCanceledRetry'),
 				icon: 'none',
 				duration: 1000
 			});
@@ -1076,7 +1174,7 @@
 			if (extraData.code == 'success') {
 				uni.hideLoading()
 				uni.showToast({
-					title: "支付成功",
+					title: t('paySuccess'),
 					icon: 'success',
 					duration: 1000,
 					success() {
@@ -1091,7 +1189,7 @@
 			} else if (extraData.code == 'cancel') {
 				uni.hideLoading()
 				uni.showToast({
-					title: "支付取消，请您重新支付",
+					title: t('payCanceledRetry'),
 					icon: 'none',
 					duration: 1000
 				});
@@ -1106,7 +1204,7 @@
 			} else {
 				uni.hideLoading()
 				uni.showToast({
-					title: "支付失败，请您重新支付",
+					title: t('payFailedRetry'),
 					icon: 'none',
 					duration: 1000
 				});
@@ -1127,7 +1225,7 @@
 				console.log('拨号失败:', err);
 				// 可以在这里给用户一个提示
 				uni.showToast({
-				title: '拨号失败，请重试',
+				title: t('callFailed'),
 				icon: 'none'
 				});
 			}

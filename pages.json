@@ -241,6 +241,27 @@
 				"navigationBarTitleText": ""
 			}
 		}
+		// #ifdef VERSION_INT
+		,
+		{
+			"path": "pages/intlPay/intlPay",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/payStripe/payStripe",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/feedback/feedback",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		}
+		// #endif
 		// #endif
 	],
 	"tabBar": {
@@ -249,12 +270,22 @@
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [
+			// #ifdef VERSION_INT
+			{
+				"pagePath": "pages/h5Search/h5Search",
+				"iconPath": "/static/tabBar/intlHome.png",
+				"selectedIconPath": "/static/tabBar/intlHome2.png",
+				"text": "首页"
+			},
+			// #endif
+			// #ifndef VERSION_INT
 			{
 				"pagePath": "pages/card/card",
 				"iconPath": "/static/tabBar/home.png",
 				"selectedIconPath": "/static/tabBar/home1.png",
 				"text": "首页"
 			},
+			// #endif
 			{
 				"pagePath": "pages/mine/mine",
 				"iconPath": "/static/tabBar/mine.png",

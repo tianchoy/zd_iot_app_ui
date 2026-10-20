@@ -54,7 +54,7 @@
       <view class="detail-row last">
        <text class="detail-value" v-if="order.createTime">{{ order.createTime }}</text>
        <view class="order-footer">
-        <text class="price" v-if="order.payCurrencyAmount">{{ AmountUtil.format(order.payCurrencyAmount) }}</text>
+        <text class="price" v-if="order.payCurrencyAmount">{{ formatPrice(order) }}</text>
         <view class="footer-actions">
          <text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
         </view>
@@ -75,7 +75,7 @@
 	import {queryOrderList} from '@/api/http'
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref } from 'vue'
-	import { isWechat,isH5,isWechatWebView,getStorageSync } from '@/common/config.uts'
+	import { isWechat,isH5,isWechatWebView,getStorageSync,isINT } from '@/common/config.uts'
 	import {AmountUtil} from '@/utils/amount.uts'
 
 	// H5 下页面参数（query）会被当作组件 attrs 透传，而本页根节点是
@@ -221,11 +221,27 @@ const isFromApp = ref<boolean>(false)
 	 }
 	}
 
-	// 处理订单点击
+	// 金额展示：国际版按订单币种符号显示，国内版沿用 ¥ 格式化
+	const formatPrice = (order: any): string => {
+		const amount = order.payCurrencyAmount
+		if (isINT()) {
+			const sym = order.symbol || ''
+			return (order.signPosition == '0' ? sym : '') + ' ' + amount + ' ' + (order.signPosition == '1' ? sym : '')
+		}
+		return AmountUtil.format(amount)
+	}
+
+	// 处理订单点击：国际版进入 intlPay（订单详情+重付），国内版进入订单详情
 	const handleOrderClick = (order: any) => {
-	 uni.navigateTo({
-	  url: `/pages/orderDetail/orderDetail?orderNo=${(order as UTSJSONObject)['orderNo']}`
-	 })
+		if (isINT()) {
+			uni.navigateTo({
+				url: `/pages/intlPay/intlPay?orderId=${(order as UTSJSONObject)['id']}&msisdn=${encodeURIComponent((order as UTSJSONObject)['rechargeNo'] || '')}`
+			})
+			return
+		}
+		uni.navigateTo({
+		 url: `/pages/orderDetail/orderDetail?orderNo=${(order as UTSJSONObject)['orderNo']}`
+		})
 	}
 
 	// 处理返回
@@ -235,10 +251,16 @@ const isFromApp = ref<boolean>(false)
 	 })
 	}
 
-	// 去支付
+	// 去支付：国际版进入 intlPay 重新支付；国内版进入订单详情（待支付页）
 	const handlePay = (order: any) => {
 	 const o = order as UTSJSONObject
 	 console.log('去支付:', order)
+	 if(isINT()){
+	  uni.navigateTo({
+	   url: `/pages/intlPay/intlPay?orderId=${o['id']}&msisdn=${encodeURIComponent((o['rechargeNo'] as string) || '')}`
+	  })
+	  return
+	 }
 	 if(isWechat()){
 	  uni.showToast({
 	   title: `支付订单 ${o['id']}`,

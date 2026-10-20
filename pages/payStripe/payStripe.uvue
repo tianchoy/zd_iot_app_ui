@@ -1,0 +1,207 @@
+<template>
+	<!-- #ifndef MP-WEIXIN -->
+	<topNavBar :title="$t('pay')" :show-back="true" @back="backPath" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
+	<view class="container">
+		<view class="pkg-name" v-if="pkgName">{{ pkgName }}</view>
+		<view class="tip">{{ $t('selectCurrency') }}</view>
+		<view id="currency-selector-element" class="stripe-el"></view>
+		<view id="express-checkout-element" class="stripe-el"></view>
+		<view class="divider">
+			<view class="line"></view>
+			<text class="divider-text">{{ $t('or') }}</text>
+			<view class="line"></view>
+		</view>
+		<view id="email-element" class="stripe-el"></view>
+		<view id="payment-element" class="stripe-el"></view>
+		<rice-button type="primary" width="100%" height="96rpx" class="pay-btn" @click="handleSubmit">{{ $t('payNow') }}</rice-button>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, onLoad, onReady, nextTick, onUnmounted } from 'vue'
+	import i18n from '@/i18n'
+
+	const t = (key: string): string => i18n.global.t(key) as string
+
+	const clientKey = ref<string>('')
+	const clientSecret = ref<string>('')
+	const pkgName = ref<string>('')
+	const orderId = ref<string>('')
+	const msisdn = ref<string>('')
+	const countryCode = ref<string>('')
+
+	let checkoutRef: any = null
+	let currencyEl: any = null
+	let emailEl: any = null
+	let paymentEl: any = null
+	let expressEl: any = null
+
+	onLoad((opt: UTSJSONObject) => {
+		const options = opt as any
+		clientKey.value = options.clientKey || ''
+		clientSecret.value = options.clientSecret || ''
+		pkgName.value = options.pkgName || ''
+		orderId.value = options.orderId || ''
+		msisdn.value = options.msisdn || ''
+		countryCode.value = options.countryCode || ''
+		if (!clientKey.value || !clientSecret.value) {
+			uni.showToast({ title: t('missingParams'), icon: 'none' })
+		}
+	})
+
+	onReady(() => {
+		initStripe()
+	})
+
+	// 仅 H5：动态加载 Stripe.js 并初始化 Checkout Elements
+	const initStripe = async () => {
+		// #ifdef H5
+		try {
+			uni.showLoading({ title: t('loadingPayment'), mask: true })
+			await new Promise<void>((resolve, reject) => {
+				const s = document.createElement('script')
+				s.src = 'https://js.stripe.com/v3/'
+				s.onload = () => resolve()
+				s.onerror = () => reject(new Error('stripe script load failed'))
+				document.head.appendChild(s)
+			})
+			const Stripe = (window as any).Stripe
+			if (Stripe == null) throw new Error('Stripe 未加载')
+			const stripe = Stripe(clientKey.value)
+			const checkout = await stripe.initCheckoutElementsSdk({
+				clientSecret: clientSecret.value,
+				elementsOptions: { appearance: { theme: 'flat' } },
+				adaptivePricing: { allowed: true }
+			})
+			checkoutRef = checkout
+			await nextTick()
+			currencyEl = checkout.createCurrencySelectorElement()
+			currencyEl.mount('#currency-selector-element')
+			emailEl = checkout.createEmailElement()
+			emailEl.mount('#email-element')
+			paymentEl = checkout.createPaymentElement()
+			paymentEl.mount('#payment-element')
+			try {
+				expressEl = checkout.createExpressCheckoutElement()
+				expressEl.mount('#express-checkout-element')
+			} catch (e) {
+				// 环境不支持快捷支付时忽略
+				console.warn('Express Checkout 不可用:', e)
+			}
+		} catch (err: any) {
+			console.error('Stripe 初始化失败:', err)
+			uni.showToast({ title: t('payFailedDesc'), icon: 'none' })
+		} finally {
+			uni.hideLoading()
+		}
+		// #endif
+	}
+
+	const handleSubmit = async () => {
+		// #ifdef H5
+		if (checkoutRef == null) {
+			uni.showToast({ title: t('payFailedDesc'), icon: 'none' })
+			return
+		}
+		try {
+			uni.showLoading({ title: t('paying'), mask: true })
+			const result = await checkoutRef.loadActions()
+			if (result.type !== 'success') throw new Error('loadActions failed')
+			const confirmResult = await result.actions.confirm()
+			if (confirmResult != null && confirmResult?.error) {
+				uni.hideLoading()
+				uni.showToast({ title: confirmResult.error.message || t('payFailed'), icon: 'none' })
+			} else {
+				uni.hideLoading()
+				uni.showToast({ title: t('paySuccess'), icon: 'success' })
+				setTimeout(() => {
+					uni.redirectTo({
+						url: '/pages/feedback/feedback?id=' + orderId.value
+							+ '&status=SUCCESS&payType=stripe'
+							+ '&msisdn=' + encodeURIComponent(msisdn.value)
+							+ '&countryCode=' + encodeURIComponent(countryCode.value)
+					})
+				}, 1000)
+			}
+		} catch (err: any) {
+			uni.hideLoading()
+			uni.showToast({ title: t('payFailedDesc'), icon: 'none' })
+		}
+		// #endif
+	}
+
+	const backPath = () => {
+		if (!orderId.value) {
+			uni.navigateBack()
+		} else {
+			uni.redirectTo({
+				url: '/pages/intlPay/intlPay?orderId=' + orderId.value
+					+ '&msisdn=' + encodeURIComponent(msisdn.value)
+					+ '&countryCode=' + encodeURIComponent(countryCode.value)
+					+ '&pkgName=' + encodeURIComponent(pkgName.value)
+			})
+		}
+	}
+
+	onUnmounted(() => {
+		// #ifdef H5
+		if (currencyEl != null && currencyEl.destroy) currencyEl.destroy()
+		if (emailEl != null && emailEl.destroy) emailEl.destroy()
+		if (paymentEl != null && paymentEl.destroy) paymentEl.destroy()
+		if (expressEl != null && expressEl.destroy) expressEl.destroy()
+		checkoutRef = null
+		// #endif
+	})
+</script>
+
+<style lang="scss" scoped>
+	.container {
+		display: flex;
+		flex-direction: column;
+		background-color: #f4f7fb;
+		flex: 1;
+		padding: 24rpx;
+	}
+	.pkg-name {
+		background: #ffffff;
+		border-radius: 16rpx;
+		padding: 28rpx;
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #1e293b;
+		text-align: center;
+		margin-bottom: 24rpx;
+	}
+	.tip {
+		font-size: 28rpx;
+		color: #64748b;
+		margin: 8rpx 8rpx 16rpx;
+	}
+	.stripe-el {
+		background: #ffffff;
+		border-radius: 16rpx;
+		padding: 8rpx 16rpx;
+		margin-bottom: 20rpx;
+		min-height: 20rpx;
+	}
+	.divider {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		margin: 16rpx 0;
+		.line {
+			flex: 1;
+			height: 1rpx;
+			background: #cbd5e1;
+		}
+		.divider-text {
+			margin: 0 20rpx;
+			font-size: 24rpx;
+			color: #94a3b8;
+		}
+	}
+	.pay-btn {
+		margin-top: 24rpx;
+	}
+</style>

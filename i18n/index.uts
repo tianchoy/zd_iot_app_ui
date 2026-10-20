@@ -1,15 +1,35 @@
-
 import { createI18n } from '@/uni_modules/lime-i18n'
 import zhCN from '../locales/zh-CN.uts'
 import enUS from '../locales/en_US.uts'
+import zhTW from '../locales/zh_TW.uts'
+import esES from '../locales/es_ES.uts'
+import jaJP from '../locales/ja_JP.uts'
+import koKR from '../locales/ko_KR.uts'
+import frFR from '../locales/fr_FR.uts'
+
+// 国际版支持的语言列表（切换器使用）
+export const localeList = [
+  { code: 'zh-CN', name: '简体中文' },
+  { code: 'zh-TW', name: '繁體中文' },
+  { code: 'en-US', name: 'English' },
+  { code: 'es-ES', name: 'Español' },
+  { code: 'ja-JP', name: '日本語' },
+  { code: 'ko-KR', name: '한국어' },
+  { code: 'fr-FR', name: 'Français' }
+]
 
 const i18n = createI18n({
-  // 使用uni.getStorageSync('uVueI18nLocale') 能获取上次退出应用后保存的语言
+  // 使用 uni.getStorageSync('uVueI18nLocale') 能获取上次退出应用后保存的语言
   locale: 'zh-CN', // 默认显示语言
   fallbackLocale: 'en-US',
   messages: {
     'zh-CN': zhCN,
-    'en-US': enUS
+    'en-US': enUS,
+    'zh-TW': zhTW,
+    'es-ES': esES,
+    'ja-JP': jaJP,
+    'ko-KR': koKR,
+    'fr-FR': frFR
   }
 })
 

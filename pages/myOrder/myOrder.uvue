@@ -62,7 +62,7 @@
 						<view class="detail-row last">
 							<text class="detail-value">{{ order.createTime || '-' }}</text>
 							<view class="order-footer">
-								<text class="price">{{ AmountUtil.format(order.payCurrencyAmount) }}</text>
+								<text class="price">{{ formatPrice(order) }}</text>
 								<view class="footer-actions">
 									<text v-if="order.status === '0'" class="pay-btn" @click.stop="handlePay(order)">去支付</text>
 								</view>
@@ -83,7 +83,7 @@
 	import {queryOrderList} from '@/api/http'
 	import type {OrderListXcxItem} from '@/api/types'
 	import { ref, computed, onMounted } from 'vue'
-	import {isWechat,isH5,isWechatWebView,getStorageSync} from '@/common/config.uts'
+	import {isWechat,isH5,isWechatWebView,getStorageSync,isINT} from '@/common/config.uts'
 	import {AmountUtil} from '@/utils/amount.uts'
 
 	// 问题反馈开关
@@ -291,9 +291,25 @@
 		}
 	}
 
-	// 处理订单点击
+	// 金额展示：国际版按订单币种符号显示，国内版沿用 ¥ 格式化
+	const formatPrice = (order: any): string => {
+		const amount = order.payCurrencyAmount
+		if (isINT()) {
+			const sym = order.symbol || ''
+			return (order.signPosition == '0' ? sym : '') + ' ' + amount + ' ' + (order.signPosition == '1' ? sym : '')
+		}
+		return AmountUtil.format(amount)
+	}
+
+	// 处理订单点击：国际版进入 intlPay（该页同时承担订单详情与重付），国内版进入订单详情
 	const handleOrderClick = (order: OrderListXcxItem) => {
 		console.log(order)
+		if (isINT()) {
+			uni.navigateTo({
+				url: `/pages/intlPay/intlPay?orderId=${(order as any).id}&msisdn=${encodeURIComponent((order as any).rechargeNo || '')}`
+			})
+			return
+		}
 		uni.navigateTo({
 			url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
 		})
@@ -350,8 +366,14 @@
 		})
 	}
 
-	// 去支付：统一进入订单详情（待支付页），由详情页负责调起支付
+	// 去支付：国际版进入 intlPay 重新支付；国内版进入订单详情（待支付页）
 	const handlePay = (order: OrderListXcxItem) => {
+		if (isINT()) {
+			uni.navigateTo({
+				url: `/pages/intlPay/intlPay?orderId=${(order as any).id}&msisdn=${encodeURIComponent((order as any).rechargeNo || '')}`
+			})
+			return
+		}
 		uni.navigateTo({
 			url: `/pages/orderDetail/orderDetail?orderNo=${order.orderNo}`
 		})

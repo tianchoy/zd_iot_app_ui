@@ -8,7 +8,11 @@
 	let hasUpdate = false
 
 	onLaunch(() => {
-		// i18n.global.locale.value = getStorageSync('uVueI18nLocale')
+		// 恢复上一次保存的界面语言（国际化版本支持 7 国语言切换）
+		const savedLocale = getStorageSync('uVueI18nLocale')
+		if (savedLocale != null && savedLocale.length > 0) {
+			i18n.global.locale.value = savedLocale
+		}
 		// #ifndef MP
 		  uni.loadFontFace({
 		    family: 'iconfont',

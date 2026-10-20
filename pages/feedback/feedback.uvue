@@ -1,0 +1,215 @@
+<template>
+	<!-- #ifndef MP-WEIXIN -->
+	<topNavBar :title="$t('paymentStatus')" :show-back="false" backgroundColor="#f4f7fb" textColor="#333" :showCapsule="false"></topNavBar>
+	<!-- #endif -->
+	<view class="container" v-if="orderDetail != null">
+		<view class="icon" :class="isSuccess ? 'icon-success' : 'icon-failed'">{{ isSuccess ? '✓' : '✕' }}</view>
+		<text class="status-text">{{ statusText }}</text>
+		<view class="amount" v-if="orderDetail?.payCurrencyAmount">
+			<text>{{ orderDetail?.signPosition == '0' ? orderDetail?.symbol : '' }} {{ orderDetail?.payCurrencyAmount }} {{ orderDetail?.signPosition == '1' ? orderDetail?.symbol : '' }}</text>
+		</view>
+		<view class="info">
+			<view class="info-row" v-if="orderDetail?.pkgName">
+				<text class="il">{{ $t('pkgName') }}</text>
+				<text class="iv">{{ orderDetail?.pkgName }}</text>
+			</view>
+			<view class="info-row" v-if="orderDetail?.orderNo">
+				<text class="il">{{ $t('orderNo') }}</text>
+				<text class="iv">{{ orderDetail?.orderNo }}</text>
+			</view>
+			<view class="info-row" v-if="orderDetail?.createTime">
+				<text class="il">{{ $t('createTime') }}</text>
+				<text class="iv">{{ orderDetail?.createTime }}</text>
+			</view>
+			<view class="info-row" v-if="orderDetail?.payTime">
+				<text class="il">{{ $t('payTime') }}</text>
+				<text class="iv">{{ orderDetail?.payTime }}</text>
+			</view>
+		</view>
+		<rice-button type="primary" width="100%" height="96rpx" class="btn" @click="backPath">{{ $t('orderDetail') }}</rice-button>
+	</view>
+	<view class="container" v-else>
+		<view class="icon icon-failed">✕</view>
+		<text class="status-text">{{ $t('payFailed') }}</text>
+		<text class="msg" v-if="msg">{{ msg }}</text>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, onLoad } from 'vue'
+	import { queryBySuccessIdIntl, queryOrderIntl } from '@/api/http.uts'
+	import { isINT } from '@/common/config.uts'
+	import i18n from '@/i18n'
+
+	const t = (key: string): string => i18n.global.t(key) as string
+
+	const id = ref<string>('')
+	const payChannelId = ref<string>('')
+	const msisdn = ref<string>('')
+	const countryCode = ref<string>('')
+	const payType = ref<string>('')
+	const status = ref<string>('')
+
+	const orderDetail = ref<any>(null)
+	const isSuccess = ref<boolean>(false)
+	const statusText = ref<string>('')
+	const msg = ref<string>('')
+
+	onLoad((opt: UTSJSONObject) => {
+		const options = opt as any
+		id.value = options.id || ''
+		payChannelId.value = options.payChannelId || ''
+		msisdn.value = options.msisdn || ''
+		countryCode.value = options.countryCode || ''
+		payType.value = options.payType || ''
+		status.value = options.status || ''
+
+		if (payType.value == 'payermax') {
+			if (status.value == 'SUCCESS') {
+				fetchSuccess(id.value, payChannelId.value)
+			} else {
+				// 支付未完成：回到支付方式页重试
+				uni.redirectTo({
+					url: '/pages/intlPay/intlPay?orderId=' + id.value
+						+ '&msisdn=' + encodeURIComponent(msisdn.value)
+						+ '&countryCode=' + encodeURIComponent(countryCode.value)
+				})
+			}
+		} else {
+			// Stripe 等其它渠道：按订单号查询支付结果
+			fetchOrder(id.value)
+		}
+	})
+
+	const fetchSuccess = async (orderId: string, channelId: string) => {
+		try {
+			uni.showLoading({ title: t('loading'), mask: true })
+			const res = await queryBySuccessIdIntl(orderId, channelId)
+			uni.hideLoading()
+			if (res.code == 200 && res.data != null) {
+				orderDetail.value = res.data
+				isSuccess.value = true
+				statusText.value = t('paySuccess')
+			} else {
+				msg.value = res.msg || t('dataLoadFailed')
+			}
+		} catch (error) {
+			uni.hideLoading()
+			msg.value = t('dataLoadFailed')
+		}
+	}
+
+	const fetchOrder = async (orderId: string) => {
+		try {
+			uni.showLoading({ title: t('loading'), mask: true })
+			const res = await queryOrderIntl(orderId)
+			uni.hideLoading()
+			if (res.code == 200 && res.data != null) {
+				orderDetail.value = res.data
+				isSuccess.value = true
+				statusText.value = t('paySuccess')
+			} else {
+				msg.value = res.msg || t('dataLoadFailed')
+			}
+		} catch (error) {
+			uni.hideLoading()
+			msg.value = t('dataLoadFailed')
+		}
+	}
+
+	const backPath = () => {
+		// 国际版：支付完成后进入订单列表查看记录（按最近卡号自动过滤）
+		if (isINT()) {
+			uni.reLaunch({
+				url: '/pages/myOrder/myOrder'
+			})
+			return
+		}
+		if (msisdn.value.length > 0 && countryCode.value.length > 0) {
+			uni.reLaunch({
+				url: '/pages/recharge/recharge?rechargeNo=' + msisdn.value + '&country=' + countryCode.value + '&from=h5Search'
+			})
+		} else {
+			uni.reLaunch({
+				url: '/pages/h5Search/h5Search'
+			})
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		background-color: #f4f7fb;
+		flex: 1;
+		padding: 80rpx 48rpx;
+	}
+	.icon {
+		width: 140rpx;
+		height: 140rpx;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 80rpx;
+		color: #ffffff;
+		margin-bottom: 32rpx;
+		&.icon-success {
+			background-color: #22c55e;
+		}
+		&.icon-failed {
+			background-color: #ef4444;
+		}
+	}
+	.status-text {
+		font-size: 36rpx;
+		font-weight: bold;
+		color: #1e293b;
+		margin-bottom: 24rpx;
+	}
+	.amount {
+		font-size: 52rpx;
+		font-weight: 800;
+		color: #ef4444;
+		margin-bottom: 40rpx;
+	}
+	.info {
+		width: 100%;
+		background: #ffffff;
+		border: 1rpx solid #e5edf6;
+		border-radius: 20rpx;
+		padding: 12rpx 28rpx;
+		margin-bottom: 48rpx;
+		.info-row {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			padding: 22rpx 0;
+			border-bottom: 1rpx solid #f1f5f9;
+			&:last-child {
+				border-bottom: none;
+			}
+			.il {
+				font-size: 26rpx;
+				color: #64748b;
+			}
+			.iv {
+				font-size: 26rpx;
+				color: #334155;
+				font-weight: 500;
+				text-align: right;
+				max-width: 60%;
+			}
+		}
+	}
+	.btn {
+		margin-top: 12rpx;
+	}
+	.msg {
+		font-size: 26rpx;
+		color: #94a3b8;
+		margin-top: 12rpx;
+	}
+</style>
