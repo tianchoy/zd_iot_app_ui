@@ -80,6 +80,7 @@ export const zhTW = {
   'payCanceled': '已取消支付',
   'payConfirming': '支付結果確認中，請稍後在訂單列表查看',
   'cardInfoFailed': '獲取卡片資訊失敗',
+  'cardNoMissing': '缺少卡號，請從 APP 重新進入',
   'loginFailed': '登入失敗，請重試',
   'cardNotExist': '卡片號碼不存在',
   'callFailed': '撥號失敗，請重試',

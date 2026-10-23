@@ -80,6 +80,7 @@ export const zhCN = {
   'payCanceled': '已取消支付',
   'payConfirming': '支付结果确认中，请稍后在订单列表查看',
   'cardInfoFailed': '获取卡片信息失败',
+  'cardNoMissing': '缺少卡号，请从 APP 重新进入',
   'loginFailed': '登录失败，请重试',
   'cardNotExist': '卡片号码不存在',
   'callFailed': '拨号失败，请重试',

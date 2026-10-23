@@ -895,6 +895,19 @@
 	}
 
 	const getCardDetail = async (cardNumber: string,country: string) => {
+		// 空卡号直接拦死，不发请求：后端 /app/card/info/{cardNo} 的路径变量为空时会 404，
+		// 过去只提示笼统的「获取卡片信息失败」，用户无从判断。
+		// 典型触发：APP 下发的 H5 地址被拼坏（域名配置带了路径/参数），哈希路由错乱导致 rechargeNo 丢失。
+		if (cardNumber == null || cardNumber.trim().length === 0) {
+			h5RedirectPending.value = false
+			console.error('[recharge] 缺少卡号参数，已终止查询；当前地址=', window.location.href)
+			uni.showToast({
+				title: t('cardNoMissing'),
+				icon: 'none',
+				duration: 3000
+			})
+			return
+		}
 		try {
 			const res = await queryCardDetail(cardNumber, country,'0')
 			if(res.code == 200){
@@ -1003,6 +1016,10 @@
 	 */
 	const redirectIfExternalH5Configured = async () => {
 		// #ifdef H5
+		// 空卡号时探不到卡详情，也不可能配出有效外跳地址，直接走正常渲染（由 getCardDetail 给出明确提示）
+		if (cardNumber.value == null || cardNumber.value.trim().length === 0) {
+			return
+		}
 		try {
 			const res = await queryCardDetail(cardNumber.value, country.value, '0')
 			if (res.code == 200 && redirectToExternalH5(res.data as RechargeData)) {

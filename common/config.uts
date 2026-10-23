@@ -39,11 +39,15 @@ export type ProjectConfig = {
 }
 
 // 环境配置
-const ENV = 'prod' //  dev | prod test
+const ENV = 'test' //  dev | prod | test
 
 const API_CONFIG: UTSJSONObject = {
   dev: {
     baseUrl: 'http://127.0.0.1:8081',
+    timeout: 30000
+  },
+  test: {
+    baseUrl: 'https://cmpapp.zdiot.cn/prod-api',
     timeout: 30000
   },
   prod: {

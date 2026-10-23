@@ -80,6 +80,7 @@ export const enUS = {
   'payCanceled': 'Payment cancelled',
   'payConfirming': 'Payment confirming, please check the order list later',
   'cardInfoFailed': 'Failed to get card info',
+  'cardNoMissing': 'Missing card number. Please re-enter from the APP.',
   'loginFailed': 'Login failed, please retry',
   'cardNotExist': 'Card number not found',
   'callFailed': 'Call failed, please retry',

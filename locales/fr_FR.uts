@@ -80,6 +80,7 @@ export const frFR = {
   'payCanceled': 'Paiement annulé',
   'payConfirming': 'Paiement en cours de confirmation, consultez la liste des commandes plus tard',
   'cardInfoFailed': 'Échec de la récupération des infos carte',
+  'cardNoMissing': "Numéro de carte manquant. Veuillez revenir depuis l'application.",
   'loginFailed': 'Échec de connexion, veuillez réessayer',
   'cardNotExist': 'Numéro de carte introuvable',
   'callFailed': "Échec de l'appel, veuillez réessayer",

@@ -80,6 +80,7 @@ export const jaJP = {
   'payCanceled': '支払いをキャンセルしました',
   'payConfirming': '支払い結果を確認中です。後ほど注文リストをご確認ください',
   'cardInfoFailed': 'カード情報の取得に失敗しました',
+  'cardNoMissing': 'カード番号がありません。APPから再度入ってください',
   'loginFailed': 'ログインに失敗しました。もう一度お試しください',
   'cardNotExist': 'カード番号が見つかりません',
   'callFailed': '発信に失敗しました。もう一度お試しください',

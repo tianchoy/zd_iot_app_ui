@@ -80,6 +80,7 @@ export const esES = {
   'payCanceled': 'Pago cancelado',
   'payConfirming': 'Confirmando el pago, consulte la lista de pedidos más tarde',
   'cardInfoFailed': 'Error al obtener la información de la tarjeta',
+  'cardNoMissing': 'Falta el número de tarjeta. Vuelve a entrar desde la APP.',
   'loginFailed': 'Error al iniciar sesión, inténtelo de nuevo',
   'cardNotExist': 'Número de tarjeta no encontrado',
   'callFailed': 'Error al llamar, inténtelo de nuevo',
