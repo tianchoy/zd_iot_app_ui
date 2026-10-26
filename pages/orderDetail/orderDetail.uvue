@@ -154,6 +154,9 @@
 	const isFromPaySuccess = ref(false);
 	// 添加标记：是否正在支付流程中
 	const isInPaymentProcess = ref(false);
+	// 通联收银台小程序 appid（后端按支付渠道下发）：跳转与 1038 回跳判定都用它，
+	// 不能用自身 appid —— 微信禁止小程序跳转自身，且回跳时 referrerInfo 是收银台的 appid
+	const cashierAppId = ref<string>('');
 	const orderDetail = ref<any>({
 		orderNo: '',
 		rechargeNo: '',
@@ -317,6 +320,12 @@
 			const res = await queryOrderDetail(orderId.value)
 			if (res.code == 200) {
 				orderDetail.value = res.data
+				// 进页时还没有卡号，页面配置只能先按平台默认取；拿到本单卡号后重取一次，
+				// 让 H5 的手机号登录开关等配置落到卡所属租户
+				const cardNo = (orderDetail.value.rechargeNo as string | null) ?? ''
+				if (cardNo.length > 0) {
+					getTenantInfos()
+				}
 				// 授权回跳后自动续付一次（仅待支付且拿到凭证时生效）
 				if (ds('status') === '0') {
 					tryResumePayment()
@@ -443,8 +452,10 @@
 				sign: data['sign'] as string,
 			}
 
+			// 收银台 appid 由后端下发（payWxClassAppId）；缺失时回退自身 appid 保持旧行为
+			cashierAppId.value = (data['payWxClassAppId'] as string | null) ?? ''
 			uni.navigateToMiniProgram({
-				appId: config.api.auth.appID,
+				appId: cashierAppId.value.length > 0 ? cashierAppId.value : config.api.auth.appID,
 				extraData: param,
 				success: () => {
 					console.log('打开收银台小程序成功，等待支付结果回调')
@@ -692,7 +703,8 @@
 		})
 	}
 	const getTenantInfos = async () => {
-		const res = await getTenantInfo(getTenantId(),false)
+		// H5 不看 appid/租户，只按本单卡号定位租户
+		const res = await getTenantInfo(getTenantId(), false, orderDetail.value.rechargeNo)
 		if(res.code == 200){
 			const tenantInfo = res.data
 			wxGetPhoneLogin.value = '' + tenantInfo.wxGetPhoneLogin
@@ -768,11 +780,13 @@
 			return
 		}
 		// 从收银台小程序返回时，来源小程序 appId 应与配置的收银台 appId 一致
+		// （旧口径拿自身 appid 比对，收银台 appid 与自身不同后该判定永远不成立）
 		const referrerInfo = options.referrerInfo
 		if (referrerInfo == null) {
 			return
 		}
-		if (referrerInfo.appId != config.api.auth.appID) {
+		const expectedAppId = cashierAppId.value.length > 0 ? cashierAppId.value : config.api.auth.appID
+		if (referrerInfo.appId != expectedAppId) {
 			return
 		}
 		// 代表从收银台小程序返回

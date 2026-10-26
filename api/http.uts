@@ -1,7 +1,7 @@
 // api/http.uts
 import { ApiUrl } from './url'
 import { request, type ApiResponse } from './Request.uts'
-import { config, getTenantId, setTenantId } from '@/common/config.uts'
+import { config, getTenantId, setTenantId, getAppId } from '@/common/config.uts'
 import type {
   LoginData,
   CountryData,
@@ -21,24 +21,42 @@ import type {
 } from './types'
 
 // 查询平台品牌与备案信息（匿名接口，登录前也可展示品牌）
-export async function getPlatformInfo(tenantId: string = ''): Promise<ApiResponse<PlatformInfoData>> {
-	// AppID 是客户端唯一可信的租户识别线索；路径 tenantId 只作兼容旧包的兜底。
+//
+// 身份线索按端区分，不要混用：
+// - 小程序：appId 是唯一可信线索（路径 tenantId 只作旧包兜底）；
+// - H5：编译产物里没有小程序 appid、也没有租户号，只认卡号（rechargeNo）；
+//   首屏还没有卡号时不传，后端回退平台自身，拿到卡号后再取一次即可覆盖。
+export async function getPlatformInfo(tenantId: string = '', rechargeNo: string = ''): Promise<ApiResponse<PlatformInfoData>> {
+	// #ifdef MP-WEIXIN
 	const effectiveTenantId = tenantId.length > 0 ? tenantId : getTenantId()
-	const baseUrl = ApiUrl.platformInfo as string
-	const url = effectiveTenantId.length > 0
-		? baseUrl + '/' + effectiveTenantId + '?appId=' + config.api.auth.appID
-		: baseUrl + '?appId=' + config.api.auth.appID
+	const url = (ApiUrl.platformInfo as string) + '/' + effectiveTenantId + '?appId=' + getAppId()
+	// #endif
+	// #ifdef H5
+	// H5 产物里没有小程序身份：只按卡号，首屏无卡时由后端回退平台自身
+	const cardQuery = rechargeNo.length > 0 ? '?rechargeNo=' + encodeURIComponent(rechargeNo) : ''
+	const url = (ApiUrl.platformInfo as string) + cardQuery
+	// #endif
+	// #ifndef MP-WEIXIN || H5
+	// App 等原生端保留路径租户兜底（旧行为），卡号传了则后端按卡优先
+	const fallbackTenantId = tenantId.length > 0 ? tenantId : getTenantId()
+	const cardQuery = rechargeNo.length > 0 ? '?rechargeNo=' + encodeURIComponent(rechargeNo) : ''
+	const url = (ApiUrl.platformInfo as string) + '/' + fallbackTenantId + cardQuery
+	// #endif
 	const res = await request<PlatformInfoData>({
 		url,
 		method: 'GET',
 		withToken: false
 	})
+	// 小程序 / App：落库服务端解析出的租户号，供后续请求复用；H5 没有租户概念，跳过
+	// （否则会把平台兜底的 000000 写进运行时租户，反而污染后续请求）
+	// #ifndef H5
 	if (res != null && res.code == 200 && res.data != null) {
 		const resolved = (res.data as UTSJSONObject)['tenantId'] as string
 		if (resolved != null && resolved.length > 0) {
 			setTenantId(resolved)
 		}
 	}
+	// #endif
 	return res
 }
 
@@ -68,32 +86,37 @@ export function login(data: UTSJSONObject, withToken: boolean = true): Promise<A
       clientId: config.api.auth.clientId,
       grantType: config.api.auth.grantType,
       // 多小程序识别：C端上报自身 appid，服务端据此反查所属租户与 appSecret
-      appId: config.api.auth.appID,
+      appId: getAppId(),
     },
     withToken
   })
 }
 
 // 获取租户页面配置（自动适配平台）
-// tenantId 为兜底值；同时携带 appId，服务端以 appId 反查到的租户为准
-export async function getTenantInfo(tenantId: string, withToken: boolean = true): Promise<ApiResponse<TenantInfoData>> {
-	const appIdQuery = '?appId=' + config.api.auth.appID
-	const effectiveTenantId = tenantId.length > 0 ? tenantId : getTenantId()
-
+//
+// - 小程序：tenantId 为兜底值，同时携带自身 appId，服务端以 appId 反查到的租户为准；
+// - H5：产物里没有小程序 appid 与租户号，只按卡号（rechargeNo）定位租户，卡号为空时
+//   后端回退平台自身；因此 H5 分支不拼 appId、也不拼路径 tenantId。
+export async function getTenantInfo(tenantId: string, withToken: boolean = true, rechargeNo: string = ''): Promise<ApiResponse<TenantInfoData>> {
 	// #ifdef MP-WEIXIN
-	const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + effectiveTenantId + appIdQuery
-  const token = true
+	const effectiveTenantId = tenantId.length > 0 ? tenantId : getTenantId()
+	const url = (ApiUrl.getTenantPageConfigXcx as string) + '/' + effectiveTenantId + '?appId=' + getAppId()
+	const token = true
 	// #endif
 
 	// #ifdef H5
-	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + effectiveTenantId + appIdQuery
-  const token = false
+	// H5 产物里没有小程序 appid 与租户号：身份只来自卡号
+	const cardQuery = rechargeNo.length > 0 ? '?rechargeNo=' + encodeURIComponent(rechargeNo) : ''
+	const url = (ApiUrl.getTenantPageConfigH as string) + cardQuery
+	const token = false
 	// #endif
 
 	// #ifndef MP-WEIXIN || H5
-	// 其他平台默认使用H5配置
-	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + effectiveTenantId + appIdQuery
-  const token = false
+	// 其他平台（App 等）沿用路径租户兜底，卡号传了则后端按卡优先
+	const fallbackTenantId = tenantId.length > 0 ? tenantId : getTenantId()
+	const cardQuery = rechargeNo.length > 0 ? '?rechargeNo=' + encodeURIComponent(rechargeNo) : ''
+	const url = (ApiUrl.getTenantPageConfigH as string) + '/' + fallbackTenantId + cardQuery
+	const token = false
 	// #endif
 
 	const res = await request<TenantInfoData>({
@@ -101,25 +124,27 @@ export async function getTenantInfo(tenantId: string, withToken: boolean = true)
 		method: 'GET',
 		withToken: token
 	})
-	// 落库服务端按 appId 反查到的租户号：后续「平台信息」等请求都按它取，
-	// 否则会出现「后台改的是 A 租户、客户端读的是打包常量 B 租户」。取不到时保持原行为。
+	// 小程序 / App：落库服务端按 appId 反查到的租户号，后续请求按它取，
+	// 否则会出现「后台改的是 A 租户、客户端读的是打包常量 B 租户」。
+	// H5 没有租户概念（后续请求都按卡），不写运行时租户，避免把平台 000000 缓存下来。
+	// #ifndef H5
 	if (res != null && res.code == 200 && res.data != null) {
 		const resolved = (res.data as UTSJSONObject)['tenantId'] as string
 		if (resolved != null && resolved.length > 0) {
 			setTenantId(resolved)
 		}
 	}
+	// #endif
 	return res
 }
 
 // 获取公众号H5授权地址（仅微信内置浏览器调用）
-// 传 iccid 时后端按卡所属租户生成授权，避免租户用 000000 域名打开 H5 时租户错配；
-// 未配置公众号时后端返回失败，调用方按原 H5 支付继续
-export function getWxMpH5AuthUrl(tenantId: string, returnUrl: string, iccid: string = ''): Promise<ApiResponse<any>> {
+// H5 产物不带 appId / tenantId：租户完全由卡号确定（后端按 card_info 反查），
+// 因此这里只传回跳地址与卡号；未配置公众号时后端返回失败，调用方按原 H5 支付继续。
+export function getWxMpH5AuthUrl(returnUrl: string, iccid: string = ''): Promise<ApiResponse<any>> {
   const iccidQuery = iccid.length > 0 ? '&iccid=' + encodeURIComponent(iccid) : ''
   return request<any>({
-    url: (ApiUrl.wxMpH5AuthUrl as string) + '?tenantId=' + encodeURIComponent(tenantId)
-      + '&returnUrl=' + encodeURIComponent(returnUrl) + iccidQuery,
+    url: (ApiUrl.wxMpH5AuthUrl as string) + '?returnUrl=' + encodeURIComponent(returnUrl) + iccidQuery,
     method: 'GET',
     withToken: false,
     showError: false
@@ -455,12 +480,10 @@ export function queryVerify(id: string, withToken: boolean = true): Promise<ApiR
 
 // 查询反馈列表（H5）
 //
-// 必须携带 appId；默认带 token，后端据此返回「当前用户提交的反馈」。
-// 传了 rechargeNo 则只查该卡的反馈（用于查没有提交人归属的历史数据）。
+// H5 产物不带 appId：反馈归属完全按当前卡号（rechargeNo）确定，后端据此返回该卡的反馈；
+// 带 token 时会附带当前用户提交的反馈。appId 属于小程序身份，H5 不再上报。
 export function getFeedbackList(rechargeNo: string = '', withToken: boolean = true): Promise<ApiResponse<FeedbackItem[]>> {
-  const data: UTSJSONObject = {
-    appId: config.api.auth.appID
-  }
+  const data: UTSJSONObject = {}
   if (rechargeNo.length > 0) {
     data['rechargeNo'] = rechargeNo
   }

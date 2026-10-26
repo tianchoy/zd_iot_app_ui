@@ -197,7 +197,7 @@
 	import { ref, computed } from 'vue';
 	import { queryCardDetail, addOrder,login,getTenantInfo} from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
-	import { config , getTenantId,isWechat,isH5,setToken,setStorageSync,getToken,setWxGetPhoneLogin,isPhoneLoginRequired,isINT} from '@/common/config.uts';
+	import { config , getTenantId,getAppId,isWechat,isH5,setToken,setStorageSync,getToken,setWxGetPhoneLogin,isPhoneLoginRequired,isINT} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	import tousu from '@/components/tousu.uvue';
 	import {DataFormat} from '@/utils/dataFormat.uts';
@@ -222,6 +222,9 @@
 	const showPopup = ref<boolean>(false);
 	// 添加标记：是否正在支付流程中
 	const isInPaymentProcess = ref<boolean>(false);
+	// 通联收银台小程序 appid（后端按支付渠道下发）：跳转与 1038 回跳判定都用它，
+	// 不能用自身 appid —— 微信禁止小程序跳转自身，且回跳时 referrerInfo 是收银台的 appid
+	const cashierAppId = ref<string>('');
 	// 是否显示返回按钮
 	const showBack = ref<boolean>(true);
 	// 是否由 App 内 WebView 打开（source=app）：决定返回按钮走原生关闭通道
@@ -612,8 +615,10 @@
 				sign: res.sign,
 			}
 
+			// 收银台 appid 由后端下发（payWxClassAppId）；缺失时回退自身 appid 保持旧行为
+			cashierAppId.value = (res.payWxClassAppId as string) ?? ''
 			uni.navigateToMiniProgram({
-				appId: config.api.auth.appID,
+				appId: cashierAppId.value.length > 0 ? cashierAppId.value : config.api.auth.appID,
 				extraData: param,
 				success: () => {
 					console.log('打开收银台小程序成功，等待支付结果回调')
@@ -712,7 +717,7 @@
 			params = {
 				pkgId: currentItem.pkgId,
 				rechargeNo: cardDetail.value.rechargeNo,
-				appId: config.api.auth.appID,
+				appId: getAppId(),
 			}
 		}
 
@@ -1142,7 +1147,8 @@
 	// 获取租户页面配置（含手机号登录开关）
 	const getTenantInfos = async () => {
 		try {
-			const res = await getTenantInfo(getTenantId(),false)
+			// H5 不看 appid/租户，只按当前卡号定位租户；小程序端该参数忽略，仍按 appId 解析
+			const res = await getTenantInfo(getTenantId(), false, cardNumber.value)
 			if(res.code == 200){
 				// 约定：'1' = 免手机号；'0' = 需要授权手机号
 				setWxGetPhoneLogin(res.data.wxGetPhoneLogin)
@@ -1168,11 +1174,13 @@
 			return
 		}
 		// 从收银台小程序返回时，来源小程序 appId 应与配置的收银台 appId 一致
+		// （旧口径拿自身 appid 比对，收银台 appid 与自身不同后该判定永远不成立）
 		const referrerInfo = options.referrerInfo
 		if (referrerInfo == null) {
 			return
 		}
-		if (referrerInfo.appId != config.api.auth.appID) {
+		const expectedAppId = cashierAppId.value.length > 0 ? cashierAppId.value : config.api.auth.appID
+		if (referrerInfo.appId != expectedAppId) {
 			return
 		}
 		// 代表从收银台小程序返回

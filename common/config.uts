@@ -39,7 +39,7 @@ export type ProjectConfig = {
 }
 
 // 环境配置
-const ENV = 'test' //  dev | prod | test
+const ENV = 'prod' //  dev | prod | test
 
 const API_CONFIG: UTSJSONObject = {
   dev: {
@@ -116,7 +116,24 @@ export function setTenantId(tenantId: string) {
 }
 
 //获取当前小程序 appid（多小程序识别：登录/拉取配置时上报给服务端）
+//
+// 小程序端优先取运行时真实 appid：多小程序共用一套代码时，manifest 与打包常量很容易
+// 出现「改了 manifest 忘了改常量」，到了线上就是「登录上报的 appid 与小程序不一致」。
+// H5 端没有该 API，继续用打包常量；H5 的租户识别也不依赖 appid（按卡号）。
 export function getAppId(): string {
+  // #ifdef MP-WEIXIN
+  try {
+    // 用 wx.* 而不是 uni.*：同级工程 zd_iot_gps_ui 已在 UTS 里这样用，类型一定义过；
+    // uni.getAccountInfoSync 在部分 SDK 版本没有 UTS 声明，写错就是编译失败
+    const info = wx.getAccountInfoSync()
+    const appId = info.miniProgram.appId
+    if (appId != null && appId.length > 0) {
+      return appId
+    }
+  } catch (error) {
+    console.warn('读取小程序 appid 失败，回退打包常量:', error)
+  }
+  // #endif
   return config.api.auth.appID
 }
 

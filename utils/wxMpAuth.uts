@@ -10,7 +10,7 @@
  * 2. 后端用 code 换 openid 后 302 回来，URL 带上一次性 mpToken；
  * 3. 页面把 mpToken 存本地并抹掉地址栏参数，下单时回传。
  */
-import { getTenantId, setStorageSync, getStorageSync, removeStorageSync } from '@/common/config.uts'
+import { setStorageSync, getStorageSync, removeStorageSync } from '@/common/config.uts'
 import { getWxMpH5AuthUrl } from '@/api/http.uts'
 
 const MP_TOKEN_KEY = 'h5MpToken'
@@ -242,7 +242,7 @@ export async function ensureWxMpAuth(cardNo: string = '', force: boolean = false
 	}
 	const returnUrl = window.location.href as string
 	try {
-		const res = await getWxMpH5AuthUrl(getTenantId(), returnUrl, cardNo)
+		const res = await getWxMpH5AuthUrl(returnUrl, cardNo)
 		const data = res.data as any
 		const url = data != null ? ((data['url'] as string | null) ?? '') : ''
 		if (res.code != 200 || url.length == 0) {
