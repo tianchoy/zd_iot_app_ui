@@ -195,7 +195,7 @@
 
 <script setup lang="uts">
 	import { ref, computed } from 'vue';
-	import { queryCardDetail, addOrder,login,getTenantInfo} from '@/api/http.uts';
+	import { queryCardDetail, addOrder, goPayXcx, login,getTenantInfo} from '@/api/http.uts';
 	import type {RechargeData,PkgXcxVo} from '@/api/types'
 	import { config , getTenantId,getAppId,isWechat,isH5,setToken,setStorageSync,getToken,setWxGetPhoneLogin,isPhoneLoginRequired,isINT} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
@@ -518,6 +518,9 @@
 	}
 
 	const orderNo = ref<string>('')
+	// 当前待支付单对应的套餐：取消支付后再次支付时，只有同一套餐才复用该单，
+	// 避免重复下单触发服务端「订单正在创建，请勿重复支付」；切换套餐则重新下单。
+	const pendingPkgId = ref<string>('')
 	const payChannelId = ref<string>('')
 	// 支付失败/未知状态统一收尾：清理加载态与支付流程标记
 	const handlePayFailed = (message: string) => {
@@ -712,32 +715,45 @@
 
 		console.log('currentItem:', currentItem,currentItem.pkgId)
 
-		let params = {}
-		if(isWechat()){
-			params = {
-				pkgId: currentItem.pkgId,
-				rechargeNo: cardDetail.value.rechargeNo,
-				appId: getAppId(),
-			}
-		}
-
-		if(isH5()){
-			params = {
-				pkgId: currentItem.pkgId,
-				rechargeNo: cardDetail.value.rechargeNo,
-				merchantConfigId,
-				// 公众号授权凭证：为空时后端自动回退微信H5支付
-				mpToken: getMpToken()
-			}
-		}
-
-		console.log('params:', params)
+		// 同一套餐已存在待支付单时，复用该单重拉起支付，避免重复下单触发
+		// 服务端「订单正在创建，请勿重复支付」的防重提示（接口端未返回可复用单号）。
+		const canReuse = orderNo.value.length > 0 && pendingPkgId.value === currentItem.pkgId
 
 		// 处理确认逻辑
 		isSubmittingOrder.value = true
 		try {
-			const res = await addOrder(params)
+			let res
+			if (canReuse) {
+				// 复用已落库的待支付单（goPayment）：按当前所选渠道 merchantConfigId 重拉起，
+				// 不会触发重复下单防重；换渠道（微信↔支付宝）也能正确重新生成预支付。
+				res = await goPayXcx(orderNo.value, merchantConfigId, isWechat(), getMpToken())
+			} else {
+				let params = {}
+				if(isWechat()){
+					params = {
+						pkgId: currentItem.pkgId,
+						rechargeNo: cardDetail.value.rechargeNo,
+						appId: getAppId(),
+					}
+				}
+
+				if(isH5()){
+					params = {
+						pkgId: currentItem.pkgId,
+						rechargeNo: cardDetail.value.rechargeNo,
+						merchantConfigId,
+						// 公众号授权凭证：为空时后端自动回退微信H5支付
+						mpToken: getMpToken()
+					}
+				}
+				console.log('params:', params)
+				res = await addOrder(params)
+			}
 			if(res.code == 200){
+				// 记住本次下单/重拉起的待支付单与对应套餐：取消后再次支付时复用同一单
+				// （走 goPayXcx），而不是重复下单触发「请勿重复支付」防重提示。
+				orderNo.value = (res.data?.orderNo ?? orderNo.value) as string
+				pendingPkgId.value = currentItem.pkgId
 				console.log('添加订单成功:', res)
 
 				if(isWechat()){

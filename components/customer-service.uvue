@@ -1,0 +1,198 @@
+<template>
+	<!-- 客服悬浮按钮：可拖动 / 上下跳动 / 闲置 5s 右侧半隐藏 -->
+	<view
+		class="cs-fab"
+		:style="containerStyle"
+		@touchstart="onTouchStart"
+		@touchmove="onTouchMove"
+		@touchend="onTouchEnd"
+		@touchcancel="onTouchEnd"
+		@click="onTap"
+	>
+		<view class="cs-icon-box">
+			<image class="cs-icon" src="/static/server-man.png" mode="aspectFit" />
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+	// 图标固定 40*40
+	const ICON_SIZE = 40
+	const IDLE_MS = 5000
+
+	const windowWidth = ref<number>(375)
+	const windowHeight = ref<number>(667)
+
+	// 拖动后的基准位置（px）
+	const posX = ref<number>(0)
+	const posY = ref<number>(0)
+	// 闲置半隐藏：true 时贴右边缘只露一半
+	const peeked = ref<boolean>(false)
+
+	let startClientX = 0
+	let startClientY = 0
+	let startPosX = 0
+	let startPosY = 0
+	let moved = false
+	let wasPeeked = false
+	let idleTimer: number | null = null
+
+	const clamp = (v: number, min: number, max: number): number => {
+		if (v < min) return min
+		if (v > max) return max
+		return v
+	}
+
+	// 拖动位置 + 闲置半隐藏位置
+	const containerStyle = computed<UTSJSONObject>(() => {
+		const x = peeked.value ? (windowWidth.value - ICON_SIZE / 2) : posX.value
+		return {
+			transform: 'translate(' + x + 'px,' + posY.value + 'px)'
+		}
+	})
+
+	const resetIdle = () => {
+		if (idleTimer != null) {
+			clearTimeout(idleTimer!)
+		}
+		idleTimer = setTimeout(() => {
+			peeked.value = true
+		}, IDLE_MS)
+	}
+
+	const openCustomerService = () => {
+		// @ts-ignore
+		if (typeof uni.openCustomerServiceChat === 'function') {
+			// 打印当前运行环境的真实 AppID：errCode 6 时用它核对企微后台绑定的到底是哪个小程序
+			try {
+				// @ts-ignore
+				const acc = wx.getAccountInfoSync()
+				console.log('当前小程序 appId =', acc.miniProgram.appId, 'env =', acc.miniProgram.envVersion)
+			} catch (e) {
+			}
+			uni.openCustomerServiceChat({
+				extInfo: { url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a' },
+				corpId: 'ww686122ec6a4db85a',
+				success(res: any) {
+					console.log('联系客服成功', res)
+				},
+				fail(res: any) {
+					console.log('联系客服失败', res)
+				},
+				complete(res: any) {
+					console.log('联系客服完成', res)
+				}
+			})
+		} else {
+			uni.showToast({ title: '当前环境暂不支持客服', icon: 'none' })
+		}
+	}
+
+	const onTouchStart = (e: any) => {
+		// 任何触碰都先激活（从半隐藏态完全显示）并重置闲置计时
+		wasPeeked = peeked.value
+		peeked.value = false
+		resetIdle()
+		const t = e.touches[0]
+		startClientX = t.clientX
+		startClientY = t.clientY
+		startPosX = posX.value
+		startPosY = posY.value
+		moved = false
+	}
+
+	const onTouchMove = (e: any) => {
+		const t = e.touches[0]
+		const dx = t.clientX - startClientX
+		const dy = t.clientY - startClientY
+		if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+			moved = true
+		}
+		posX.value = clamp(startPosX + dx, 0, windowWidth.value - ICON_SIZE)
+		posY.value = clamp(startPosY + dy, 0, windowHeight.value - ICON_SIZE)
+	}
+
+	const onTouchEnd = () => {
+		// 拖动/点击的"打开客服"改由 @click 处理（满足微信 TAP 手势约束），
+		// 这里只负责重置闲置计时；moved 仍保留给 click 判断是否为拖动
+		resetIdle()
+	}
+
+	// 必须以原生 TAP 手势调用 openCustomerServiceChat，否则报
+	// "can only be invoked by user TAP gesture"
+	const onTap = () => {
+		// 拖动结束后可能附带触发 click，忽略
+		if (moved) {
+			moved = false
+			return
+		}
+		// 非拖动：若此前处于半隐藏（本次仅用于激活显示），不打开客服；否则打开客服
+		if (!wasPeeked) {
+			openCustomerService()
+		}
+	}
+
+	onMounted(() => {
+		try {
+			// @ts-ignore
+			const info = uni.getWindowInfo()
+			windowWidth.value = info.windowWidth
+			windowHeight.value = info.windowHeight
+		} catch (e) {
+			// 兜底尺寸
+		}
+		// 默认悬浮在右侧垂直居中
+		posX.value = windowWidth.value - ICON_SIZE
+		posY.value = (windowHeight.value - ICON_SIZE) / 2
+		resetIdle()
+	})
+
+	onUnmounted(() => {
+		if (idleTimer != null) clearTimeout(idleTimer!)
+	})
+</script>
+
+<style scoped lang="scss">
+	.cs-fab {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 40px;
+		height: 40px;
+		z-index: 999;
+		touch-action: none;
+		pointer-events: auto;
+		transition-property: transform;
+		// uni-app x 的 view 默认 overflow:hidden，会把上跳超出的部分裁掉；40*40 只约束图标，不约束跳动高度
+		overflow: visible;
+	}
+
+	// 白色背景，大小贴合图标；跳动动画加在背景层，使背景与图标一起上下跳动
+	.cs-icon-box {
+		width: 40px;
+		height: 40px;
+		background-color: #ffffff;
+		border-radius: 50%;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		animation: cs-bounce 1.2s ease-in-out infinite;
+	}
+
+	.cs-icon {
+		width: 40px;
+		height: 40px;
+	}
+
+	@keyframes cs-bounce {
+		0%, 100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-8px);
+		}
+	}
+</style>

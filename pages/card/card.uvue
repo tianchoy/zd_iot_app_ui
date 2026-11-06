@@ -92,12 +92,14 @@
 			<text class="empty-text">暂无卡片数据</text>
 		</view>
 		<tousu v-if="false" @connect_tousu="handleConnectTousu"></tousu>
+		<customer-service></customer-service>
 	</view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import tousu from '@/components/tousu.uvue'
+import customerService from '@/components/customer-service.uvue'
 import { queryCardList, login, getTenantInfo, queryVerify } from '@/api/http.uts'
 import { getToken, getTenantId, isWechat, setToken, setStorageSync, setWxGetPhoneLogin, isPhoneLoginRequired } from '@/common/config.uts'
 import { CardNoHistory } from '@/utils/cardNoHistory.uts'
