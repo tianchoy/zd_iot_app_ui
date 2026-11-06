@@ -1,6 +1,15 @@
 <template>
-	<!-- 客服悬浮按钮：可拖动 / 上下跳动 / 闲置 5s 右侧半隐藏 -->
+	<!--
+		客服悬浮按钮
+
+		交互（参考 llk-mini 的 liu-drag-button）：
+		- 可上下左右拖动，松手后按「离屏幕中线更近的一侧」自动吸附到左/右边缘，带滑入动画；
+		- 不做贴边收起：任何时候（含页面滚动）都完整展示，避免只露半边看不清；
+		- 背景透明，只展示客服 logo 本身（图片自带底色），不套白底方块。
+		未配置任何客服渠道时整体不渲染。
+	-->
 	<view
+		v-if="enabled"
 		class="cs-fab"
 		:style="containerStyle"
 		@touchstart="onTouchStart"
@@ -9,35 +18,67 @@
 		@touchcancel="onTouchEnd"
 		@click="onTap"
 	>
-		<view class="cs-icon-box">
-			<image class="cs-icon" src="/static/server-man.png" mode="aspectFit" />
+		<view class="cs-icon-wrap">
+			<image class="cs-icon" src="/static/service.png" mode="aspectFit" />
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
 	import { ref, computed, onMounted, onUnmounted } from 'vue'
+	import { emptyCustomerService, hasAnyChannel, openCustomerService } from '@/common/customerService.uts'
+	import type { CustomerServiceConfig } from '@/common/customerService.uts'
 
-	// 图标固定 40*40
-	const ICON_SIZE = 40
-	const IDLE_MS = 5000
+	/**
+	 * 客服配置：由页面从接口下发（卡片详情 objectMap 或租户页面配置）。
+	 *
+	 * <p>历史实现把 corpId / kfid 链接**硬编码在本组件里**，运营改客服账号必须发版；
+	 * 现在只认配置，未配置任何渠道时整个悬浮球不渲染（产品口径：
+	 * 「都没有配置则不展示客服 logo」）。</p>
+	 */
+	const props = defineProps<{
+		config?: CustomerServiceConfig
+	}>()
+
+	// 不给 props 设「对象工厂默认值」：uni-app x 对 withDefaults 的引用类型默认值支持有限，
+	// 这里统一在读取处兜底，避免 props.config 为 undefined 时模板直接不渲染。
+	const cfg = computed<CustomerServiceConfig>(() => props.config ?? emptyCustomerService())
+
+	const emit = defineEmits<{
+		/**
+		 * 需要在页面展示手机号/二维码弹框（降级渠道）。
+		 *
+		 * <p>事件名必须用下划线：uni-app x 的模板编译不会把 `@show-popup` 归一成
+		 * `showPopup`，写成驼峰会「emit 出去了但父页面收不到」——表现为点客服 logo
+		 * 完全没反应。项目内其它自定义事件（connect_service / connect_tousu）同理。</p>
+		 */
+		show_popup: []
+	}>()
+
+	const enabled = computed<boolean>(() => hasAnyChannel(cfg.value))
+
+	// 图标固定 48*48（视觉更大更好点）
+	const ICON_SIZE = 48
+	/** 吸附后与屏幕左右边缘的间距（px） */
+	const EDGE_GAP = 2
+	/** 吸附动画时长，与 style 里的 transition 保持一致 */
+	const SNAP_MS = 250
 
 	const windowWidth = ref<number>(375)
 	const windowHeight = ref<number>(667)
 
-	// 拖动后的基准位置（px）
+	// 当前位置（px，相对视口左上角）
 	const posX = ref<number>(0)
 	const posY = ref<number>(0)
-	// 闲置半隐藏：true 时贴右边缘只露一半
-	const peeked = ref<boolean>(false)
+	// 是否处于「松手吸附」的动画窗口：拖动跟手时不能有过渡，否则会拖出橡皮筋感
+	const snapping = ref<boolean>(false)
 
 	let startClientX = 0
 	let startClientY = 0
 	let startPosX = 0
 	let startPosY = 0
 	let moved = false
-	let wasPeeked = false
-	let idleTimer: number | null = null
+	let snapTimer: number | null = null
 
 	const clamp = (v: number, min: number, max: number): number => {
 		if (v < min) return min
@@ -45,56 +86,48 @@
 		return v
 	}
 
-	// 拖动位置 + 闲置半隐藏位置
 	const containerStyle = computed<UTSJSONObject>(() => {
-		const x = peeked.value ? (windowWidth.value - ICON_SIZE / 2) : posX.value
 		return {
-			transform: 'translate(' + x + 'px,' + posY.value + 'px)'
+			transform: 'translate(' + posX.value + 'px,' + posY.value + 'px)',
+			transition: snapping.value ? ('transform ' + SNAP_MS + 'ms ease') : 'none'
 		}
 	})
 
-	const resetIdle = () => {
-		if (idleTimer != null) {
-			clearTimeout(idleTimer!)
+	/**
+	 * 松手吸附：以图标中心点判断靠左还是靠右，吸到对应边缘。
+	 *
+	 * <p>和参考组件同一口径（中线左 → 贴左，中线右 → 贴右），
+	 * 拖到屏幕中间松手也不会停在中间挡内容。</p>
+	 */
+	const snapToEdge = () => {
+		const centerX = posX.value + ICON_SIZE / 2
+		const isLeft = centerX < windowWidth.value / 2
+		snapping.value = true
+		posX.value = isLeft ? EDGE_GAP : (windowWidth.value - ICON_SIZE - EDGE_GAP)
+		if (snapTimer != null) {
+			clearTimeout(snapTimer!)
 		}
-		idleTimer = setTimeout(() => {
-			peeked.value = true
-		}, IDLE_MS)
+		snapTimer = setTimeout(() => {
+			snapping.value = false
+			snapTimer = null
+		}, SNAP_MS + 30)
 	}
 
-	const openCustomerService = () => {
-		// @ts-ignore
-		if (typeof uni.openCustomerServiceChat === 'function') {
-			// 打印当前运行环境的真实 AppID：errCode 6 时用它核对企微后台绑定的到底是哪个小程序
-			try {
-				// @ts-ignore
-				const acc = wx.getAccountInfoSync()
-				console.log('当前小程序 appId =', acc.miniProgram.appId, 'env =', acc.miniProgram.envVersion)
-			} catch (e) {
-			}
-			uni.openCustomerServiceChat({
-				extInfo: { url: 'https://work.weixin.qq.com/kfid/kfc030824eb947a0c9a' },
-				corpId: 'ww686122ec6a4db85a',
-				success(res: any) {
-					console.log('联系客服成功', res)
-				},
-				fail(res: any) {
-					console.log('联系客服失败', res)
-				},
-				complete(res: any) {
-					console.log('联系客服完成', res)
-				}
-			})
-		} else {
-			uni.showToast({ title: '当前环境暂不支持客服', icon: 'none' })
-		}
+	/**
+	 * 按统一优先级打开客服（客服地址 → 企业微信客服 → 手机号/二维码弹框）。
+	 *
+	 * <p>本组件只负责「点一下」，渠道判定与降级全在 {@code common/customerService.uts}，
+	 * 避免与充值页出现两套口径。</p>
+	 */
+	const handleOpenCustomerService = () => {
+		openCustomerService(cfg.value, () => {
+			// 降级渠道：弹框由页面渲染（组件不持有 UI，避免每处各写一套）
+			emit('show_popup')
+		})
 	}
 
 	const onTouchStart = (e: any) => {
-		// 任何触碰都先激活（从半隐藏态完全显示）并重置闲置计时
-		wasPeeked = peeked.value
-		peeked.value = false
-		resetIdle()
+		snapping.value = false
 		const t = e.touches[0]
 		startClientX = t.clientX
 		startClientY = t.clientY
@@ -107,7 +140,9 @@
 		const t = e.touches[0]
 		const dx = t.clientX - startClientX
 		const dy = t.clientY - startClientY
-		if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+		// 阈值 8px（与设备端一致）：手指轻点时的细微抖动不应被判成拖动，
+		// 否则 onTap 会把这次点击当成拖动结束而吞掉，表现为「点了没反应」。
+		if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
 			moved = true
 		}
 		posX.value = clamp(startPosX + dx, 0, windowWidth.value - ICON_SIZE)
@@ -115,9 +150,10 @@
 	}
 
 	const onTouchEnd = () => {
-		// 拖动/点击的"打开客服"改由 @click 处理（满足微信 TAP 手势约束），
-		// 这里只负责重置闲置计时；moved 仍保留给 click 判断是否为拖动
-		resetIdle()
+		// 只有真的拖过才吸附；单纯点击保持原位（避免点一下按钮就滑走）
+		if (moved) {
+			snapToEdge()
+		}
 	}
 
 	// 必须以原生 TAP 手势调用 openCustomerServiceChat，否则报
@@ -128,10 +164,7 @@
 			moved = false
 			return
 		}
-		// 非拖动：若此前处于半隐藏（本次仅用于激活显示），不打开客服；否则打开客服
-		if (!wasPeeked) {
-			openCustomerService()
-		}
+		handleOpenCustomerService()
 	}
 
 	onMounted(() => {
@@ -143,14 +176,16 @@
 		} catch (e) {
 			// 兜底尺寸
 		}
-		// 默认悬浮在右侧垂直居中
-		posX.value = windowWidth.value - ICON_SIZE
+		// 默认吸附右侧、垂直居中
+		posX.value = windowWidth.value - ICON_SIZE - EDGE_GAP
 		posY.value = (windowHeight.value - ICON_SIZE) / 2
-		resetIdle()
 	})
 
 	onUnmounted(() => {
-		if (idleTimer != null) clearTimeout(idleTimer!)
+		if (snapTimer != null) {
+			clearTimeout(snapTimer!)
+			snapTimer = null
+		}
 	})
 </script>
 
@@ -159,23 +194,21 @@
 		position: fixed;
 		left: 0;
 		top: 0;
-		width: 40px;
-		height: 40px;
+		width: 48px;
+		height: 48px;
 		z-index: 999;
 		touch-action: none;
 		pointer-events: auto;
-		transition-property: transform;
-		// uni-app x 的 view 默认 overflow:hidden，会把上跳超出的部分裁掉；40*40 只约束图标，不约束跳动高度
+		background-color: transparent;
+		// uni-app x 的 view 默认 overflow:hidden，会把上跳超出的部分裁掉；48*48 只约束图标，不约束跳动高度
 		overflow: visible;
 	}
 
-	// 白色背景，大小贴合图标；跳动动画加在背景层，使背景与图标一起上下跳动
-	.cs-icon-box {
-		width: 40px;
-		height: 40px;
-		background-color: #ffffff;
-		border-radius: 50%;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+	// 透明容器：只承载跳动动画，不再画白底/阴影/圆角
+	.cs-icon-wrap {
+		width: 48px;
+		height: 48px;
+		background-color: transparent;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -183,8 +216,8 @@
 	}
 
 	.cs-icon {
-		width: 40px;
-		height: 40px;
+		width: 48px;
+		height: 48px;
 	}
 
 	@keyframes cs-bounce {

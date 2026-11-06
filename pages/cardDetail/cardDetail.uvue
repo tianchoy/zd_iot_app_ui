@@ -127,6 +127,15 @@
 		<view class="empty-state" v-else>
 			<view class="empty-text">暂无卡片详情</view>
 		</view>
+		<!--
+			客服入口：客服配置按卡下发（后端在卡片详情 objectMap 里给），
+			因此只有本页（知道是哪张卡）才是正确位置；卡查询页不再展示客服。
+			组件内部按「客服地址 > 企业微信客服 > 手机号/二维码」选渠道，全未配置则不渲染。
+		-->
+		<customer-service v-if="hasCustomerService" :config="customerServiceConfig"
+			@show_popup="showCustomerServicePopup = true"></customer-service>
+		<customerServicePopup v-model:show="showCustomerServicePopup" :qrcode="customerServiceConfig.serviceQrcode"
+			:phones="csPhones" :serviceTime="customerServiceConfig.serviceTime"></customerServicePopup>
 	</view>
 </template>
 
@@ -135,6 +144,10 @@
 	import {queryCardDetail,userBindCard,queryPkgInfoList,queryOrderList,userUnBindCard} from '@/api/http'
 	import type {BindCard,OrderListXcxItem,PkgInfoItem,RechargeData} from '@/api/types'
 	import {isH5,isWechat,isWechatWebView,setStorageSync} from '@/common/config.uts'
+	import customerService from '@/components/customer-service.uvue'
+	import customerServicePopup from '@/components/customerServicePopup.uvue'
+	import { emptyCustomerService, hasAnyChannel, splitServicePhones } from '@/common/customerService.uts'
+	import type { CustomerServiceConfig } from '@/common/customerService.uts'
 	import {AmountUtil} from '@/utils/amount.uts';
 	import {DataFormat} from '@/utils/dataFormat.uts'
 
@@ -164,6 +177,25 @@
 	const cardDetail = ref<RechargeData | null>(null)
 	const orderList = ref<OrderListXcxItem[]>([])
 	const pkgInfoList = ref<PkgInfoItem[]>([])
+
+	// 客服配置：按卡下发（后端在卡片详情 objectMap 里给）；空 key = 未配置
+	const customerServiceConfig = computed<CustomerServiceConfig>(() => {
+		const map = cardDetail.value?.objectMap
+		if (map == null) {
+			return emptyCustomerService()
+		}
+		return {
+			serviceJumpUrl: map.serviceJumpUrl ?? '',
+			serviceCorpId: map.serviceCorpId ?? '',
+			serviceKfidUrl: map.serviceKfidUrl ?? '',
+			servicePhone: map.servicePhone ?? '',
+			serviceQrcode: map.serviceQrcode ?? '',
+			serviceTime: map.serviceTime ?? ''
+		}
+	})
+	const hasCustomerService = computed<boolean>(() => hasAnyChannel(customerServiceConfig.value))
+	const showCustomerServicePopup = ref(false)
+	const csPhones = computed<string[]>(() => splitServicePhones(customerServiceConfig.value))
 
 	const fixedTabsStyle = computed(() => {
 		const css = new Map<string, string>()

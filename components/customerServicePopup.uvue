@@ -1,0 +1,182 @@
+<template>
+	<!--
+		客服降级弹框：客服二维码 + 客服手机号（可拨号）
+
+		样式对齐设备端（zd_iot_gps_ui）的客服弹框：纵向居中卡片，
+		标题 + 二维码大图 + 长按提示 + 电话行（蓝色圆角按钮）+ 服务时间。
+		内容为空的那一项自动不渲染。
+	-->
+	<rice-popup v-model:show="visible" position="bottom">
+		<view class="cs-popup">
+			<text class="cs-popup-title">{{ titleText }}</text>
+
+			<view class="cs-row" v-if="qrcodeUrl.length > 0">
+				<text class="cs-label">{{ qrcodeLabel }}</text>
+				<image class="cs-qrcode" :src="qrcodeUrl" show-menu-by-longpress mode="aspectFit"></image>
+				<text class="cs-tip">{{ tipText }}</text>
+			</view>
+
+			<view class="cs-row" v-for="(phone, index) in phoneList" :key="index">
+				<text class="cs-label">{{ phoneLabel }}</text>
+				<text class="cs-phone">{{ phone }}</text>
+				<text class="cs-call" @click="callPhone(phone)">{{ callText }}</text>
+			</view>
+
+			<text class="cs-time" v-if="serviceTimeText.length > 0">{{ serviceTimeLabel }}{{ serviceTimeText }}</text>
+		</view>
+	</rice-popup>
+</template>
+
+<script setup lang="uts">
+	import { computed } from 'vue'
+	import { isWechatWebView } from '@/common/config.uts'
+
+	const props = withDefaults(defineProps<{
+		/** 显隐（v-model:show） */
+		show?: boolean
+		/** 客服二维码图片地址，空串不渲染该行 */
+		qrcode?: string
+		/** 客服手机号列表，空数组不渲染 */
+		phones?: string[]
+		/** 客服服务时间（自由文案），空串不渲染 */
+		serviceTime?: string
+		/** 弹框标题 */
+		titleText?: string
+		/** 二维码上方标签 */
+		qrcodeLabel?: string
+		/** 「请添加客服为您服务」这类提示 */
+		wechatTip?: string
+		/** 「客服电话：」标签 */
+		phoneLabel?: string
+		/** 「拨打电话」按钮文案 */
+		callText?: string
+		/** 「服务时间：」标签 */
+		serviceTimeLabel?: string
+	}>(), {
+		show: false,
+		qrcode: '',
+		serviceTime: '',
+		wechatTip: '请添加客服为您服务',
+		phoneLabel: '客服电话：',
+		callText: '拨打电话',
+		titleText: '联系客服',
+		qrcodeLabel: '客服二维码',
+		serviceTimeLabel: '服务时间：'
+	})
+
+	// 模板里所有取值都在这里兜底：uni-app x 的 withDefaults 对「父组件显式传 undefined」
+	// 不一定回落到默认值，直接写 `serviceTime.length` 会报
+	// `Cannot read property 'length' of undefined` 并导致整页白屏。
+	const phoneList = computed<string[]>(() => props.phones ?? ([] as string[]))
+	const qrcodeUrl = computed<string>(() => props.qrcode ?? '')
+	const serviceTimeText = computed<string>(() => props.serviceTime ?? '')
+
+	/**
+	 * 当前环境能否长按识别二维码。
+	 *
+	 * <p>微信小程序、微信内置浏览器（公众号 H5）的长按菜单都带「识别图中二维码」；
+	 * 外部浏览器 / App 内 WebView 没有这个能力，提示语必须换成「请添加客服为您服务」，
+	 * 否则用户长按后什么都没有，会以为功能坏了。</p>
+	 */
+	function canLongPressQrcode(): boolean {
+		// #ifdef MP-WEIXIN
+		return true
+		// #endif
+
+		// #ifdef H5
+		return isWechatWebView()
+		// #endif
+
+		return false
+	}
+
+	/** 二维码下方提示语：微信内引导长按识别，其它环境引导直接添加 */
+	const tipText = computed<string>(() => {
+		if (canLongPressQrcode()) {
+			return '长按识别二维码添加客服'
+		}
+		const custom = props.wechatTip ?? ''
+		return custom.length > 0 ? custom : '请添加客服为您服务'
+	})
+
+	const emit = defineEmits<{
+		'update:show': [value: boolean]
+	}>()
+
+	const visible = computed<boolean>({
+		get: (): boolean => props.show,
+		set: (value: boolean) => {
+			emit('update:show', value)
+		}
+	})
+
+	const callPhone = (phone: string) => {
+		uni.makePhoneCall({
+			phoneNumber: phone
+		})
+	}
+</script>
+
+<style lang="scss">
+	.cs-popup {
+		display: flex;
+		flex-direction: column;
+		padding: 40rpx 32rpx 60rpx 32rpx;
+
+		.cs-popup-title {
+			font-size: 32rpx;
+			font-weight: bold;
+			color: #1f2937;
+			text-align: center;
+			margin-bottom: 24rpx;
+		}
+
+		.cs-row {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 24rpx 0;
+			border-bottom: 1rpx solid #e5e7eb;
+
+			.cs-label {
+				font-size: 26rpx;
+				color: #64748b;
+			}
+
+			.cs-qrcode {
+				width: 300rpx;
+				height: 300rpx;
+				margin-top: 16rpx;
+			}
+
+			.cs-tip {
+				// 22rpx 在真机上偏小，且这句是引导用户加客服的关键提示，调到 28rpx
+				font-size: 28rpx;
+				color: #94a3b8;
+				margin-top: 12rpx;
+			}
+
+			.cs-phone {
+				font-size: 30rpx;
+				color: #1f2937;
+				margin-top: 12rpx;
+			}
+
+			.cs-call {
+				font-size: 26rpx;
+				color: #ffffff;
+				background-color: #2563eb;
+				border-radius: 40rpx;
+				padding: 10rpx 40rpx;
+				margin-top: 16rpx;
+			}
+		}
+
+		.cs-time {
+			font-size: 24rpx;
+			color: #94a3b8;
+			text-align: center;
+			margin-top: 24rpx;
+		}
+	}
+</style>

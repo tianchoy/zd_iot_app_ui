@@ -164,33 +164,14 @@
 		</view>
 	</view>
 	<view ref="formContainer" class="form-container"></view>
-	<customService v-if="cardDetail?.objectMap?.serviceJumpUrl" @connect_service="handleConnectService"></customService>
+	<!-- 客服入口与卡片详情页共用同一组件（同一套 logo / 拖动手感 / 渠道降级） -->
+	<customer-service v-if="hasCustomerService" :config="customerServiceConfig"
+		@show_popup="showCustomService = true"></customer-service>
 	<tousu v-if="false" @connect_tousu="handleConnectTousu"></tousu>
-	<rice-popup v-model:show="showCustomService" position="bottom">
-		<view class="popup-center">
-			<view class="cs-list" v-if="cardDetail?.objectMap?.serviceQrcode">
-				<view class="label">
-					<text class="cs-label-desc">{{ $t('wechatLabel') }}</text>
-					<text class="cs-label-desc">{{ $t('addWechatTip') }}</text>
-				</view>
-				<view class="value">
-					<image :src="cardDetail?.objectMap?.serviceQrcode" show-menu-by-longpress mode="aspectFill" class="qrcode">
-					</image>
-				</view>
-			</view>
-			<view v-if="phoneList">
-				<view class="cs-list" v-for="(phone, index) in phoneList" :key="index">
-					<view class="label">
-						<text class="cs-label-desc">{{ $t('servicePhone') }}</text>
-						<text>{{ phone }}</text>
-					</view>
-					<view class="value">
-						<rice-button type="primary" icon="phone-call" :text="$t('makeCall')" shape="round" size="small" @click="callPhone(phone)"></rice-button>
-					</view>
-				</view>
-			</view>
-		</view>
-	</rice-popup>
+	<customerServicePopup v-model:show="showCustomService" :qrcode="customerServiceConfig.serviceQrcode"
+		:phones="phoneList" :wechatTip="$t('addWechatTip')"
+		:phoneLabel="$t('servicePhone')" :callText="$t('makeCall')"
+		:serviceTime="customerServiceConfig.serviceTime"></customerServicePopup>
 </template>
 
 <script setup lang="uts">
@@ -200,6 +181,10 @@
 	import { config , getTenantId,getAppId,isWechat,isH5,setToken,setStorageSync,getToken,setWxGetPhoneLogin,isPhoneLoginRequired,isINT} from '@/common/config.uts';
 	import Payment from '@/components/payment.uvue';
 	import tousu from '@/components/tousu.uvue';
+	import customerServicePopup from '@/components/customerServicePopup.uvue';
+	import customerService from '@/components/customer-service.uvue';
+	import { emptyCustomerService, hasAnyChannel, splitServicePhones } from '@/common/customerService.uts';
+	import type { CustomerServiceConfig } from '@/common/customerService.uts';
 	import {DataFormat} from '@/utils/dataFormat.uts';
 	import {AmountUtil} from '@/utils/amount.uts';
 	import i18n from '@/i18n';
@@ -970,21 +955,31 @@
 		}
 	}
 
-	const phoneList = computed(() => {
-		const phoneStr = cardDetail.value?.objectMap?.servicePhone || ''
-		return phoneStr ? phoneStr.split(',').map(item => item.trim()) : []
+	const phoneList = computed<string[]>(() => splitServicePhones(customerServiceConfig.value))
+
+	/**
+	 * 客服配置：卡片详情 objectMap 下发（空 key = 未配置）。
+	 *
+	 * <p>本页可能是公众号/外部 H5，也可能是 App 内 WebView；「能不能跳企业微信客服」
+	 * 由 common/customerService.uts 按环境判定，页面不做平台判断。</p>
+	 */
+	const customerServiceConfig = computed<CustomerServiceConfig>(() => {
+		const map = cardDetail.value?.objectMap
+		if (map == null) {
+			return emptyCustomerService()
+		}
+		return {
+			serviceJumpUrl: map.serviceJumpUrl ?? '',
+			serviceCorpId: map.serviceCorpId ?? '',
+			serviceKfidUrl: map.serviceKfidUrl ?? '',
+			servicePhone: map.servicePhone ?? '',
+			serviceQrcode: map.serviceQrcode ?? '',
+			serviceTime: map.serviceTime ?? ''
+		}
 	})
 
-	const handleConnectService = () => {
-		if(cardDetail.value?.objectMap.serviceJumpUrl){
-			window.open(cardDetail.value?.objectMap.serviceJumpUrl,'_blank')
-		}else{
-			setTimeout(() => {
-				showCustomService.value = true;
-			}, 100);
-		}
-
-	}
+	// 任一渠道有值才渲染客服入口（产品口径：全未配置则不展示客服 logo）
+	const hasCustomerService = computed<boolean>(() => hasAnyChannel(customerServiceConfig.value))
 
 	const checkToken = (): boolean => {
 		const token = getToken()
@@ -1256,22 +1251,6 @@
 		}
 	})
 
-	const callPhone = (phone: string) => {
-		uni.makePhoneCall({
-			phoneNumber: phone,
-			success: () => {
-				console.log('拨号界面弹出成功');
-			},
-			fail: (err) => {
-				console.log('拨号失败:', err);
-				// 可以在这里给用户一个提示
-				uni.showToast({
-				title: t('callFailed'),
-				icon: 'none'
-				});
-			}
-		});
-	}
 </script>
 
 <style lang="scss" scoped>
@@ -1466,7 +1445,8 @@
 		display: flex;
 		flex-direction: column;
 		.tips{
-			font-size: 24rpx;
+			// 充值提示文案：24rpx 偏小，手机上看不清，提到 28rpx
+			font-size: 28rpx;
 			background: #ffffff;
 			color: #64748b;
 			border: 1rpx solid #e2e8f0;
@@ -1522,35 +1502,6 @@
 					font-size: 40rpx;
 				}
 			}
-		}
-	}
-	.popup-center{
-		display: flex;
-		flex-direction: column;
-		padding: 75rpx 24rpx;
-		.cs-list {
-			display: flex;
-			flex-direction: row;
-			justify-content: space-between;
-			align-items: center;
-			border-bottom: 1rpx solid #E5E5E5;
-			padding: 20rpx 0;
-
-			.label {
-				display: flex;
-				flex-direction: row;
-				justify-content: flex-start;
-				align-items: center;
-				.cs-label-desc{
-					font-size: 24rpx;
-					color: #64748b;
-				}
-			}
-		}
-
-		.qrcode {
-			width: 150rpx;
-			height: 150rpx;
 		}
 	}
 </style>

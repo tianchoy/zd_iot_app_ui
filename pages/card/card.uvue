@@ -92,14 +92,16 @@
 			<text class="empty-text">暂无卡片数据</text>
 		</view>
 		<tousu v-if="false" @connect_tousu="handleConnectTousu"></tousu>
-		<customer-service></customer-service>
+		<!--
+			本页是「卡查询/绑卡」入口：此时还不知道是哪张卡，而客服配置是按卡下发的，
+			在这里展示客服只能拿到租户级兜底，口径不对；客服入口统一放在卡片详情页。
+		-->
 	</view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import tousu from '@/components/tousu.uvue'
-import customerService from '@/components/customer-service.uvue'
 import { queryCardList, login, getTenantInfo, queryVerify } from '@/api/http.uts'
 import { getToken, getTenantId, isWechat, setToken, setStorageSync, setWxGetPhoneLogin, isPhoneLoginRequired } from '@/common/config.uts'
 import { CardNoHistory } from '@/utils/cardNoHistory.uts'
