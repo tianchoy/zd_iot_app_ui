@@ -1,7 +1,8 @@
 /**
  * 客服渠道统一封装（卡项目：小程序 / 公众号H5 / 外部H5 / App）
  *
- * <p>统一口径（产品确认）：**客服地址 &gt; 企业微信客服 &gt; 客服手机号/二维码**。</p>
+ * <p>统一口径（产品确认）：**客服地址 &gt; 企业微信客服 &gt; 客服手机号/二维码**。
+ * 微信小程序端例外：客服地址整条渠道视为未配置，优先级从企业微信客服开始。</p>
  *
  * <p>与后端的分工：服务端只下发原始字段（空值不下发 key），**不做优先级裁剪**——
  * 同一份配置在小程序、微信内 H5、外部浏览器里可执行的动作不同，服务端无法判定。
@@ -10,7 +11,7 @@
  * <p>环境能力：</p>
  * <ul>
  *   <li>小程序：`uni.openCustomerServiceChat` 可用（必须用户 TAP 同步调用）；
- *       外部链接打不开，客服地址降级为「复制链接」。</li>
+ *       客服地址（外部链接）整体忽略：不复制、不提示、也不参与渠道判定。</li>
  *   <li>微信内置浏览器 H5：客服地址用 `window.open`；企业微信客服直接打开 kfid 链接。</li>
  *   <li>外部浏览器 / App 内 WebView：企业微信客服不可用，跳过该渠道继续降级。</li>
  * </ul>
@@ -102,14 +103,28 @@ export function hasPopupChannel(cfg: CustomerServiceConfig): boolean {
  * 外部浏览器 / App 时，企微唤不起来且又没有电话/二维码，入口就不该出现——
  * 否则会出现「logo 显示、点了毫无反应」。</p>
  *
- * <p>客服地址在小程序里只能复制，但复制本身也是可执行反馈，故仍算有动作；
- * 打开时由 {@link openCustomerService} 继续降级，不会被复制动作独占。</p>
+ * <p>微信小程序端把客服地址视为未配置（不复制、不提示），因此只配了客服地址时
+ * 小程序不渲染入口；H5 与其它环境仍按原逻辑计入。</p>
  */
 export function hasAnyChannel(cfg: CustomerServiceConfig): boolean {
 	return resolveChannel(cfg) != CS_CHANNEL_NONE
 }
 
-/** 小程序内无法直接打开外部链接，客服地址只能复制（属「部分可用」，优先级仍高于手机号） */
+/**
+ * 客服地址是否作为有效渠道参与判定。
+ *
+ * <p>仅微信小程序端返回 false：外部链接打不开，原先「复制链接 + toast 后继续降级」
+ * 既会弹出误导性提示，又会让只配了地址的小程序显示一个点了没用的入口。
+ * H5 / App 保持原逻辑。</p>
+ */
+function hasServiceJump(cfg: CustomerServiceConfig): boolean {
+	// #ifdef MP-WEIXIN
+	return false
+	// #endif
+	return cfg.serviceJumpUrl.trim().length > 0
+}
+
+/** 外部浏览器/小程序无法直接打开外部链接：H5 才可直接打开，其余环境只能复制 */
 export function canOpenUrlDirectly(): boolean {
 	// #ifdef H5
 	return true
@@ -138,7 +153,7 @@ export function canOpenWecom(): boolean {
  * **跳过并继续下降**，而不是整块失效。</p>
  */
 export function resolveChannel(cfg: CustomerServiceConfig): string {
-	const hasJump = cfg.serviceJumpUrl.trim().length > 0
+	const hasJump = hasServiceJump(cfg)
 	// 1) 客服地址：H5 可直接打开
 	if (hasJump && canOpenUrlDirectly()) {
 		return CS_CHANNEL_JUMP
@@ -147,7 +162,8 @@ export function resolveChannel(cfg: CustomerServiceConfig): string {
 	if (hasWecom(cfg) && canOpenWecom()) {
 		return CS_CHANNEL_WECOM
 	}
-	// 3) 客服地址在小程序内只能复制，也算一个可执行动作（复制后仍会继续降级）
+	// 3) 客服地址在 App 等环境只能复制，也算一个可执行动作（复制后仍会继续降级）；
+	//    微信小程序端 hasJump 恒为 false，不会走到这一步
 	if (hasJump) {
 		return CS_CHANNEL_JUMP
 	}
@@ -181,10 +197,10 @@ export function splitServicePhones(cfg: CustomerServiceConfig): string[] {
  * @param onShowPopup  需要展示手机号/二维码弹框时回调（渠道为 POPUP 时）
  */
 export function openCustomerService(cfg: CustomerServiceConfig, onShowPopup: () => void): void {
-	const hasJump = cfg.serviceJumpUrl.trim().length > 0
+	const hasJump = hasServiceJump(cfg)
 
-	// 1) 客服地址优先：H5 直接打开后结束；小程序/App 只完成复制，继续往下降级，
-	//    避免用户只拿到「链接已复制」却被屏蔽了电话/二维码。
+	// 1) 客服地址优先：H5 直接打开后结束；App 只完成复制，继续往下降级。
+	//    微信小程序端 hasJump 恒为 false —— 完全跳过复制/toast，直接走企业微信客服
 	if (hasJump) {
 		openUrl(cfg.serviceJumpUrl)
 		if (canOpenUrlDirectly()) {
@@ -210,7 +226,8 @@ export function openCustomerService(cfg: CustomerServiceConfig, onShowPopup: () 
 		return
 	}
 
-	// 4) 绝不静默返回：只复制过链接时 openUrl 已给过 toast，不再重复提示
+	// 4) 绝不静默返回：App 等环境只复制过链接时 openUrl 已给过 toast，不再重复提示。
+	//    小程序端 hasJump 恒为 false，不会复制，也不会走到这个 return
 	if (hasJump) {
 		return
 	}
@@ -222,7 +239,7 @@ export function openCustomerService(cfg: CustomerServiceConfig, onShowPopup: () 
 	}
 }
 
-/** 打开客服地址：H5 直接新窗口；小程序/App 复制链接（无法打开外部网页） */
+/** 打开客服地址：H5 直接新窗口；App 复制链接（微信小程序端不再调用本函数） */
 function openUrl(url: string): void {
 	// #ifdef H5
 	// @ts-ignore
