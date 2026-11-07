@@ -95,9 +95,18 @@ export function hasPopupChannel(cfg: CustomerServiceConfig): boolean {
 	return cfg.servicePhone.trim().length > 0 || cfg.serviceQrcode.trim().length > 0
 }
 
-/** 是否配置了任意客服渠道：false 时页面不应渲染客服入口 */
+/**
+ * 当前环境是否存在**任一可执行动作**：false 时页面不渲染客服入口。
+ *
+ * <p>与 {@link openCustomerService} 的降级链逐条对应：只配了企微客服但当前是
+ * 外部浏览器 / App 时，企微唤不起来且又没有电话/二维码，入口就不该出现——
+ * 否则会出现「logo 显示、点了毫无反应」。</p>
+ *
+ * <p>客服地址在小程序里只能复制，但复制本身也是可执行反馈，故仍算有动作；
+ * 打开时由 {@link openCustomerService} 继续降级，不会被复制动作独占。</p>
+ */
 export function hasAnyChannel(cfg: CustomerServiceConfig): boolean {
-	return cfg.serviceJumpUrl.trim().length > 0 || hasWecom(cfg) || hasPopupChannel(cfg)
+	return resolveChannel(cfg) != CS_CHANNEL_NONE
 }
 
 /** 小程序内无法直接打开外部链接，客服地址只能复制（属「部分可用」，优先级仍高于手机号） */
@@ -130,17 +139,19 @@ export function canOpenWecom(): boolean {
  */
 export function resolveChannel(cfg: CustomerServiceConfig): string {
 	const hasJump = cfg.serviceJumpUrl.trim().length > 0
-	// 微信内可以直接用客服地址
+	// 1) 客服地址：H5 可直接打开
 	if (hasJump && canOpenUrlDirectly()) {
 		return CS_CHANNEL_JUMP
 	}
+	// 2) 企业微信客服：仅小程序 / 微信内置浏览器可用，其它环境跳过继续降级
 	if (hasWecom(cfg) && canOpenWecom()) {
 		return CS_CHANNEL_WECOM
 	}
-	// 客服地址仍排在手机号/二维码之前：小程序/App 里降级为复制链接
+	// 3) 客服地址在小程序内只能复制，也算一个可执行动作（复制后仍会继续降级）
 	if (hasJump) {
 		return CS_CHANNEL_JUMP
 	}
+	// 4) 手机号 / 二维码弹框
 	if (hasPopupChannel(cfg)) {
 		return CS_CHANNEL_POPUP
 	}
@@ -170,17 +181,44 @@ export function splitServicePhones(cfg: CustomerServiceConfig): string[] {
  * @param onShowPopup  需要展示手机号/二维码弹框时回调（渠道为 POPUP 时）
  */
 export function openCustomerService(cfg: CustomerServiceConfig, onShowPopup: () => void): void {
-	const channel = resolveChannel(cfg)
-	if (channel == CS_CHANNEL_JUMP) {
+	const hasJump = cfg.serviceJumpUrl.trim().length > 0
+
+	// 1) 客服地址优先：H5 直接打开后结束；小程序/App 只完成复制，继续往下降级，
+	//    避免用户只拿到「链接已复制」却被屏蔽了电话/二维码。
+	if (hasJump) {
 		openUrl(cfg.serviceJumpUrl)
+		if (canOpenUrlDirectly()) {
+			return
+		}
+	}
+
+	// 2) 企业微信客服：当前环境唤不起时跳过；唤起失败的异步回调里继续降级
+	if (hasWecom(cfg) && canOpenWecom()) {
+		openWecom(cfg.serviceCorpId, cfg.serviceKfidUrl, () => {
+			if (hasPopupChannel(cfg)) {
+				onShowPopup()
+			} else {
+				uni.showToast({ title: '客服打开失败，请稍后重试', icon: 'none' })
+			}
+		})
 		return
 	}
-	if (channel == CS_CHANNEL_WECOM) {
-		openWecom(cfg.serviceCorpId, cfg.serviceKfidUrl)
-		return
-	}
-	if (channel == CS_CHANNEL_POPUP) {
+
+	// 3) 手机号 / 二维码弹框
+	if (hasPopupChannel(cfg)) {
 		onShowPopup()
+		return
+	}
+
+	// 4) 绝不静默返回：只复制过链接时 openUrl 已给过 toast，不再重复提示
+	if (hasJump) {
+		return
+	}
+	if (hasWecom(cfg)) {
+		// 配置了企微但当前环境唤不起（外部浏览器 / App WebView）
+		uni.showToast({ title: '请在微信内打开以联系在线客服', icon: 'none' })
+	} else {
+		uni.showToast({ title: '暂未配置客服，请联系管理员', icon: 'none' })
 	}
 }
 
@@ -204,8 +242,13 @@ function openUrl(url: string): void {
 	// #endif
 }
 
-/** 唤起企业微信客服 */
-function openWecom(corpId: string, kfidUrl: string): void {
+/**
+ * 唤起企业微信客服。
+ *
+ * <p>小程序必须由用户 TAP 同步调用；H5 是整页跳转、没有 fail 回调，
+ * 故 onFail 只在小程序分支生效。</p>
+ */
+function openWecom(corpId: string, kfidUrl: string, onFail: () => void): void {
 	// #ifdef MP-WEIXIN
 	// @ts-ignore 仅微信小程序提供该 API
 	if (typeof uni.openCustomerServiceChat === 'function') {
@@ -216,19 +259,13 @@ function openWecom(corpId: string, kfidUrl: string): void {
 				url: kfidUrl
 			},
 			fail: (res: any) => {
-				// 失败（如企微后台未绑定该小程序）不静默：给出可执行提示
+				// 企微后台未绑定小程序 / 客服账号停用 / 基础库过低：继续降级
 				console.log('打开企业微信客服失败', res)
-				uni.showToast({
-					title: '客服打开失败，请稍后重试',
-					icon: 'none'
-				})
+				onFail()
 			}
 		})
 	} else {
-		uni.showToast({
-			title: '当前环境暂不支持企业微信客服',
-			icon: 'none'
-		})
+		onFail()
 	}
 	// #endif
 
