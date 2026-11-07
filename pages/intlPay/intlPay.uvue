@@ -29,14 +29,16 @@
 		<text class="section">{{ $t('paymentMethod') }}</text>
 		<view class="method-card">
 			<view
-				v-for="item in options"
+				v-for="(item, index) in options"
 				:key="item.value"
 				class="method"
 				:class="{ selected: selected == item.value }"
 				@click="selectMethod(item.value)"
 			>
 				<view class="method-left">
-					<image v-if="item.logoUrl" :src="item.logoUrl" mode="aspectFit" class="logo"></image>
+					<!-- 私有桶签名地址过期时重建图片并回源换地址；同秒重签 URL 可能相同，必须靠 key -->
+					<image v-if="item.logoUrl" :key="'pay-logo-' + String(index) + '-' + String(logoRetryKey)"
+						:src="item.logoUrl" mode="aspectFit" class="logo" @error="onLogoError"></image>
 					<view class="method-text">
 						<text class="mlabel">{{ item.label }}</text>
 						<text v-if="item.desc" class="mdesc">{{ item.desc }}</text>
@@ -68,6 +70,11 @@
 	const orderDetail = ref<any>(null)
 	const options = ref<Array<any>>([])
 	const selected = ref<string>('')
+	// 图片加载失败重试：递增 key 强制重建 <image>，防抖避免多张图同时 403 打 N 次接口
+	const logoRetryKey = ref(0)
+	let logoRefreshing = false
+	// 自动重拉上限：OSS 持续不可用或同秒重签 URL 相同时，避免无限打接口
+	let logoRetryCount = 0
 
 	onLoad((opt: UTSJSONObject) => {
 		const options = opt as any
@@ -112,9 +119,51 @@
 			uni.hideLoading()
 			uni.showToast({ title: t('dataLoadFailed'), icon: 'none' })
 		}
-	}
+		}
 
-	const selectMethod = (value: string) => {
+		/**
+		* 只刷新支付方式图标地址：不重建 selected，避免用户已选渠道被悄悄改回第一项。
+		* 后端每次下发都会重新签发 7 天私有链接。
+		*/
+		const refreshPayTypeLogos = async () => {
+		if (logoRefreshing) return
+		logoRefreshing = true
+		try {
+			const res = await queryOrderIntl(orderId.value)
+			if (res.code != 200 || res.data == null) return
+			const payTypeVos = res.data.payTypeVos || []
+			const urlById = new Map<string, string>()
+			payTypeVos.forEach((item: any) => {
+				// 显式转 String：UTS 编译到 App 时 any 直接写入 Map<string,string> 可能类型不匹配
+				urlById.set(String(item.payTypeId), String(item.logoUrl ?? ''))
+			})
+			options.value = options.value.map((item: any) => {
+				const fresh = urlById.get(String(item.value)) ?? ''
+				return {
+					label: item.label,
+					value: item.value,
+					desc: item.desc,
+					// 后端偶发返回空值时保留原图标，否则 v-if 会让图片消失且不再触发 @error
+					logoUrl: fresh.length > 0 ? fresh : item.logoUrl
+				}
+			})
+		} catch (error) {
+			console.error('刷新支付方式图标失败:', error)
+		} finally {
+			logoRefreshing = false
+		}
+		}
+
+		const onLogoError = () => {
+		// 上限后不再递增 key，避免「重建→失败→再重建」的无限循环
+		if (logoRefreshing || logoRetryCount >= 3) return
+		// 同一秒重签可能返回完全相同的 URL，不递增 key 微信会复用失败缓存
+		logoRetryKey.value++
+		logoRetryCount++
+		void refreshPayTypeLogos()
+		}
+
+		const selectMethod = (value: string) => {
 		selected.value = value
 	}
 

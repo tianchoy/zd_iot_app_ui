@@ -50,7 +50,10 @@
 					</view>
 					<view class="message-content">{{ item.replyContent }}</view>
 					<view class="message-images" v-if="getImageUrls(item.imgOssUrl).length > 0">
-						<image class="msg-image" v-for="(img, imgIndex) in getImageUrls(item.imgOssUrl)" :key="imgIndex" :src="img" mode="aspectFill" @click="previewImage(img, item.imgOssUrl)"></image>
+						<!-- 私有桶签名地址过期时重建图片并回源换地址；同秒重签 URL 可能相同，必须靠 key -->
+					<image class="msg-image" v-for="(img, imgIndex) in getImageUrls(item.imgOssUrl)"
+						:key="'fb-img-' + String(imgIndex) + '-' + String(imageRetryKey)" :src="img" mode="aspectFill"
+						@error="onImageError" @click="previewImage(img, item.imgOssUrl)"></image>
 					</view>
 				</view>
 			</view>
@@ -157,6 +160,11 @@
 	const replyContent = ref('')
 	const replyImages = ref<string[]>([])
 	const replyLoading = ref(false)
+	// 回复图加载失败重试：递增 key 强制重建 <image>，防抖避免多张图同时 403 打 N 次接口
+	const imageRetryKey = ref(0)
+	let imageRefreshing = false
+	// 自动重拉上限：避免 OSS 持续不可用或同秒重签 URL 相同时无限打接口
+	let imageRetryCount = 0
 
 	// 获取状态标签类型
 	const getStatusType = (status: string): string => {
@@ -193,6 +201,29 @@
 		} catch (error) {
 			console.error('查询详情异常:', error)
 		}
+	}
+
+	/**
+	 * 重新拉详情换新签名地址；「继续反馈」弹窗打开时不自动重拉，
+	 * 避免把用户正在输入的草稿冲掉（此时只靠 key 重建图片）。
+	 */
+	const refreshImages = async () => {
+		if (showReplyPopup.value || imageRefreshing) return
+		imageRefreshing = true
+		try {
+			await loadDetail()
+		} finally {
+			imageRefreshing = false
+		}
+	}
+
+	const onImageError = () => {
+		// 弹窗打开（保草稿）、刷新中、超过上限都不再重建，避免无限循环
+		if (showReplyPopup.value || imageRefreshing || imageRetryCount >= 3) return
+		// 同一秒重签可能返回完全相同的 URL，不递增 key 微信会复用失败缓存
+		imageRetryKey.value++
+		imageRetryCount++
+		void refreshImages()
 	}
 
 	const getImageUrls = (urls: string): string[] => {

@@ -171,7 +171,8 @@
 	<customerServicePopup v-model:show="showCustomService" :qrcode="customerServiceConfig.serviceQrcode"
 		:phones="phoneList" :wechatTip="$t('addWechatTip')"
 		:phoneLabel="$t('servicePhone')" :callText="$t('makeCall')"
-		:serviceTime="customerServiceConfig.serviceTime"></customerServicePopup>
+		:serviceTime="customerServiceConfig.serviceTime"
+		@qrcodeError="refreshCustomerService"></customerServicePopup>
 </template>
 
 <script setup lang="uts">
@@ -1056,6 +1057,12 @@
 
 	const cardNumber = ref<string>('')
 	const country = ref<string>('')
+
+	// 二维码是 7 天有效的私有桶签名地址：加载失败时重新拉卡详情换一条新地址
+	const refreshCustomerService = () => {
+		void getCardDetail(cardNumber.value, country.value)
+	}
+
 	onLoad((options: UTSJSONObject) => {
 		console.log('options:', options)
 		const opt = options as any

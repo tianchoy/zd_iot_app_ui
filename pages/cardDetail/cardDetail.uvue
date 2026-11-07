@@ -135,7 +135,8 @@
 		<customer-service v-if="hasCustomerService" :config="customerServiceConfig"
 			@show_popup="showCustomerServicePopup = true"></customer-service>
 		<customerServicePopup v-model:show="showCustomerServicePopup" :qrcode="customerServiceConfig.serviceQrcode"
-			:phones="csPhones" :serviceTime="customerServiceConfig.serviceTime"></customerServicePopup>
+			:phones="csPhones" :serviceTime="customerServiceConfig.serviceTime"
+			@qrcodeError="refreshCustomerService"></customerServicePopup>
 	</view>
 </template>
 
@@ -233,6 +234,11 @@
 				setStorageSync('lastRechargeNo', lastCard)
 			}
 		}
+	}
+
+	// 二维码是 7 天有效的私有桶签名地址：加载失败时重新拉卡详情换一条新地址
+	const refreshCustomerService = () => {
+		void getCardDetail()
 	}
 
 	// 查询订单列表Xcx
